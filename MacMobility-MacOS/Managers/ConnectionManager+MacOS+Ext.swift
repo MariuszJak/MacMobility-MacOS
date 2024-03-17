@@ -28,6 +28,16 @@ struct RunningAppData: Codable, Equatable, Identifiable {
     let imageData: Data?
 }
 
+struct RunningAppResponse: Codable {
+    let applicationsTitle: String
+    let runningApps: [RunningAppData]
+}
+
+struct WebpagesResponse: Codable {
+    let webpagesTitle: String
+    let webpages: [WebpageItem]
+}
+
 extension ConnectionManager: ConnectionSenable {
     var mouseLocation: NSPoint { NSEvent.mouseLocation }
     
@@ -35,11 +45,12 @@ extension ConnectionManager: ConnectionSenable {
         self.observers = [
             NSWorkspace.shared.observe(\.runningApplications) { workspace, apps in
                 let apps = self.getRunningApps()
-                guard self.runningApps != apps else {
+                guard self.runningApps != apps, !apps.isEmpty else {
                     return
                 }
                 self.runningApps = apps
                 self.send(runningApps: apps)
+                self.send(webpages: self.webpages)
             }
         ]
     }
@@ -51,10 +62,29 @@ extension ConnectionManager: ConnectionSenable {
                                          imageData: try? $0.icon?.imageData(for: .png(scale: 1.0,
                                                                                       excludeGPSData: false))) }
     }
+    
+    
+//    func send(runningApps: AllAppData) {
+//        guard !session.connectedPeers.isEmpty,
+//              let data = try? JSONEncoder().encode(runningApps) else {
+//            return
+//        }
+//        send(data)
+//    }
 
     func send(runningApps: [RunningAppData]) {
+        let payload = RunningAppResponse(applicationsTitle: "applicationsTitle", runningApps: runningApps)
         guard !session.connectedPeers.isEmpty,
-              let data = try? JSONEncoder().encode(runningApps) else {
+              let data = try? JSONEncoder().encode(payload) else {
+            return
+        }
+        send(data)
+    }
+    
+    func send(webpages: [WebpageItem]) {
+        let payload = WebpagesResponse(webpagesTitle: "webpagesTitle", webpages: webpages)
+        guard !session.connectedPeers.isEmpty,
+              let data = try? JSONEncoder().encode(payload) else {
             return
         }
         send(data)
@@ -63,14 +93,8 @@ extension ConnectionManager: ConnectionSenable {
 
 extension ConnectionManager {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if let position = try? JSONDecoder().decode(CursorPosition.self, from: data) {
-            moveCursor(onDisplay: mainDisplayID(),
-                       toPoint: CGPoint(x: position.width,
-                                        y: position.height))
-            return
-        }
-        if let mouseScroll = try? JSONDecoder().decode(MouseScroll.self, from: data) {
-            scrollMouse(onPoint: .init(x: mouseScroll.offsetX, y: mouseScroll.offsetY), xLines: 1, yLines: -1)
+        if let webpageItem = try? JSONDecoder().decode(WebpageItem.self, from: data) {
+            openWebPage(for: webpageItem)
             return
         }
         if let string = String(data: data, encoding: .utf8),
@@ -86,10 +110,22 @@ extension ConnectionManager {
         } else if let string = String(data: data, encoding: .utf8) {
             if string == "Connected - send data." {
                 self.send(runningApps: self.runningApps)
+                self.send(webpages: self.webpages)
             } else {
                 focusToApp(string)
             }
         }
+    }
+    
+    func openWebPage(for webpageItem: WebpageItem) {
+        guard let url = NSURL(string: webpageItem.webpageLink) as? URL else {
+            return
+        }
+        NSWorkspace.shared.open([url],
+                                withAppBundleIdentifier: webpageItem.browser.bundleIdentifier,
+                                options: NSWorkspace.LaunchOptions.default,
+                                additionalEventParamDescriptor: nil,
+                                launchIdentifiers: nil)
     }
     
     public func mainDisplayID() -> CGDirectDisplayID {

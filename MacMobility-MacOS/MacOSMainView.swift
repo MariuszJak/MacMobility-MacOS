@@ -8,6 +8,7 @@
 import SwiftUI
 import QRCode
 import os
+import WebKit
 
 enum WorkspaceControl: String, CaseIterable {
     case prev, next
@@ -29,7 +30,7 @@ struct MacOSMainPopoverView: View {
                 HStack(alignment: .top, spacing: spacing * 2) {
                     VStack(alignment: .leading, spacing: spacing) {
                         permissionView
-                        //testWindowButtonView
+                        webpagestWindowButtonView
                         pairiningView
                         if connectionManager.isConnecting {
                             Spacer()
@@ -52,7 +53,7 @@ struct MacOSMainPopoverView: View {
         }
     }
     
-    private func openTestWindow() {
+    private func openWebpagesWindow() {
         if nil == newWindow {
             newWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
@@ -63,7 +64,7 @@ struct MacOSMainPopoverView: View {
             newWindow?.center()
             newWindow?.setFrameAutosaveName("Preferences")
             newWindow?.isReleasedWhenClosed = false
-            newWindow?.contentView = NSHostingView(rootView: AutomationsWindowView(connectionManager: connectionManager))
+            newWindow?.contentView = NSHostingView(rootView: WebpagesWindowView(connectionManager: connectionManager))
         }
         newWindow?.makeKeyAndOrderFront(nil)
     }
@@ -102,9 +103,9 @@ struct MacOSMainPopoverView: View {
         .disabled(AXIsProcessTrusted())
     }
     
-    private var testWindowButtonView: some View {
-        Button("Test window") {
-            openTestWindow()
+    private var webpagestWindowButtonView: some View {
+        Button("Webpages") {
+            openWebpagesWindow()
         }
     }
     
@@ -145,163 +146,4 @@ struct MacOSMainPopoverView: View {
         guard let generated = doc.cgImage(CGSize(width: 800, height: 800)) else { return nil }
         return NSImage(cgImage: generated, size: .init(width: 80, height: 80))
     }
-}
-
-
-extension View {
-    @ViewBuilder
-    func `if`<Content: View>(_ conditional: Bool, content: (Self) -> Content) -> some View {
-        if conditional {
-            content(self)
-        } else {
-            self
-        }
-    }
-}
-
-struct AutomationsWindowView: View {
-    @State private var newWindow: NSWindow?
-    @StateObject var viewModel = AutomationsWindowViewModel()
-    let connectionManager: ConnectionManager
-    
-    init(connectionManager: ConnectionManager) {
-        self.connectionManager = connectionManager
-    }
-    
-    var body: some View {
-        NavigationView {
-            List {
-                ForEach(connectionManager.getRunningApps()) { app in
-                    NavigationLink(app.id, tag: app.id, selection: $viewModel.selectedId) {
-                        linkPage(for: app.title)
-                    }
-                }
-            }
-            .listStyle(.sidebar)
-            Text("No selection")
-        }
-    }
-    
-    @ViewBuilder
-    private func linkPage(for application: String) -> some View {
-        let automations = viewModel.getAutomations(for: application)
-        if automations.isEmpty {
-            Text("No automations. Press '+' to add new one.")
-                .navigationTitle(application)
-            Button {
-                openCreateNewAutomationWindow(for: application)
-            } label: {
-                Image("plus")
-            }
-        } else {
-            List(automations) { automation in
-                Text(automation.title)
-            }
-            HStack {
-                Button {
-                    openCreateNewAutomationWindow(for: application)
-                } label: {
-                    Image("plus")
-                }
-                Spacer()
-            }
-            .padding()
-        }
-    }
-    
-    private func openCreateNewAutomationWindow(for application: String) {
-        if nil == newWindow {
-            newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
-            newWindow?.center()
-            newWindow?.setFrameAutosaveName("Preferences")
-            newWindow?.isReleasedWhenClosed = false
-            newWindow?.contentView = NSHostingView(rootView: NewAutomationView(parentApp: application,
-                                                                               delegate: viewModel))
-            viewModel.close = {
-                newWindow?.close()
-            }
-        }
-        newWindow?.makeKeyAndOrderFront(nil)
-    }
-}
-
-protocol AutomationsWindowDelegate: AnyObject {
-    func saveAutomation(with automationItem: AutomationItem)
-    var close: () -> Void { get }
-}
-
-struct NewAutomationView: View {
-    @ObservedObject var viewModel = NewAutomationViewModel()
-    let parentApp: String
-    weak var delegate: AutomationsWindowDelegate?
-    
-    init(parentApp: String, delegate: AutomationsWindowDelegate?) {
-        self.parentApp = parentApp
-        self.delegate = delegate
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Automation title:")
-            TextField("", text: $viewModel.title)
-            Text("Automation:")
-            TextEditor(text: $viewModel.automationText)
-                .frame(height: 200.0)
-            Button {
-                delegate?.saveAutomation(with: .init(parentApp: parentApp,
-                                                     title: viewModel.title,
-                                                     automationText: viewModel.automationText))
-                viewModel.clear()
-                delegate?.close()
-                
-            } label: {
-                Text("Save")
-            }
-        }
-        .padding()
-    }
-}
-
-
-struct ViewHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat { 0 }
-    static func reduce(value: inout Value, nextValue: () -> Value) {
-        value = value + nextValue()
-    }
-}
-
-class NewAutomationViewModel: ObservableObject {
-    @Published var title: String = ""
-    @Published var automationText: String = ""
-    
-    func clear() {
-        title = ""
-        automationText = ""
-    }
-}
-
-class AutomationsWindowViewModel: ObservableObject, AutomationsWindowDelegate {
-    @Published var selectedId: String?
-    @Published var automations: [AutomationItem] = []
-    var close: () -> Void = {}
-    
-    func getAutomations(for application: String) -> [AutomationItem] {
-        self.automations.filter { $0.parentApp == application }
-    }
-    
-    func saveAutomation(with automationItem: AutomationItem) {
-        automations.append(automationItem)
-    }
-}
-
-struct AutomationItem: Identifiable {
-    var id: String { UUID().uuidString }
-    var parentApp: String
-    var title: String
-    var automationText: String
 }

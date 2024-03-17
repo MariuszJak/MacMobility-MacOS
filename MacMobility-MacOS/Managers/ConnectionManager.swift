@@ -36,6 +36,11 @@ class ConnectionManager: NSObject, ObservableObject {
     public let session: MCSession
     public let log = Logger()
     public var runningApps: [RunningAppData] = []
+    public var webpages: [WebpageItem] = [] {
+        didSet {
+            self.send(webpages: webpages)
+        }
+    }
     public var observers = [NSKeyValueObservation]()
     public var subscriptions = Set<AnyCancellable>()
     public var isUpdating = false
@@ -54,6 +59,7 @@ class ConnectionManager: NSObject, ObservableObject {
         super.init()
 
         runningApps = getRunningApps()
+        webpages = UserDefaults.standard.getWebItems() ?? []
         subscribeForRunningApps()
 
         session.delegate = self

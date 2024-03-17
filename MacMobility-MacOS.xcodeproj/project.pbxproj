@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
 		C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */; };
 		C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775332B5C319E00F4FFE6 /* Assets.xcassets */; };
 		C09775372B5C319E00F4FFE6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775362B5C319E00F4FFE6 /* Preview Assets.xcassets */; };
@@ -20,8 +21,12 @@
 		C09775662B5C31EE00F4FFE6 /* MacOSMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09775642B5C31EE00F4FFE6 /* MacOSMainView.swift */; };
 		C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09775652B5C31EE00F4FFE6 /* AppleScriptCommandable.swift */; };
 		C09775692B5C329300F4FFE6 /* scriptnext.scpt in Resources */ = {isa = PBXBuildFile; fileRef = C09775682B5C329300F4FFE6 /* scriptnext.scpt */; };
-		C097756D2B5C334000F4FFE6 /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C097756C2B5C334000F4FFE6 /* QRCode */; };
 		C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */; };
+		C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037002BA37FAC00BFBD2A /* WebpagesWindowView.swift */; };
+		C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037022BA37FD400BFBD2A /* Browsers.swift */; };
+		C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */; };
+		C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */; };
+		C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +66,11 @@
 		C09775682B5C329300F4FFE6 /* scriptnext.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scriptnext.scpt; sourceTree = "<group>"; };
 		C097756A2B5C32AA00F4FFE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionSenable.swift; sourceTree = "<group>"; };
+		C0E037002BA37FAC00BFBD2A /* WebpagesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpagesWindowView.swift; sourceTree = "<group>"; };
+		C0E037022BA37FD400BFBD2A /* Browsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Browsers.swift; sourceTree = "<group>"; };
+		C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWebpageView.swift; sourceTree = "<group>"; };
+		C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Ext.swift"; sourceTree = "<group>"; };
+		C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Ext.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,7 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C097756D2B5C334000F4FFE6 /* QRCode in Frameworks */,
+				C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,6 +99,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C091AD242BA4D93000C8DC8D /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				C09775652B5C31EE00F4FFE6 /* AppleScriptCommandable.swift */,
+				C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */,
+				C097755E2B5C31D700F4FFE6 /* ConnectionManager.swift */,
+				C09775602B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift */,
+				C09775612B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		C091AD282BA4E14700C8DC8D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		C09775232B5C319D00F4FFE6 = {
 			isa = PBXGroup;
 			children = (
@@ -96,6 +125,7 @@
 				C09775402B5C319E00F4FFE6 /* MacMobility-MacOSTests */,
 				C097754A2B5C319E00F4FFE6 /* MacMobility-MacOSUITests */,
 				C097752D2B5C319D00F4FFE6 /* Products */,
+				C091AD282BA4E14700C8DC8D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -112,14 +142,11 @@
 		C097752E2B5C319D00F4FFE6 /* MacMobility-MacOS */ = {
 			isa = PBXGroup;
 			children = (
+				C091AD242BA4D93000C8DC8D /* Managers */,
+				C0E037072BA3801F00BFBD2A /* Extensions */,
+				C0E037042BA37FE400BFBD2A /* Webpages */,
 				C097756A2B5C32AA00F4FFE6 /* Info.plist */,
-				C097755B2B5C31CA00F4FFE6 /* Array+Ext.swift */,
 				C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */,
-				C09775602B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift */,
-				C09775612B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift */,
-				C097755E2B5C31D700F4FFE6 /* ConnectionManager.swift */,
-				C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */,
-				C09775652B5C31EE00F4FFE6 /* AppleScriptCommandable.swift */,
 				C09775642B5C31EE00F4FFE6 /* MacOSMainView.swift */,
 				C09775332B5C319E00F4FFE6 /* Assets.xcassets */,
 				C09775682B5C329300F4FFE6 /* scriptnext.scpt */,
@@ -154,6 +181,26 @@
 			path = "MacMobility-MacOSUITests";
 			sourceTree = "<group>";
 		};
+		C0E037042BA37FE400BFBD2A /* Webpages */ = {
+			isa = PBXGroup;
+			children = (
+				C0E037022BA37FD400BFBD2A /* Browsers.swift */,
+				C0E037002BA37FAC00BFBD2A /* WebpagesWindowView.swift */,
+				C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */,
+			);
+			path = Webpages;
+			sourceTree = "<group>";
+		};
+		C0E037072BA3801F00BFBD2A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				C097755B2B5C31CA00F4FFE6 /* Array+Ext.swift */,
+				C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */,
+				C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -171,7 +218,7 @@
 			);
 			name = "MacMobility-MacOS";
 			packageProductDependencies = (
-				C097756C2B5C334000F4FFE6 /* QRCode */,
+				C091AD2E2BA4E1D000C8DC8D /* QRCode */,
 			);
 			productName = "MacMobility-MacOS";
 			productReference = C097752C2B5C319D00F4FFE6 /* MacMobility-MacOS.app */;
@@ -246,7 +293,7 @@
 			);
 			mainGroup = C09775232B5C319D00F4FFE6;
 			packageReferences = (
-				C097756B2B5C334000F4FFE6 /* XCRemoteSwiftPackageReference "qrcode" */,
+				C091AD2D2BA4E1D000C8DC8D /* XCRemoteSwiftPackageReference "qrcode" */,
 			);
 			productRefGroup = C097752D2B5C319D00F4FFE6 /* Products */;
 			projectDirPath = "";
@@ -291,13 +338,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */,
 				C097755D2B5C31CA00F4FFE6 /* Array+Ext.swift in Sources */,
 				C097755F2B5C31D700F4FFE6 /* ConnectionManager.swift in Sources */,
+				C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */,
 				C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
 				C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */,
 				C09775632B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift in Sources */,
+				C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */,
 				C09775662B5C31EE00F4FFE6 /* MacOSMainView.swift in Sources */,
+				C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */,
+				C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */,
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -631,20 +683,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C097756B2B5C334000F4FFE6 /* XCRemoteSwiftPackageReference "qrcode" */ = {
+		C091AD2D2BA4E1D000C8DC8D /* XCRemoteSwiftPackageReference "qrcode" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dagronf/qrcode.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 17.0.0;
+				minimumVersion = 18.3.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C097756C2B5C334000F4FFE6 /* QRCode */ = {
+		C091AD2E2BA4E1D000C8DC8D /* QRCode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C097756B2B5C334000F4FFE6 /* XCRemoteSwiftPackageReference "qrcode" */;
+			package = C091AD2D2BA4E1D000C8DC8D /* XCRemoteSwiftPackageReference "qrcode" */;
 			productName = QRCode;
 		};
 /* End XCSwiftPackageProductDependency section */
