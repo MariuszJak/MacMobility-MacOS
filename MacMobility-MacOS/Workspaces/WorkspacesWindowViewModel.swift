@@ -42,8 +42,8 @@ class WorkspacesWindowViewModel: ObservableObject, WorkspaceWindowDelegate {
         UserDefaults.standard.storeWorkspaceItems(workspaces)
     }
     
-    func removeWebPageItem(with webpageItem: WebpageItem) {
-        workspaces = workspaces.filter { $0.id != webpageItem.id }
+    func removeWorkspace(with item: WorkspaceItem) {
+        workspaces = workspaces.filter { $0.id != item.id }
         connectionManager.workspaces = workspaces
         UserDefaults.standard.storeWorkspaceItems(workspaces)
     }
