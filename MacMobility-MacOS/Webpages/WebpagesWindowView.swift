@@ -85,6 +85,15 @@ struct WebpagesWindowView: View {
         newWindow?.makeKeyAndOrderFront(nil)
     }
     
+    public func toggleWebpagesWindow() {
+        guard let allBrowserwWindow else { return }
+        if allBrowserwWindow.isVisible {
+            allBrowserwWindow.orderOut(nil)
+        } else {
+            openAllWebpageWindow()
+        }
+    }
+    
     private func openAllWebpageWindow() {
         if nil == allBrowserwWindow {
             allBrowserwWindow = NSWindow(
@@ -93,6 +102,7 @@ struct WebpagesWindowView: View {
                 backing: .buffered,
                 defer: false
             )
+            allBrowserwWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
             allBrowserwWindow?.center()
             allBrowserwWindow?.setFrameAutosaveName("AllWebpages")
             allBrowserwWindow?.isReleasedWhenClosed = false

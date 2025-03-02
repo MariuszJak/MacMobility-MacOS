@@ -41,6 +41,11 @@ class ConnectionManager: NSObject, ObservableObject {
             self.send(webpages: webpages)
         }
     }
+    public var workspaces: [WorkspaceItem] = [] {
+        didSet {
+            self.send(workspaces: workspaces)
+        }
+    }
     public var observers = [NSKeyValueObservation]()
     public var subscriptions = Set<AnyCancellable>()
     public var isUpdating = false
@@ -60,6 +65,7 @@ class ConnectionManager: NSObject, ObservableObject {
 
         runningApps = getRunningApps()
         webpages = UserDefaults.standard.getWebItems() ?? []
+        workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
         subscribeForRunningApps()
 
         session.delegate = self

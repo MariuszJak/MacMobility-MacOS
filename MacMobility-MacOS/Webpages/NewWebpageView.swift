@@ -85,6 +85,7 @@ struct AllWebpagesView: View {
                                        content: { image in
                                 image
                                     .resizable()
+                                    .scaledToFit()
                                     .cornerRadius(Constants.cornerRadius)
                                     .frame(width: Constants.imageSize, height: Constants.imageSize)
                             }, placeholder: {
@@ -117,11 +118,9 @@ struct AllWebpagesView: View {
         guard let url = NSURL(string: webpageItem.webpageLink) as? URL else {
             return
         }
-        NSWorkspace.shared.open([url],
-                                withAppBundleIdentifier: webpageItem.browser.bundleIdentifier,
-                                options: NSWorkspace.LaunchOptions.default,
-                                additionalEventParamDescriptor: nil,
-                                launchIdentifiers: nil)
+        NSWorkspace.shared.open(url, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+            if let error { print(error) }
+        }
     }
 }
 

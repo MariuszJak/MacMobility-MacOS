@@ -38,6 +38,11 @@ struct WebpagesResponse: Codable {
     let webpages: [WebpageItem]
 }
 
+struct WorkspacesResponse: Codable {
+    let workspacesTitle: String
+    let workspaces: [WorkspaceSendableItem]
+}
+
 extension ConnectionManager: ConnectionSenable {
     var mouseLocation: NSPoint { NSEvent.mouseLocation }
     
@@ -51,6 +56,7 @@ extension ConnectionManager: ConnectionSenable {
                 self.runningApps = apps
                 self.send(runningApps: apps)
                 self.send(webpages: self.webpages)
+                self.send(workspaces: self.workspaces)
             }
         ]
     }
@@ -62,15 +68,6 @@ extension ConnectionManager: ConnectionSenable {
                                          imageData: try? $0.icon?.imageData(for: .png(scale: 1.0,
                                                                                       excludeGPSData: false))) }
     }
-    
-    
-//    func send(runningApps: AllAppData) {
-//        guard !session.connectedPeers.isEmpty,
-//              let data = try? JSONEncoder().encode(runningApps) else {
-//            return
-//        }
-//        send(data)
-//    }
 
     func send(runningApps: [RunningAppData]) {
         let payload = RunningAppResponse(applicationsTitle: "applicationsTitle", runningApps: runningApps)
@@ -89,12 +86,40 @@ extension ConnectionManager: ConnectionSenable {
         }
         send(data)
     }
+    
+    func send(workspaces: [WorkspaceItem]) {
+        let sendableWorkspaces: [WorkspaceSendableItem] = workspaces.map {
+            .init(id: $0.id, title: $0.title, apps: $0.apps.map {
+                .init(
+                    id: $0.id,
+                    name: $0.name,
+                    path: $0.path,
+                    imageData: try? NSWorkspace.shared.icon(forFile: $0.path).imageData(for: .png(scale: 0.2, excludeGPSData: false)))
+            })
+        }
+        let payload = WorkspacesResponse(workspacesTitle: "workspacesTitle", workspaces: sendableWorkspaces)
+        guard !session.connectedPeers.isEmpty,
+              let data = try? JSONEncoder().encode(payload) else {
+            return
+        }
+        send(data)
+    }
 }
 
 extension ConnectionManager {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let webpageItem = try? JSONDecoder().decode(WebpageItem.self, from: data) {
             openWebPage(for: webpageItem)
+            return
+        }
+        if let appItem = try? JSONDecoder().decode(AppSendableInfo.self, from: data) {
+            openApp(at: appItem.path)
+            return
+        }
+        if let workspaceItem = try? JSONDecoder().decode(WorkspaceSendableItem.self, from: data) {
+            workspaceItem.apps.forEach { app in
+                openApp(at: app.path)
+            }
             return
         }
         if let string = String(data: data, encoding: .utf8),
@@ -111,6 +136,7 @@ extension ConnectionManager {
             if string == "Connected - send data." {
                 self.send(runningApps: self.runningApps)
                 self.send(webpages: self.webpages)
+                self.send(workspaces: self.workspaces)
             } else {
                 focusToApp(string)
             }
@@ -121,11 +147,14 @@ extension ConnectionManager {
         guard let url = NSURL(string: webpageItem.webpageLink) as? URL else {
             return
         }
-        NSWorkspace.shared.open([url],
-                                withAppBundleIdentifier: webpageItem.browser.bundleIdentifier,
-                                options: NSWorkspace.LaunchOptions.default,
-                                additionalEventParamDescriptor: nil,
-                                launchIdentifiers: nil)
+        NSWorkspace.shared.open(url, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+            if let error { print(error) }
+        }
+    }
+    
+    func openApp(at path: String) {
+        let url = URL(fileURLWithPath: path)
+        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
     }
     
     public func mainDisplayID() -> CGDirectDisplayID {

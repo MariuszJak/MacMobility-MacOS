@@ -21,6 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     var popOver = NSPopover()
     var menuView: MacOSMainPopoverView?
+    var eventMonitor: Any?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         menuView = MacOSMainPopoverView()
@@ -31,11 +32,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let menuButton = statusItem?.button {
-            menuButton.image = NSImage(systemSymbolName: "rectangle.filled.and.hand.point.up.left",
-                                       accessibilityDescription: nil)
+            menuButton.image = NSImage(named: "app-icon")
             menuButton.action = #selector(menuAction)
         }
         NSApp.setActivationPolicy(.accessory)
+        startListeningForShortcut()
     }
     
     @objc
@@ -48,5 +49,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 popOver.contentViewController?.view.window?.makeKey()
             }
         }
+    }
+    
+    func startListeningForShortcut() {
+        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            if event.modifierFlags.contains(.control) && event.keyCode == 49 {
+                self?.toggleWindow()
+            }
+        }
+    }
+    
+    func toggleWindow() {
+//        menuView?.toggleWebpagesWindow()
     }
 }

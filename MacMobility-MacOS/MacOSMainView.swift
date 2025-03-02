@@ -17,6 +17,7 @@ enum WorkspaceControl: String, CaseIterable {
 struct MacOSMainPopoverView: View {
     @StateObject var connectionManager = ConnectionManager()
     @State private var newWindow: NSWindow?
+    @State private var workspacesWindow: NSWindow?
     @State var isAccessibilityGranted: Bool = false
     private var spacing = 6.0
     
@@ -31,6 +32,7 @@ struct MacOSMainPopoverView: View {
                     VStack(alignment: .leading, spacing: spacing) {
                         permissionView
                         webpagestWindowButtonView
+                        workspacesWindowButtonView
                         pairiningView
                         if connectionManager.isConnecting {
                             Spacer()
@@ -67,6 +69,35 @@ struct MacOSMainPopoverView: View {
             newWindow?.contentView = NSHostingView(rootView: WebpagesWindowView(connectionManager: connectionManager))
         }
         newWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openWorkspacesWindow() {
+        if nil == workspacesWindow {
+            workspacesWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 800, height: 700),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            workspacesWindow?.center()
+            workspacesWindow?.setFrameAutosaveName("Workspaces")
+            workspacesWindow?.isReleasedWhenClosed = false
+            workspacesWindow?.titlebarAppearsTransparent = true
+            workspacesWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: workspacesWindow) else {
+                return
+            }
+            
+            workspacesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: WorkspacesWindowView(connectionManager: connectionManager, closeAction: {
+                workspacesWindow?.close()
+            }))
+            workspacesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = workspacesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        workspacesWindow?.makeKeyAndOrderFront(nil)
     }
     
     private var qrCodeView: some View {
@@ -109,6 +140,12 @@ struct MacOSMainPopoverView: View {
         }
     }
     
+    private var workspacesWindowButtonView: some View {
+        Button("Workspaces") {
+            openWorkspacesWindow()
+        }
+    }
+    
     @ViewBuilder
     private var pairiningView: some View {
         switch connectionManager.pairingStatus {
@@ -145,5 +182,19 @@ struct MacOSMainPopoverView: View {
         let doc = QRCode.Document(utf8String: code, errorCorrection: .high)
         guard let generated = doc.cgImage(CGSize(width: 800, height: 800)) else { return nil }
         return NSImage(cgImage: generated, size: .init(width: 80, height: 80))
+    }
+}
+
+extension NSVisualEffectView {
+    public static func createVisualAppearance(for window: NSWindow?) -> NSVisualEffectView? {
+        guard let window else { return nil }
+        
+        let visualEffectView = NSVisualEffectView(frame: window.contentView?.bounds ?? .zero)
+        visualEffectView.autoresizingMask = [.width, .height]
+        visualEffectView.blendingMode = .behindWindow
+        visualEffectView.state = .active
+        visualEffectView.appearance = NSAppearance(named: .vibrantDark)
+        
+        return visualEffectView
     }
 }
