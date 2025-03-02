@@ -94,7 +94,7 @@ struct WorkspacesWindowView: View {
                     Divider()
                     if !viewModel.workspaces.isEmpty {
                         ScrollView {
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 8) {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 6) {
                                 ForEach(viewModel.workspaces) { workspace in
                                     VStack(alignment: .leading) {
                                         VStack(alignment: .leading) {
@@ -103,36 +103,43 @@ struct WorkspacesWindowView: View {
                                                     .lineLimit(1)
                                                     .font(.system(size: 16, weight: .bold))
                                                     .padding(.bottom, 8)
-                                                Spacer()
-                                                Image(systemName: "gear")
-                                                    .resizable()
-                                                    .frame(width: 16, height: 16)
-                                                    .onTapGesture {
-                                                        openCreateNewWorkspaceWindow(workspace)
-                                                    }
                                             }
-                                            HStack {
+                                            HStack(spacing: 4) {
                                                 ForEach(workspace.apps) { app in
                                                     Image(nsImage: NSWorkspace.shared.icon(forFile: app.path))
                                                         .resizable()
-                                                        .frame(width: 24, height: 24)
+                                                        .frame(width: 38, height: 38)
                                                         .cornerRadius(3)
                                                         .onTapGesture {
                                                             openApp(at: app.path)
                                                         }
                                                 }
                                             }
-                                            .padding(.bottom, 12.0)
+                                            .padding(.bottom, 20.0)
+                                            Divider()
                                             HStack {
-                                                Button("Launch All") {
-                                                    workspace.apps.forEach { app in
-                                                        openApp(at: app.path)
+                                                Image(systemName: "arrow.up.right.square")
+                                                    .resizable()
+                                                    .frame(width: 16, height: 16)
+                                                    .onTapGesture {
+                                                        workspace.apps.forEach { app in
+                                                            openApp(at: app.path)
+                                                        }
+                                                        closeAction()
                                                     }
-                                                    closeAction()
-                                                }
-                                                Button("Delete") {
-                                                    viewModel.removeWorkspace(with: workspace)
-                                                }
+                                                Image(systemName: "gear")
+                                                    .resizable()
+                                                    .frame(width: 16, height: 16)
+                                                    .onTapGesture {
+                                                        openCreateNewWorkspaceWindow(workspace)
+                                                    }
+                                                Image(systemName: "trash")
+                                                    .resizable()
+                                                    .frame(width: 16, height: 16)
+                                                    .onTapGesture {
+                                                        viewModel.removeWorkspace(with: workspace)
+                                                    }
+                                                Spacer()
                                             }
                                         }
                                         .padding(.all, 10)

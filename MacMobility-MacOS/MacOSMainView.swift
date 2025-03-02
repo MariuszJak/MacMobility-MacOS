@@ -58,15 +58,26 @@ struct MacOSMainPopoverView: View {
     private func openWebpagesWindow() {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 550),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             newWindow?.center()
-            newWindow?.setFrameAutosaveName("Preferences")
+            newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
-            newWindow?.contentView = NSHostingView(rootView: WebpagesWindowView(connectionManager: connectionManager))
+            newWindow?.titlebarAppearsTransparent = true
+            newWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
+                return
+            }
+            
+            newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: WebpagesWindowView(connectionManager: connectionManager))
+            newWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         }
         newWindow?.makeKeyAndOrderFront(nil)
     }
@@ -74,7 +85,7 @@ struct MacOSMainPopoverView: View {
     private func openWorkspacesWindow() {
         if nil == workspacesWindow {
             workspacesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 800, height: 550),
+                contentRect: NSRect(x: 0, y: 0, width: 1000, height: 550),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

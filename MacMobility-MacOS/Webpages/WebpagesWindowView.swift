@@ -18,44 +18,107 @@ struct WebpagesWindowView: View {
     @StateObject var viewModel = WebpagesWindowViewModel()
     let connectionManager: ConnectionManager
     
+    enum Constants {
+        static let imageSize = 46.0
+        static let cornerRadius = 6.0
+    }
+    
     init(connectionManager: ConnectionManager) {
         self.connectionManager = connectionManager
     }
     
     var body: some View {
         VStack {
-            List {
+            HStack {
                 Text("Webpages links")
-                ForEach(viewModel.webpages) { item in
-                    HStack {
-                        Text(item.webpageTitle)
-                        Spacer()
-                        Button(action: {
-                            openCreateNewWebpageWindow(item: item)
-                        }, label: {
-                            Text("Edit")
-                        })
-                        Button(action: {
-                            viewModel.removeWebPageItem(with: item)
-                        }, label: {
-                            Text("Delete")
-                        })
-                    }
-                }.onMove(perform: { from, to in
-                    viewModel.webpages.move(fromOffsets: from, toOffset: to)
-                    viewModel.saveWebpages()
-                })
+                    .font(.system(size: 16.0, weight: .bold))
+                    .padding([.horizontal, .top], 16)
                 Spacer()
-                Button(action: {
-                    openCreateNewWebpageWindow()
-                }, label: {
-                    Image("plus")
-                })
-                Button {
-                    openAllWebpageWindow()
-                } label: {
-                    Text("Open all webpages")
+                Image(systemName: "arrow.up.right.square")
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                    .onTapGesture {
+                        openAllWebpageWindow()
+                    }
+                    .padding(.top, 16.0)
+                    .padding(.trailing, 4.0)
+                Image(systemName: "plus.circle.fill")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        openCreateNewWebpageWindow()
+                    }
+                    .padding([.trailing, .top], 16.0)
+            }
+            Divider()
+            if viewModel.webpages.isEmpty {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        VStack {
+                            Text("No webpages found.")
+                                .font(.system(size: 24, weight: .medium))
+                                .padding(.bottom, 12.0)
+                            Button {
+                                openCreateNewWebpageWindow()
+                            } label: {
+                                Text("Add new one!")
+                                    .font(.system(size: 16.0))
+                            }
+                        }
+                        Spacer()
+                    }
+                    Spacer()
                 }
+            } else {
+                List {
+                    ForEach(viewModel.webpages) { item in
+                        HStack {
+                            if let link = item.faviconLink, let url = URL(string: link) {
+                                AsyncImage(url: url,
+                                           content: { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFit()
+                                        .cornerRadius(Constants.cornerRadius)
+                                        .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                }, placeholder: {
+                                    Image("Empty")
+                                        .resizable()
+                                        .cornerRadius(Constants.cornerRadius)
+                                        .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                })
+                                .cornerRadius(Constants.cornerRadius)
+                                .frame(width: Constants.imageSize, height: Constants.imageSize)
+                            }
+                            Text(item.webpageTitle)
+                            Spacer()
+                            Image(systemName: "gear")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                                .onTapGesture {
+                                    openCreateNewWebpageWindow(item: item)
+                                }
+                            
+                            Image(systemName: "trash")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                                .onTapGesture {
+                                    viewModel.removeWebPageItem(with: item)
+                                }
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 20.0)
+                                .fill(Color.black.opacity(0.4))
+                        )
+                    }.onMove(perform: { from, to in
+                        viewModel.webpages.move(fromOffsets: from, toOffset: to)
+                        viewModel.saveWebpages()
+                    })
+                }
+                .listStyle(.sidebar)
             }
         }
         .frame(minWidth: 400, minHeight: 200)
