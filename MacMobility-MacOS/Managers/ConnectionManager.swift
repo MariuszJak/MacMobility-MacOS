@@ -26,6 +26,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var invitationHandler: ((Bool, MCSession?) -> Void)?
     @Published var selectedWorkspace: WorkspaceControl?
     @Published var pairingStatus: PairingStatus = .notPaired
+    public var currentIndex = 0
     public let serviceType = "magic-trackpad"
     public var myPeerId: MCPeerID = {
         return MCPeerID(displayName: Host.current().name ?? "")

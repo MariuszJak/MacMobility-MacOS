@@ -60,10 +60,11 @@ protocol WorkspaceWindowDelegate: AnyObject {
     var close: () -> Void { get }
 }
 
-struct WorkspacesWindowView: View {
+struct WorkspacesWindowView: View, AppleScriptCommandable {
     @State private var newWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
     @State private var installedApps: [AppInfo] = []
+    @State var currentIndex = 0
     @StateObject var viewModel: WorkspacesWindowViewModel
     let connectionManager: ConnectionManager
     let closeAction: () -> Void
@@ -111,7 +112,8 @@ struct WorkspacesWindowView: View {
                                                         .frame(width: 38, height: 38)
                                                         .cornerRadius(3)
                                                         .onTapGesture {
-                                                            openApp(at: app.path)
+                                                            openApp(at: app.path, inNewWorkspace: false)
+                                                            closeAction()
                                                         }
                                                 }
                                             }
@@ -122,9 +124,8 @@ struct WorkspacesWindowView: View {
                                                     .resizable()
                                                     .frame(width: 16, height: 16)
                                                     .onTapGesture {
-                                                        workspace.apps.forEach { app in
-                                                            openApp(at: app.path)
-                                                        }
+                                                        currentIndex = 0
+                                                        recursivelyOpenMultipleApps(workspace)
                                                         closeAction()
                                                     }
                                                 Image(systemName: "gear")
@@ -182,9 +183,195 @@ struct WorkspacesWindowView: View {
         .padding()
     }
     
-    func openApp(at path: String) {
-        let url = URL(fileURLWithPath: path)
-        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
+    func recursivelyOpenMultipleApps(_ workspace: WorkspaceItem) {
+//        connectionManager.recursivelyOpenMultipleApps(workspace)
+        let limit = workspace.apps.count
+        
+        openApp(at: workspace.apps[currentIndex].path) {
+            currentIndex += 1
+            if currentIndex >= limit {
+                currentIndex = 0
+                return
+            }
+            recursivelyOpenMultipleApps(workspace)
+        }
+    }
+    
+    func openApp(at path: String, inNewWorkspace: Bool = true, completed: (() -> Void)? = nil) {
+//        connectionManager.openApp(at: path, inNewWorkspace: inNewWorkspace, completed: completed)
+        if inNewWorkspace {
+            createNewSpace()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                moveToNextWorkspace()
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                let url = URL(fileURLWithPath: path)
+                NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                if let bundleId = getBundleIdentifier(forAppAtPath: path) {
+                    waitForAppLaunch(bundleIdentifier: bundleId) { app in
+                        if let app, let appName = app.localizedName {
+                            resizeAppWindow(appName: appName, width: 1920, height: 1080)
+                        }
+                        completed?()
+                    }
+                }
+            }
+        } else {
+            let url = URL(fileURLWithPath: path)
+            NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
+        }
+    }
+    
+    func resizeAppWindow(appName: String, width: CGFloat, height: CGFloat) {
+//        connectionManager.resizeAppWindow(appName: appName, width: width, height: height)
+        if !isAppInCurrentSpace(appName: appName) {
+            switchToAppWorkspace(appName: appName)
+            sleep(1)
+        }
+        
+        let type = CGWindowListOption.optionOnScreenOnly
+        let windowList = CGWindowListCopyWindowInfo(type, kCGNullWindowID) as NSArray? as? [[String: AnyObject]]
+        
+        for entry  in windowList! {
+            let owner = entry[kCGWindowOwnerName as String] as! String
+            _ = entry[kCGWindowBounds as String] as? [String: Int]
+            let pid = entry[kCGWindowOwnerPID as String] as? Int32
+            
+            if owner == appName {
+                let appRef = AXUIElementCreateApplication(pid!)
+                
+                var value: AnyObject?
+                _ = AXUIElementCopyAttributeValue(appRef, kAXWindowsAttribute as CFString, &value)
+                
+                if let windowList = value as? [AXUIElement] { print ("windowList #\(windowList)")
+                    if let _ = windowList.first {
+                        var position : CFTypeRef
+                        var size : CFTypeRef
+                        var newPoint = CGPoint(x: 0, y: 0)
+                        var newSize = CGSize(width: width, height: height)
+                        
+                        position = AXValueCreate(AXValueType(rawValue: kAXValueCGPointType)!,&newPoint)!;
+                        AXUIElementSetAttributeValue(windowList.first!, kAXPositionAttribute as CFString, position);
+                        
+                        size = AXValueCreate(AXValueType(rawValue: kAXValueCGSizeType)!,&newSize)!;
+                        AXUIElementSetAttributeValue(windowList.first!, kAXSizeAttribute as CFString, size);
+                    }
+                }
+            }
+        }
+    }
+    
+    func moveToNextWorkspace() {
+//        connectionManager.moveToNextWorkspace()
+        let script = """
+        tell application "System Events" to key code 124 using {control down}
+        """
+        execute(script)
+    }
+    
+    func createNewSpace() {
+//        connectionManager.createNewSpace()
+        let script = """
+        do shell script "open -a 'Mission Control'"
+        delay 0.2
+        tell application "System Events" to ¬
+            click (every button whose value of attribute "AXDescription" is "add desktop") ¬
+                of UI element "Spaces Bar" of UI element 1 of group 1 of process "Dock"
+        delay 0.2
+        do shell script "open -a 'Mission Control'"
+        """
+        
+        execute(script)
+    }
+    
+    func getBundleIdentifier(forAppAtPath appPath: String) -> String? {
+//        connectionManager.getBundleIdentifier(forAppAtPath: appPath)
+        let appBundle = Bundle(path: appPath)
+        return appBundle?.bundleIdentifier
+    }
+    
+    func waitForAppLaunch(bundleIdentifier: String, completion: @escaping (NSRunningApplication?) -> Void) {
+//        connectionManager.waitForAppLaunch(bundleIdentifier: bundleIdentifier, completion: completion)
+        DispatchQueue.global(qos: .background).async {
+            while true {
+                if let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).first {
+                    DispatchQueue.main.async {
+                        completion(app)
+                    }
+                    return
+                }
+                usleep(500_000)
+            }
+        }
+    }
+    
+    func getAppWindows(appName: String) -> [AXUIElement] {
+//        connectionManager.getAppWindows(appName: appName)
+        let runningApps = NSWorkspace.shared.runningApplications
+        guard let app = runningApps.first(where: { $0.localizedName == appName }) else {
+            print("App not found")
+            return []
+        }
+
+        let appElement = AXUIElementCreateApplication(app.processIdentifier)
+        var value: AnyObject?
+        let result = AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &value)
+
+        if result != .success {
+            print("Failed to get windows")
+            return []
+        }
+
+        return value as? [AXUIElement] ?? []
+    }
+
+    func getWindowPosition(_ window: AXUIElement) -> CGPoint? {
+//        connectionManager.getWindowPosition(window)
+        var positionValue: AnyObject?
+        if AXUIElementCopyAttributeValue(window, kAXPositionAttribute as CFString, &positionValue) == .success {
+            var point = CGPoint()
+            let pos = positionValue as! AXValue
+            if AXValueGetValue(pos, AXValueType.cgPoint, &point) {
+                return point
+            }
+        }
+        return nil
+    }
+
+    // Check if the app is in the current space
+    func isAppInCurrentSpace(appName: String) -> Bool {
+//        connectionManager.isAppInCurrentSpace(appName: appName)
+        let windows = getAppWindows(appName: appName)
+        
+        for window in windows {
+            if let pos = getWindowPosition(window) {
+                let screens = NSScreen.screens
+                for screen in screens {
+                    if screen.frame.contains(pos) {
+                        print("\(appName) is in the current space.")
+                        return true
+                    }
+                }
+            }
+        }
+
+        print("\(appName) is NOT in the current space.")
+        return false
+    }
+    
+    func switchToAppWorkspace(appName: String) {
+//        connectionManager.switchToAppWorkspace(appName: appName)
+        let script = """
+        tell application "System Events"
+            tell process "\(appName)"
+                perform action "AXRaise" of window 1
+            end tell
+        end tell
+        """
+        
+        execute(script)
     }
     
     private func openCreateNewWorkspaceWindow(_ item: WorkspaceItem? = nil) {
