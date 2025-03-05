@@ -475,9 +475,11 @@ struct ScreenTypeContainer: Identifiable, Codable {
 }
 
 struct ScreenTypeView: View {
+    let id: String
     let screenType: ConfigurableScreenType
     let size: ConfigurableScreenTypeSize
     let addAction: ([ScreenTypeContainer]) -> Void
+    var removeAction: ((String) -> Void)?
     @State var apps: [ScreenTypeContainer]
     
     var screenSize: CGSize {
@@ -492,7 +494,16 @@ struct ScreenTypeView: View {
         }
     }
     
-    init(screenType: ConfigurableScreenType, size: ConfigurableScreenTypeSize, apps: [ScreenTypeContainer]?, addAction: @escaping ([ScreenTypeContainer]) -> Void) {
+    init(
+        id: String,
+        screenType: ConfigurableScreenType,
+        size: ConfigurableScreenTypeSize,
+        apps: [ScreenTypeContainer]?,
+        removeAction: ((String) -> Void)? = nil,
+        addAction: @escaping ([ScreenTypeContainer]) -> Void
+    ) {
+        self.id = id
+        self.removeAction = removeAction
         self.apps = apps ?? [.init(id: 0), .init(id: 1)]
         self.screenType = screenType
         self.size = size
@@ -500,13 +511,20 @@ struct ScreenTypeView: View {
     }
     
     var body: some View {
-        switch screenType {
-        case .singleScreen:
-            cell(index: 0)
-        case .splitScreenHorizontal:
-            HStack {
+        VStack {
+            switch screenType {
+            case .singleScreen:
                 cell(index: 0)
-                cell(index: 1)
+            case .splitScreenHorizontal:
+                HStack {
+                    cell(index: 0)
+                    cell(index: 1)
+                }
+            }
+            if let removeAction {
+                Button("Delete") {
+                    removeAction(id)
+                }
             }
         }
     }
@@ -590,37 +608,47 @@ class ConfigurableScreenViewModel: ObservableObject {
     @Published var screenType: ConfigurableScreenType = .singleScreen
     var apps: [ScreenTypeContainer]?
     var addAction: ([ScreenTypeContainer]) -> Void
+    var removeAction: (String) -> Void
     var cancellables = Set<AnyCancellable>()
     
-    init(apps: [ScreenTypeContainer]?, addAction: @escaping ([ScreenTypeContainer]) -> Void) {
+    init(apps: [ScreenTypeContainer]?, addAction: @escaping ([ScreenTypeContainer]) -> Void, removeAction: @escaping (String) -> Void) {
         self.apps = apps
         self.screenType = (apps?.filter { $0.app != nil }.count ?? 0) > 1 ? .splitScreenHorizontal : .singleScreen
         self.addAction = addAction
+        self.removeAction = removeAction
+    }
+    
+    func resetToSingleScreen() {
+        apps?[1] = .init(id: 1)
+        addAction(apps ?? [])
     }
 }
 
 struct ConfigurableScreenView: View {
     @StateObject var viewModel: ConfigurableScreenViewModel
+    private let id: String
     
-    init(viewModel: ConfigurableScreenViewModel) {
+    init(id: String, viewModel: ConfigurableScreenViewModel) {
         self._viewModel = .init(wrappedValue: viewModel)
+        self.id = id
     }
     
     var body: some View {
         VStack {
             HStack {
-                ScreenTypeView(screenType: viewModel.screenType, size: .medium, apps: viewModel.apps, addAction: viewModel.addAction)
+                ScreenTypeView(id: id, screenType: viewModel.screenType, size: .medium, apps: viewModel.apps, removeAction: viewModel.removeAction, addAction: viewModel.addAction)
                 VStack {
                     Button {
                         viewModel.screenType = .singleScreen
+                        viewModel.resetToSingleScreen()
                     } label: {
-                        ScreenTypeView(screenType: .singleScreen, size: .small, apps: nil, addAction: { _ in})
+                        ScreenTypeView(id: "1", screenType: .singleScreen, size: .small, apps: nil, addAction: { _ in})
                     }
                     .background(viewModel.screenType == .singleScreen ? Color.blue : Color.clear)
                     Button {
                         viewModel.screenType = .splitScreenHorizontal
                     } label: {
-                        ScreenTypeView(screenType: .splitScreenHorizontal, size: .small, apps: nil, addAction: { _ in })
+                        ScreenTypeView(id: "2", screenType: .splitScreenHorizontal, size: .small, apps: nil, addAction: { _ in })
                     }
                     .background(viewModel.screenType == .splitScreenHorizontal ? Color.blue : Color.clear)
                 }
@@ -639,7 +667,7 @@ class ScreenItem: Identifiable, Codable {
     let id: String
     var apps: [ScreenTypeContainer]
     
-    init(id: String, apps: [ScreenTypeContainer] = []) {
+    init(id: String, apps: [ScreenTypeContainer] = [.init(id: 0), .init(id: 1)]) {
         self.id = id
         self.apps = apps
     }
@@ -666,6 +694,10 @@ class CreateWorkspaceWithMultipleScreensViewModel: ObservableObject {
     
     func addNewScreen() {
         screens.append(.init(id: UUID().uuidString))
+    }
+    
+    func removeScreen(_ id: String) -> Void {
+        screens = screens.filter { $0.id != id }
     }
     
     func registerListener() {
@@ -761,7 +793,7 @@ struct CreateWorkspaceWithMultipleScreens: View {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 6) {
                     ForEach(viewModel.screens) { screen in
-                        ConfigurableScreenView(viewModel: .init(apps: screen.apps, addAction: screen.updateApps))
+                        ConfigurableScreenView(id: screen.id, viewModel: .init(apps: screen.apps, addAction: screen.updateApps, removeAction: viewModel.removeScreen))
                     }
                     AddNewScreenView {
                         viewModel.addNewScreen()
