@@ -42,9 +42,14 @@ class ConnectionManager: NSObject, ObservableObject {
             self.send(webpages: webpages)
         }
     }
-    public var workspaces: [WorkspaceItem] = [] {
+//    public var workspaces: [WorkspaceItem] = [] {
+//        didSet {
+//            self.send(workspaces: workspaces)
+//        }
+//    }
+    public var workspaces2: [WorkspaceItem2] = [] {
         didSet {
-            self.send(workspaces: workspaces)
+            self.send(workspaces: workspaces2)
         }
     }
     public var observers = [NSKeyValueObservation]()
@@ -66,7 +71,7 @@ class ConnectionManager: NSObject, ObservableObject {
 
         runningApps = getRunningApps()
         webpages = UserDefaults.standard.getWebItems() ?? []
-        workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
+        workspaces2 = UserDefaults.standard.getWorkspaceItems2() ?? []
         subscribeForRunningApps()
 
         session.delegate = self

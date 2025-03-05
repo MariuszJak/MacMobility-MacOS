@@ -23,6 +23,13 @@ struct WorkspaceItem: Identifiable, Codable {
     var id: String
     let title: String
     let apps: [AppInfo]
+    let size: CGSize?
+}
+
+struct WorkspaceItem2: Identifiable, Codable {
+    var id: String
+    let title: String
+    let screens: [ScreenItem]
 }
 
 // ---
@@ -56,13 +63,14 @@ struct WorkspaceSendableItem: Identifiable, Codable {
 // ---
 
 protocol WorkspaceWindowDelegate: AnyObject {
-    func saveWorkspace(with item: WorkspaceItem)
+    func saveWorkspace2(with item: WorkspaceItem2)
     var close: () -> Void { get }
 }
 
 struct WorkspacesWindowView: View, AppleScriptCommandable {
     @State private var newWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
+    @State private var inProgressWindow: NSWindow?
     @State private var installedApps: [AppInfo] = []
     @State var currentIndex = 0
     @StateObject var viewModel: WorkspacesWindowViewModel
@@ -93,10 +101,10 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                             .padding([.horizontal, .top], 16.0)
                     }
                     Divider()
-                    if !viewModel.workspaces.isEmpty {
+                    if !viewModel.workspaces2.isEmpty {
                         ScrollView {
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 6) {
-                                ForEach(viewModel.workspaces) { workspace in
+                                ForEach(viewModel.workspaces2) { workspace in
                                     VStack(alignment: .leading) {
                                         VStack(alignment: .leading) {
                                             HStack(alignment: .top) {
@@ -105,19 +113,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                                                     .font(.system(size: 16, weight: .bold))
                                                     .padding(.bottom, 8)
                                             }
-                                            HStack(spacing: 4) {
-                                                ForEach(workspace.apps) { app in
-                                                    Image(nsImage: NSWorkspace.shared.icon(forFile: app.path))
-                                                        .resizable()
-                                                        .frame(width: 38, height: 38)
-                                                        .cornerRadius(3)
-                                                        .onTapGesture {
-                                                            openApp(at: app.path, inNewWorkspace: false)
-                                                            closeAction()
-                                                        }
-                                                }
-                                            }
-                                            .padding(.bottom, 20.0)
+                                            test(workspace: workspace)
                                             Divider()
                                             HStack {
                                                 Image(systemName: "arrow.up.right.square")
@@ -125,7 +121,12 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                                                     .frame(width: 16, height: 16)
                                                     .onTapGesture {
                                                         currentIndex = 0
-                                                        recursivelyOpenMultipleApps(workspace)
+                                                        processWorkspace(workspace) {
+                                                            DispatchQueue.main.async {
+                                                                inProgressWindow?.close()
+                                                            }
+                                                        }
+                                                        appOpeningInProgressWindow()
                                                         closeAction()
                                                     }
                                                 Image(systemName: "gear")
@@ -138,7 +139,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                                                     .resizable()
                                                     .frame(width: 16, height: 16)
                                                     .onTapGesture {
-                                                        viewModel.removeWorkspace(with: workspace)
+                                                        viewModel.removeWorkspace2(with: workspace)
                                                     }
                                                 Spacer()
                                             }
@@ -183,49 +184,99 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
         .padding()
     }
     
-    func recursivelyOpenMultipleApps(_ workspace: WorkspaceItem) {
-//        connectionManager.recursivelyOpenMultipleApps(workspace)
-        let limit = workspace.apps.count
-        
-        openApp(at: workspace.apps[currentIndex].path) {
-            currentIndex += 1
-            if currentIndex >= limit {
-                currentIndex = 0
-                return
-            }
-            recursivelyOpenMultipleApps(workspace)
-        }
-    }
-    
-    func openApp(at path: String, inNewWorkspace: Bool = true, completed: (() -> Void)? = nil) {
-//        connectionManager.openApp(at: path, inNewWorkspace: inNewWorkspace, completed: completed)
-        if inNewWorkspace {
-            createNewSpace()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                moveToNextWorkspace()
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                let url = URL(fileURLWithPath: path)
-                NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                if let bundleId = getBundleIdentifier(forAppAtPath: path) {
-                    waitForAppLaunch(bundleIdentifier: bundleId) { app in
-                        if let app, let appName = app.localizedName {
-                            resizeAppWindow(appName: appName, width: 1920, height: 1080)
-                        }
-                        completed?()
+    @ViewBuilder
+    func test(workspace: WorkspaceItem2) -> some View {
+        HStack(spacing: 4) {
+            ForEach(workspace.screens) { screen in
+                ForEach(screen.apps) { test in
+                    if let app = test.app {
+                        Image(nsImage: NSWorkspace.shared.icon(forFile: app.path))
+                            .resizable()
+                            .frame(width: 38, height: 38)
+                            .cornerRadius(3)
+                            .onTapGesture {
+                                openApp(at: app.path, size: test.size ?? .zero, position: test.position ?? .zero)
+                                closeAction()
+                            }
                     }
                 }
             }
-        } else {
+        }
+        .padding(.bottom, 20.0)
+    }
+    
+    func processWorkspace(_ workspace: WorkspaceItem2, completion: @escaping () -> Void) {
+        var screenIndex = 0
+
+        func processNextScreen() {
+            guard screenIndex < workspace.screens.count else {
+                completion() // All screens processed
+                return
+            }
+
+            let screen = workspace.screens[screenIndex]
+            screenIndex += 1
+
+            createNewSpace()
+            processScreen(screen) {
+                processNextScreen() // Move to the next screen after completion
+            }
+        }
+
+        processNextScreen()
+    }
+
+    func processScreen(_ screen: ScreenItem, completion: @escaping () -> Void) {
+        let screenApps = screen.apps // Get all ScreenTypeContainers
+        var pendingApps = screenApps.count
+
+        guard pendingApps > 0 else {
+            completion() // No apps in this screen, move to next
+            return
+        }
+
+        for container in screenApps {
+            if let app = container.app {
+                processApp(app, size: container.size ?? .zero, position: container.position ?? .zero) {
+                    pendingApps -= 1
+                    if pendingApps == 0 {
+                        completion()
+                    }
+                }
+            } else {
+                pendingApps -= 1
+                if pendingApps == 0 {
+                    completion()
+                }
+            }
+        }
+    }
+
+    func processApp(_ app: AppInfo, size: CGSize, position: CGPoint, completion: @escaping () -> Void) {
+        openApp(at: app.path, size: size, position: position, completed: completion)
+    }
+    
+    func openApp(at path: String, size: CGSize, position: CGPoint, completed: (() -> Void)? = nil) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            moveToNextWorkspace()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             let url = URL(fileURLWithPath: path)
             NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            if let bundleId = getBundleIdentifier(forAppAtPath: path) {
+                waitForAppLaunch(bundleIdentifier: bundleId) { app in
+                    if let app, let appName = app.localizedName {
+                        resizeAppWindow(appName: appName, width: size.width, height: size.height, screenPosition: position)
+                    }
+                    completed?()
+                }
+            }
+        }
     }
     
-    func resizeAppWindow(appName: String, width: CGFloat, height: CGFloat) {
-//        connectionManager.resizeAppWindow(appName: appName, width: width, height: height)
+    func resizeAppWindow(appName: String, width: CGFloat, height: CGFloat, screenPosition: CGPoint) {
         if !isAppInCurrentSpace(appName: appName) {
             switchToAppWorkspace(appName: appName)
             sleep(1)
@@ -249,7 +300,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                     if let _ = windowList.first {
                         var position : CFTypeRef
                         var size : CFTypeRef
-                        var newPoint = CGPoint(x: 0, y: 0)
+                        var newPoint = CGPoint(x: screenPosition.x, y: screenPosition.y)
                         var newSize = CGSize(width: width, height: height)
                         
                         position = AXValueCreate(AXValueType(rawValue: kAXValueCGPointType)!,&newPoint)!;
@@ -264,7 +315,6 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
     }
     
     func moveToNextWorkspace() {
-//        connectionManager.moveToNextWorkspace()
         let script = """
         tell application "System Events" to key code 124 using {control down}
         """
@@ -272,7 +322,6 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
     }
     
     func createNewSpace() {
-//        connectionManager.createNewSpace()
         let script = """
         do shell script "open -a 'Mission Control'"
         delay 0.2
@@ -287,13 +336,11 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
     }
     
     func getBundleIdentifier(forAppAtPath appPath: String) -> String? {
-//        connectionManager.getBundleIdentifier(forAppAtPath: appPath)
         let appBundle = Bundle(path: appPath)
         return appBundle?.bundleIdentifier
     }
     
     func waitForAppLaunch(bundleIdentifier: String, completion: @escaping (NSRunningApplication?) -> Void) {
-//        connectionManager.waitForAppLaunch(bundleIdentifier: bundleIdentifier, completion: completion)
         DispatchQueue.global(qos: .background).async {
             while true {
                 if let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).first {
@@ -308,7 +355,6 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
     }
     
     func getAppWindows(appName: String) -> [AXUIElement] {
-//        connectionManager.getAppWindows(appName: appName)
         let runningApps = NSWorkspace.shared.runningApplications
         guard let app = runningApps.first(where: { $0.localizedName == appName }) else {
             print("App not found")
@@ -328,7 +374,6 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
     }
 
     func getWindowPosition(_ window: AXUIElement) -> CGPoint? {
-//        connectionManager.getWindowPosition(window)
         var positionValue: AnyObject?
         if AXUIElementCopyAttributeValue(window, kAXPositionAttribute as CFString, &positionValue) == .success {
             var point = CGPoint()
@@ -342,7 +387,6 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
 
     // Check if the app is in the current space
     func isAppInCurrentSpace(appName: String) -> Bool {
-//        connectionManager.isAppInCurrentSpace(appName: appName)
         let windows = getAppWindows(appName: appName)
         
         for window in windows {
@@ -362,7 +406,6 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
     }
     
     func switchToAppWorkspace(appName: String) {
-//        connectionManager.switchToAppWorkspace(appName: appName)
         let script = """
         tell application "System Events"
             tell process "\(appName)"
@@ -374,7 +417,58 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
         execute(script)
     }
     
-    private func openCreateNewWorkspaceWindow(_ item: WorkspaceItem? = nil) {
+    func getFrameOfScreen() -> NSRect? {
+        if let window = NSApplication.shared.mainWindow {
+            if let screen = window.screen {
+                let screenFrame = screen.frame
+                return screenFrame
+            }
+        }
+        return nil
+    }
+    
+    private func appOpeningInProgressWindow() {
+        let windowWidth: CGFloat = 400
+        let windowHeight: CGFloat = 140
+        if nil == inProgressWindow {
+            let screenFrame = getFrameOfScreen() ?? .zero
+            
+            let windowX = (screenFrame.width - windowWidth) / 2
+            let windowY = (screenFrame.height - windowHeight) / 2
+            inProgressWindow = NSWindow(
+                contentRect: NSRect(x: windowX, y: windowY, width: windowWidth, height: windowHeight),
+                styleMask: [.borderless],
+                backing: .buffered,
+                defer: false
+            )
+            inProgressWindow?.center()
+            inProgressWindow?.setFrameAutosaveName("In Progress")
+            inProgressWindow?.isReleasedWhenClosed = false
+            inProgressWindow?.titlebarAppearsTransparent = true
+            inProgressWindow?.styleMask.insert(.fullSizeContentView)
+            
+            inProgressWindow?.level = .floating
+            inProgressWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary]
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: inProgressWindow) else {
+                return
+            }
+            let test = InProgressView(width: windowWidth, height: windowHeight) {
+                currentIndex = -1
+            }
+            inProgressWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: test)
+            inProgressWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = inProgressWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        inProgressWindow?.contentView = NSHostingView(rootView: InProgressView(width: windowWidth, height: windowHeight) {
+            currentIndex = -1
+        })
+        inProgressWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openCreateNewWorkspaceWindow(_ item: WorkspaceItem2? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 800, height: 500),
@@ -391,7 +485,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
                 return
             }
-            let test = CreateWorkspace(viewModel: .init(workspace: item), delegate: viewModel)
+            let test = CreateWorkspaceWithMultipleScreens(viewModel: .init(workspace: item), delegate: viewModel)
             newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: test)
             newWindow?.contentView?.addSubview(hv.view)
@@ -407,231 +501,35 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                    object: newWindow,
                    queue: .main
                ) { _ in
-                   test.viewModel.items.removeAll()
+                   test.viewModel.screens.removeAll()
                }
         }
-        newWindow?.contentView = NSHostingView(rootView: CreateWorkspace(viewModel: .init(workspace: item), delegate: viewModel))
+        newWindow?.contentView = NSHostingView(rootView: CreateWorkspaceWithMultipleScreens(viewModel: .init(workspace: item), delegate: viewModel))
         newWindow?.makeKeyAndOrderFront(nil)
     }
 }
 
-class CreateWorkspaceViewModel: ObservableObject {
-    @Published var items: [AppInfo]
-    @Published var title: String
-    @Published var searchText: String = ""
-    @Published var cancellables = Set<AnyCancellable>()
-    @Published var installedApps: [AppInfo] = []
-    var id: String
-    
-    public init(workspace: WorkspaceItem? = nil) {
-        self.items = workspace?.apps ?? []
-        self.title = workspace?.title ?? ""
-        self.id = workspace?.id ?? UUID().uuidString
-        registerListener()
-    }
-    
-    func registerListener() {
-        $searchText
-            .sink { [weak self] _ in
-                self?.fetchInstalledApps()
-            }
-            .store(in: &cancellables)
-    }
-    
-    func removeItem(with path: String) {
-        items = items.filter { $0.path != path }
-    }
-    
-    func save() -> WorkspaceItem? {
-        guard !title.isEmpty && !items.isEmpty else {
-            return nil
-        }
-        return .init(id: id, title: title, apps: items)
-    }
-    
-    func fetchInstalledApps() {
-        let appDirectories = [
-            "/Applications",
-            "/System/Applications/Utilities"
-        ]
-
-        var apps: [AppInfo] = []
-
-        for directory in appDirectories {
-            apps.append(contentsOf: findApps(in: directory))
-        }
-
-        DispatchQueue.main.async {
-            if self.searchText.isEmpty {
-                self.installedApps = apps.sorted { $0.name.lowercased() < $1.name.lowercased() }
-            } else {
-                self.installedApps = apps.sorted { $0.name.lowercased() < $1.name.lowercased() }.filter { $0.name.contains(self.searchText) }
-            }
-        }
-    }
-    
-    func findApps(in directory: String) -> [AppInfo] {
-        var apps: [AppInfo] = []
-
-        if let appURLs = try? FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: directory), includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
-            for appURL in appURLs where appURL.pathExtension == "app" {
-                let appName = appURL.deletingPathExtension().lastPathComponent
-                apps.append(AppInfo(id: UUID().uuidString, name: appName, path: appURL.path))
-            }
-        }
-
-        return apps
-    }
-}
-
-import Combine
-
-struct CreateWorkspace: View {
-    @ObservedObject var viewModel: CreateWorkspaceViewModel
-    
-    
-    weak var delegate: WorkspaceWindowDelegate?
-    var size: Double = 100
-    
-    public init(viewModel: CreateWorkspaceViewModel, delegate: WorkspaceWindowDelegate?) {
-        self.viewModel = viewModel
-        self.delegate = delegate
-    }
+struct InProgressView: View {
+    let width: CGFloat
+    let height: CGFloat
+    let cancelAction: () -> Void
+    @State var didCancel = false
     
     var body: some View {
-        HStack {
-            VStack {
-                Text("Create new workspace")
-                    .font(.system(size: 24.0, weight: .bold))
-                    .padding()
-                VStack(alignment: .leading) {
-                    Text("Name your workspace")
-                    TextField(text: $viewModel.title) {
-                        Text("Name")
-                            .padding()
-                    }
-                }
-                .padding(.bottom, 16.0)
-                Spacer()
-                if viewModel.items.isEmpty {
-                    Text("Drag & Drop apps")
-                        .background(
-                            RoundedRectangle(cornerRadius: 20.0)
-                                .fill(Color.black.opacity(0.6))
-                                .frame(width: 200, height: 200)
-                        )
-                        .frame(width: 200, height: 200)
-                    Spacer()
-                } else {
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: size))], spacing: 8) {
-                            ForEach(viewModel.items) { app in
-                                ZStack {
-                                    VStack {
-                                        Image(nsImage: NSWorkspace.shared.icon(forFile: app.path))
-                                            .resizable()
-                                            .frame(width: 64, height: 64)
-                                            .cornerRadius(6)
-                                        Text(app.name)
-                                            .multilineTextAlignment(.center)
-                                            .font(.headline)
-                                    }
-                                    .frame(width: 150, height: 100)
-                                    HStack {
-                                        Spacer().frame(width: 50.0)
-                                        RedXButton {
-                                            viewModel.removeItem(with: app.path)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                    .scrollIndicators(.hidden)
-                    .frame(minWidth: 350, maxHeight: 350)
-                    .background(Color.black.cornerRadius(20.0).opacity(0.8))
-                    Spacer()
-                    VStack(alignment: .center) {
-                        Button {
-                            if let workspace = viewModel.save() {
-                                delegate?.saveWorkspace(with: workspace)
-                                delegate?.close()
-                            }
-                        } label: {
-                            Text("Save")
-                                .font(.system(size: 12.0))
-                        }
-                    }
-                    Spacer()
-                }
+        VStack {
+            HStack {
+                Text(didCancel ? "Cancelling..." : "Opening apps in Progress")
+                ProgressView()
+                    .progressViewStyle(.circular)
             }
-            .onDrop(of: [.text], isTargeted: nil) { providers in
-                providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                    if let droppedString = droppedItem as? String {
-                        DispatchQueue.main.async {
-                            if viewModel.items.count < 6 {
-                                if !viewModel.items.contains(where: { $0.path == createAppFromPath(droppedString).path }) {
-                                    viewModel.items.append(createAppFromPath(droppedString))
-                                }
-                                
-                            } else {
-                                print("ERROR")
-                            }
-                        }
-                    }
-                }
-                return true
-            }
-            VStack {
-                TextField("Search...", text: $viewModel.searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.vertical, 16.0)
-                ScrollView {
-                    ForEach(viewModel.installedApps) { app in
-                        HStack {
-                            HStack {
-                                Image(nsImage: NSWorkspace.shared.icon(forFile: app.path))
-                                    .resizable()
-                                    .frame(width: 32, height: 32)
-                                    .cornerRadius(6)
-                                Text(app.name)
-                                    .font(.headline)
-                            }
-                            .onDrag {
-                                NSItemProvider(object: app.path as NSString)
-                            }
-                            
-                            Spacer()
-                            
-                            Button("Launch") {
-                                openApp(at: app.path)
-                            }
-                            .buttonStyle(BorderlessButtonStyle())
-                            .padding(.trailing, 22.0)
-                        }
-                        .padding(.vertical, 4)
-                        
-                    }
-                    .onAppear(perform: viewModel.fetchInstalledApps)
-                }
+            Button("Cancel") {
+                didCancel = true
+                cancelAction()
             }
         }
-        .frame(minWidth: 400, minHeight: 200)
-        .padding()
-    }
-    
-    func createAppFromPath(_ path: String) -> AppInfo {
-        let appName = URL(string: path)?.deletingPathExtension().lastPathComponent ?? ""
-        return .init(id: UUID().uuidString, name: appName, path: path)
-    }
-    
-    func openApp(at path: String) {
-        let url = URL(fileURLWithPath: path)
-        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
+        .frame(width: width, height: height)
     }
 }
-
 
 struct RedXButton: View {
     var action: () -> Void
