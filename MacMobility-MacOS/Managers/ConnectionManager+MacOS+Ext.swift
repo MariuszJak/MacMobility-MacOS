@@ -124,7 +124,12 @@ extension ConnectionManager {
         if let workspaceItem = try? JSONDecoder().decode(WorkspaceSendableItem.self, from: data) {
             if let workspace = workspaces.first(where: { $0.id == workspaceItem.id }) {
                 processWorkspace(workspace) {
-                    print("Done")
+                    DispatchQueue.main.async {
+                        self.inProgressWindow?.close()
+                    }
+                }
+                DispatchQueue.main.async {
+                    self.appOpeningInProgressWindow()
                 }
             }
             return
@@ -194,11 +199,16 @@ extension ConnectionManager {
     }
     
     func processWorkspace(_ workspace: WorkspaceItem, completion: @escaping () -> Void) {
-        var screenIndex = 0
+        screenIndex = 0
 
         func processNextScreen() {
+            if screenIndex == -1 {
+                screenIndex = 0
+                completion()
+                return
+            }
             guard screenIndex < workspace.screens.count else {
-                completion() // All screens processed
+                completion()
                 return
             }
 
@@ -207,7 +217,7 @@ extension ConnectionManager {
 
             createNewSpace()
             processScreen(screen) {
-                processNextScreen() // Move to the next screen after completion
+                processNextScreen()
             }
         }
 
@@ -418,5 +428,46 @@ extension ConnectionManager {
             }
         }
         return nil
+    }
+    
+    private func appOpeningInProgressWindow() {
+        let windowWidth: CGFloat = 400
+        let windowHeight: CGFloat = 140
+        if nil == inProgressWindow {
+            let screenFrame = getFrameOfScreen() ?? .zero
+            
+            let windowX = (screenFrame.width - windowWidth) / 2
+            let windowY = (screenFrame.height - windowHeight) / 2
+            inProgressWindow = NSWindow(
+                contentRect: NSRect(x: windowX, y: windowY, width: windowWidth, height: windowHeight),
+                styleMask: [.borderless],
+                backing: .buffered,
+                defer: false
+            )
+            inProgressWindow?.center()
+            inProgressWindow?.setFrameAutosaveName("In Progress")
+            inProgressWindow?.isReleasedWhenClosed = false
+            inProgressWindow?.titlebarAppearsTransparent = true
+            inProgressWindow?.styleMask.insert(.fullSizeContentView)
+            
+            inProgressWindow?.level = .floating
+            inProgressWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary]
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: inProgressWindow) else {
+                return
+            }
+            let test = InProgressView(width: windowWidth, height: windowHeight) { [weak self] in
+                self?.screenIndex = -1
+            }
+            inProgressWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: test)
+            inProgressWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = inProgressWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        inProgressWindow?.contentView = NSHostingView(rootView: InProgressView(width: windowWidth, height: windowHeight) { [weak self] in
+            self?.screenIndex = -1
+        })
+        inProgressWindow?.makeKeyAndOrderFront(nil)
     }
 }

@@ -19,6 +19,8 @@ enum PairingStatus: Equatable {
 }
 
 class ConnectionManager: NSObject, ObservableObject {
+    @Published var screenIndex = 0
+    @Published var inProgressWindow: NSWindow?
     @Published var availablePeer: MCPeerID?
     @Published var connectedPeerName: String?
     @Published var receivedInvite: Bool = false

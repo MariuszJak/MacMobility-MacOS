@@ -57,11 +57,11 @@ protocol WorkspaceWindowDelegate: AnyObject {
 }
 
 struct WorkspacesWindowView: View, AppleScriptCommandable {
+    @State private var screenIndex = 0
     @State private var newWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
     @State private var inProgressWindow: NSWindow?
     @State private var installedApps: [AppInfo] = []
-    @State var currentIndex = 0
     @StateObject var viewModel: WorkspacesWindowViewModel
     let connectionManager: ConnectionManager
     let closeAction: () -> Void
@@ -109,7 +109,6 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                                                     .resizable()
                                                     .frame(width: 16, height: 16)
                                                     .onTapGesture {
-                                                        currentIndex = 0
                                                         processWorkspace(workspace) {
                                                             DispatchQueue.main.async {
                                                                 inProgressWindow?.close()
@@ -184,7 +183,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                             .frame(width: 38, height: 38)
                             .cornerRadius(3)
                             .onTapGesture {
-                                openApp(at: app.path, size: test.size ?? .zero, position: test.position ?? .zero)
+                                openApp(at: app.path)
                                 closeAction()
                             }
                     }
@@ -195,11 +194,16 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
     }
     
     func processWorkspace(_ workspace: WorkspaceItem, completion: @escaping () -> Void) {
-        var screenIndex = 0
+        screenIndex = 0
 
         func processNextScreen() {
+            if screenIndex == -1 {
+                screenIndex = 0
+                completion()
+                return
+            }
             guard screenIndex < workspace.screens.count else {
-                completion() // All screens processed
+                completion()
                 return
             }
 
@@ -208,7 +212,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
 
             createNewSpace()
             processScreen(screen) {
-                processNextScreen() // Move to the next screen after completion
+                processNextScreen()
             }
         }
 
@@ -239,6 +243,11 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                 }
             }
         }
+    }
+    
+    func openApp(at path: String) {
+        let url = URL(fileURLWithPath: path)
+        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
     }
 
     func processApp(_ app: AppInfo, size: CGSize, position: CGPoint, completion: @escaping () -> Void) {
@@ -443,7 +452,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                 return
             }
             let test = InProgressView(width: windowWidth, height: windowHeight) {
-                currentIndex = -1
+                screenIndex = -1
             }
             inProgressWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: test)
@@ -452,7 +461,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
             hv.view.autoresizingMask = [.width, .height]
         }
         inProgressWindow?.contentView = NSHostingView(rootView: InProgressView(width: windowWidth, height: windowHeight) {
-            currentIndex = -1
+            screenIndex = -1
         })
         inProgressWindow?.makeKeyAndOrderFront(nil)
     }
