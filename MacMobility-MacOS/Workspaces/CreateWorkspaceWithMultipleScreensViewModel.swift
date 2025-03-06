@@ -67,7 +67,8 @@ class CreateWorkspaceWithMultipleScreensViewModel: ObservableObject {
             if self.searchText.isEmpty {
                 self.installedApps = apps.sorted { $0.name.lowercased() < $1.name.lowercased() }
             } else {
-                self.installedApps = apps.sorted { $0.name.lowercased() < $1.name.lowercased() }.filter { $0.name.contains(self.searchText) }
+                self.installedApps = apps.sorted { $0.name.lowercased() < $1.name.lowercased() }
+                    .filter { $0.name.lowercased().contains(self.searchText.lowercased()) }
             }
         }
     }

@@ -36,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             menuButton.action = #selector(menuAction)
         }
         NSApp.setActivationPolicy(.accessory)
-        startListeningForShortcut()
+//        startListeningForShortcut()
     }
     
     @objc
@@ -51,15 +51,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    func startListeningForShortcut() {
-        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            if event.modifierFlags.contains(.control) && event.keyCode == 49 {
-                self?.toggleWindow()
-            }
-        }
-    }
-    
-    func toggleWindow() {
-        
-    }
+//    func startListeningForShortcut() {
+//        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+//            if event.modifierFlags.contains(.option) && event.keyCode == 49 {
+//                DispatchQueue.main.async {
+//                    self?.toggleWindow()
+//                }
+//            }
+//        }
+//    }
+//    
+//    func toggleWindow() {
+//        menuView?.openWorkspacesWindow()
+//    }
 }

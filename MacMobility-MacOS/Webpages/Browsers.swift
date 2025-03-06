@@ -21,4 +21,13 @@ enum Browsers: String, CaseIterable, Identifiable, Codable {
             return "com.apple.safari"
         }
     }
+    
+    var icon: String {
+        switch self {
+        case .chrome:
+            return "chrome-logo"
+        case .safari:
+            return "safari-logo"
+        }
+    }
 }

@@ -91,6 +91,12 @@ struct WebpagesWindowView: View {
                                 })
                                 .cornerRadius(Constants.cornerRadius)
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
+                            } else {
+                                Image(item.browser.icon)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .cornerRadius(Constants.cornerRadius)
+                                    .frame(width: Constants.imageSize, height: Constants.imageSize)
                             }
                             Text(item.webpageTitle)
                             Spacer()
@@ -123,7 +129,7 @@ struct WebpagesWindowView: View {
         }
         .frame(minWidth: 400, minHeight: 200)
         .padding()
-        .onChange(of: viewModel.webpages) { webpages, _ in
+        .onChange(of: viewModel.webpages) { _, webpages in
             connectionManager.webpages = webpages
         }
     }

@@ -117,7 +117,7 @@ extension ConnectionManager {
         }
         if let appItem = try? JSONDecoder().decode(AppSendableInfo.self, from: data) {
             if let app = workspaces.flatMap({ $0.screens }).flatMap({ $0.apps }).first(where: { $0.app?.path == appItem.path }) {
-                openApp(at: app.app?.path ?? "", size: app.size ?? .zero, position: app.position ?? .zero)
+                openApp(at: app.app?.path ?? "")
             }
             return
         }
@@ -154,8 +154,22 @@ extension ConnectionManager {
         guard let url = NSURL(string: webpageItem.webpageLink) as? URL else {
             return
         }
-        NSWorkspace.shared.open(url, configuration: NSWorkspace.OpenConfiguration()) { _, error in
-            if let error { print(error) }
+        
+        switch webpageItem.browser {
+        case .chrome:
+            if let chromeURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.google.Chrome") {
+                NSWorkspace.shared.open([url], withApplicationAt: chromeURL, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+                    if let error {
+                        print("Failed to open URL in Chrome: \(error)")
+                    }
+                }
+            } else {
+                print("Google Chrome is not installed or not found.")
+            }
+        case .safari:
+            NSWorkspace.shared.open(url, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+                if let error { print(error) }
+            }
         }
     }
     
@@ -228,6 +242,11 @@ extension ConnectionManager {
 
     func processApp(_ app: AppInfo, size: CGSize, position: CGPoint, completion: @escaping () -> Void) {
         openApp(at: app.path, size: size, position: position, completed: completion)
+    }
+    
+    func openApp(at path: String) {
+        let url = URL(fileURLWithPath: path)
+        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
     }
     
     func openApp(at path: String, size: CGSize, position: CGPoint, completed: (() -> Void)? = nil) {

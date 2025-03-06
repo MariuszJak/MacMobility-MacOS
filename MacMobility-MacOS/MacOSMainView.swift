@@ -195,17 +195,3 @@ struct MacOSMainPopoverView: View {
         return NSImage(cgImage: generated, size: .init(width: 80, height: 80))
     }
 }
-
-extension NSVisualEffectView {
-    public static func createVisualAppearance(for window: NSWindow?) -> NSVisualEffectView? {
-        guard let window else { return nil }
-        
-        let visualEffectView = NSVisualEffectView(frame: window.contentView?.bounds ?? .zero)
-        visualEffectView.autoresizingMask = [.width, .height]
-        visualEffectView.blendingMode = .behindWindow
-        visualEffectView.state = .active
-        visualEffectView.appearance = NSAppearance(named: .vibrantDark)
-        
-        return visualEffectView
-    }
-}

@@ -32,6 +32,7 @@
 		C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D6A2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift */; };
 		C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D6C2D7A261F00FEF931 /* ScreenTypeView.swift */; };
 		C0D21D6F2D7A266100FEF931 /* AddNewScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D6E2D7A266100FEF931 /* AddNewScreenView.swift */; };
+		C0D21D712D7A286600FEF931 /* NSVisualEffectView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D702D7A286600FEF931 /* NSVisualEffectView+Ext.swift */; };
 		C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037002BA37FAC00BFBD2A /* WebpagesWindowView.swift */; };
 		C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037022BA37FD400BFBD2A /* Browsers.swift */; };
 		C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */; };
@@ -86,6 +87,7 @@
 		C0D21D6A2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurableScreenViewModel.swift; sourceTree = "<group>"; };
 		C0D21D6C2D7A261F00FEF931 /* ScreenTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTypeView.swift; sourceTree = "<group>"; };
 		C0D21D6E2D7A266100FEF931 /* AddNewScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewScreenView.swift; sourceTree = "<group>"; };
+		C0D21D702D7A286600FEF931 /* NSVisualEffectView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSVisualEffectView+Ext.swift"; sourceTree = "<group>"; };
 		C0E037002BA37FAC00BFBD2A /* WebpagesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpagesWindowView.swift; sourceTree = "<group>"; };
 		C0E037022BA37FD400BFBD2A /* Browsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Browsers.swift; sourceTree = "<group>"; };
 		C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWebpageView.swift; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 				C097755B2B5C31CA00F4FFE6 /* Array+Ext.swift */,
 				C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */,
 				C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */,
+				C0D21D702D7A286600FEF931 /* NSVisualEffectView+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -376,6 +379,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0D21D712D7A286600FEF931 /* NSVisualEffectView+Ext.swift in Sources */,
 				C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */,
 				C097755D2B5C31CA00F4FFE6 /* Array+Ext.swift in Sources */,
 				C0D21D632D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift in Sources */,
