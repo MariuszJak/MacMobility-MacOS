@@ -32,7 +32,7 @@ extension UserDefaults {
         set(jsonData, forKey: Const.workspaceItems)
     }
     
-    func storeWorkspaceItems2(_ workspaceItems: [WorkspaceItem2]) {
+    func storeWorkspaceItems2(_ workspaceItems: [WorkspaceItem]) {
         guard let jsonData = try? JSONEncoder().encode(workspaceItems) else {
             return
         }
@@ -40,9 +40,9 @@ extension UserDefaults {
         set(jsonData, forKey: Const.workspaceItems2)
     }
     
-    func getWorkspaceItems2() -> [WorkspaceItem2]? {
+    func getWorkspaceItems2() -> [WorkspaceItem]? {
         guard let itemsData = object(forKey: Const.workspaceItems2) as? Data,
-              let items = try? JSONDecoder().decode([WorkspaceItem2].self, from: itemsData) else {
+              let items = try? JSONDecoder().decode([WorkspaceItem].self, from: itemsData) else {
             return nil
         }
         return items

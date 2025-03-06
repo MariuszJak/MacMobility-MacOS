@@ -56,7 +56,7 @@ extension ConnectionManager: ConnectionSenable {
                 self.runningApps = apps
                 self.send(runningApps: apps)
                 self.send(webpages: self.webpages)
-                self.send(workspaces: self.workspaces2)
+                self.send(workspaces: self.workspaces)
             }
         ]
     }
@@ -87,7 +87,7 @@ extension ConnectionManager: ConnectionSenable {
         send(data)
     }
     
-    func send(workspaces: [WorkspaceItem2]) {
+    func send(workspaces: [WorkspaceItem]) {
         let sendableWorkspaces: [WorkspaceSendableItem] = workspaces.map {
             .init(id: $0.id,
                   title: $0.title,
@@ -116,13 +116,13 @@ extension ConnectionManager {
             return
         }
         if let appItem = try? JSONDecoder().decode(AppSendableInfo.self, from: data) {
-            if let app = workspaces2.flatMap({ $0.screens }).flatMap({ $0.apps }).first(where: { $0.app?.path == appItem.path }) {
+            if let app = workspaces.flatMap({ $0.screens }).flatMap({ $0.apps }).first(where: { $0.app?.path == appItem.path }) {
                 openApp(at: app.app?.path ?? "", size: app.size ?? .zero, position: app.position ?? .zero)
             }
             return
         }
         if let workspaceItem = try? JSONDecoder().decode(WorkspaceSendableItem.self, from: data) {
-            if let workspace = workspaces2.first(where: { $0.id == workspaceItem.id }) {
+            if let workspace = workspaces.first(where: { $0.id == workspaceItem.id }) {
                 processWorkspace(workspace) {
                     print("Done")
                 }
@@ -143,7 +143,7 @@ extension ConnectionManager {
             if string == "Connected - send data." {
                 self.send(runningApps: self.runningApps)
                 self.send(webpages: self.webpages)
-                self.send(workspaces: self.workspaces2)
+                self.send(workspaces: self.workspaces)
             } else {
                 focusToApp(string)
             }
@@ -179,7 +179,7 @@ extension ConnectionManager {
         scrollEvent.post(tap: CGEventTapLocation.cghidEventTap)
     }
     
-    func processWorkspace(_ workspace: WorkspaceItem2, completion: @escaping () -> Void) {
+    func processWorkspace(_ workspace: WorkspaceItem, completion: @escaping () -> Void) {
         var screenIndex = 0
 
         func processNextScreen() {
@@ -399,446 +399,5 @@ extension ConnectionManager {
             }
         }
         return nil
-    }
-}
-
-
-// ----
-
-struct AddNewScreenView: View {
-    let addAction: () -> Void
-    
-    var body: some View {
-        VStack {
-            Text("Add new screen")
-        }
-        .frame(width: 280, height: 140)
-        .background(
-            RoundedRectangle(cornerRadius: 20.0)
-                .fill(Color.black.opacity(0.2))
-        )
-        .onTapGesture {
-            addAction()
-        }
-    }
-}
-
-enum ConfigurableScreenType {
-    case singleScreen
-    case splitScreenHorizontal
-}
-
-enum ConfigurableScreenTypeSize {
-    case small
-    case medium
-    
-    var padding: CGFloat {
-        switch self {
-        case .small:
-            return 0.5
-        case .medium:
-            return 8.0
-        }
-    }
-    
-    var lineWidth: CGFloat {
-        switch self {
-        case .small:
-            return 1.5
-        case .medium:
-            return 4.0
-        }
-    }
-    
-    var cornerRadius: CGFloat {
-        switch self {
-        case .small:
-            return 1.0
-        case .medium:
-            return 8.0
-        }
-    }
-}
-
-struct ScreenTypeContainer: Identifiable, Codable {
-    let id: Int
-    let size: CGSize?
-    let position: CGPoint?
-    let app: AppInfo?
-    
-    init(id: Int, size: CGSize? = nil, position: CGPoint? = nil, app: AppInfo? = nil) {
-        self.id = id
-        self.size = size
-        self.position = position
-        self.app = app
-    }
-}
-
-struct ScreenTypeView: View {
-    let id: String
-    let screenType: ConfigurableScreenType
-    let size: ConfigurableScreenTypeSize
-    let addAction: ([ScreenTypeContainer]) -> Void
-    var removeAction: ((String) -> Void)?
-    @State var apps: [ScreenTypeContainer]
-    
-    var screenSize: CGSize {
-        guard let test = getFrameOfScreen() else {
-            return .zero
-        }
-        switch screenType {
-        case .singleScreen:
-            return .init(width: test.width, height: test.height)
-        case .splitScreenHorizontal:
-            return .init(width: test.width / 2, height: test.height)
-        }
-    }
-    
-    init(
-        id: String,
-        screenType: ConfigurableScreenType,
-        size: ConfigurableScreenTypeSize,
-        apps: [ScreenTypeContainer]?,
-        removeAction: ((String) -> Void)? = nil,
-        addAction: @escaping ([ScreenTypeContainer]) -> Void
-    ) {
-        self.id = id
-        self.removeAction = removeAction
-        self.apps = apps ?? [.init(id: 0), .init(id: 1)]
-        self.screenType = screenType
-        self.size = size
-        self.addAction = addAction
-    }
-    
-    var body: some View {
-        VStack {
-            switch screenType {
-            case .singleScreen:
-                cell(index: 0)
-            case .splitScreenHorizontal:
-                HStack {
-                    cell(index: 0)
-                    cell(index: 1)
-                }
-            }
-            if let removeAction {
-                Button("Delete") {
-                    removeAction(id)
-                }
-            }
-        }
-    }
-    
-    func getFrameOfScreen() -> NSRect? {
-        if let window = NSApplication.shared.mainWindow {
-            if let screen = window.screen {
-                let screenFrame = screen.frame
-                return screenFrame
-            }
-        }
-        return nil
-    }
-    
-    func cell(index: Int) -> some View {
-        VStack {
-            if let path = apps[safe: index]?.app?.path {
-                ZStack {
-                    RoundedRectangle(cornerRadius: size.cornerRadius)
-                        .stroke(Color.gray, lineWidth: size.lineWidth)
-                        .padding(.all, size.padding)
-                    Image(nsImage: NSWorkspace.shared.icon(forFile: path))
-                        .resizable()
-                        .frame(width: 32, height: 32)
-                        .cornerRadius(6)
-                        .onDrag {
-                            NSItemProvider(object: path as NSString)
-                        }
-                }
-            } else {
-                VStack {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: size.cornerRadius)
-                            .stroke(Color.gray, lineWidth: size.lineWidth)
-                            .padding(.all, size.padding)
-                        if size == .medium {
-                            Text("Drop app here")
-                        }
-                    }
-                }
-                .background(
-                    RoundedRectangle(cornerRadius: size.cornerRadius)
-                        .fill(Color.black)
-                )
-            }
-        }
-        .onDrop(of: [.text], isTargeted: nil) { providers in
-            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                if let droppedString = droppedItem as? String {
-                    DispatchQueue.main.async {
-                        if apps[safe: index]?.app?.path != createAppFromPath(droppedString).path {
-                            apps.enumerated().forEach { (index, app) in
-                                if app.app?.path == createAppFromPath(droppedString).path {
-                                    apps[index] = .init(id: index)
-                                }
-                            }
-                            let position: CGPoint = index == 0 ? .init(x: 0, y: 0) : .init(x: screenSize.width, y: 0)
-                            apps[index] = .init(id: index, size: screenSize, position: position, app: createAppFromPath(droppedString))
-                            addAction(apps)
-                        }
-                    }
-                }
-            }
-            return true
-        }
-    }
-    
-    func createAppFromPath(_ path: String) -> AppInfo {
-        let appName = URL(string: path)?.deletingPathExtension().lastPathComponent ?? ""
-        return .init(id: UUID().uuidString, name: appName, path: path)
-    }
-}
-
-extension Array {
-    subscript(safe index: Int) -> Element? {
-        return indices.contains(index) ? self[index] : nil
-    }
-}
-
-class ConfigurableScreenViewModel: ObservableObject {
-    @Published var screenType: ConfigurableScreenType = .singleScreen
-    var apps: [ScreenTypeContainer]?
-    var addAction: ([ScreenTypeContainer]) -> Void
-    var removeAction: (String) -> Void
-    var cancellables = Set<AnyCancellable>()
-    
-    init(apps: [ScreenTypeContainer]?, addAction: @escaping ([ScreenTypeContainer]) -> Void, removeAction: @escaping (String) -> Void) {
-        self.apps = apps
-        self.screenType = (apps?.filter { $0.app != nil }.count ?? 0) > 1 ? .splitScreenHorizontal : .singleScreen
-        self.addAction = addAction
-        self.removeAction = removeAction
-    }
-    
-    func resetToSingleScreen() {
-        apps?[1] = .init(id: 1)
-        addAction(apps ?? [])
-    }
-}
-
-struct ConfigurableScreenView: View {
-    @StateObject var viewModel: ConfigurableScreenViewModel
-    private let id: String
-    
-    init(id: String, viewModel: ConfigurableScreenViewModel) {
-        self._viewModel = .init(wrappedValue: viewModel)
-        self.id = id
-    }
-    
-    var body: some View {
-        VStack {
-            HStack {
-                ScreenTypeView(id: id, screenType: viewModel.screenType, size: .medium, apps: viewModel.apps, removeAction: viewModel.removeAction, addAction: viewModel.addAction)
-                VStack {
-                    Button {
-                        viewModel.screenType = .singleScreen
-                        viewModel.resetToSingleScreen()
-                    } label: {
-                        ScreenTypeView(id: "1", screenType: .singleScreen, size: .small, apps: nil, addAction: { _ in})
-                    }
-                    .background(viewModel.screenType == .singleScreen ? Color.blue : Color.clear)
-                    Button {
-                        viewModel.screenType = .splitScreenHorizontal
-                    } label: {
-                        ScreenTypeView(id: "2", screenType: .splitScreenHorizontal, size: .small, apps: nil, addAction: { _ in })
-                    }
-                    .background(viewModel.screenType == .splitScreenHorizontal ? Color.blue : Color.clear)
-                }
-                .frame(width: 45)
-            }
-        }
-        .frame(width: 280, height: 140)
-        .background(
-            RoundedRectangle(cornerRadius: 20.0)
-                .fill(Color.black.opacity(0.4))
-        )
-    }
-}
-
-class ScreenItem: Identifiable, Codable {
-    let id: String
-    var apps: [ScreenTypeContainer]
-    
-    init(id: String, apps: [ScreenTypeContainer] = [.init(id: 0), .init(id: 1)]) {
-        self.id = id
-        self.apps = apps
-    }
-    
-    func updateApps(_ containers: [ScreenTypeContainer]) {
-        apps = containers
-    }
-}
-
-class CreateWorkspaceWithMultipleScreensViewModel: ObservableObject {
-    @Published var screens: [ScreenItem] = []
-    @Published var title: String
-    @Published var searchText: String = ""
-    @Published var cancellables = Set<AnyCancellable>()
-    @Published var installedApps: [AppInfo] = []
-    var id: String
-    
-    public init(workspace: WorkspaceItem2? = nil) {
-        self.screens = workspace?.screens ?? []
-        self.title = workspace?.title ?? ""
-        self.id = workspace?.id ?? UUID().uuidString
-        registerListener()
-    }
-    
-    func addNewScreen() {
-        screens.append(.init(id: UUID().uuidString))
-    }
-    
-    func removeScreen(_ id: String) -> Void {
-        screens = screens.filter { $0.id != id }
-    }
-    
-    func registerListener() {
-        $searchText
-            .sink { [weak self] _ in
-                self?.fetchInstalledApps()
-            }
-            .store(in: &cancellables)
-    }
-    
-    func removeItem(with path: String) {
-        screens = screens.filter { $0.id != id }
-    }
-    
-    func save() -> WorkspaceItem2? {
-        guard !title.isEmpty && !screens.isEmpty else {
-            return nil
-        }
-        return .init(id: id, title: title, screens: screens)
-    }
-    
-    func fetchInstalledApps() {
-        let appDirectories = [
-            "/Applications",
-            "/System/Applications/Utilities"
-        ]
-
-        var apps: [AppInfo] = []
-
-        for directory in appDirectories {
-            apps.append(contentsOf: findApps(in: directory))
-        }
-
-        DispatchQueue.main.async {
-            if self.searchText.isEmpty {
-                self.installedApps = apps.sorted { $0.name.lowercased() < $1.name.lowercased() }
-            } else {
-                self.installedApps = apps.sorted { $0.name.lowercased() < $1.name.lowercased() }.filter { $0.name.contains(self.searchText) }
-            }
-        }
-    }
-    
-    func findApps(in directory: String) -> [AppInfo] {
-        var apps: [AppInfo] = []
-
-        if let appURLs = try? FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: directory), includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
-            for appURL in appURLs where appURL.pathExtension == "app" {
-                let appName = appURL.deletingPathExtension().lastPathComponent
-                apps.append(AppInfo(id: UUID().uuidString, name: appName, path: appURL.path))
-            }
-        }
-
-        return apps
-    }
-}
-
-struct CreateWorkspaceWithMultipleScreens: View {
-    @ObservedObject var viewModel: CreateWorkspaceWithMultipleScreensViewModel
-    
-    weak var delegate: WorkspaceWindowDelegate?
-    var size: Double = 100
-    
-    public init(viewModel: CreateWorkspaceWithMultipleScreensViewModel, delegate: WorkspaceWindowDelegate?) {
-        self.viewModel = viewModel
-        self.delegate = delegate
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("New Workspace")
-                    .font(.system(size: 17.0, weight: .bold))
-                    .padding([.horizontal, .top], 16)
-                TextField(text: $viewModel.title) {
-                    Text("Name")
-                        .padding()
-                }
-                Spacer()
-                Button("Save") {
-                    if let workspace = viewModel.save() {
-                        delegate?.saveWorkspace2(with: workspace)
-                        delegate?.close()
-                    }
-                }
-                Image(systemName: "plus.circle.fill")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .padding([.horizontal, .top], 16.0)
-            }
-            Divider()
-        }
-        HStack {
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 6) {
-                    ForEach(viewModel.screens) { screen in
-                        ConfigurableScreenView(id: screen.id, viewModel: .init(apps: screen.apps, addAction: screen.updateApps, removeAction: viewModel.removeScreen))
-                    }
-                    AddNewScreenView {
-                        viewModel.addNewScreen()
-                    }
-                }
-            }
-            .frame(minWidth: 600, minHeight: 500)
-            VStack(alignment: .leading) {
-                TextField("Search...", text: $viewModel.searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.vertical, 16.0)
-                ScrollView {
-                    ForEach(viewModel.installedApps) { app in
-                        HStack {
-                            HStack {
-                                Image(nsImage: NSWorkspace.shared.icon(forFile: app.path))
-                                    .resizable()
-                                    .frame(width: 32, height: 32)
-                                    .cornerRadius(6)
-                                Text(app.name)
-                                    .font(.headline)
-                                Spacer()
-                            }
-                            .onDrag {
-                                NSItemProvider(object: app.path as NSString)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                        
-                    }
-                    .onAppear(perform: viewModel.fetchInstalledApps)
-                }
-            }
-        }
-        .frame(minWidth: 800, minHeight: 500)
-        .padding()
-    }
-    
-    func createAppFromPath(_ path: String) -> AppInfo {
-        let appName = URL(string: path)?.deletingPathExtension().lastPathComponent ?? ""
-        return .init(id: UUID().uuidString, name: appName, path: path)
-    }
-    
-    func openApp(at path: String) {
-        let url = URL(fileURLWithPath: path)
-        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
     }
 }

@@ -60,6 +60,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func toggleWindow() {
-//        menuView?.toggleWebpagesWindow()
+        
     }
 }

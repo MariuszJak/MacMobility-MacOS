@@ -24,6 +24,14 @@
 		C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */; };
 		C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */; };
 		C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */; };
+		C0D21D612D7A24A000FEF931 /* WebpagesWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D602D7A24A000FEF931 /* WebpagesWindowViewModel.swift */; };
+		C0D21D632D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D622D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift */; };
+		C0D21D652D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D642D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift */; };
+		C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D662D7A25D700FEF931 /* ScreenItem.swift */; };
+		C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D682D7A25E600FEF931 /* ConfigurableScreenView.swift */; };
+		C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D6A2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift */; };
+		C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D6C2D7A261F00FEF931 /* ScreenTypeView.swift */; };
+		C0D21D6F2D7A266100FEF931 /* AddNewScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D6E2D7A266100FEF931 /* AddNewScreenView.swift */; };
 		C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037002BA37FAC00BFBD2A /* WebpagesWindowView.swift */; };
 		C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037022BA37FD400BFBD2A /* Browsers.swift */; };
 		C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */; };
@@ -70,6 +78,14 @@
 		C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionSenable.swift; sourceTree = "<group>"; };
 		C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacesWindowView.swift; sourceTree = "<group>"; };
 		C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacesWindowViewModel.swift; sourceTree = "<group>"; };
+		C0D21D602D7A24A000FEF931 /* WebpagesWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpagesWindowViewModel.swift; sourceTree = "<group>"; };
+		C0D21D622D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateWorkspaceWithMultipleScreens.swift; sourceTree = "<group>"; };
+		C0D21D642D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateWorkspaceWithMultipleScreensViewModel.swift; sourceTree = "<group>"; };
+		C0D21D662D7A25D700FEF931 /* ScreenItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenItem.swift; sourceTree = "<group>"; };
+		C0D21D682D7A25E600FEF931 /* ConfigurableScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurableScreenView.swift; sourceTree = "<group>"; };
+		C0D21D6A2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurableScreenViewModel.swift; sourceTree = "<group>"; };
+		C0D21D6C2D7A261F00FEF931 /* ScreenTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTypeView.swift; sourceTree = "<group>"; };
+		C0D21D6E2D7A266100FEF931 /* AddNewScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewScreenView.swift; sourceTree = "<group>"; };
 		C0E037002BA37FAC00BFBD2A /* WebpagesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpagesWindowView.swift; sourceTree = "<group>"; };
 		C0E037022BA37FD400BFBD2A /* Browsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Browsers.swift; sourceTree = "<group>"; };
 		C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWebpageView.swift; sourceTree = "<group>"; };
@@ -191,6 +207,13 @@
 			children = (
 				C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */,
 				C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */,
+				C0D21D622D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift */,
+				C0D21D642D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift */,
+				C0D21D662D7A25D700FEF931 /* ScreenItem.swift */,
+				C0D21D682D7A25E600FEF931 /* ConfigurableScreenView.swift */,
+				C0D21D6A2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift */,
+				C0D21D6C2D7A261F00FEF931 /* ScreenTypeView.swift */,
+				C0D21D6E2D7A266100FEF931 /* AddNewScreenView.swift */,
 			);
 			path = Workspaces;
 			sourceTree = "<group>";
@@ -201,6 +224,7 @@
 				C0E037022BA37FD400BFBD2A /* Browsers.swift */,
 				C0E037002BA37FAC00BFBD2A /* WebpagesWindowView.swift */,
 				C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */,
+				C0D21D602D7A24A000FEF931 /* WebpagesWindowViewModel.swift */,
 			);
 			path = Webpages;
 			sourceTree = "<group>";
@@ -354,19 +378,27 @@
 			files = (
 				C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */,
 				C097755D2B5C31CA00F4FFE6 /* Array+Ext.swift in Sources */,
+				C0D21D632D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift in Sources */,
 				C097755F2B5C31D700F4FFE6 /* ConnectionManager.swift in Sources */,
 				C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */,
+				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
+				C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */,
 				C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */,
+				C0D21D652D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift in Sources */,
+				C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
 				C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */,
 				C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */,
 				C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */,
 				C09775632B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift in Sources */,
+				C0D21D612D7A24A000FEF931 /* WebpagesWindowViewModel.swift in Sources */,
 				C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */,
 				C09775662B5C31EE00F4FFE6 /* MacOSMainView.swift in Sources */,
+				C0D21D6F2D7A266100FEF931 /* AddNewScreenView.swift in Sources */,
 				C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */,
 				C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */,
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
+				C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

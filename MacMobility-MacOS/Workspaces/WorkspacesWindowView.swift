@@ -22,17 +22,8 @@ struct AppInfo: Identifiable, Codable {
 struct WorkspaceItem: Identifiable, Codable {
     var id: String
     let title: String
-    let apps: [AppInfo]
-    let size: CGSize?
-}
-
-struct WorkspaceItem2: Identifiable, Codable {
-    var id: String
-    let title: String
     let screens: [ScreenItem]
 }
-
-// ---
 
 struct AppSendableInfo: Identifiable, Codable {
     let id: String
@@ -60,10 +51,8 @@ struct WorkspaceSendableItem: Identifiable, Codable {
     }
 }
 
-// ---
-
 protocol WorkspaceWindowDelegate: AnyObject {
-    func saveWorkspace2(with item: WorkspaceItem2)
+    func saveWorkspace(with item: WorkspaceItem)
     var close: () -> Void { get }
 }
 
@@ -113,7 +102,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                                                     .font(.system(size: 16, weight: .bold))
                                                     .padding(.bottom, 8)
                                             }
-                                            test(workspace: workspace)
+                                            apps(in: workspace)
                                             Divider()
                                             HStack {
                                                 Image(systemName: "arrow.up.right.square")
@@ -185,8 +174,8 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
     }
     
     @ViewBuilder
-    func test(workspace: WorkspaceItem2) -> some View {
-        HStack(spacing: 4) {
+    func apps(in workspace: WorkspaceItem) -> some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 30))], spacing: 2) {
             ForEach(workspace.screens) { screen in
                 ForEach(screen.apps) { test in
                     if let app = test.app {
@@ -205,7 +194,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
         .padding(.bottom, 20.0)
     }
     
-    func processWorkspace(_ workspace: WorkspaceItem2, completion: @escaping () -> Void) {
+    func processWorkspace(_ workspace: WorkspaceItem, completion: @escaping () -> Void) {
         var screenIndex = 0
 
         func processNextScreen() {
@@ -468,7 +457,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
         inProgressWindow?.makeKeyAndOrderFront(nil)
     }
     
-    private func openCreateNewWorkspaceWindow(_ item: WorkspaceItem2? = nil) {
+    private func openCreateNewWorkspaceWindow(_ item: WorkspaceItem? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 800, height: 500),

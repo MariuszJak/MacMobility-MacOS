@@ -10,7 +10,7 @@ import Combine
 
 class WorkspacesWindowViewModel: ObservableObject, WorkspaceWindowDelegate {
     @Published var selectedId: String?
-    @Published var workspaces2: [WorkspaceItem2] = []
+    @Published var workspaces2: [WorkspaceItem] = []
     let connectionManager: ConnectionManager
     var cancellables = Set<AnyCancellable>()
     var close: () -> Void = {}
@@ -26,25 +26,25 @@ class WorkspacesWindowViewModel: ObservableObject, WorkspaceWindowDelegate {
         workspaces2 = UserDefaults.standard.getWorkspaceItems2() ?? []
     }
     
-    func getAutomations() -> [WorkspaceItem2] {
+    func getAutomations() -> [WorkspaceItem] {
         workspaces2
     }
     
-    func saveWorkspace2(with item: WorkspaceItem2) {
+    func saveWorkspace(with item: WorkspaceItem) {
         if let index = workspaces2.firstIndex(where: { $0.id == item.id }) {
             workspaces2[index] = item
             UserDefaults.standard.storeWorkspaceItems2(workspaces2)
-            connectionManager.workspaces2 = workspaces2
+            connectionManager.workspaces = workspaces2
             return
         }
         workspaces2.append(item)
-        connectionManager.workspaces2 = workspaces2
+        connectionManager.workspaces = workspaces2
         UserDefaults.standard.storeWorkspaceItems2(workspaces2)
     }
     
-    func removeWorkspace2(with item: WorkspaceItem2) {
+    func removeWorkspace2(with item: WorkspaceItem) {
         workspaces2 = workspaces2.filter { $0.id != item.id }
-        connectionManager.workspaces2 = workspaces2
+        connectionManager.workspaces = workspaces2
         UserDefaults.standard.storeWorkspaceItems2(workspaces2)
     }
     
