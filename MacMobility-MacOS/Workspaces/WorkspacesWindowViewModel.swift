@@ -10,7 +10,7 @@ import Combine
 
 class WorkspacesWindowViewModel: ObservableObject, WorkspaceWindowDelegate {
     @Published var selectedId: String?
-    @Published var workspaces2: [WorkspaceItem] = []
+    @Published var workspaces: [WorkspaceItem] = []
     let connectionManager: ConnectionManager
     var cancellables = Set<AnyCancellable>()
     var close: () -> Void = {}
@@ -18,37 +18,37 @@ class WorkspacesWindowViewModel: ObservableObject, WorkspaceWindowDelegate {
     init(selectedId: String? = nil, connectionManager: ConnectionManager, close: @escaping () -> Void = {}) {
         self.selectedId = selectedId
         self.connectionManager = connectionManager
-        self.workspaces2 = UserDefaults.standard.getWorkspaceItems2() ?? []
+        self.workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
         self.close = close
     }
     
     func refreshFromStorage() {
-        workspaces2 = UserDefaults.standard.getWorkspaceItems2() ?? []
+        workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
     }
     
     func getAutomations() -> [WorkspaceItem] {
-        workspaces2
+        workspaces
     }
     
     func saveWorkspace(with item: WorkspaceItem) {
-        if let index = workspaces2.firstIndex(where: { $0.id == item.id }) {
-            workspaces2[index] = item
-            UserDefaults.standard.storeWorkspaceItems2(workspaces2)
-            connectionManager.workspaces = workspaces2
+        if let index = workspaces.firstIndex(where: { $0.id == item.id }) {
+            workspaces[index] = item
+            UserDefaults.standard.storeWorkspaceItems(workspaces)
+            connectionManager.workspaces = workspaces
             return
         }
-        workspaces2.append(item)
-        connectionManager.workspaces = workspaces2
-        UserDefaults.standard.storeWorkspaceItems2(workspaces2)
+        workspaces.append(item)
+        connectionManager.workspaces = workspaces
+        UserDefaults.standard.storeWorkspaceItems(workspaces)
     }
     
     func removeWorkspace2(with item: WorkspaceItem) {
-        workspaces2 = workspaces2.filter { $0.id != item.id }
-        connectionManager.workspaces = workspaces2
-        UserDefaults.standard.storeWorkspaceItems2(workspaces2)
+        workspaces = workspaces.filter { $0.id != item.id }
+        connectionManager.workspaces = workspaces
+        UserDefaults.standard.storeWorkspaceItems(workspaces)
     }
     
     func saveWebpages() {
-        UserDefaults.standard.storeWorkspaceItems2(workspaces2)
+        UserDefaults.standard.storeWorkspaceItems(workspaces)
     }
 }

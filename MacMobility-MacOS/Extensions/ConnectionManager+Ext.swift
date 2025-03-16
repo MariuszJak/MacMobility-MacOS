@@ -31,6 +31,10 @@ extension ConnectionManager {
             openWebPage(for: webpageItem)
             return
         }
+        if let shortcutItem = try? JSONDecoder().decode(ShortcutObject.self, from: data) {
+            openShortcut(name: shortcutItem.title)
+            return
+        }
         if let appItem = try? JSONDecoder().decode(AppSendableInfo.self, from: data) {
             if let app = workspaces.flatMap({ $0.screens }).flatMap({ $0.apps }).first(where: { $0.app?.path == appItem.path }) {
                 openApp(at: app.app?.path ?? "")
@@ -68,6 +72,12 @@ extension ConnectionManager {
             } else {
                 focusToApp(string)
             }
+        }
+    }
+    
+    func openShortcut(name: String) {
+        if let url = URL(string: "shortcuts://run-shortcut?name=\(name)") {
+            NSWorkspace.shared.open(url)
         }
     }
     

@@ -8,60 +8,80 @@
 import SwiftUI
 
 struct ShortcutsView: View {
-    @State private var shortcuts: [String] = []
+    @ObservedObject private var viewModel: ShortcutsViewModel
+    
+    
+    init(viewModel: ShortcutsViewModel) {
+        self.viewModel = viewModel
+    }
     
     var body: some View {
-        VStack {
-            List(shortcuts, id: \.self) { shortcut in
-                Button(action: {
-                    openShortcut(name: shortcut)
-                }) {
-                    Text(shortcut)
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Shortcuts Editor")
+                    .font(.system(size: 17.0, weight: .bold))
+                    .padding([.horizontal, .top], 16)
+                
+                Image(systemName: "plus.circle.fill")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .padding([.horizontal, .top], 16.0)
+            }
+            Divider()
+        }
+        HStack {
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 6) {
+                    ForEach(0..<30) { index in
+                        VStack {
+                            if let object = viewModel.objectAt(index: index) {
+                                Text(object.title)
+                                    .onDrag {
+                                        NSItemProvider(object: object.id as NSString)
+                                    }
+                            }
+                        }
+                        .frame(width: 80, height: 80)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20.0)
+                                .fill(Color.black.opacity(0.4))
+                        )
+                        .onDrop(of: [.text], isTargeted: nil) { providers in
+                            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                                if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
+                                    DispatchQueue.main.async {
+                                        viewModel.addConfiguredShortcut(object: .init(index: index, id: object.id, title: object.title))
+                                    }
+                                }
+                            }
+                            return true
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .scrollIndicators(.hidden)
+            .frame(minWidth: 600, minHeight: 500)
+            
+            VStack(alignment: .leading) {
+                TextField("Search...", text: $viewModel.searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.vertical, 16.0)
+                ScrollView {
+                    ForEach(viewModel.shortcuts) { shortcut in
+                        HStack {
+                            Text(shortcut.title)
+                                .padding(.vertical, 6.0)
+                            Spacer()
+                        }
+                        .onDrag {
+                            NSItemProvider(object: shortcut.id as NSString)
+                        }
+                        Divider()
+                    }
                 }
             }
-        }
-        .padding()
-        .onAppear {
-            shortcuts = getShortcutsList()
-        }
-    }
-    
-    func runShortcut(name: String) {
-        let process = Process()
-        process.launchPath = "/usr/bin/shortcuts"
-        process.arguments = ["run", name]
-        
-        do {
-            try process.run()
-            process.waitUntilExit()
-        } catch {
-            print("Failed to run shortcut: \(error)")
-        }
-    }
-    
-    func openShortcut(name: String) {
-        if let url = URL(string: "shortcuts://run-shortcut?name=\(name)") {
-            NSWorkspace.shared.open(url)
-        }
-    }
-    
-    func getShortcutsList() -> [String] {
-        let process = Process()
-        let pipe = Pipe()
-        
-        process.launchPath = "/usr/bin/shortcuts"
-        process.arguments = ["list"]
-        process.standardOutput = pipe
-        
-        do {
-            try process.run()
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            let output = String(data: data, encoding: .utf8)
-            
-            return output?.components(separatedBy: "\n").filter { !$0.isEmpty } ?? []
-        } catch {
-            print("Failed to fetch shortcuts: \(error)")
-            return []
+            .padding()
         }
     }
 }

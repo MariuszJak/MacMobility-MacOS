@@ -50,6 +50,11 @@ class ConnectionManager: NSObject, ObservableObject {
             self.send(workspaces: workspaces)
         }
     }
+    public var shortcuts: [ShortcutObject] = [] {
+        didSet {
+            self.send(shortcuts: shortcuts)
+        }
+    }
     public var observers = [NSKeyValueObservation]()
     public var subscriptions = Set<AnyCancellable>()
     public var isUpdating = false
@@ -69,7 +74,8 @@ class ConnectionManager: NSObject, ObservableObject {
 
         runningApps = getRunningApps()
         webpages = UserDefaults.standard.getWebItems() ?? []
-        workspaces = UserDefaults.standard.getWorkspaceItems2() ?? []
+        workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
+        shortcuts = UserDefaults.standard.getShortcutsItems() ?? []
         subscribeForRunningApps()
 
         session.delegate = self

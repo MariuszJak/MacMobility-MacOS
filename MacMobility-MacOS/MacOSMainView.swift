@@ -87,7 +87,7 @@ struct MacOSMainPopoverView: View {
     private func openShortcutsWindow() {
         if nil == shortcutsWindow {
             shortcutsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 550),
+                contentRect: NSRect(x: 0, y: 0, width: 1000, height: 550),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -103,7 +103,7 @@ struct MacOSMainPopoverView: View {
             }
             
             shortcutsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: ShortcutsView())
+            let hv = NSHostingController(rootView: ShortcutsView(viewModel: .init(connectionManager: connectionManager)))
             shortcutsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = shortcutsWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]

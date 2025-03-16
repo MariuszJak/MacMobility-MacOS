@@ -33,6 +33,11 @@ struct WorkspacesResponse: Codable {
     let workspaces: [WorkspaceSendableItem]
 }
 
+struct ShortcutsResponse: Codable {
+    let shortcutTitle: String
+    let shortcuts: [ShortcutObject]
+}
+
 extension ConnectionManager: ConnectionSenable {
     var mouseLocation: NSPoint { NSEvent.mouseLocation }
     
@@ -91,6 +96,15 @@ extension ConnectionManager: ConnectionSenable {
             )
         }
         let payload = WorkspacesResponse(workspacesTitle: "workspacesTitle", workspaces: sendableWorkspaces)
+        guard !session.connectedPeers.isEmpty,
+              let data = try? JSONEncoder().encode(payload) else {
+            return
+        }
+        send(data)
+    }
+    
+    func send(shortcuts: [ShortcutObject]) {
+        let payload = ShortcutsResponse(shortcutTitle: "shortcutTitle", shortcuts: shortcuts)
         guard !session.connectedPeers.isEmpty,
               let data = try? JSONEncoder().encode(payload) else {
             return

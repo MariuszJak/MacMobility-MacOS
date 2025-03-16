@@ -32,25 +32,25 @@ extension UserDefaults {
         set(jsonData, forKey: Const.workspaceItems)
     }
     
-    func storeWorkspaceItems2(_ workspaceItems: [WorkspaceItem]) {
-        guard let jsonData = try? JSONEncoder().encode(workspaceItems) else {
+    func storeShortcutsItems(_ shortcuts: [ShortcutObject]) {
+        guard let jsonData = try? JSONEncoder().encode(shortcuts) else {
             return
         }
 
-        set(jsonData, forKey: Const.workspaceItems2)
-    }
-    
-    func getWorkspaceItems2() -> [WorkspaceItem]? {
-        guard let itemsData = object(forKey: Const.workspaceItems2) as? Data,
-              let items = try? JSONDecoder().decode([WorkspaceItem].self, from: itemsData) else {
-            return nil
-        }
-        return items
+        set(jsonData, forKey: Const.shortcuts)
     }
 
     func getWorkspaceItems() -> [WorkspaceItem]? {
         guard let itemsData = object(forKey: Const.workspaceItems) as? Data,
               let items = try? JSONDecoder().decode([WorkspaceItem].self, from: itemsData) else {
+            return nil
+        }
+        return items
+    }
+    
+    func getShortcutsItems() -> [ShortcutObject]? {
+        guard let itemsData = object(forKey: Const.shortcuts) as? Data,
+              let items = try? JSONDecoder().decode([ShortcutObject].self, from: itemsData) else {
             return nil
         }
         return items
@@ -67,7 +67,7 @@ extension UserDefaults {
     enum Const: String, CaseIterable {
         case webItems
         case workspaceItems
-        case workspaceItems2
+        case shortcuts
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C064B8C42D86EB090091E2BE /* ShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064B8C32D86EB090091E2BE /* ShortcutsView.swift */; };
+		C064B8D22D86F37E0091E2BE /* ShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064B8D12D86F37E0091E2BE /* ShortcutsViewModel.swift */; };
 		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
 		C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */; };
 		C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775332B5C319E00F4FFE6 /* Assets.xcassets */; };
@@ -61,6 +62,7 @@
 
 /* Begin PBXFileReference section */
 		C064B8C32D86EB090091E2BE /* ShortcutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsView.swift; sourceTree = "<group>"; };
+		C064B8D12D86F37E0091E2BE /* ShortcutsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsViewModel.swift; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility-MacOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MacMobility-MacOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				C064B8C32D86EB090091E2BE /* ShortcutsView.swift */,
+				C064B8D12D86F37E0091E2BE /* ShortcutsViewModel.swift */,
 			);
 			path = Shortcuts;
 			sourceTree = "<group>";
@@ -395,6 +398,7 @@
 			files = (
 				C064B8C42D86EB090091E2BE /* ShortcutsView.swift in Sources */,
 				C0D21D712D7A286600FEF931 /* NSVisualEffectView+Ext.swift in Sources */,
+				C064B8D22D86F37E0091E2BE /* ShortcutsViewModel.swift in Sources */,
 				C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */,
 				C097755D2B5C31CA00F4FFE6 /* Array+Ext.swift in Sources */,
 				C0D21D632D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift in Sources */,

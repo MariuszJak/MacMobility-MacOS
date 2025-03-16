@@ -90,10 +90,10 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                             .padding([.horizontal, .top], 16.0)
                     }
                     Divider()
-                    if !viewModel.workspaces2.isEmpty {
+                    if !viewModel.workspaces.isEmpty {
                         ScrollView {
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 6) {
-                                ForEach(viewModel.workspaces2) { workspace in
+                                ForEach(viewModel.workspaces) { workspace in
                                     VStack(alignment: .leading) {
                                         VStack(alignment: .leading) {
                                             HStack(alignment: .top) {
