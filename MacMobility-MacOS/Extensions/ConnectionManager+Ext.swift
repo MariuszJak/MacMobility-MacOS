@@ -69,6 +69,7 @@ extension ConnectionManager {
                 self.send(runningApps: self.runningApps)
                 self.send(webpages: self.webpages)
                 self.send(workspaces: self.workspaces)
+                self.send(shortcuts: self.shortcuts)
             } else {
                 focusToApp(string)
             }

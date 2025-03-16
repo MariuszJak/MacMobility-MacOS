@@ -12,11 +12,13 @@ public struct ShortcutObject: Identifiable, Codable {
     public let index: Int?
     public let id: String
     public let title: String
+    public var color: String?
     
-    public init(index: Int? = nil, id: String, title: String) {
+    public init(index: Int? = nil, id: String, title: String, color: String? = nil) {
         self.index = index
         self.id = id
         self.title = title
+        self.color = color
     }
 }
 
@@ -40,6 +42,12 @@ public class ShortcutsViewModel: ObservableObject {
     
     func object(for id: String) -> ShortcutObject? {
         shortcuts.first { $0.id == id }
+    }
+    
+    func removeShortcut(id: String) {
+        configuredShortcuts.removeAll { $0.id == id }
+        connectionManager.shortcuts = configuredShortcuts
+        UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
     }
     
     func addConfiguredShortcut(object: ShortcutObject) {
@@ -88,14 +96,26 @@ public class ShortcutsViewModel: ObservableObject {
             try process.run()
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             let output = String(data: data, encoding: .utf8)
+            let list = output?.components(separatedBy: "\n")
+                .filter { !$0.isEmpty }
             
             if self.searchText.isEmpty {
-                return output?.components(separatedBy: "\n").filter { !$0.isEmpty }.map { .init(id: UUID().uuidString, title: $0) } ?? []
+                return list?.map {
+                    item in .init(
+                        id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
+                        title: item,
+                        color: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.color ?? Color.randomDarkPastel.toHex()
+                    )
+                } ?? []
             } else {
-                return output?.components(separatedBy: "\n")
-                    .filter { !$0.isEmpty }
-                    .filter { $0.lowercased().contains(self.searchText.lowercased()) }
-                    .map { .init(id: UUID().uuidString, title: $0) } ?? []
+                return list?.filter { $0.lowercased().contains(self.searchText.lowercased()) }
+                    .map {
+                        item in .init(
+                            id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
+                            title: item,
+                            color: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.color ?? Color.randomDarkPastel.toHex()
+                        )
+                    } ?? []
             }
         } catch {
             print("Failed to fetch shortcuts: \(error)")

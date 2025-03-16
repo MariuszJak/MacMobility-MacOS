@@ -31,26 +31,47 @@ struct ShortcutsView: View {
         }
         HStack {
             ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 6) {
-                    ForEach(0..<30) { index in
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 6) {
+                    ForEach(0..<42) { index in
                         VStack {
                             if let object = viewModel.objectAt(index: index) {
-                                Text(object.title)
-                                    .onDrag {
-                                        NSItemProvider(object: object.id as NSString)
+                                ZStack {
+                                    Text(object.title)
+                                        .font(.system(size: 12))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.all, 3)
+                                        
+                                    VStack {
+                                        HStack {
+                                            Spacer()
+                                            RedXButton {
+                                                viewModel.removeShortcut(id: object.id)
+                                            }
+                                        }
+                                        Spacer()
                                     }
+                                }
+                                
                             }
                         }
-                        .frame(width: 80, height: 80)
+                        .frame(width: 70, height: 70)
                         .background(
                             RoundedRectangle(cornerRadius: 20.0)
-                                .fill(Color.black.opacity(0.4))
+                                .fill(viewModel.objectAt(index: index)?.color.let { Color(hex: $0) } ?? Color.black.opacity(0.4))
                         )
+                        .ifLet(viewModel.objectAt(index: index)?.id) { view, id in
+                            view.onDrag {
+                                NSItemProvider(object: id as NSString)
+                            }
+                        }
                         .onDrop(of: [.text], isTargeted: nil) { providers in
                             providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
                                 if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
                                     DispatchQueue.main.async {
-                                        viewModel.addConfiguredShortcut(object: .init(index: index, id: object.id, title: object.title))
+                                        viewModel.addConfiguredShortcut(object: .init(index: index,
+                                                                                      id: object.id,
+                                                                                      title: object.title,
+                                                                                      color: object.color))
                                     }
                                 }
                             }
