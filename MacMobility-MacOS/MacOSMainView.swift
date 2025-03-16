@@ -17,6 +17,7 @@ enum WorkspaceControl: String, CaseIterable {
 struct MacOSMainPopoverView: View {
     @StateObject var connectionManager = ConnectionManager()
     @State private var newWindow: NSWindow?
+    @State private var shortcutsWindow: NSWindow?
     @State private var workspacesWindow: NSWindow?
     @State var isAccessibilityGranted: Bool = false
     private var spacing = 6.0
@@ -33,6 +34,7 @@ struct MacOSMainPopoverView: View {
                         permissionView
                         webpagestWindowButtonView
                         workspacesWindowButtonView
+                        shortcutsWindowButtonView
                         pairiningView
                         if connectionManager.isConnecting {
                             Spacer()
@@ -80,6 +82,33 @@ struct MacOSMainPopoverView: View {
             hv.view.autoresizingMask = [.width, .height]
         }
         newWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openShortcutsWindow() {
+        if nil == shortcutsWindow {
+            shortcutsWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 550),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            shortcutsWindow?.center()
+            shortcutsWindow?.setFrameAutosaveName("Shortcuts")
+            shortcutsWindow?.isReleasedWhenClosed = false
+            shortcutsWindow?.titlebarAppearsTransparent = true
+            shortcutsWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: shortcutsWindow) else {
+                return
+            }
+            
+            shortcutsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: ShortcutsView())
+            shortcutsWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = shortcutsWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        shortcutsWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openWorkspacesWindow() {
@@ -143,6 +172,12 @@ struct MacOSMainPopoverView: View {
             }
         }
         .disabled(AXIsProcessTrusted())
+    }
+    
+    private var shortcutsWindowButtonView: some View {
+        Button("Shortcuts") {
+            openShortcutsWindow()
+        }
     }
     
     private var webpagestWindowButtonView: some View {
