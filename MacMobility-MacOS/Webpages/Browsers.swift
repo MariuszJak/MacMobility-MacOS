@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum Browsers: String, CaseIterable, Identifiable, Codable {
-    var id: Self { self }
+public enum Browsers: String, CaseIterable, Identifiable, Codable {
+    public var id: Self { self }
     
     case chrome
     case safari

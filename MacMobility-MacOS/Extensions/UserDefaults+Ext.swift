@@ -8,7 +8,7 @@
 import Foundation
 
 extension UserDefaults {
-    func storeWebItems(_ webItems: [WebpageItem]) {
+    func storeWebItems(_ webItems: [ShortcutObject]) {
         guard let jsonData = try? JSONEncoder().encode(webItems) else {
             return
         }
@@ -16,9 +16,9 @@ extension UserDefaults {
         set(jsonData, forKey: Const.webItems)
     }
 
-    func getWebItems() -> [WebpageItem]? {
+    func getWebItems() -> [ShortcutObject]? {
         guard let itemsData = object(forKey: Const.webItems) as? Data,
-              let items = try? JSONDecoder().decode([WebpageItem].self, from: itemsData) else {
+              let items = try? JSONDecoder().decode([ShortcutObject].self, from: itemsData) else {
             return nil
         }
         return items

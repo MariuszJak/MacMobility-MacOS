@@ -8,23 +8,22 @@
 import SwiftUI
 
 protocol WebpagesWindowDelegate: AnyObject {
-    func saveWebpage(with webpageItem: WebpageItem)
+    func saveWebpage(with webpageItem: ShortcutObject)
     var close: () -> Void { get }
 }
 
 struct WebpagesWindowView: View {
     @State private var newWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
-    @StateObject var viewModel = WebpagesWindowViewModel()
-    let connectionManager: ConnectionManager
+    @StateObject var viewModel: ShortcutsViewModel
     
     enum Constants {
         static let imageSize = 46.0
         static let cornerRadius = 6.0
     }
     
-    init(connectionManager: ConnectionManager) {
-        self.connectionManager = connectionManager
+    init(viewModel: ShortcutsViewModel) {
+        self._viewModel = .init(wrappedValue: viewModel)
     }
     
     var body: some View {
@@ -34,14 +33,6 @@ struct WebpagesWindowView: View {
                     .font(.system(size: 16.0, weight: .bold))
                     .padding([.horizontal, .top], 16)
                 Spacer()
-                Image(systemName: "arrow.up.right.square")
-                    .resizable()
-                    .frame(width: 16, height: 16)
-                    .onTapGesture {
-                        openAllWebpageWindow()
-                    }
-                    .padding(.top, 16.0)
-                    .padding(.trailing, 4.0)
                 Image(systemName: "plus.circle.fill")
                     .resizable()
                     .frame(width: 20, height: 20)
@@ -72,7 +63,7 @@ struct WebpagesWindowView: View {
                     Spacer()
                 }
             } else {
-                List {
+                ScrollView {
                     ForEach(viewModel.webpages) { item in
                         HStack {
                             if let link = item.faviconLink, let url = URL(string: link) {
@@ -92,13 +83,15 @@ struct WebpagesWindowView: View {
                                 .cornerRadius(Constants.cornerRadius)
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
                             } else {
-                                Image(item.browser.icon)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .cornerRadius(Constants.cornerRadius)
-                                    .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                if let browser = item.browser {
+                                    Image(browser.icon)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .cornerRadius(Constants.cornerRadius)
+                                        .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                }
                             }
-                            Text(item.webpageTitle)
+                            Text(item.title)
                             Spacer()
                             Image(systemName: "gear")
                                 .resizable()
@@ -111,30 +104,25 @@ struct WebpagesWindowView: View {
                                 .resizable()
                                 .frame(width: 16, height: 16)
                                 .onTapGesture {
-                                    viewModel.removeWebPageItem(with: item)
+                                    viewModel.removeWebItem(id: item.id)
                                 }
+                        }
+                        .onDrag {
+                            NSItemProvider(object: item.id as NSString)
                         }
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 20.0)
                                 .fill(Color.black.opacity(0.4))
                         )
-                    }.onMove(perform: { from, to in
-                        viewModel.webpages.move(fromOffsets: from, toOffset: to)
-                        viewModel.saveWebpages()
-                    })
+                    }
                 }
-                .listStyle(.sidebar)
             }
         }
-        .frame(minWidth: 400, minHeight: 200)
         .padding()
-        .onChange(of: viewModel.webpages) { _, webpages in
-            connectionManager.webpages = webpages
-        }
     }
     
-    private func openCreateNewWebpageWindow(item: WebpageItem? = nil) {
+    private func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
@@ -158,30 +146,6 @@ struct WebpagesWindowView: View {
         guard let allBrowserwWindow else { return }
         if allBrowserwWindow.isVisible {
             allBrowserwWindow.orderOut(nil)
-        } else {
-            openAllWebpageWindow()
         }
-    }
-    
-    private func openAllWebpageWindow() {
-        if nil == allBrowserwWindow {
-            allBrowserwWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-                styleMask: [.closable, .titled, .resizable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
-            allBrowserwWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
-            allBrowserwWindow?.center()
-            allBrowserwWindow?.setFrameAutosaveName("AllWebpages")
-            allBrowserwWindow?.isReleasedWhenClosed = false
-            allBrowserwWindow?.titlebarAppearsTransparent = true
-            allBrowserwWindow?.styleMask.insert(.fullSizeContentView)
-            allBrowserwWindow?.contentView = NSHostingView(rootView: AllWebpagesView(viewModel: viewModel))
-            viewModel.close = {
-                newWindow?.close()
-            }
-        }
-        allBrowserwWindow?.makeKeyAndOrderFront(nil)
     }
 }

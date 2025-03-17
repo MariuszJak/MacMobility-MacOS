@@ -14,7 +14,6 @@ import SwiftUI
 
 protocol ConnectionManagerWorskpaceCapable {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID)
-    func openWebpage(for webpageItem: WebpageItem)
     func openApp(at path: String)
     func mainDisplayID() -> CGDirectDisplayID
     func moveCursor(onDisplay display: CGDirectDisplayID, toPoint point: CGPoint)
@@ -27,10 +26,6 @@ protocol ConnectionManagerWorskpaceCapable {
 
 extension ConnectionManager {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if let webpageItem = try? JSONDecoder().decode(WebpageItem.self, from: data) {
-            openWebPage(for: webpageItem)
-            return
-        }
         if let shortcutItem = try? JSONDecoder().decode(ShortcutObject.self, from: data) {
             switch shortcutItem.type {
             case .app:
@@ -38,7 +33,7 @@ extension ConnectionManager {
             case .shortcut:
                 openShortcut(name: shortcutItem.title)
             case .webpage:
-                openWebPage(for: .init(id: shortcutItem.id, webpageTitle: shortcutItem.title, webpageLink: shortcutItem.path ?? "", browser: .safari))
+                openWebPage(for: shortcutItem)
             }
             return
         }
@@ -74,7 +69,6 @@ extension ConnectionManager {
         } else if let string = String(data: data, encoding: .utf8) {
             if string == "Connected - send data." {
                 self.send(runningApps: self.runningApps)
-                self.send(webpages: self.webpages)
                 self.send(workspaces: self.workspaces)
                 self.send(shortcuts: self.shortcuts)
             } else {
@@ -89,8 +83,8 @@ extension ConnectionManager {
         }
     }
     
-    func openWebPage(for webpageItem: WebpageItem) {
-        guard let url = NSURL(string: webpageItem.webpageLink) as? URL else {
+    func openWebPage(for webpageItem: ShortcutObject) {
+        guard let path = webpageItem.path, let url = NSURL(string: path) as? URL else {
             return
         }
         
@@ -109,6 +103,8 @@ extension ConnectionManager {
             NSWorkspace.shared.open(url, configuration: NSWorkspace.OpenConfiguration()) { _, error in
                 if let error { print(error) }
             }
+        case .none:
+            break
         }
     }
     

@@ -39,11 +39,6 @@ class ConnectionManager: NSObject, ObservableObject {
     public let session: MCSession
     public let log = Logger()
     public var runningApps: [RunningAppData] = []
-    public var webpages: [WebpageItem] = [] {
-        didSet {
-            self.send(webpages: webpages)
-        }
-    }
 
     public var workspaces: [WorkspaceItem] = [] {
         didSet {
@@ -73,7 +68,7 @@ class ConnectionManager: NSObject, ObservableObject {
         super.init()
 
         runningApps = getRunningApps()
-        webpages = UserDefaults.standard.getWebItems() ?? []
+//        webpages = UserDefaults.standard.getWebItems() ?? []
         workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
         shortcuts = UserDefaults.standard.getShortcutsItems() ?? []
         subscribeForRunningApps()

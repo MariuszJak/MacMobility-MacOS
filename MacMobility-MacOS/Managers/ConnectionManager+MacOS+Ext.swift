@@ -23,11 +23,6 @@ struct RunningAppResponse: Codable {
     let runningApps: [RunningAppData]
 }
 
-struct WebpagesResponse: Codable {
-    let webpagesTitle: String
-    let webpages: [WebpageItem]
-}
-
 struct WorkspacesResponse: Codable {
     let workspacesTitle: String
     let workspaces: [WorkspaceSendableItem]
@@ -50,8 +45,8 @@ extension ConnectionManager: ConnectionSenable {
                 }
                 self.runningApps = apps
                 self.send(runningApps: apps)
-                self.send(webpages: self.webpages)
                 self.send(workspaces: self.workspaces)
+                self.send(shortcuts: self.shortcuts)
             }
         ]
     }
@@ -72,16 +67,7 @@ extension ConnectionManager: ConnectionSenable {
         }
         send(data)
     }
-    
-    func send(webpages: [WebpageItem]) {
-        let payload = WebpagesResponse(webpagesTitle: "webpagesTitle", webpages: webpages)
-        guard !session.connectedPeers.isEmpty,
-              let data = try? JSONEncoder().encode(payload) else {
-            return
-        }
-        send(data)
-    }
-    
+
     func send(workspaces: [WorkspaceItem]) {
         let sendableWorkspaces: [WorkspaceSendableItem] = workspaces.map {
             .init(id: $0.id,

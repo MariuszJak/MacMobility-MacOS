@@ -69,6 +69,23 @@ struct ShortcutsView: View {
                                             Spacer()
                                         }
                                     }
+                                } else if let path = object.browser?.icon, object.type == .webpage {
+                                    ZStack {
+                                        Image(path)
+                                            .resizable()
+                                            .frame(width: 80, height: 80)
+                                            .cornerRadius(20)
+                                            
+                                        VStack {
+                                            HStack {
+                                                Spacer()
+                                                RedXButton {
+                                                    viewModel.removeShortcut(id: object.id)
+                                                }
+                                            }
+                                            Spacer()
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -86,12 +103,18 @@ struct ShortcutsView: View {
                             providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
                                 if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
                                     DispatchQueue.main.async {
-                                        viewModel.addConfiguredShortcut(object: .init(type: object.type,
-                                                                                      index: index,
-                                                                                      path: object.path,
-                                                                                      id: object.id,
-                                                                                      title: object.title,
-                                                                                      color: object.color))
+                                        viewModel.addConfiguredShortcut(object:
+                                                .init(
+                                                    type: object.type,
+                                                    index: index,
+                                                    path: object.path,
+                                                    id: object.id,
+                                                    title: object.title,
+                                                    color: object.color,
+                                                    faviconLink: object.faviconLink,
+                                                    browser: object.browser
+                                                )
+                                        )
                                     }
                                 }
                             }
@@ -112,6 +135,8 @@ struct ShortcutsView: View {
                         .tabItem( { Text("Shortcuts") })
                     installedAppsView
                         .tabItem( { Text("Applications") })
+                    websitesView
+                        .tabItem( { Text("Websites") })
                 }
                 .tabViewStyle(.automatic)
                 .padding([.horizontal, .bottom])
@@ -166,5 +191,9 @@ struct ShortcutsView: View {
             }
         }
         .padding()
+    }
+    
+    private var websitesView: some View {
+        WebpagesWindowView(viewModel: viewModel)
     }
 }

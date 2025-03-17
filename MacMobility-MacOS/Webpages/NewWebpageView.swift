@@ -26,12 +26,12 @@ struct NewWebpageView: View {
     @State private var browser = Browsers.chrome
     weak var delegate: WebpagesWindowDelegate?
     
-    init(item: WebpageItem? = nil, delegate: WebpagesWindowDelegate?) {
+    init(item: ShortcutObject? = nil, delegate: WebpagesWindowDelegate?) {
         self.delegate = delegate
         if let item {
-            self._browser = .init(initialValue: item.browser)
-            viewModel.title = item.webpageTitle
-            viewModel.link = item.webpageLink
+            self._browser = .init(initialValue: item.browser ?? .safari)
+            viewModel.title = item.title
+            viewModel.link = item.path ?? ""
             viewModel.id = item.id
             viewModel.faviconLink = item.faviconLink ?? ""
         }
@@ -52,11 +52,9 @@ struct NewWebpageView: View {
             .pickerStyle(.menu)
             .padding()
             Button {
-                delegate?.saveWebpage(with: .init(id: viewModel.id ?? UUID().uuidString,
-                                                  webpageTitle: viewModel.title,
-                                                  webpageLink: viewModel.link,
-                                                  faviconLink: viewModel.faviconLink,
-                                                  browser: browser))
+                delegate?.saveWebpage(with:
+                    .init(type: .webpage, path: viewModel.link, id: viewModel.id ?? UUID().uuidString, title: viewModel.title, faviconLink: viewModel.faviconLink, browser: browser)
+                )
                 viewModel.clear()
                 delegate?.close()
             } label: {
@@ -64,63 +62,6 @@ struct NewWebpageView: View {
             }
         }
         .padding()
-    }
-}
-
-struct AllWebpagesView: View {
-    @ObservedObject var viewModel: WebpagesWindowViewModel
-    
-    enum Constants {
-        static let imageSize = 46.0
-        static let cornerRadius = 6.0
-    }
-    
-    var body: some View {
-        ScrollView(.vertical, showsIndicators: false ) {
-            VStack {
-                ForEach(viewModel.webpages) { webpage in
-                    VStack(spacing: 0.0) {
-                        if let link = webpage.faviconLink, let url = URL(string: link) {
-                            AsyncImage(url: url,
-                                       content: { image in
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .cornerRadius(Constants.cornerRadius)
-                                    .frame(width: Constants.imageSize, height: Constants.imageSize)
-                            }, placeholder: {
-                                Image("Empty")
-                                    .resizable()
-                                    .cornerRadius(Constants.cornerRadius)
-                                    .frame(width: Constants.imageSize, height: Constants.imageSize)
-                            })
-                            .cornerRadius(Constants.cornerRadius)
-                            .frame(width: Constants.imageSize, height: Constants.imageSize)
-                        }
-                        Text(webpage.webpageTitle)
-                            .font(.caption2)
-                            .frame(maxWidth: 50.0)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.horizontal, 10.0)
-                    .padding(.vertical, 8.0)
-                    .onTapGesture {
-                        openWebPage(for: webpage)
-                    }
-                }
-            }
-        }
-        .clipped()
-        .background(VisualEffect().ignoresSafeArea())
-    }
-    
-    func openWebPage(for webpageItem: WebpageItem) {
-        guard let url = NSURL(string: webpageItem.webpageLink) as? URL else {
-            return
-        }
-        NSWorkspace.shared.open(url, configuration: NSWorkspace.OpenConfiguration()) { _, error in
-            if let error { print(error) }
-        }
     }
 }
 

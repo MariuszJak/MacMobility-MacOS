@@ -32,7 +32,6 @@ struct MacOSMainPopoverView: View {
                 HStack(alignment: .top, spacing: spacing * 2) {
                     VStack(alignment: .leading, spacing: spacing) {
                         permissionView
-                        webpagestWindowButtonView
                         workspacesWindowButtonView
                         shortcutsWindowButtonView
                         pairiningView
@@ -55,33 +54,6 @@ struct MacOSMainPopoverView: View {
             }
             .padding()
         }
-    }
-    
-    private func openWebpagesWindow() {
-        if nil == newWindow {
-            newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 550),
-                styleMask: [.titled, .closable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
-            newWindow?.center()
-            newWindow?.setFrameAutosaveName("Webpages")
-            newWindow?.isReleasedWhenClosed = false
-            newWindow?.titlebarAppearsTransparent = true
-            newWindow?.styleMask.insert(.fullSizeContentView)
-            
-            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
-                return
-            }
-            
-            newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: WebpagesWindowView(connectionManager: connectionManager))
-            newWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-        }
-        newWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openShortcutsWindow() {
@@ -177,12 +149,6 @@ struct MacOSMainPopoverView: View {
     private var shortcutsWindowButtonView: some View {
         Button("Shortcuts") {
             openShortcutsWindow()
-        }
-    }
-    
-    private var webpagestWindowButtonView: some View {
-        Button("Webpages") {
-            openWebpagesWindow()
         }
     }
     
