@@ -35,23 +35,41 @@ struct ShortcutsView: View {
                     ForEach(0..<42) { index in
                         VStack {
                             if let object = viewModel.objectAt(index: index) {
-                                ZStack {
-                                    Text(object.title)
-                                        .font(.system(size: 12))
-                                        .multilineTextAlignment(.center)
-                                        .padding(.all, 3)
-                                        
-                                    VStack {
-                                        HStack {
-                                            Spacer()
-                                            RedXButton {
-                                                viewModel.removeShortcut(id: object.id)
+                                if let path = object.path, object.type == .app {
+                                    ZStack {
+                                        Image(nsImage: NSWorkspace.shared.icon(forFile: path))
+                                            .resizable()
+                                            .frame(width: 80, height: 80)
+                                            .cornerRadius(20)
+                                            
+                                        VStack {
+                                            HStack {
+                                                Spacer()
+                                                RedXButton {
+                                                    viewModel.removeShortcut(id: object.id)
+                                                }
                                             }
+                                            Spacer()
                                         }
-                                        Spacer()
+                                    }
+                                } else if object.type == .shortcut {
+                                    ZStack {
+                                        Text(object.title)
+                                            .font(.system(size: 12))
+                                            .multilineTextAlignment(.center)
+                                            .padding(.all, 3)
+                                            
+                                        VStack {
+                                            HStack {
+                                                Spacer()
+                                                RedXButton {
+                                                    viewModel.removeShortcut(id: object.id)
+                                                }
+                                            }
+                                            Spacer()
+                                        }
                                     }
                                 }
-                                
                             }
                         }
                         .frame(width: 70, height: 70)
@@ -68,7 +86,9 @@ struct ShortcutsView: View {
                             providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
                                 if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
                                     DispatchQueue.main.async {
-                                        viewModel.addConfiguredShortcut(object: .init(index: index,
+                                        viewModel.addConfiguredShortcut(object: .init(type: object.type,
+                                                                                      index: index,
+                                                                                      path: object.path,
                                                                                       id: object.id,
                                                                                       title: object.title,
                                                                                       color: object.color))
@@ -79,30 +99,72 @@ struct ShortcutsView: View {
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding([.horizontal, .top])
             }
             .scrollIndicators(.hidden)
             .frame(minWidth: 600, minHeight: 500)
-            
-            VStack(alignment: .leading) {
+            VStack {
                 TextField("Search...", text: $viewModel.searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.vertical, 16.0)
-                ScrollView {
-                    ForEach(viewModel.shortcuts) { shortcut in
-                        HStack {
-                            Text(shortcut.title)
-                                .padding(.vertical, 6.0)
-                            Spacer()
-                        }
-                        .onDrag {
-                            NSItemProvider(object: shortcut.id as NSString)
-                        }
-                        Divider()
+                    .padding([.horizontal, .bottom], 16.0)
+                TabView {
+                    shortcutsView
+                        .tabItem( { Text("Shortcuts") })
+                    installedAppsView
+                        .tabItem( { Text("Applications") })
+                }
+                .tabViewStyle(.automatic)
+                .padding([.horizontal, .bottom])
+            }
+        }
+    }
+    
+    private var shortcutsView: some View {
+        VStack(alignment: .leading) {
+            ScrollView {
+                ForEach(viewModel.shortcuts) { shortcut in
+                    HStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: shortcut.color ?? ""))
+                            .frame(width: 44, height: 44)
+                            .padding(.trailing, 8)
+                        Text(shortcut.title)
+                            .padding(.vertical, 6.0)
+                        Spacer()
                     }
+                    .onDrag {
+                        NSItemProvider(object: shortcut.id as NSString)
+                    }
+                    Divider()
                 }
             }
-            .padding()
         }
+        .padding()
+    }
+    
+    private var installedAppsView: some View {
+        VStack(alignment: .leading) {
+            ScrollView {
+                ForEach(viewModel.installedApps) { app in
+                    HStack {
+                        HStack {
+                            Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
+                                .resizable()
+                                .frame(width: 38, height: 38)
+                                .cornerRadius(3)
+                                .padding(.trailing, 8)
+                            Text(app.title)
+                                .padding(.vertical, 6.0)
+                        }
+                        Spacer()
+                    }
+                    .onDrag {
+                        NSItemProvider(object: app.id as NSString)
+                    }
+                    Divider()
+                }
+            }
+        }
+        .padding()
     }
 }

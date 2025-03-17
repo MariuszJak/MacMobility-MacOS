@@ -32,7 +32,14 @@ extension ConnectionManager {
             return
         }
         if let shortcutItem = try? JSONDecoder().decode(ShortcutObject.self, from: data) {
-            openShortcut(name: shortcutItem.title)
+            switch shortcutItem.type {
+            case .app:
+                openApp(at: shortcutItem.path ?? "")
+            case .shortcut:
+                openShortcut(name: shortcutItem.title)
+            case .webpage:
+                openWebPage(for: .init(id: shortcutItem.id, webpageTitle: shortcutItem.title, webpageLink: shortcutItem.path ?? "", browser: .safari))
+            }
             return
         }
         if let appItem = try? JSONDecoder().decode(AppSendableInfo.self, from: data) {

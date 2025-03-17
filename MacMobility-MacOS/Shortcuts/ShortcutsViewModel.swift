@@ -8,17 +8,29 @@
 import SwiftUI
 import Combine
 
+public enum ShortcutType: String, Codable {
+    case shortcut
+    case app
+    case webpage
+}
+
 public struct ShortcutObject: Identifiable, Codable {
     public let index: Int?
     public let id: String
     public let title: String
+    public let path: String?
     public var color: String?
+    public let type: ShortcutType
+    public let imageData: Data?
     
-    public init(index: Int? = nil, id: String, title: String, color: String? = nil) {
+    public init(type: ShortcutType, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil) {
+        self.type = type
         self.index = index
+        self.path = path
         self.id = id
         self.title = title
         self.color = color
+        self.imageData = try? NSWorkspace.shared.icon(forFile: path ?? "").imageData(for: .png(scale: 0.2, excludeGPSData: false))
     }
 }
 
@@ -26,6 +38,7 @@ public class ShortcutsViewModel: ObservableObject {
     let connectionManager: ConnectionManager
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []
+    @Published var installedApps: [ShortcutObject] = []
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     
@@ -33,6 +46,7 @@ public class ShortcutsViewModel: ObservableObject {
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.getShortcutsItems() ?? []
         fetchShortcuts()
+        fetchInstalledApps()
         registerListener()
     }
     
@@ -41,7 +55,7 @@ public class ShortcutsViewModel: ObservableObject {
     }
     
     func object(for id: String) -> ShortcutObject? {
-        shortcuts.first { $0.id == id }
+        shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id }
     }
     
     func removeShortcut(id: String) {
@@ -52,10 +66,16 @@ public class ShortcutsViewModel: ObservableObject {
     
     func addConfiguredShortcut(object: ShortcutObject) {
         if let index = configuredShortcuts.firstIndex(where: { $0.index == object.index }) {
+            let oldObject = configuredShortcuts[index]
             configuredShortcuts[index] = object
             configuredShortcuts.enumerated().forEach { (index, shortcut) in
                 if (object.index != shortcut.index && shortcut.id == object.id) {
-                    configuredShortcuts.remove(at: index)
+                    configuredShortcuts[index] = .init(type: oldObject.type,
+                                                       index: configuredShortcuts[index].index,
+                                                       path: oldObject.path,
+                                                       id: oldObject.id,
+                                                       title: oldObject.title,
+                                                       color: oldObject.color)
                 }
             }
         } else {
@@ -70,6 +90,7 @@ public class ShortcutsViewModel: ObservableObject {
         $searchText
             .sink { [weak self] _ in
                 self?.fetchShortcuts()
+                self?.fetchInstalledApps()
             }
             .store(in: &cancellables)
     }
@@ -102,6 +123,7 @@ public class ShortcutsViewModel: ObservableObject {
             if self.searchText.isEmpty {
                 return list?.map {
                     item in .init(
+                        type: .shortcut,
                         id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
                         title: item,
                         color: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.color ?? Color.randomDarkPastel.toHex()
@@ -111,6 +133,7 @@ public class ShortcutsViewModel: ObservableObject {
                 return list?.filter { $0.lowercased().contains(self.searchText.lowercased()) }
                     .map {
                         item in .init(
+                            type: .shortcut,
                             id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
                             title: item,
                             color: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.color ?? Color.randomDarkPastel.toHex()
@@ -121,5 +144,48 @@ public class ShortcutsViewModel: ObservableObject {
             print("Failed to fetch shortcuts: \(error)")
             return []
         }
+    }
+    
+    func fetchInstalledApps() {
+        let appDirectories = [
+            "/Applications",
+            "/System/Applications/Utilities"
+        ]
+
+        var apps: [ShortcutObject] = []
+
+        for directory in appDirectories {
+            apps.append(contentsOf: findApps(in: directory))
+        }
+
+        DispatchQueue.main.async {
+            if self.searchText.isEmpty {
+                self.installedApps = apps.sorted { $0.title.lowercased() < $1.title.lowercased() }
+            } else {
+                self.installedApps = apps.sorted { $0.title.lowercased() < $1.title.lowercased() }
+                    .filter { $0.title.lowercased().contains(self.searchText.lowercased()) }
+            }
+        }
+    }
+    
+    func findApps(in directory: String) -> [ShortcutObject] {
+        var apps: [ShortcutObject] = []
+
+        if let appURLs = try? FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: directory), includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
+            for appURL in appURLs where appURL.pathExtension == "app" {
+                let appName = appURL.deletingPathExtension().lastPathComponent
+                apps.append(
+                    ShortcutObject(
+                        type: .app,
+                        path: appURL.path,
+                        id: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
+                        title: appName,
+                        color: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.color ?? Color.randomDarkPastel.toHex()
+                    )
+                )
+            }
+        }
+
+        return apps
     }
 }
