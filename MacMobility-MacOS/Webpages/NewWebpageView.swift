@@ -66,6 +66,7 @@ struct NewWebpageView: View {
                 delegate?.saveWebpage(with:
                     .init(
                         type: .webpage,
+                        page: 1, // TODO: Check is it correct
                         path: viewModel.link,
                         id: viewModel.id ?? UUID().uuidString,
                         title: viewModel.title,

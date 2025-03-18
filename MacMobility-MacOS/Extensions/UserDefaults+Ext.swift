@@ -7,6 +7,10 @@
 
 import Foundation
 
+public struct Pages: Codable {
+    let pages: Int
+}
+
 extension UserDefaults {
     func storeWebItems(_ webItems: [ShortcutObject]) {
         guard let jsonData = try? JSONEncoder().encode(webItems) else {
@@ -22,6 +26,23 @@ extension UserDefaults {
             return nil
         }
         return items
+    }
+    
+    func storePages(_ pagesCount: Int) {
+        let pages = Pages(pages: pagesCount)
+        guard let jsonData = try? JSONEncoder().encode(pages) else {
+            return
+        }
+
+        set(jsonData, forKey: Const.pages)
+    }
+
+    func getPagesCount() -> Int? {
+        guard let itemsData = object(forKey: Const.pages) as? Data,
+              let pages = try? JSONDecoder().decode(Pages.self, from: itemsData) else {
+            return nil
+        }
+        return pages.pages
     }
     
     func storeWorkspaceItems(_ workspaceItems: [WorkspaceItem]) {
@@ -68,6 +89,7 @@ extension UserDefaults {
         case webItems
         case workspaceItems
         case shortcuts
+        case pages
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {

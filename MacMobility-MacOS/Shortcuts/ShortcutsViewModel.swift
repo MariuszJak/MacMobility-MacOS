@@ -16,6 +16,7 @@ public enum ShortcutType: String, Codable {
 
 public struct ShortcutObject: Identifiable, Codable {
     public let index: Int?
+    public var page: Int
     public let id: String
     public let title: String
     public let path: String?
@@ -25,7 +26,8 @@ public struct ShortcutObject: Identifiable, Codable {
     public let imageData: Data?
     public var browser: Browsers?
     
-    public init(type: ShortcutType, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil, imageData: Data? = nil) {
+    public init(type: ShortcutType, page: Int, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil, imageData: Data? = nil) {
+        self.page = page
         self.type = type
         self.index = index
         self.path = path
@@ -53,19 +55,22 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
     @Published var webpages: [ShortcutObject] = []
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
+    @Published var pages = 1
+    @Published var currentPage = 1
     var close: () -> Void = {}
     
     init(connectionManager: ConnectionManager) {
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.getShortcutsItems() ?? []
         self.webpages = UserDefaults.standard.getWebItems() ?? []
+        self.pages = UserDefaults.standard.getPagesCount() ?? 1
         fetchShortcuts()
         fetchInstalledApps()
         registerListener()
     }
     
     func objectAt(index: Int) -> ShortcutObject? {
-        configuredShortcuts.first(where: { $0.index == index })
+        configuredShortcuts.filter { $0.page == currentPage }.first(where: { $0.index == index })
     }
     
     func object(for id: String) -> ShortcutObject? {
@@ -78,6 +83,27 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
         UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
     }
     
+    func addPage() {
+        pages += 1
+        currentPage = pages
+        UserDefaults.standard.storePages(pages)
+    }
+    
+    func removePage() {  
+        configuredShortcuts.removeAll { $0.page == currentPage }
+        configuredShortcuts.enumerated().forEach { (index, object) in
+            if configuredShortcuts[index].page > currentPage {
+                configuredShortcuts[index].page -= 1
+            }
+        }
+        if pages > 1 {
+            pages -= 1
+        }
+        connectionManager.shortcuts = configuredShortcuts
+        UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
+        UserDefaults.standard.storePages(pages)
+    }
+    
     func removeWebItem(id: String) {
         webpages.removeAll { $0.id == id }
         configuredShortcuts.removeAll { $0.id == id }
@@ -86,13 +112,14 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
     }
     
     func addConfiguredShortcut(object: ShortcutObject) {
-        if let index = configuredShortcuts.firstIndex(where: { $0.index == object.index }) {
+        if let index = configuredShortcuts.firstIndex(where: { $0.index == object.index && $0.page == object.page }) {
             let oldObject = configuredShortcuts[index]
             configuredShortcuts[index] = object
             configuredShortcuts.enumerated().forEach { (index, shortcut) in
                 if (object.index != shortcut.index && shortcut.id == object.id) {
                     configuredShortcuts[index] = .init(
                         type: oldObject.type,
+                        page: oldObject.page,
                         index: configuredShortcuts[index].index,
                         path: oldObject.path,
                         id: oldObject.id,
@@ -131,6 +158,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
             if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == webpageItem.id }) {
                 configuredShortcuts[configuredIndex] = .init(
                     type: webpageItem.type,
+                    page: webpageItem.page,
                     index: configuredShortcuts[configuredIndex].index,
                     path: webpageItem.path,
                     id: webpageItem.id,
@@ -174,6 +202,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
                 return list?.map {
                     item in .init(
                         type: .shortcut,
+                        page: currentPage,
                         id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
                         title: item,
                         color: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.color ?? Color.randomDarkPastel.toHex()
@@ -184,6 +213,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
                     .map {
                         item in .init(
                             type: .shortcut,
+                            page: currentPage,
                             id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
                             title: item,
                             color: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.color ?? Color.randomDarkPastel.toHex()
@@ -227,6 +257,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
                 apps.append(
                     ShortcutObject(
                         type: .app,
+                        page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? currentPage,
                         path: appURL.path,
                         id: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
                         title: appName,
