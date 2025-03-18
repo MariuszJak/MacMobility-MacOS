@@ -32,7 +32,6 @@ struct MacOSMainPopoverView: View {
                 HStack(alignment: .top, spacing: spacing * 2) {
                     VStack(alignment: .leading, spacing: spacing) {
                         permissionView
-                        workspacesWindowButtonView
                         shortcutsWindowButtonView
                         pairiningView
                         if connectionManager.isConnecting {
@@ -147,7 +146,7 @@ struct MacOSMainPopoverView: View {
     }
     
     private var shortcutsWindowButtonView: some View {
-        Button("Shortcuts") {
+        Button("Workspace") {
             openShortcutsWindow()
         }
     }
