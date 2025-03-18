@@ -69,13 +69,20 @@ struct ShortcutsView: View {
                                             Spacer()
                                         }
                                     }
-                                } else if let path = object.browser?.icon, object.type == .webpage {
+                                } else if object.type == .webpage {
                                     ZStack {
-                                        Image(path)
-                                            .resizable()
-                                            .frame(width: 80, height: 80)
-                                            .cornerRadius(20)
-                                            
+                                        if let data = object.imageData, let image = NSImage(data: data) {
+                                            Image(nsImage: image)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .cornerRadius(6.0)
+                                                .frame(width: 40, height: 40)
+                                        } else if let path = object.browser?.icon {
+                                            Image(path)
+                                                .resizable()
+                                                .frame(width: 80, height: 80)
+                                                .cornerRadius(20)
+                                        }
                                         VStack {
                                             HStack {
                                                 Spacer()
@@ -112,7 +119,8 @@ struct ShortcutsView: View {
                                                     title: object.title,
                                                     color: object.color,
                                                     faviconLink: object.faviconLink,
-                                                    browser: object.browser
+                                                    browser: object.browser,
+                                                    imageData: object.imageData
                                                 )
                                         )
                                     }

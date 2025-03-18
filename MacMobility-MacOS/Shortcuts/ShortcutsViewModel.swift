@@ -25,7 +25,7 @@ public struct ShortcutObject: Identifiable, Codable {
     public let imageData: Data?
     public var browser: Browsers?
     
-    public init(type: ShortcutType, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil) {
+    public init(type: ShortcutType, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil, imageData: Data? = nil) {
         self.type = type
         self.index = index
         self.path = path
@@ -34,11 +34,11 @@ public struct ShortcutObject: Identifiable, Codable {
         self.color = color
         switch type {
         case .shortcut:
-            self.imageData = nil
+            self.imageData = imageData
         case .app:
             self.imageData = try? NSWorkspace.shared.icon(forFile: path ?? "").imageData(for: .png(scale: 0.2, excludeGPSData: false))
         case .webpage:
-            self.imageData = nil
+            self.imageData = imageData
         }
         self.faviconLink = faviconLink
         self.browser = browser
@@ -82,6 +82,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
         webpages.removeAll { $0.id == id }
         configuredShortcuts.removeAll { $0.id == id }
         UserDefaults.standard.storeWebItems(webpages)
+        connectionManager.shortcuts = configuredShortcuts
     }
     
     func addConfiguredShortcut(object: ShortcutObject) {
@@ -90,14 +91,17 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
             configuredShortcuts[index] = object
             configuredShortcuts.enumerated().forEach { (index, shortcut) in
                 if (object.index != shortcut.index && shortcut.id == object.id) {
-                    configuredShortcuts[index] = .init(type: oldObject.type,
-                                                       index: configuredShortcuts[index].index,
-                                                       path: oldObject.path,
-                                                       id: oldObject.id,
-                                                       title: oldObject.title,
-                                                       color: oldObject.color,
-                                                       faviconLink: oldObject.faviconLink,
-                                                       browser: oldObject.browser)
+                    configuredShortcuts[index] = .init(
+                        type: oldObject.type,
+                        index: configuredShortcuts[index].index,
+                        path: oldObject.path,
+                        id: oldObject.id,
+                        title: oldObject.title,
+                        color: oldObject.color,
+                        faviconLink: oldObject.faviconLink,
+                        browser: oldObject.browser,
+                        imageData: oldObject.imageData
+                    )
                 }
             }
         } else {
@@ -125,14 +129,17 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
         if let index = webpages.firstIndex(where: { $0.id == webpageItem.id }) {
             webpages[index] = webpageItem
             if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == webpageItem.id }) {
-                configuredShortcuts[configuredIndex] = .init(type: webpageItem.type,
-                                                             index: configuredShortcuts[configuredIndex].index,
-                                                             path: webpageItem.path,
-                                                             id: webpageItem.id,
-                                                             title: webpageItem.title,
-                                                             color: webpageItem.color,
-                                                             faviconLink: webpageItem.faviconLink,
-                                                             browser: webpageItem.browser)
+                configuredShortcuts[configuredIndex] = .init(
+                    type: webpageItem.type,
+                    index: configuredShortcuts[configuredIndex].index,
+                    path: webpageItem.path,
+                    id: webpageItem.id,
+                    title: webpageItem.title,
+                    color: webpageItem.color,
+                    faviconLink: webpageItem.faviconLink,
+                    browser: webpageItem.browser,
+                    imageData: webpageItem.imageData
+                )
                 UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
             }
         } else {

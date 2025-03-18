@@ -12,28 +12,36 @@ class NewWebpageViewModel: ObservableObject {
     @Published var title: String = ""
     @Published var link: String = ""
     @Published var faviconLink: String = ""
+    @Published var iconData: Data?
+    @Published var selectedIcon: NSImage?
+    @Published var browser = Browsers.chrome
     
     func clear() {
         id = nil
+        iconData = nil
         title = ""
         link = ""
         faviconLink = ""
+        browser = .chrome
     }
 }
 
 struct NewWebpageView: View {
     @ObservedObject var viewModel = NewWebpageViewModel()
-    @State private var browser = Browsers.chrome
+    
     weak var delegate: WebpagesWindowDelegate?
     
     init(item: ShortcutObject? = nil, delegate: WebpagesWindowDelegate?) {
         self.delegate = delegate
         if let item {
-            self._browser = .init(initialValue: item.browser ?? .safari)
+            viewModel.browser = item.browser ?? .chrome
             viewModel.title = item.title
             viewModel.link = item.path ?? ""
             viewModel.id = item.id
             viewModel.faviconLink = item.faviconLink ?? ""
+            if let data = item.imageData {
+                viewModel.selectedIcon = NSImage(data: data)
+            }
         }
     }
     
@@ -45,15 +53,26 @@ struct NewWebpageView: View {
             TextField("", text: $viewModel.link)
             Text("Favicon:")
             TextField("", text: $viewModel.faviconLink)
-            Picker("Browser", selection: $browser) {
+            Picker("Browser", selection: $viewModel.browser) {
                 Text("Chrome").tag(Browsers.chrome)
                 Text("Safari").tag(Browsers.safari)
             }
             .pickerStyle(.menu)
             .padding()
+            IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
+                viewModel.selectedIcon = image
+            })
             Button {
                 delegate?.saveWebpage(with:
-                    .init(type: .webpage, path: viewModel.link, id: viewModel.id ?? UUID().uuidString, title: viewModel.title, faviconLink: viewModel.faviconLink, browser: browser)
+                    .init(
+                        type: .webpage,
+                        path: viewModel.link,
+                        id: viewModel.id ?? UUID().uuidString,
+                        title: viewModel.title,
+                        faviconLink: viewModel.faviconLink,
+                        browser: viewModel.browser,
+                        imageData: viewModel.selectedIcon?.toData
+                    )
                 )
                 viewModel.clear()
                 delegate?.close()
@@ -62,6 +81,17 @@ struct NewWebpageView: View {
             }
         }
         .padding()
+    }
+}
+
+extension NSImage {
+    var toData: Data? {
+        guard let tiffData = self.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: tiffData) else {
+            return nil
+        }
+        
+        return bitmap.representation(using: .png, properties: [:])
     }
 }
 
@@ -74,5 +104,64 @@ struct VisualEffect: NSViewRepresentable {
         visualEffect.state = .active
         visualEffect.material = .popover
         return visualEffect
+    }
+}
+
+import SwiftUI
+import AppKit
+
+class IconPickerViewModel: ObservableObject {
+    @Published var selectedImage: NSImage?
+    var completion: (NSImage) -> Void
+    
+    init(selectedImage: NSImage?, completion: @escaping (NSImage) -> Void) {
+        self.selectedImage = selectedImage
+        self.completion = completion
+    }
+    
+    func pickImage() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.image]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        
+        if panel.runModal() == .OK, let url = panel.url {
+            if let image = NSImage(contentsOf: url) {
+                DispatchQueue.main.async {
+                    self.selectedImage = image
+                    self.completion(image)
+                }
+            }
+        }
+    }
+}
+
+struct IconPickerView: View {
+    @StateObject private var viewModel: IconPickerViewModel
+    
+    init(viewModel: IconPickerViewModel) {
+        self._viewModel = .init(wrappedValue: viewModel)
+    }
+    
+    var body: some View {
+        HStack {
+            if let image = viewModel.selectedImage {
+                Image(nsImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            } else {
+                Text("No Icon Selected")
+                    .frame(width: 100, height: 100)
+                    .background(Color.gray.opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            
+            Button("Select Icon") {
+                viewModel.pickImage()
+            }
+        }
+        .padding()
     }
 }

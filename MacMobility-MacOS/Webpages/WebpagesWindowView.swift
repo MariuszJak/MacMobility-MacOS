@@ -66,7 +66,13 @@ struct WebpagesWindowView: View {
                 ScrollView {
                     ForEach(viewModel.webpages) { item in
                         HStack {
-                            if let link = item.faviconLink, let url = URL(string: link) {
+                            if let data = item.imageData, let image = NSImage(data: data) {
+                                Image(nsImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .cornerRadius(Constants.cornerRadius)
+                                    .frame(width: Constants.imageSize, height: Constants.imageSize)
+                            } else if let link = item.faviconLink, let url = URL(string: link) {
                                 AsyncImage(url: url,
                                            content: { image in
                                     image
