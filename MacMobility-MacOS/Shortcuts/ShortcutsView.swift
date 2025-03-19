@@ -42,6 +42,17 @@ struct ShortcutsView: View {
         }
         HStack {
             VStack {
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(1..<viewModel.pages + 1, id: \.self) { page in
+                            Button("Page \(page)") {
+                                viewModel.currentPage = page
+                            }
+                        }
+                    }
+                }
+                .scrollIndicators(.hidden)
+                .padding(.vertical, 21.0)
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 6) {
                         ForEach(0..<21) { index in
@@ -52,8 +63,7 @@ struct ShortcutsView: View {
                                             Image(nsImage: NSWorkspace.shared.icon(forFile: path))
                                                 .resizable()
                                                 .frame(width: 80, height: 80)
-                                                .cornerRadius(20)
-                                            
+                                                .cornerRadius(8.0)
                                             VStack {
                                                 HStack {
                                                     Spacer()
@@ -88,11 +98,11 @@ struct ShortcutsView: View {
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fill)
                                                     .cornerRadius(6.0)
-                                                    .frame(width: 40, height: 40)
+                                                    .frame(width: 70, height: 70)
                                             } else if let path = object.browser?.icon {
                                                 Image(path)
                                                     .resizable()
-                                                    .frame(width: 80, height: 80)
+                                                    .frame(width: 70, height: 70)
                                                     .cornerRadius(20)
                                             }
                                             VStack {
@@ -105,12 +115,43 @@ struct ShortcutsView: View {
                                                 Spacer()
                                             }
                                         }
+                                    } else if object.type == .utility {
+                                        ZStack {
+                                            if let data = object.imageData, let image = NSImage(data: data) {
+                                                Image(nsImage: image)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .cornerRadius(6.0)
+                                                    .frame(width: 70, height: 70)
+                                            }
+                                            VStack {
+                                                HStack {
+                                                    Spacer()
+                                                    RedXButton {
+                                                        viewModel.removeShortcut(id: object.id)
+                                                    }
+                                                }
+                                                Spacer()
+                                            }
+                                            if !object.title.isEmpty {
+                                                Text(object.title)
+                                                    .font(.system(size: 11))
+                                                    .multilineTextAlignment(.center)
+                                                    .lineLimit(2)
+                                                    .frame(maxWidth: 80)
+                                                    .background(
+                                                        RoundedRectangle(cornerRadius: 2)
+                                                            .fill(Color.black.opacity(0.8))
+                                                    )
+                                                    .padding(.top, 20)
+                                            }
+                                        }
                                     }
                                 }
                             }
                             .frame(width: 70, height: 70)
                             .background(
-                                RoundedRectangle(cornerRadius: 20.0)
+                                RoundedRectangle(cornerRadius: 8.0)
                                     .fill(viewModel.objectAt(index: index)?.color.let { Color(hex: $0) } ?? Color.black.opacity(0.4))
                             )
                             .ifLet(viewModel.objectAt(index: index)?.id) { view, id in
@@ -133,7 +174,9 @@ struct ShortcutsView: View {
                                                         color: object.color,
                                                         faviconLink: object.faviconLink,
                                                         browser: object.browser,
-                                                        imageData: object.imageData
+                                                        imageData: object.imageData,
+                                                        scriptCode: object.scriptCode,
+                                                        utilityType: object.utilityType
                                                     )
                                             )
                                         }
@@ -148,16 +191,6 @@ struct ShortcutsView: View {
                 .scrollIndicators(.hidden)
                 .frame(minWidth: 600)
                 .scrollDisabled(true)
-                ScrollView(.horizontal) {
-                    HStack {
-                        ForEach(1..<viewModel.pages + 1, id: \.self) { page in
-                            Button("Page \(page)") {
-                                viewModel.currentPage = page
-                            }
-                        }
-                    }
-                }
-                .padding(.bottom, 21.0)
             }
             VStack {
                 TextField("Search...", text: $viewModel.searchText)
@@ -170,6 +203,8 @@ struct ShortcutsView: View {
                         .tabItem( { Text("Applications") })
                     websitesView
                         .tabItem( { Text("Websites") })
+                    utilitiesView
+                        .tabItem( { Text("Utilities") })
                 }
                 .tabViewStyle(.automatic)
                 .padding([.horizontal, .bottom])
@@ -228,5 +263,9 @@ struct ShortcutsView: View {
     
     private var websitesView: some View {
         WebpagesWindowView(viewModel: viewModel)
+    }
+    
+    private var utilitiesView: some View {
+        UtilitiesWindowView(viewModel: viewModel)
     }
 }

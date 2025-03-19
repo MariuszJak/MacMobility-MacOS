@@ -43,6 +43,9 @@
 		C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */; };
 		C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */; };
 		C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */; };
+		C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */; };
+		C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */; };
+		C0EAF9392D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +106,9 @@
 		C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWebpageView.swift; sourceTree = "<group>"; };
 		C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Ext.swift"; sourceTree = "<group>"; };
 		C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Ext.swift"; sourceTree = "<group>"; };
+		C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilitiesWindowView.swift; sourceTree = "<group>"; };
+		C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBashUtilityView.swift; sourceTree = "<group>"; };
+		C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectUtilityTypeWindowView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +189,7 @@
 		C097752E2B5C319D00F4FFE6 /* MacMobility-MacOS */ = {
 			isa = PBXGroup;
 			children = (
+				C0EAF9332D8B491700044947 /* Utilities */,
 				C064B8C22D86EAED0091E2BE /* Shortcuts */,
 				C0CEDBAA2D7098B700E1A041 /* Workspaces */,
 				C091AD242BA4D93000C8DC8D /* Managers */,
@@ -263,6 +270,16 @@
 				C064BA662D876FA40091E2BE /* Optional+Ext.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		C0EAF9332D8B491700044947 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */,
+				C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */,
+				C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -411,10 +428,13 @@
 				C0D21D632D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift in Sources */,
 				C0D21D732D7B8F0400FEF931 /* ConnectionManager+Ext.swift in Sources */,
 				C097755F2B5C31D700F4FFE6 /* ConnectionManager.swift in Sources */,
+				C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */,
 				C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */,
 				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
+				C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */,
 				C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */,
 				C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */,
+				C0EAF9392D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift in Sources */,
 				C0D21D652D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift in Sources */,
 				C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,

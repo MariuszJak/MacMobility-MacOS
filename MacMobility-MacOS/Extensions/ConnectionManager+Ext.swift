@@ -34,6 +34,10 @@ extension ConnectionManager {
                 openShortcut(name: shortcutItem.title)
             case .webpage:
                 openWebPage(for: shortcutItem)
+            case .utility:
+                if let script = shortcutItem.scriptCode {
+                    runInlineBashScript(script: script)
+                }
             }
             return
         }
@@ -74,6 +78,26 @@ extension ConnectionManager {
             } else {
                 focusToApp(string)
             }
+        }
+    }
+    
+    @discardableResult
+    func runInlineBashScript(script: String) -> String? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/bash")
+        process.arguments = ["-c", script]
+
+        let outputPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = outputPipe
+
+        do {
+            try process.run()
+            let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            return String(data: outputData, encoding: .utf8)
+        } catch {
+            print("Error executing script: \(error)")
+            return nil
         }
     }
     

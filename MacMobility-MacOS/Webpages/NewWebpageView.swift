@@ -139,24 +139,40 @@ class IconPickerViewModel: ObservableObject {
 
 struct IconPickerView: View {
     @StateObject private var viewModel: IconPickerViewModel
+    @Binding var title: String
     
-    init(viewModel: IconPickerViewModel) {
+    init(viewModel: IconPickerViewModel, title: Binding<String> = .constant("")) {
         self._viewModel = .init(wrappedValue: viewModel)
+        self._title = title
     }
     
     var body: some View {
         HStack {
-            if let image = viewModel.selectedImage {
-                Image(nsImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-            } else {
-                Text("No Icon Selected")
-                    .frame(width: 100, height: 100)
-                    .background(Color.gray.opacity(0.2))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            ZStack {
+                if let image = viewModel.selectedImage {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 100)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                } else {
+                    Text("No Icon Selected")
+                        .frame(width: 100, height: 100)
+                        .background(Color.gray.opacity(0.2))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                if !title.isEmpty {
+                    Text(title)
+                        .font(.system(size: 12))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .frame(maxWidth: 80)
+                        .background(
+                            RoundedRectangle(cornerRadius: 2)
+                                .fill(Color.black.opacity(0.8))
+                        )
+                        .padding(.top, 40)
+                }
             }
             
             Button("Select Icon") {

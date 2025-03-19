@@ -12,6 +12,7 @@ public enum ShortcutType: String, Codable {
     case shortcut
     case app
     case webpage
+    case utility
 }
 
 public struct ShortcutObject: Identifiable, Codable {
@@ -25,8 +26,10 @@ public struct ShortcutObject: Identifiable, Codable {
     public let type: ShortcutType
     public let imageData: Data?
     public var browser: Browsers?
+    public var scriptCode: String?
+    public var utilityType: UtilityObject.UtilityType?
     
-    public init(type: ShortcutType, page: Int, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil, imageData: Data? = nil) {
+    public init(type: ShortcutType, page: Int, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil, imageData: Data? = nil, scriptCode: String? = nil, utilityType: UtilityObject.UtilityType? = nil) {
         self.page = page
         self.type = type
         self.index = index
@@ -34,6 +37,8 @@ public struct ShortcutObject: Identifiable, Codable {
         self.id = id
         self.title = title
         self.color = color
+        self.scriptCode = scriptCode
+        self.utilityType = utilityType
         switch type {
         case .shortcut:
             self.imageData = imageData
@@ -41,18 +46,21 @@ public struct ShortcutObject: Identifiable, Codable {
             self.imageData = try? NSWorkspace.shared.icon(forFile: path ?? "").imageData(for: .png(scale: 0.2, excludeGPSData: false))
         case .webpage:
             self.imageData = imageData
+        case .utility:
+            self.imageData = imageData
         }
         self.faviconLink = faviconLink
         self.browser = browser
     }
 }
 
-public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
+public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate {
     let connectionManager: ConnectionManager
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []
     @Published var installedApps: [ShortcutObject] = []
     @Published var webpages: [ShortcutObject] = []
+    @Published var utilities: [ShortcutObject] = []
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     @Published var pages = 1
@@ -63,6 +71,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.getShortcutsItems() ?? []
         self.webpages = UserDefaults.standard.getWebItems() ?? []
+        self.utilities = UserDefaults.standard.getUtilitiesItems() ?? []
         self.pages = UserDefaults.standard.getPagesCount() ?? 1
         fetchShortcuts()
         fetchInstalledApps()
@@ -74,7 +83,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
     }
     
     func object(for id: String) -> ShortcutObject? {
-        shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id }
+        shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id } ?? utilities.first { $0.id == id }
     }
     
     func removeShortcut(id: String) {
@@ -111,6 +120,13 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
         connectionManager.shortcuts = configuredShortcuts
     }
     
+    func removeUtilityItem(id: String) {
+        utilities.removeAll { $0.id == id }
+        configuredShortcuts.removeAll { $0.id == id }
+        UserDefaults.standard.storeUtilitiesItems(utilities)
+        connectionManager.shortcuts = configuredShortcuts
+    }
+    
     func addConfiguredShortcut(object: ShortcutObject) {
         if let index = configuredShortcuts.firstIndex(where: { $0.index == object.index && $0.page == object.page }) {
             let oldObject = configuredShortcuts[index]
@@ -127,7 +143,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
                         color: oldObject.color,
                         faviconLink: oldObject.faviconLink,
                         browser: oldObject.browser,
-                        imageData: oldObject.imageData
+                        imageData: oldObject.imageData,
+                        scriptCode: oldObject.scriptCode,
+                        utilityType: oldObject.utilityType
                     )
                 }
             }
@@ -175,6 +193,33 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
         }
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.storeWebItems(webpages)
+    }
+    
+    func saveUtility(with utilityItem: ShortcutObject) {
+        if let index = utilities.firstIndex(where: { $0.id == utilityItem.id }) {
+            utilities[index] = utilityItem
+            if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == utilityItem.id }) {
+                configuredShortcuts[configuredIndex] = .init(
+                    type: utilityItem.type,
+                    page: utilityItem.page,
+                    index: configuredShortcuts[configuredIndex].index,
+                    path: utilityItem.path,
+                    id: utilityItem.id,
+                    title: utilityItem.title,
+                    color: utilityItem.color,
+                    faviconLink: utilityItem.faviconLink,
+                    browser: utilityItem.browser,
+                    imageData: utilityItem.imageData,
+                    scriptCode: utilityItem.scriptCode,
+                    utilityType: utilityItem.utilityType
+                )
+                UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
+            }
+        } else {
+            utilities.insert(utilityItem, at: 0)
+        }
+        connectionManager.shortcuts = configuredShortcuts
+        UserDefaults.standard.storeUtilitiesItems(utilities)
     }
     
     func openShortcut(name: String) {
@@ -260,8 +305,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate {
                         page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? currentPage,
                         path: appURL.path,
                         id: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
-                        title: appName,
-                        color: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.color ?? Color.randomDarkPastel.toHex()
+                        title: appName
                     )
                 )
             }

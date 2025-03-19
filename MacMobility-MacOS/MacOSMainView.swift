@@ -58,7 +58,7 @@ struct MacOSMainPopoverView: View {
     private func openShortcutsWindow() {
         if nil == shortcutsWindow {
             shortcutsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 1000, height: 550),
+                contentRect: NSRect(x: 0, y: 0, width: 1000, height: 850),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

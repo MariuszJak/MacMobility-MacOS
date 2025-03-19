@@ -12,6 +12,22 @@ public struct Pages: Codable {
 }
 
 extension UserDefaults {
+    func storeUtilitiesItems(_ utilitiesItems: [ShortcutObject]) {
+        guard let jsonData = try? JSONEncoder().encode(utilitiesItems) else {
+            return
+        }
+
+        set(jsonData, forKey: Const.utilities)
+    }
+
+    func getUtilitiesItems() -> [ShortcutObject]? {
+        guard let itemsData = object(forKey: Const.utilities) as? Data,
+              let items = try? JSONDecoder().decode([ShortcutObject].self, from: itemsData) else {
+            return nil
+        }
+        return items
+    }
+    
     func storeWebItems(_ webItems: [ShortcutObject]) {
         guard let jsonData = try? JSONEncoder().encode(webItems) else {
             return
@@ -90,6 +106,7 @@ extension UserDefaults {
         case workspaceItems
         case shortcuts
         case pages
+        case utilities
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {
