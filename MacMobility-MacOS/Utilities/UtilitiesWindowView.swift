@@ -9,6 +9,7 @@ import SwiftUI
 
 protocol UtilitiesWindowDelegate: AnyObject {
     func saveUtility(with utilityItem: ShortcutObject)
+    func allObjects() -> [ShortcutObject]
     var close: () -> Void { get }
 }
 
@@ -171,6 +172,10 @@ struct UtilitiesWindowView: View {
                 newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
                     newWindow?.close()
                 })
+            case .multiselection:
+                newWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+                    newWindow?.close()
+                })
             case .none:
                 break
             }
@@ -179,6 +184,10 @@ struct UtilitiesWindowView: View {
         switch item.utilityType {
         case .commandline:
             newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel){
+                newWindow?.close()
+            })
+        case .multiselection:
+            newWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                 newWindow?.close()
             })
         case .none:

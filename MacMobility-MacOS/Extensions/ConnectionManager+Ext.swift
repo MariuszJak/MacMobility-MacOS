@@ -27,18 +27,7 @@ protocol ConnectionManagerWorskpaceCapable {
 extension ConnectionManager {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let shortcutItem = try? JSONDecoder().decode(ShortcutObject.self, from: data) {
-            switch shortcutItem.type {
-            case .app:
-                openApp(at: shortcutItem.path ?? "")
-            case .shortcut:
-                openShortcut(name: shortcutItem.title)
-            case .webpage:
-                openWebPage(for: shortcutItem)
-            case .utility:
-                if let script = shortcutItem.scriptCode {
-                    runInlineBashScript(script: script)
-                }
-            }
+            runShortuct(for: shortcutItem)
             return
         }
         if let appItem = try? JSONDecoder().decode(AppSendableInfo.self, from: data) {
@@ -77,6 +66,60 @@ extension ConnectionManager {
                 self.send(shortcuts: self.shortcuts)
             } else {
                 focusToApp(string)
+            }
+        }
+    }
+    
+    func runShortuct(for shortcutItem: ShortcutObject) {
+        switch shortcutItem.type {
+        case .app:
+            openApp(at: shortcutItem.path ?? "")
+        case .shortcut:
+            openShortcut(name: shortcutItem.title)
+        case .webpage:
+            openWebPage(for: shortcutItem)
+        case .utility:
+            switch shortcutItem.utilityType {
+            case .commandline:
+                if let script = shortcutItem.scriptCode {
+                    runInlineBashScript(script: script)
+                }
+            case .multiselection:
+                runMultiselection(for: shortcutItem)
+            case .none:
+                break
+            @unknown default:
+                break
+            }
+        }
+    }
+    
+    func runMultiselection(for item: ShortcutObject) {
+        if let tools = item.objects {
+            tools.forEach { tool in
+                switch tool.type {
+                case .app:
+                    openApp(at: tool.path ?? "")
+                case .shortcut:
+                    openShortcut(name: tool.title)
+                case .webpage:
+                    openWebPage(for: tool)
+                case .utility:
+                    switch tool.utilityType {
+                    case .commandline:
+                        if let script = tool.scriptCode {
+                            runInlineBashScript(script: script)
+                        }
+                    case .multiselection:
+                        if let objects = tool.objects {
+                            objects.forEach { item in
+                                runShortuct(for: item)
+                            }
+                        }
+                    case .none:
+                        break
+                    }
+                }
             }
         }
     }

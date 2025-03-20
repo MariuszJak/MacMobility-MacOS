@@ -73,4 +73,3 @@ struct NewBashUtilityView: View {
         .padding()
     }
 }
-

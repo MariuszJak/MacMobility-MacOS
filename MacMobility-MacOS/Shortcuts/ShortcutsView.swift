@@ -41,7 +41,7 @@ struct ShortcutsView: View {
             Divider()
         }
         HStack {
-            VStack {
+            VStack(alignment: .leading) {
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(1..<viewModel.pages + 1, id: \.self) { page in
@@ -52,7 +52,7 @@ struct ShortcutsView: View {
                     }
                 }
                 .scrollIndicators(.hidden)
-                .padding(.vertical, 21.0)
+                .padding(.all, 21.0)
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 6) {
                         ForEach(0..<21) { index in
@@ -176,7 +176,8 @@ struct ShortcutsView: View {
                                                         browser: object.browser,
                                                         imageData: object.imageData,
                                                         scriptCode: object.scriptCode,
-                                                        utilityType: object.utilityType
+                                                        utilityType: object.utilityType,
+                                                        objects: object.objects
                                                     )
                                             )
                                         }

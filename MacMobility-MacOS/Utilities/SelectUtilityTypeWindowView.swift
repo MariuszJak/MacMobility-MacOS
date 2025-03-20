@@ -11,13 +11,16 @@ public struct UtilityObject: Identifiable {
     public let id: String = UUID().uuidString
     public enum UtilityType: String, Codable {
         case commandline
+        case multiselection
     }
     let type: UtilityType
     let title: String
+    let description: String
     
-    public init(type: UtilityType, title: String) {
+    public init(type: UtilityType, title: String, description: String) {
         self.type = type
         self.title = title
+        self.description = description
     }
 }
 
@@ -26,7 +29,8 @@ class SelectUtilityTypeWindowViewModel: ObservableObject {
     weak var delegate: UtilitiesWindowDelegate?
     
     @Published var utilities: [UtilityObject] = [
-        .init(type: .commandline, title: "Commandline tool")
+        .init(type: .commandline, title: "Commandline tool", description: "This tool allows creation of shortcuts for triggering Bash scripts remotely from companion device. You can define a script, assign a secure activation method and execute it instantly from phone."),
+        .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone.")
     ]
     
     init(connectionManager: ConnectionManager, delegate: UtilitiesWindowDelegate?) {
@@ -56,12 +60,6 @@ struct SelectUtilityTypeWindowView: View {
                             .font(.system(size: 17.0, weight: .bold))
                             .padding([.horizontal, .top], 16)
                         Spacer()
-                        Image(systemName: "plus.circle.fill")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .onTapGesture {
-                            }
-                            .padding([.horizontal, .top], 16.0)
                     }
                     Divider()
                     if !viewModel.utilities.isEmpty {
@@ -70,30 +68,22 @@ struct SelectUtilityTypeWindowView: View {
                                 ForEach(viewModel.utilities) { utility in
                                     VStack(alignment: .leading) {
                                         VStack(alignment: .leading) {
-                                            HStack(alignment: .top) {
-                                                Text(utility.title)
-                                                    .lineLimit(1)
-                                                    .font(.system(size: 16, weight: .bold))
-                                                    .padding(.bottom, 8)
-                                            }
+                                            Text(utility.title)
+                                                .lineLimit(1)
+                                                .font(.system(size: 16, weight: .bold))
+                                                .padding(.bottom, 4)
+                                            Text(utility.description)
+                                                .font(.system(size: 12, weight: .regular))
+                                                .foregroundStyle(Color.gray)
+                                                .padding(.bottom, 8)
                                             Divider()
                                             HStack {
-                                                Image(systemName: "arrow.up.right.square")
+                                                Image(systemName: "plus.circle.fill")
                                                     .resizable()
                                                     .frame(width: 16, height: 16)
                                                     .onTapGesture {
                                                         closeAction()
                                                         openCreateNewUtilityWindow(type: utility.type)
-                                                    }
-                                                Image(systemName: "gear")
-                                                    .resizable()
-                                                    .frame(width: 16, height: 16)
-                                                    .onTapGesture {
-                                                    }
-                                                Image(systemName: "trash")
-                                                    .resizable()
-                                                    .frame(width: 16, height: 16)
-                                                    .onTapGesture {
                                                     }
                                                 Spacer()
                                             }
@@ -153,12 +143,20 @@ struct SelectUtilityTypeWindowView: View {
                 newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
                     newWindow?.close()
                 })
+            case .multiselection:
+                newWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
+                    newWindow?.close()
+                })
             }
             
         }
         switch type {
         case .commandline:
             newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate){
+                newWindow?.close()
+            })
+        case .multiselection:
+            newWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
                 newWindow?.close()
             })
         }

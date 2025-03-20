@@ -46,6 +46,8 @@
 		C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */; };
 		C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */; };
 		C0EAF9392D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */; };
+		C0EAF93B2D8CC67600044947 /* NewMultiSelectionUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF93A2D8CC67600044947 /* NewMultiSelectionUtilityView.swift */; };
+		C0EAF93D2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF93C2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +111,8 @@
 		C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilitiesWindowView.swift; sourceTree = "<group>"; };
 		C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBashUtilityView.swift; sourceTree = "<group>"; };
 		C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectUtilityTypeWindowView.swift; sourceTree = "<group>"; };
+		C0EAF93A2D8CC67600044947 /* NewMultiSelectionUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMultiSelectionUtilityView.swift; sourceTree = "<group>"; };
+		C0EAF93C2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMultiSelectionUtilityViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -278,6 +282,8 @@
 				C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */,
 				C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */,
 				C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */,
+				C0EAF93A2D8CC67600044947 /* NewMultiSelectionUtilityView.swift */,
+				C0EAF93C2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -444,9 +450,11 @@
 				C09775632B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift in Sources */,
 				C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */,
 				C09775662B5C31EE00F4FFE6 /* MacOSMainView.swift in Sources */,
+				C0EAF93D2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift in Sources */,
 				C064BA652D876F7C0091E2BE /* NSColor+Ext.swift in Sources */,
 				C0D21D6F2D7A266100FEF931 /* AddNewScreenView.swift in Sources */,
 				C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */,
+				C0EAF93B2D8CC67600044947 /* NewMultiSelectionUtilityView.swift in Sources */,
 				C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */,
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
 				C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */,

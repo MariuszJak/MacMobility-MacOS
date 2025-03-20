@@ -28,8 +28,9 @@ public struct ShortcutObject: Identifiable, Codable {
     public var browser: Browsers?
     public var scriptCode: String?
     public var utilityType: UtilityObject.UtilityType?
+    public var objects: [ShortcutObject]?
     
-    public init(type: ShortcutType, page: Int, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil, imageData: Data? = nil, scriptCode: String? = nil, utilityType: UtilityObject.UtilityType? = nil) {
+    public init(type: ShortcutType, page: Int, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil, imageData: Data? = nil, scriptCode: String? = nil, utilityType: UtilityObject.UtilityType? = nil, objects: [ShortcutObject]? = nil) {
         self.page = page
         self.type = type
         self.index = index
@@ -51,6 +52,7 @@ public struct ShortcutObject: Identifiable, Codable {
         }
         self.faviconLink = faviconLink
         self.browser = browser
+        self.objects = objects
     }
 }
 
@@ -86,6 +88,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id } ?? utilities.first { $0.id == id }
     }
     
+    func allObjects() -> [ShortcutObject] {
+        shortcuts + installedApps + webpages + utilities
+    }
+    
     func removeShortcut(id: String) {
         configuredShortcuts.removeAll { $0.id == id }
         connectionManager.shortcuts = configuredShortcuts
@@ -107,6 +113,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
         if pages > 1 {
             pages -= 1
+            currentPage = pages
         }
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
@@ -145,7 +152,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         browser: oldObject.browser,
                         imageData: oldObject.imageData,
                         scriptCode: oldObject.scriptCode,
-                        utilityType: oldObject.utilityType
+                        utilityType: oldObject.utilityType,
+                        objects: oldObject.objects
                     )
                 }
             }
@@ -184,7 +192,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     color: webpageItem.color,
                     faviconLink: webpageItem.faviconLink,
                     browser: webpageItem.browser,
-                    imageData: webpageItem.imageData
+                    imageData: webpageItem.imageData,
+                    objects: webpageItem.objects
                 )
                 UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
             }
@@ -211,7 +220,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     browser: utilityItem.browser,
                     imageData: utilityItem.imageData,
                     scriptCode: utilityItem.scriptCode,
-                    utilityType: utilityItem.utilityType
+                    utilityType: utilityItem.utilityType,
+                    objects: utilityItem.objects
                 )
                 UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
             }
