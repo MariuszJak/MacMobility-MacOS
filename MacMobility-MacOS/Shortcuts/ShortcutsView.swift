@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ShortcutsView: View {
     @ObservedObject private var viewModel: ShortcutsViewModel
-    
+    @State private var selectedTab = 0
+    let cornerRadius = 17.0
     
     init(viewModel: ShortcutsViewModel) {
         self.viewModel = viewModel
@@ -29,14 +30,6 @@ struct ShortcutsView: View {
                     .onTapGesture {
                         viewModel.addPage()
                     }
-                
-                Image(systemName: "minus.circle.fill")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .padding([.horizontal, .top], 16.0)
-                    .onTapGesture {
-                        viewModel.removePage()
-                    }
             }
             Divider()
         }
@@ -45,170 +38,171 @@ struct ShortcutsView: View {
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(1..<viewModel.pages + 1, id: \.self) { page in
-                            Button("Page \(page)") {
-                                viewModel.currentPage = page
-                            }
+                            Button("Page \(page)") {}
                         }
                     }
                 }
                 .scrollIndicators(.hidden)
                 .padding(.all, 21.0)
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 6) {
-                        ForEach(0..<21) { index in
-                            VStack {
-                                if let object = viewModel.objectAt(index: index) {
-                                    if let path = object.path, object.type == .app {
-                                        ZStack {
-                                            Image(nsImage: NSWorkspace.shared.icon(forFile: path))
-                                                .resizable()
-                                                .frame(width: 80, height: 80)
-                                                .cornerRadius(8.0)
-                                            VStack {
-                                                HStack {
-                                                    Spacer()
-                                                    RedXButton {
-                                                        viewModel.removeShortcut(id: object.id)
-                                                    }
-                                                }
-                                                Spacer()
-                                            }
-                                        }
-                                    } else if object.type == .shortcut {
-                                        ZStack {
-                                            Text(object.title)
-                                                .font(.system(size: 12))
-                                                .multilineTextAlignment(.center)
-                                                .padding(.all, 3)
-                                            
-                                            VStack {
-                                                HStack {
-                                                    Spacer()
-                                                    RedXButton {
-                                                        viewModel.removeShortcut(id: object.id)
-                                                    }
-                                                }
-                                                Spacer()
-                                            }
-                                        }
-                                    } else if object.type == .webpage {
-                                        ZStack {
-                                            if let data = object.imageData, let image = NSImage(data: data) {
-                                                Image(nsImage: image)
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fill)
-                                                    .cornerRadius(6.0)
-                                                    .frame(width: 70, height: 70)
-                                            } else if let path = object.browser?.icon {
-                                                Image(path)
-                                                    .resizable()
-                                                    .frame(width: 70, height: 70)
-                                                    .cornerRadius(20)
-                                            }
-                                            VStack {
-                                                HStack {
-                                                    Spacer()
-                                                    RedXButton {
-                                                        viewModel.removeShortcut(id: object.id)
-                                                    }
-                                                }
-                                                Spacer()
-                                            }
-                                        }
-                                    } else if object.type == .utility {
-                                        ZStack {
-                                            if let data = object.imageData, let image = NSImage(data: data) {
-                                                Image(nsImage: image)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .cornerRadius(6.0)
-                                                    .frame(width: 70, height: 70)
-                                            }
-                                            VStack {
-                                                HStack {
-                                                    Spacer()
-                                                    RedXButton {
-                                                        viewModel.removeShortcut(id: object.id)
-                                                    }
-                                                }
-                                                Spacer()
-                                            }
-                                            if !object.title.isEmpty {
-                                                Text(object.title)
-                                                    .font(.system(size: 11))
-                                                    .multilineTextAlignment(.center)
-                                                    .lineLimit(2)
-                                                    .frame(maxWidth: 80)
-                                                    .background(
-                                                        RoundedRectangle(cornerRadius: 2)
-                                                            .fill(Color.black.opacity(0.8))
-                                                    )
-                                                    .padding(.top, 20)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            .frame(width: 70, height: 70)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8.0)
-                                    .fill(viewModel.objectAt(index: index)?.color.let { Color(hex: $0) } ?? Color.black.opacity(0.4))
-                            )
-                            .ifLet(viewModel.objectAt(index: index)?.id) { view, id in
-                                view.onDrag {
-                                    NSItemProvider(object: id as NSString)
-                                }
-                            }
-                            .onDrop(of: [.text], isTargeted: nil) { providers in
-                                providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                                    if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
-                                        DispatchQueue.main.async {
-                                            viewModel.addConfiguredShortcut(object:
-                                                    .init(
-                                                        type: object.type,
-                                                        page: viewModel.currentPage,
-                                                        index: index,
-                                                        path: object.path,
-                                                        id: object.id,
-                                                        title: object.title,
-                                                        color: object.color,
-                                                        faviconLink: object.faviconLink,
-                                                        browser: object.browser,
-                                                        imageData: object.imageData,
-                                                        scriptCode: object.scriptCode,
-                                                        utilityType: object.utilityType,
-                                                        objects: object.objects
-                                                    )
-                                            )
-                                        }
-                                    }
-                                }
-                                return true
+                    ForEach(1..<viewModel.pages+1, id: \.self) { page in
+                        HStack {
+                            Text("Page: \(page)")
+                                .font(.system(size: 16, weight: .bold))
+                            Spacer()
+                            Button {
+                                viewModel.removePage(with: page)
+                            } label: {
+                                Text("Remove")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(Color.red)
                             }
                         }
+                        .padding()
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 10) {
+                            ForEach(0..<21) { index in
+                                VStack {
+                                    ZStack {
+                                        itemViews(for: index, page: page)
+                                            .frame(width: 70, height: 70)
+                                            .clipped()
+                                        if let id = viewModel.objectAt(index: index, page: page)?.id {
+                                            VStack {
+                                                HStack {
+                                                    Spacer()
+                                                    RedXButton {
+                                                        viewModel.removeShortcut(id: id)
+                                                    }
+                                                }
+                                                Spacer()
+                                            }
+                                        }
+                                        
+                                    }
+                                }
+                                .frame(width: 70, height: 70)
+                                .background(
+                                    RoundedRectangle(cornerRadius: cornerRadius)
+                                        .fill(viewModel.objectAt(index: index, page: page)?.color.let { Color(hex: $0) } ?? Color.black.opacity(0.4))
+                                )
+                                .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
+                                    view.onDrag {
+                                        NSItemProvider(object: id as NSString)
+                                    }
+                                }
+                                .onDrop(of: [.text], isTargeted: nil) { providers in
+                                    providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                                        if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
+                                            handleOnDrop(index: index, page: page, object: object)
+                                        }
+                                    }
+                                    return true
+                                }
+                            }
+                        }
+                        .padding([.horizontal, .top])
                     }
-                    .padding([.horizontal, .top])
                 }
-                .scrollIndicators(.hidden)
                 .frame(minWidth: 600)
-                .scrollDisabled(true)
             }
             VStack {
                 TextField("Search...", text: $viewModel.searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding([.horizontal, .bottom], 16.0)
-                TabView {
-                    shortcutsView
-                        .tabItem( { Text("Shortcuts") })
+                TabView(selection: $selectedTab) {
                     installedAppsView
                         .tabItem( { Text("Applications") })
+                        .tag(0)
+                    shortcutsView
+                        .tabItem( { Text("Shortcuts") })
+                        .tag(1)
                     websitesView
                         .tabItem( { Text("Websites") })
+                        .tag(2)
                     utilitiesView
                         .tabItem( { Text("Utilities") })
+                        .tag(3)
                 }
                 .tabViewStyle(.automatic)
                 .padding([.horizontal, .bottom])
+                .onChange(of: selectedTab) { _, _ in
+                    viewModel.searchText = ""
+                }
+            }
+        }
+    }
+    
+    private func handleOnDrop(index: Int, page: Int, object: ShortcutObject) {
+        DispatchQueue.main.async {
+            viewModel.addConfiguredShortcut(object:
+                    .init(
+                        type: object.type,
+                        page: page,
+                        index: index,
+                        path: object.path,
+                        id: object.id,
+                        title: object.title,
+                        color: object.color,
+                        faviconLink: object.faviconLink,
+                        browser: object.browser,
+                        imageData: object.imageData,
+                        scriptCode: object.scriptCode,
+                        utilityType: object.utilityType,
+                        objects: object.objects
+                    )
+            )
+        }
+    }
+    
+    @ViewBuilder
+    private func itemViews(for index: Int, page: Int) -> some View {
+        if let object = viewModel.objectAt(index: index, page: page) {
+            if let path = object.path, object.type == .app {
+                Image(nsImage: NSWorkspace.shared.icon(forFile: path))
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 85, height: 85)
+            } else if object.type == .shortcut {
+                Text(object.title)
+                    .font(.system(size: 12))
+                    .multilineTextAlignment(.center)
+                    .padding(.all, 3)
+            } else if object.type == .webpage {
+                if let data = object.imageData, let image = NSImage(data: data) {
+                    Image(nsImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .cornerRadius(cornerRadius)
+                        .frame(width: 70, height: 70)
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                        )
+                } else if let path = object.browser?.icon {
+                    Image(path)
+                        .resizable()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(cornerRadius)
+                }
+            } else if object.type == .utility {
+                if let data = object.imageData, let image = NSImage(data: data) {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .cornerRadius(cornerRadius)
+                        .frame(width: 70, height: 70)
+                }
+                if !object.title.isEmpty {
+                    Text(object.title)
+                        .font(.system(size: 11))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .frame(maxWidth: 80)
+                        .background(
+                            RoundedRectangle(cornerRadius: 2)
+                                .fill(Color.black.opacity(0.8))
+                        )
+                        .padding(.top, 20)
+                }
             }
         }
     }
@@ -218,9 +212,9 @@ struct ShortcutsView: View {
             ScrollView {
                 ForEach(viewModel.shortcuts) { shortcut in
                     HStack {
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: cornerRadius / 2)
                             .fill(Color(hex: shortcut.color ?? ""))
-                            .frame(width: 44, height: 44)
+                            .frame(width: 38, height: 38)
                             .padding(.trailing, 8)
                         Text(shortcut.title)
                             .padding(.vertical, 6.0)
@@ -245,7 +239,7 @@ struct ShortcutsView: View {
                             Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
                                 .resizable()
                                 .frame(width: 38, height: 38)
-                                .cornerRadius(3)
+                                .cornerRadius(cornerRadius)
                                 .padding(.trailing, 8)
                             Text(app.title)
                                 .padding(.vertical, 6.0)

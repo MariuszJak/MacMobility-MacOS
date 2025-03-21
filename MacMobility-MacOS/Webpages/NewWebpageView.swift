@@ -28,7 +28,7 @@ class NewWebpageViewModel: ObservableObject {
 
 struct NewWebpageView: View {
     @ObservedObject var viewModel = NewWebpageViewModel()
-    
+    private var currentPage: Int?
     weak var delegate: WebpagesWindowDelegate?
     
     init(item: ShortcutObject? = nil, delegate: WebpagesWindowDelegate?) {
@@ -39,6 +39,7 @@ struct NewWebpageView: View {
             viewModel.link = item.path ?? ""
             viewModel.id = item.id
             viewModel.faviconLink = item.faviconLink ?? ""
+            currentPage = item.page
             if let data = item.imageData {
                 viewModel.selectedIcon = NSImage(data: data)
             }
@@ -66,7 +67,7 @@ struct NewWebpageView: View {
                 delegate?.saveWebpage(with:
                     .init(
                         type: .webpage,
-                        page: 1, // TODO: Check is it correct
+                        page: currentPage ?? 1,
                         path: viewModel.link,
                         id: viewModel.id ?? UUID().uuidString,
                         title: viewModel.title,

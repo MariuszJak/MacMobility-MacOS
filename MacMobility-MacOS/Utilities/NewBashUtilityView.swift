@@ -26,11 +26,13 @@ struct NewBashUtilityView: View {
     @ObservedObject var viewModel = NewBashUtilityViewModel()
     var closeAction: () -> Void
     weak var delegate: UtilitiesWindowDelegate?
+    var currentPage: Int?
     
     init(item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
         self.delegate = delegate
         self.closeAction = closeAction
         if let item {
+            currentPage = item.page
             viewModel.title = item.title
             viewModel.id = item.id
             viewModel.scriptCode = item.scriptCode ?? ""
@@ -56,7 +58,7 @@ struct NewBashUtilityView: View {
                 delegate?.saveUtility(with:
                     .init(
                         type: .utility,
-                        page: 1, // TODO: Check is it correct
+                        page: currentPage ?? 1,
                         id: viewModel.id ?? UUID().uuidString,
                         title: viewModel.title,
                         imageData: viewModel.selectedIcon?.toData,

@@ -65,67 +65,79 @@ struct WebpagesWindowView: View {
             } else {
                 ScrollView {
                     ForEach(viewModel.webpages) { item in
-                        HStack {
-                            if let data = item.imageData, let image = NSImage(data: data) {
-                                Image(nsImage: image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .cornerRadius(Constants.cornerRadius)
-                                    .frame(width: Constants.imageSize, height: Constants.imageSize)
-                            } else if let link = item.faviconLink, let url = URL(string: link) {
-                                AsyncImage(url: url,
-                                           content: { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .cornerRadius(Constants.cornerRadius)
-                                        .frame(width: Constants.imageSize, height: Constants.imageSize)
-                                }, placeholder: {
-                                    Image("Empty")
-                                        .resizable()
-                                        .cornerRadius(Constants.cornerRadius)
-                                        .frame(width: Constants.imageSize, height: Constants.imageSize)
-                                })
-                                .cornerRadius(Constants.cornerRadius)
-                                .frame(width: Constants.imageSize, height: Constants.imageSize)
+                        if let scriptCode = item.scriptCode {
+                            if scriptCode.isEmpty {
+                                itemView(item: item)
                             } else {
-                                if let browser = item.browser {
-                                    Image(browser.icon)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .cornerRadius(Constants.cornerRadius)
-                                        .frame(width: Constants.imageSize, height: Constants.imageSize)
-                                }
+                                EmptyView()
                             }
-                            Text(item.title)
-                            Spacer()
-                            Image(systemName: "gear")
-                                .resizable()
-                                .frame(width: 16, height: 16)
-                                .onTapGesture {
-                                    openCreateNewWebpageWindow(item: item)
-                                }
-                            
-                            Image(systemName: "trash")
-                                .resizable()
-                                .frame(width: 16, height: 16)
-                                .onTapGesture {
-                                    viewModel.removeWebItem(id: item.id)
-                                }
+                        } else {
+                            itemView(item: item)
                         }
-                        .onDrag {
-                            NSItemProvider(object: item.id as NSString)
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 20.0)
-                                .fill(Color.black.opacity(0.4))
-                        )
                     }
                 }
             }
         }
         .padding()
+    }
+    
+    private func itemView(item: ShortcutObject) -> some View {
+        HStack {
+            if let data = item.imageData, let image = NSImage(data: data) {
+                Image(nsImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(Constants.cornerRadius)
+                    .frame(width: Constants.imageSize, height: Constants.imageSize)
+            } else if let link = item.faviconLink, let url = URL(string: link) {
+                AsyncImage(url: url,
+                           content: { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .cornerRadius(Constants.cornerRadius)
+                        .frame(width: Constants.imageSize, height: Constants.imageSize)
+                }, placeholder: {
+                    Image("Empty")
+                        .resizable()
+                        .cornerRadius(Constants.cornerRadius)
+                        .frame(width: Constants.imageSize, height: Constants.imageSize)
+                })
+                .cornerRadius(Constants.cornerRadius)
+                .frame(width: Constants.imageSize, height: Constants.imageSize)
+            } else {
+                if let browser = item.browser {
+                    Image(browser.icon)
+                        .resizable()
+                        .scaledToFit()
+                        .cornerRadius(Constants.cornerRadius)
+                        .frame(width: Constants.imageSize, height: Constants.imageSize)
+                }
+            }
+            Text(item.title)
+            Spacer()
+            Image(systemName: "gear")
+                .resizable()
+                .frame(width: 16, height: 16)
+                .onTapGesture {
+                    openCreateNewWebpageWindow(item: item)
+                }
+            
+            Image(systemName: "trash")
+                .resizable()
+                .frame(width: 16, height: 16)
+                .onTapGesture {
+                    viewModel.removeWebItem(id: item.id)
+                }
+        }
+        .onDrag {
+            NSItemProvider(object: item.id as NSString)
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 20.0)
+                .fill(Color.black.opacity(0.4))
+        )
     }
     
     private func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {

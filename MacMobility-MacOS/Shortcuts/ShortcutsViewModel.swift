@@ -20,7 +20,7 @@ public struct ShortcutObject: Identifiable, Codable {
     public var page: Int
     public let id: String
     public let title: String
-    public let path: String?
+    public var path: String?
     public var color: String?
     public var faviconLink: String?
     public let type: ShortcutType
@@ -66,8 +66,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     @Published var pages = 1
-    @Published var currentPage = 1
     var close: () -> Void = {}
+    private var timer: Timer?
+    public var testColor = "#6DDADE"
+    private var allWebpages: [ShortcutObject] = []
     
     init(connectionManager: ConnectionManager) {
         self.connectionManager = connectionManager
@@ -78,10 +80,23 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchShortcuts()
         fetchInstalledApps()
         registerListener()
+        startMonitoring()
     }
     
-    func objectAt(index: Int) -> ShortcutObject? {
-        configuredShortcuts.filter { $0.page == currentPage }.first(where: { $0.index == index })
+    func registerListener() {
+        $searchText
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.fetchShortcuts()
+                self?.fetchInstalledApps()
+                self?.searchWebpages()
+                self?.searchUtilities()
+            }
+            .store(in: &cancellables)
+    }
+    
+    func objectAt(index: Int, page: Int) -> ShortcutObject? {
+        configuredShortcuts.filter { $0.page == page }.first(where: { $0.index == index })
     }
     
     func object(for id: String) -> ShortcutObject? {
@@ -100,20 +115,18 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     func addPage() {
         pages += 1
-        currentPage = pages
         UserDefaults.standard.storePages(pages)
     }
     
-    func removePage() {  
-        configuredShortcuts.removeAll { $0.page == currentPage }
+    func removePage(with number: Int) {
+        configuredShortcuts.removeAll { $0.page == number }
         configuredShortcuts.enumerated().forEach { (index, object) in
-            if configuredShortcuts[index].page > currentPage {
+            if configuredShortcuts[index].page > number {
                 configuredShortcuts[index].page -= 1
             }
         }
         if pages > 1 {
             pages -= 1
-            currentPage = pages
         }
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
@@ -165,13 +178,24 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
     }
     
-    func registerListener() {
-        $searchText
-            .sink { [weak self] _ in
-                self?.fetchShortcuts()
-                self?.fetchInstalledApps()
+    func searchWebpages() {
+        webpages.enumerated().forEach { (index, webpage) in
+            if searchText.isEmpty {
+                webpages[index].scriptCode = ""
+            } else {
+                webpages[index].scriptCode = webpage.title.lowercased().contains(self.searchText.lowercased()) ? "" : "Hidden"
             }
-            .store(in: &cancellables)
+        }
+    }
+    
+    func searchUtilities() {
+        utilities.enumerated().forEach { (index, utility) in
+            if searchText.isEmpty {
+                utilities[index].path = ""
+            } else {
+                utilities[index].path = utility.title.lowercased().contains(self.searchText.lowercased()) ? "" : "Hidden"
+            }
+        }
     }
     
     func fetchShortcuts() {
@@ -184,7 +208,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == webpageItem.id }) {
                 configuredShortcuts[configuredIndex] = .init(
                     type: webpageItem.type,
-                    page: webpageItem.page,
+                    page: configuredShortcuts[configuredIndex].page,
                     index: configuredShortcuts[configuredIndex].index,
                     path: webpageItem.path,
                     id: webpageItem.id,
@@ -210,7 +234,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == utilityItem.id }) {
                 configuredShortcuts[configuredIndex] = .init(
                     type: utilityItem.type,
-                    page: utilityItem.page,
+                    page: configuredShortcuts[configuredIndex].page,
                     index: configuredShortcuts[configuredIndex].index,
                     path: utilityItem.path,
                     id: utilityItem.id,
@@ -257,10 +281,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 return list?.map {
                     item in .init(
                         type: .shortcut,
-                        page: currentPage,
+                        page: 1,
                         id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
                         title: item,
-                        color: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.color ?? Color.randomDarkPastel.toHex()
+                        color: testColor
                     )
                 } ?? []
             } else {
@@ -268,10 +292,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     .map {
                         item in .init(
                             type: .shortcut,
-                            page: currentPage,
+                            page: 1,
                             id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
                             title: item,
-                            color: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.color ?? Color.randomDarkPastel.toHex()
+                            color: testColor
                         )
                     } ?? []
             }
@@ -279,6 +303,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             print("Failed to fetch shortcuts: \(error)")
             return []
         }
+    }
+    
+    func startMonitoring() {
+        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            self?.fetchShortcuts()
+        }
+    }
+    
+    deinit {
+        timer?.invalidate()
     }
     
     func fetchInstalledApps() {
@@ -312,7 +346,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 apps.append(
                     ShortcutObject(
                         type: .app,
-                        page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? currentPage,
+                        page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? 1,
                         path: appURL.path,
                         id: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
                         title: appName

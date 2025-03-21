@@ -11,14 +11,17 @@ struct NewMultiSelectionUtilityView: View {
     @ObservedObject var viewModel: NewMultiSelectionUtilityViewModel
     var closeAction: () -> Void
     weak var delegate: UtilitiesWindowDelegate?
+    private var currentPage: Int?
     
     init(item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
         self.delegate = delegate
         self.closeAction = closeAction
         self.viewModel = .init(allObjects: delegate?.allObjects() ?? [])
         if let item {
+            currentPage = item.page
             viewModel.title = item.title
             viewModel.id = item.id
+            currentPage = item.page
             if let objects = item.objects {
                 viewModel.configuredShortcuts = objects
             }
@@ -178,7 +181,7 @@ struct NewMultiSelectionUtilityView: View {
                 delegate?.saveUtility(with:
                     .init(
                         type: .utility,
-                        page: 1,
+                        page: currentPage ?? 1,
                         id: viewModel.id ?? UUID().uuidString,
                         title: viewModel.title,
                         imageData: viewModel.selectedIcon?.toData,
