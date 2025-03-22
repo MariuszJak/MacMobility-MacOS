@@ -86,9 +86,12 @@ struct WebpagesWindowView: View {
             if let data = item.imageData, let image = NSImage(data: data) {
                 Image(nsImage: image)
                     .resizable()
-                    .scaledToFit()
+                    .aspectRatio(contentMode: .fill)
                     .cornerRadius(Constants.cornerRadius)
                     .frame(width: Constants.imageSize, height: Constants.imageSize)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                    )
             } else if let link = item.faviconLink, let url = URL(string: link) {
                 AsyncImage(url: url,
                            content: { image in
@@ -149,7 +152,7 @@ struct WebpagesWindowView: View {
                 defer: false
             )
             newWindow?.center()
-            newWindow?.setFrameAutosaveName("Preferences")
+            newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
             newWindow?.contentView = NSHostingView(rootView: NewWebpageView(item: item, delegate: viewModel))
             viewModel.close = {

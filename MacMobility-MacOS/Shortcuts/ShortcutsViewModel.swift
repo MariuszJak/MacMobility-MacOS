@@ -15,7 +15,7 @@ public enum ShortcutType: String, Codable {
     case utility
 }
 
-public struct ShortcutObject: Identifiable, Codable {
+public struct ShortcutObject: Identifiable, Codable, Equatable {
     public let index: Int?
     public var page: Int
     public let id: String
@@ -282,7 +282,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     item in .init(
                         type: .shortcut,
                         page: 1,
-                        id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
+                        id: shortcuts.first(where: { shortcut in item == shortcut.title })?.id
+                        ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id
+                        ?? UUID().uuidString,
                         title: item,
                         color: testColor
                     )
@@ -293,7 +295,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         item in .init(
                             type: .shortcut,
                             page: 1,
-                            id: configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id ?? UUID().uuidString,
+                            id: shortcuts.first(where: { shortcut in item == shortcut.title })?.id
+                            ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id
+                            ?? UUID().uuidString,
                             title: item,
                             color: testColor
                         )
@@ -348,7 +352,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         type: .app,
                         page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? 1,
                         path: appURL.path,
-                        id: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
+                        id: installedApps.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
                         title: appName
                     )
                 )

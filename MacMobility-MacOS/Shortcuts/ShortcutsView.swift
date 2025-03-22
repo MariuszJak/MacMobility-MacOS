@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ShortcutsView: View {
+    @State private var newWindow: NSWindow?
+    @State private var editUtilitiesWindow: NSWindow?
     @ObservedObject private var viewModel: ShortcutsViewModel
     @State private var selectedTab = 0
     let cornerRadius = 17.0
@@ -19,31 +21,24 @@ struct ShortcutsView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("Shortcuts Editor")
+                Text("Editor")
                     .font(.system(size: 17.0, weight: .bold))
                     .padding([.horizontal, .top], 16)
-                
-                Image(systemName: "plus.circle.fill")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .padding([.horizontal, .top], 16.0)
-                    .onTapGesture {
-                        viewModel.addPage()
-                    }
             }
             Divider()
         }
         HStack {
             VStack(alignment: .leading) {
-                ScrollView(.horizontal) {
-                    HStack {
-                        ForEach(1..<viewModel.pages + 1, id: \.self) { page in
-                            Button("Page \(page)") {}
+                HStack(alignment: .bottom) {
+                    Image(systemName: "plus.circle.fill")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .padding([.horizontal, .top], 16.0)
+                        .onTapGesture {
+                            viewModel.addPage()
                         }
-                    }
+                    Text("Add page")
                 }
-                .scrollIndicators(.hidden)
-                .padding(.all, 21.0)
                 ScrollView {
                     ForEach(1..<viewModel.pages+1, id: \.self) { page in
                         HStack {
@@ -177,11 +172,17 @@ struct ShortcutsView: View {
                         .clipShape(
                             RoundedRectangle(cornerRadius: cornerRadius)
                         )
+                        .onTapGesture {
+                            openCreateNewWebpageWindow(item: object)
+                        }
                 } else if let path = object.browser?.icon {
                     Image(path)
                         .resizable()
                         .frame(width: 80, height: 80)
                         .cornerRadius(cornerRadius)
+                        .onTapGesture {
+                            openCreateNewWebpageWindow(item: object)
+                        }
                 }
             } else if object.type == .utility {
                 if let data = object.imageData, let image = NSImage(data: data) {
@@ -190,6 +191,9 @@ struct ShortcutsView: View {
                         .scaledToFill()
                         .cornerRadius(cornerRadius)
                         .frame(width: 70, height: 70)
+                        .onTapGesture {
+                            openEditUtilityWindow(item: object)
+                        }
                 }
                 if !object.title.isEmpty {
                     Text(object.title)
@@ -202,6 +206,9 @@ struct ShortcutsView: View {
                                 .fill(Color.black.opacity(0.8))
                         )
                         .padding(.top, 20)
+                        .onTapGesture {
+                            openEditUtilityWindow(item: object)
+                        }
                 }
             }
         }
@@ -262,5 +269,65 @@ struct ShortcutsView: View {
     
     private var utilitiesView: some View {
         UtilitiesWindowView(viewModel: viewModel)
+    }
+    
+    private func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {
+        if nil == newWindow {
+            newWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
+                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            newWindow?.center()
+            newWindow?.setFrameAutosaveName("Webpages")
+            newWindow?.isReleasedWhenClosed = false
+            newWindow?.contentView = NSHostingView(rootView: NewWebpageView(item: item, delegate: viewModel))
+            viewModel.close = {
+                newWindow?.close()
+            }
+        }
+        newWindow?.contentView = NSHostingView(rootView: NewWebpageView(item: item, delegate: viewModel))
+        newWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openEditUtilityWindow(item: ShortcutObject) {
+        if nil == editUtilitiesWindow {
+            editUtilitiesWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 320, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            editUtilitiesWindow?.center()
+            editUtilitiesWindow?.setFrameAutosaveName("Utilities")
+            editUtilitiesWindow?.isReleasedWhenClosed = false
+            switch item.utilityType {
+            case .commandline:
+                editUtilitiesWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
+                })
+            case .multiselection:
+                editUtilitiesWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
+                })
+            case .none:
+                break
+            }
+            
+        }
+        switch item.utilityType {
+        case .commandline:
+            editUtilitiesWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel){
+                editUtilitiesWindow?.close()
+            })
+        case .multiselection:
+            editUtilitiesWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+                editUtilitiesWindow?.close()
+            })
+        case .none:
+            break
+        }
+        editUtilitiesWindow?.makeKeyAndOrderFront(nil)
     }
 }

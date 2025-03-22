@@ -171,13 +171,13 @@ struct UtilitiesWindowView: View {
     private func openEditUtilityWindow(item: ShortcutObject) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 320, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             newWindow?.center()
-            newWindow?.setFrameAutosaveName("Preferences")
+            newWindow?.setFrameAutosaveName("Utilities")
             newWindow?.isReleasedWhenClosed = false
             switch item.utilityType {
             case .commandline:
