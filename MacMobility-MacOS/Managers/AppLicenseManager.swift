@@ -1,5 +1,5 @@
 //
-//  AppLicenceManager.swift
+//  AppLicenseManager.swift
 //  MacMobility-MacOS
 //
 //  Created by CoderBlocks on 23/03/2025.
@@ -18,7 +18,7 @@ public class AppLicenseManager: ObservableObject {
     public var completion: ((LicenseType) -> Void)?
     
     public init() {
-        self.license = UserDefaults.standard.get(key: .licence) ?? .free
+        self.license = UserDefaults.standard.get(key: .license) ?? .free
         completion?(license)
     }
     
@@ -30,7 +30,7 @@ public class AppLicenseManager: ObservableObject {
     public func degrade() {
         license = .free
         completion?(license)
-        UserDefaults.standard.store(license, for: .licence)
+        UserDefaults.standard.store(license, for: .license)
     }
     
     public func validate(key: String) -> Bool {
@@ -45,6 +45,6 @@ public class AppLicenseManager: ObservableObject {
     private func upgrade() {
         license = .paid
         completion?(license)
-        UserDefaults.standard.store(license, for: .licence)
+        UserDefaults.standard.store(license, for: .license)
     }
 }

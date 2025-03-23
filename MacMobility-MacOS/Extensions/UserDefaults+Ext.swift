@@ -46,7 +46,7 @@ extension UserDefaults {
         case shortcuts
         case pages
         case utilities
-        case licence
+        case license
         case firstActivationDate
     }
 

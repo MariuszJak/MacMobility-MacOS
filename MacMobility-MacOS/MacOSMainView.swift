@@ -156,7 +156,7 @@ struct MacOSMainPopoverView: View {
                 defer: false
             )
             licenseWindow?.center()
-            licenseWindow?.setFrameAutosaveName("Licence")
+            licenseWindow?.setFrameAutosaveName("License")
             licenseWindow?.isReleasedWhenClosed = false
             licenseWindow?.titlebarAppearsTransparent = true
             licenseWindow?.styleMask.insert(.fullSizeContentView)
@@ -166,7 +166,7 @@ struct MacOSMainPopoverView: View {
             }
             
             licenseWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: ValidateLicenceView(viewModel: .init()))
+            let hv = NSHostingController(rootView: ValidateLicenseView(viewModel: .init()))
             licenseWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = licenseWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
@@ -215,7 +215,7 @@ struct MacOSMainPopoverView: View {
     }
     
     private var licenseWindowButtonView: some View {
-        Button("Verify licence") {
+        Button("Verify license") {
             openLicenseWindow()
         }
     }

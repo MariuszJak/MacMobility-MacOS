@@ -1,5 +1,5 @@
 //
-//  ValidateLicenceView.swift
+//  ValidateLicenseView.swift
 //  MacMobility-MacOS
 //
 //  Created by CoderBlocks on 23/03/2025.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-public class ValidateLicenceViewModel: ObservableObject {
+public class ValidateLicenseViewModel: ObservableObject {
     public enum LicenseValidationStep {
         case trial
         case valid
@@ -49,10 +49,10 @@ public class ValidateLicenceViewModel: ObservableObject {
     }
 }
 
-public struct ValidateLicenceView: View {
-    @ObservedObject var viewModel: ValidateLicenceViewModel
+public struct ValidateLicenseView: View {
+    @ObservedObject var viewModel: ValidateLicenseViewModel
     
-    init(viewModel: ValidateLicenceViewModel) {
+    init(viewModel: ValidateLicenseViewModel) {
         self.viewModel = viewModel
     }
     
