@@ -62,7 +62,7 @@ public struct ValidateLicenseView: View {
                 .font(.system(size: 21, weight: .bold))
                 .padding(.bottom, 10)
             
-            Text("Activate your license to unlock the full features of the app. Enter your license key below to proceed. If you don’t have a key, you can get one at www.coderblocks.eu. Need help? Contact us at kontakt@coderblocks.eu.")
+            Text("Activate your license to continue using the app beyond the 7-day trial. Enter your license key below to proceed. If you don’t have one, you can get it at www.coderblocks.eu. Need help? Contact us at kontakt@coderblocks.eu.")
                 .font(.system(size: 12))
                 .foregroundStyle(Color.gray)
                 .padding(.bottom, 10)
