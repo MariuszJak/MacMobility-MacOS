@@ -535,9 +535,10 @@ struct RedXButton: View {
     var body: some View {
         Image(systemName: "xmark")
             .frame(width: 25, height: 25)
-            .background(Color.red)
+            .foregroundStyle(Color.black)
+            .background(Color.gray)
             .clipShape(Circle())
-            .shadow(radius: 5.0)
+            .shadow(color: .black, radius: 2.0)
             .onTapGesture {
                 action()
             }

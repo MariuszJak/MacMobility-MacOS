@@ -286,7 +286,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id
                         ?? UUID().uuidString,
                         title: item,
-                        color: testColor
+                        color: testColor,
+                        imageData: NSImage(named: "shortcuts")?.tiffRepresentation
                     )
                 } ?? []
             } else {
@@ -299,7 +300,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                             ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id
                             ?? UUID().uuidString,
                             title: item,
-                            color: testColor
+                            color: testColor,
+                            imageData: NSImage(named: "shortcuts")?.tiffRepresentation
                         )
                     } ?? []
             }

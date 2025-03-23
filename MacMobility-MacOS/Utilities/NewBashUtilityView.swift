@@ -11,7 +11,7 @@ class NewBashUtilityViewModel: ObservableObject {
     var id: String?
     @Published var title: String = ""
     @Published var iconData: Data?
-    @Published var selectedIcon: NSImage?
+    @Published var selectedIcon: NSImage? = NSImage(named: "terminal")
     @Published var scriptCode: String = ""
     
     func clear() {
@@ -44,16 +44,33 @@ struct NewBashUtilityView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Utility title:")
+            VStack(alignment: .leading) {
+                Text("Bash Script Tool")
+                    .font(.system(size: 21, weight: .bold))
+                    .padding(.bottom, 4)
+                Text("Write bash script that can be triggered remotely.")
+                    .foregroundStyle(Color.gray)
+                    .lineLimit(2)
+                    .font(.system(size: 12))
+                    .padding(.bottom, 12)
+            }
+            Text("Script label")
+                .font(.system(size: 14, weight: .bold))
+                .padding(.bottom, 4)
+            Text("Add a label that will be present on an icon and as the description on a list.")
+                .foregroundStyle(Color.gray)
+                .lineLimit(2)
+                .font(.system(size: 12))
+                .padding(.bottom, 12)
             TextField("", text: $viewModel.title)
-                .padding()
             TextEditor(text: $viewModel.scriptCode)
-                .frame(height: 150)
-                .padding()
-                .border(Color.gray, width: 1)
+                .frame(height: 160)
+                .padding(.bottom, 12)
             IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                 viewModel.selectedIcon = image
             }, title: $viewModel.title)
+            Divider()
+                .padding(.top, 8)
             Button {
                 delegate?.saveUtility(with:
                     .init(
@@ -70,6 +87,8 @@ struct NewBashUtilityView: View {
                 closeAction()
             } label: {
                 Text("Save")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.green)
             }
         }
         .padding()

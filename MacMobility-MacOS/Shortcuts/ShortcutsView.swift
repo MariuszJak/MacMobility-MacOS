@@ -78,7 +78,7 @@ struct ShortcutsView: View {
                                 .frame(width: 70, height: 70)
                                 .background(
                                     RoundedRectangle(cornerRadius: cornerRadius)
-                                        .fill(viewModel.objectAt(index: index, page: page)?.color.let { Color(hex: $0) } ?? Color.black.opacity(0.4))
+                                        .fill(Color.black.opacity(0.4))
                                 )
                                 .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
                                     view.onDrag {
@@ -158,10 +158,21 @@ struct ShortcutsView: View {
                     .scaledToFill()
                     .frame(width: 85, height: 85)
             } else if object.type == .shortcut {
+                if let data = object.imageData, let image = NSImage(data: data) {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .cornerRadius(cornerRadius)
+                        .frame(width: 70, height: 70)
+                        .onTapGesture {
+                            openEditUtilityWindow(item: object)
+                        }
+                }
                 Text(object.title)
                     .font(.system(size: 12))
                     .multilineTextAlignment(.center)
                     .padding(.all, 3)
+                    .stroke(color: Color.black)
             } else if object.type == .webpage {
                 if let data = object.imageData, let image = NSImage(data: data) {
                     Image(nsImage: image)
@@ -175,11 +186,27 @@ struct ShortcutsView: View {
                         .onTapGesture {
                             openCreateNewWebpageWindow(item: object)
                         }
+                    Text(object.title)
+                        .font(.system(size: 12))
+                        .multilineTextAlignment(.center)
+                        .padding(.all, 3)
+                        .stroke(color: Color.black)
+                        .onTapGesture {
+                            openCreateNewWebpageWindow(item: object)
+                        }
                 } else if let path = object.browser?.icon {
                     Image(path)
                         .resizable()
                         .frame(width: 80, height: 80)
                         .cornerRadius(cornerRadius)
+                        .onTapGesture {
+                            openCreateNewWebpageWindow(item: object)
+                        }
+                    Text(object.title)
+                        .font(.system(size: 12))
+                        .multilineTextAlignment(.center)
+                        .padding(.all, 3)
+                        .stroke(color: Color.black)
                         .onTapGesture {
                             openCreateNewWebpageWindow(item: object)
                         }
@@ -201,11 +228,7 @@ struct ShortcutsView: View {
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .frame(maxWidth: 80)
-                        .background(
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(Color.black.opacity(0.8))
-                        )
-                        .padding(.top, 20)
+                        .stroke(color: Color.black)
                         .onTapGesture {
                             openEditUtilityWindow(item: object)
                         }
@@ -219,10 +242,13 @@ struct ShortcutsView: View {
             ScrollView {
                 ForEach(viewModel.shortcuts) { shortcut in
                     HStack {
-                        RoundedRectangle(cornerRadius: cornerRadius / 2)
-                            .fill(Color(hex: shortcut.color ?? ""))
-                            .frame(width: 38, height: 38)
-                            .padding(.trailing, 8)
+                        if let data = shortcut.imageData, let image = NSImage(data: data) {
+                            Image(nsImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .cornerRadius(cornerRadius)
+                                .frame(width: 38, height: 38)
+                        }
                         Text(shortcut.title)
                             .padding(.vertical, 6.0)
                         Spacer()
@@ -274,27 +300,46 @@ struct ShortcutsView: View {
     private func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             newWindow?.center()
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
-            newWindow?.contentView = NSHostingView(rootView: NewWebpageView(item: item, delegate: viewModel))
+            newWindow?.titlebarAppearsTransparent = true
+            newWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
+                return
+            }
+            newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
             viewModel.close = {
                 newWindow?.close()
             }
+            newWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            newWindow?.makeKeyAndOrderFront(nil)
+            return
         }
-        newWindow?.contentView = NSHostingView(rootView: NewWebpageView(item: item, delegate: viewModel))
+        newWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
+        let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
+        viewModel.close = {
+            newWindow?.close()
+        }
+        newWindow?.contentView?.addSubview(hv.view)
+        hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+        hv.view.autoresizingMask = [.width, .height]
         newWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openEditUtilityWindow(item: ShortcutObject) {
         if nil == editUtilitiesWindow {
             editUtilitiesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 320, height: 500),
+                contentRect: NSRect(x: 0, y: 0, width: 320, height: 570),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -302,29 +347,51 @@ struct ShortcutsView: View {
             editUtilitiesWindow?.center()
             editUtilitiesWindow?.setFrameAutosaveName("Utilities")
             editUtilitiesWindow?.isReleasedWhenClosed = false
+            editUtilitiesWindow?.titlebarAppearsTransparent = true
+            editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
+                return
+            }
+            
+            editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             switch item.utilityType {
             case .commandline:
-                editUtilitiesWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
+                let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
                 })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .multiselection:
-                editUtilitiesWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+                let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
                 })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .none:
                 break
             }
-            
+            editUtilitiesWindow?.makeKeyAndOrderFront(nil)
+            return
         }
+        editUtilitiesWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
         switch item.utilityType {
         case .commandline:
-            editUtilitiesWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel){
+            let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()
             })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         case .multiselection:
-            editUtilitiesWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+            let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()
             })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         case .none:
             break
         }

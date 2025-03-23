@@ -130,35 +130,66 @@ struct SelectUtilityTypeWindowView: View {
     private func openCreateNewUtilityWindow(type: UtilityObject.UtilityType, item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 320, height: 570),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             newWindow?.center()
-            newWindow?.setFrameAutosaveName("Preferences")
+            newWindow?.setFrameAutosaveName("CreateNewUtility")
             newWindow?.isReleasedWhenClosed = false
+            newWindow?.titlebarAppearsTransparent = true
+            newWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
+                return
+            }
+            
+            newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            
             switch type {
             case .commandline:
                 newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
                     newWindow?.close()
                 })
-            case .multiselection:
-                newWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
+                
+                let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
                     newWindow?.close()
                 })
+                newWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
+            case .multiselection:
+                let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
+                    newWindow?.close()
+                })
+                newWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             }
-            
+            newWindow?.makeKeyAndOrderFront(nil)
+            return
         }
+        newWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
         switch type {
         case .commandline:
-            newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate){
+            newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
                 newWindow?.close()
             })
+            
+            let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
+                newWindow?.close()
+            })
+            newWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         case .multiselection:
-            newWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
+            let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
                 newWindow?.close()
             })
+            newWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         }
         newWindow?.makeKeyAndOrderFront(nil)
     }

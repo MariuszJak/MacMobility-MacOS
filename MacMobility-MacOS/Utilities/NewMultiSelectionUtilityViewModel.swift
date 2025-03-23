@@ -12,7 +12,7 @@ class NewMultiSelectionUtilityViewModel: ObservableObject {
     let allObjects: [ShortcutObject]
     var id: String?
     @Published var title: String = ""
-    @Published var selectedIcon: NSImage?
+    @Published var selectedIcon: NSImage? = NSImage(named: "multiapp")
     @Published var iconData: Data?
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []

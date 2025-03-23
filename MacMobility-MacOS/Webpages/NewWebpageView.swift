@@ -48,21 +48,41 @@ struct NewWebpageView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Webpage link title:")
+            VStack(alignment: .leading) {
+                Text("Websites Link")
+                    .font(.system(size: 21, weight: .bold))
+                    .padding(.bottom, 4)
+                Text("Create a shortcut for a website link. Add url, title, icon or favicon to customise your shortcut.")
+                    .foregroundStyle(Color.gray)
+                    .lineLimit(2)
+                    .font(.system(size: 12))
+                    .padding(.bottom, 12)
+            }
+            Text("Webpage link title")
+                .font(.system(size: 14, weight: .bold))
+                .padding(.bottom, 4)
             TextField("", text: $viewModel.title)
-            Text("Link:")
+                .padding(.bottom, 8)
+            Text("Link")
+                .font(.system(size: 14, weight: .bold))
+                .padding(.bottom, 4)
             TextField("", text: $viewModel.link)
-            Text("Favicon:")
+                .padding(.bottom, 8)
+            Text("Favicon")
+                .font(.system(size: 14, weight: .bold))
+                .padding(.bottom, 4)
             TextField("", text: $viewModel.faviconLink)
+                .padding(.bottom, 8)
             Picker("Browser", selection: $viewModel.browser) {
                 Text("Chrome").tag(Browsers.chrome)
                 Text("Safari").tag(Browsers.safari)
             }
             .pickerStyle(.menu)
-            .padding()
             IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                 viewModel.selectedIcon = image
             })
+            Divider()
+                .padding(.top, 8)
             Button {
                 delegate?.saveWebpage(with:
                     .init(
@@ -80,6 +100,8 @@ struct NewWebpageView: View {
                 delegate?.close()
             } label: {
                 Text("Save")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.green)
             }
         }
         .padding()
@@ -164,15 +186,11 @@ struct IconPickerView: View {
                 }
                 if !title.isEmpty {
                     Text(title)
-                        .font(.system(size: 12))
+                        .font(.system(size: 16))
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
-                        .frame(maxWidth: 80)
-                        .background(
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(Color.black.opacity(0.8))
-                        )
-                        .padding(.top, 40)
+                        .frame(maxWidth: 100)
+                        .stroke(color: .black)
                 }
             }
             
@@ -180,6 +198,5 @@ struct IconPickerView: View {
                 viewModel.pickImage()
             }
         }
-        .padding()
     }
 }

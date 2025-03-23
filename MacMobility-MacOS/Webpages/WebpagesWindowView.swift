@@ -146,27 +146,39 @@ struct WebpagesWindowView: View {
     private func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             newWindow?.center()
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
-            newWindow?.contentView = NSHostingView(rootView: NewWebpageView(item: item, delegate: viewModel))
+            newWindow?.titlebarAppearsTransparent = true
+            newWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
+                return
+            }
+            newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
             viewModel.close = {
                 newWindow?.close()
             }
+            newWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            newWindow?.makeKeyAndOrderFront(nil)
+            return
         }
-        newWindow?.contentView = NSHostingView(rootView: NewWebpageView(item: item, delegate: viewModel))
+        let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
+        viewModel.close = {
+            newWindow?.close()
+        }
+        newWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
+        newWindow?.contentView?.addSubview(hv.view)
+        hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+        hv.view.autoresizingMask = [.width, .height]
         newWindow?.makeKeyAndOrderFront(nil)
-    }
-    
-    public func toggleWebpagesWindow() {
-        guard let allBrowserwWindow else { return }
-        if allBrowserwWindow.isVisible {
-            allBrowserwWindow.orderOut(nil)
-        }
     }
 }

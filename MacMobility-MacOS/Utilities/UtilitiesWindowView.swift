@@ -15,6 +15,7 @@ protocol UtilitiesWindowDelegate: AnyObject {
 
 struct UtilitiesWindowView: View {
     @State private var newWindow: NSWindow?
+    @State private var editUtilitiesWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
     @StateObject var viewModel: ShortcutsViewModel
     
@@ -144,13 +145,13 @@ struct UtilitiesWindowView: View {
     private func openCreateNewUtilityWindow(item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             newWindow?.center()
-            newWindow?.setFrameAutosaveName("Preferences")
+            newWindow?.setFrameAutosaveName("NewUtility")
             newWindow?.isReleasedWhenClosed = false
             newWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
                 connectionManager: viewModel.connectionManager,
@@ -169,42 +170,64 @@ struct UtilitiesWindowView: View {
     }
     
     private func openEditUtilityWindow(item: ShortcutObject) {
-        if nil == newWindow {
-            newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 320, height: 500),
+        if nil == editUtilitiesWindow {
+            editUtilitiesWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 320, height: 570),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
-            newWindow?.center()
-            newWindow?.setFrameAutosaveName("Utilities")
-            newWindow?.isReleasedWhenClosed = false
+            editUtilitiesWindow?.center()
+            editUtilitiesWindow?.setFrameAutosaveName("Utilities")
+            editUtilitiesWindow?.isReleasedWhenClosed = false
+            editUtilitiesWindow?.titlebarAppearsTransparent = true
+            editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
+                return
+            }
+            
+            editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             switch item.utilityType {
             case .commandline:
-                newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
-                    newWindow?.close()
+                let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
                 })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .multiselection:
-                newWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
-                    newWindow?.close()
+                let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
                 })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .none:
                 break
             }
-            
+            editUtilitiesWindow?.makeKeyAndOrderFront(nil)
+            return
         }
+        editUtilitiesWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
         switch item.utilityType {
         case .commandline:
-            newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel){
-                newWindow?.close()
+            let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
+                editUtilitiesWindow?.close()
             })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         case .multiselection:
-            newWindow?.contentView = NSHostingView(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
-                newWindow?.close()
+            let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+                editUtilitiesWindow?.close()
             })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         case .none:
             break
         }
-        newWindow?.makeKeyAndOrderFront(nil)
+        editUtilitiesWindow?.makeKeyAndOrderFront(nil)
     }
 }
