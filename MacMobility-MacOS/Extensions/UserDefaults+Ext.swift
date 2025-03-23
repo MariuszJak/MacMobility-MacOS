@@ -12,85 +12,24 @@ public struct Pages: Codable {
 }
 
 extension UserDefaults {
-    func storeUtilitiesItems(_ utilitiesItems: [ShortcutObject]) {
-        guard let jsonData = try? JSONEncoder().encode(utilitiesItems) else {
+    func store<T: Codable>(_ entity: T, for key: Const) {
+        guard let jsonData = try? JSONEncoder().encode(entity) else {
             return
         }
 
-        set(jsonData, forKey: Const.utilities)
-    }
-
-    func getUtilitiesItems() -> [ShortcutObject]? {
-        guard let itemsData = object(forKey: Const.utilities) as? Data,
-              let items = try? JSONDecoder().decode([ShortcutObject].self, from: itemsData) else {
-            return nil
-        }
-        return items
+        set(jsonData, forKey: key)
     }
     
-    func storeWebItems(_ webItems: [ShortcutObject]) {
-        guard let jsonData = try? JSONEncoder().encode(webItems) else {
-            return
-        }
-
-        set(jsonData, forKey: Const.webItems)
-    }
-
-    func getWebItems() -> [ShortcutObject]? {
-        guard let itemsData = object(forKey: Const.webItems) as? Data,
-              let items = try? JSONDecoder().decode([ShortcutObject].self, from: itemsData) else {
+    func get<T: Codable>(key: Const) -> T? {
+        guard let itemsData = object(forKey: key) as? Data,
+              let object = try? JSONDecoder().decode(T.self, from: itemsData) else {
             return nil
         }
-        return items
+        return object
     }
     
-    func storePages(_ pagesCount: Int) {
-        let pages = Pages(pages: pagesCount)
-        guard let jsonData = try? JSONEncoder().encode(pages) else {
-            return
-        }
-
-        set(jsonData, forKey: Const.pages)
-    }
-
-    func getPagesCount() -> Int? {
-        guard let itemsData = object(forKey: Const.pages) as? Data,
-              let pages = try? JSONDecoder().decode(Pages.self, from: itemsData) else {
-            return nil
-        }
-        return pages.pages
-    }
-    
-    func storeWorkspaceItems(_ workspaceItems: [WorkspaceItem]) {
-        guard let jsonData = try? JSONEncoder().encode(workspaceItems) else {
-            return
-        }
-
-        set(jsonData, forKey: Const.workspaceItems)
-    }
-    
-    func storeShortcutsItems(_ shortcuts: [ShortcutObject]) {
-        guard let jsonData = try? JSONEncoder().encode(shortcuts) else {
-            return
-        }
-
-        set(jsonData, forKey: Const.shortcuts)
-    }
-
-    func getWorkspaceItems() -> [WorkspaceItem]? {
-        guard let itemsData = object(forKey: Const.workspaceItems) as? Data,
-              let items = try? JSONDecoder().decode([WorkspaceItem].self, from: itemsData) else {
-            return nil
-        }
-        return items
-    }
-    
-    func getShortcutsItems() -> [ShortcutObject]? {
-        guard let itemsData = object(forKey: Const.shortcuts) as? Data,
-              let items = try? JSONDecoder().decode([ShortcutObject].self, from: itemsData) else {
-            return nil
-        }
-        return items
+    func clear(key: Const) {
+        set(nil, forKey: key)
     }
     
     func clearAll() {
@@ -107,6 +46,8 @@ extension UserDefaults {
         case shortcuts
         case pages
         case utilities
+        case licence
+        case firstActivationDate
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {

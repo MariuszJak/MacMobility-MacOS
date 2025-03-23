@@ -18,12 +18,12 @@ class WorkspacesWindowViewModel: ObservableObject, WorkspaceWindowDelegate {
     init(selectedId: String? = nil, connectionManager: ConnectionManager, close: @escaping () -> Void = {}) {
         self.selectedId = selectedId
         self.connectionManager = connectionManager
-        self.workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
+        self.workspaces = UserDefaults.standard.get(key: .workspaceItems) ?? []
         self.close = close
     }
     
     func refreshFromStorage() {
-        workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
+        workspaces = UserDefaults.standard.get(key: .workspaceItems) ?? []
     }
     
     func getAutomations() -> [WorkspaceItem] {
@@ -33,22 +33,22 @@ class WorkspacesWindowViewModel: ObservableObject, WorkspaceWindowDelegate {
     func saveWorkspace(with item: WorkspaceItem) {
         if let index = workspaces.firstIndex(where: { $0.id == item.id }) {
             workspaces[index] = item
-            UserDefaults.standard.storeWorkspaceItems(workspaces)
+            UserDefaults.standard.store(workspaces, for: .workspaceItems)
             connectionManager.workspaces = workspaces
             return
         }
         workspaces.append(item)
         connectionManager.workspaces = workspaces
-        UserDefaults.standard.storeWorkspaceItems(workspaces)
+        UserDefaults.standard.store(workspaces, for: .workspaceItems)
     }
     
     func removeWorkspace2(with item: WorkspaceItem) {
         workspaces = workspaces.filter { $0.id != item.id }
         connectionManager.workspaces = workspaces
-        UserDefaults.standard.storeWorkspaceItems(workspaces)
+        UserDefaults.standard.store(workspaces, for: .workspaceItems)
     }
     
     func saveWebpages() {
-        UserDefaults.standard.storeWorkspaceItems(workspaces)
+        UserDefaults.standard.store(workspaces, for: .workspaceItems)
     }
 }

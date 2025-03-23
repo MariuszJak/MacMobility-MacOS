@@ -48,6 +48,12 @@
 		C0EAF9392D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */; };
 		C0EAF93B2D8CC67600044947 /* NewMultiSelectionUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF93A2D8CC67600044947 /* NewMultiSelectionUtilityView.swift */; };
 		C0EAF93D2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF93C2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift */; };
+		C0EAF93F2D90213100044947 /* MacOSMainPopoverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF93E2D90213100044947 /* MacOSMainPopoverViewModel.swift */; };
+		C0EAF9412D90244700044947 /* AppLicenseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9402D90244700044947 /* AppLicenseManager.swift */; };
+		C0EAF9432D90246100044947 /* ValidateLicenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9422D90246100044947 /* ValidateLicenceView.swift */; };
+		C0EAF9F92D902AB100044947 /* Resolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9F82D902AB100044947 /* Resolver.swift */; };
+		C0EAFC182D9030D000044947 /* LicenseKeyGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAFC172D9030D000044947 /* LicenseKeyGenerator.swift */; };
+		C0EAFC1A2D903E7400044947 /* TrialManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAFC192D903E7400044947 /* TrialManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +119,12 @@
 		C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectUtilityTypeWindowView.swift; sourceTree = "<group>"; };
 		C0EAF93A2D8CC67600044947 /* NewMultiSelectionUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMultiSelectionUtilityView.swift; sourceTree = "<group>"; };
 		C0EAF93C2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMultiSelectionUtilityViewModel.swift; sourceTree = "<group>"; };
+		C0EAF93E2D90213100044947 /* MacOSMainPopoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSMainPopoverViewModel.swift; sourceTree = "<group>"; };
+		C0EAF9402D90244700044947 /* AppLicenseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLicenseManager.swift; sourceTree = "<group>"; };
+		C0EAF9422D90246100044947 /* ValidateLicenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateLicenceView.swift; sourceTree = "<group>"; };
+		C0EAF9F82D902AB100044947 /* Resolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Resolver.swift; sourceTree = "<group>"; };
+		C0EAFC172D9030D000044947 /* LicenseKeyGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseKeyGenerator.swift; sourceTree = "<group>"; };
+		C0EAFC192D903E7400044947 /* TrialManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrialManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +170,11 @@
 				C097755E2B5C31D700F4FFE6 /* ConnectionManager.swift */,
 				C09775602B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift */,
 				C09775612B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift */,
+				C0EAF9402D90244700044947 /* AppLicenseManager.swift */,
+				C0EAF9422D90246100044947 /* ValidateLicenceView.swift */,
+				C0EAF9F82D902AB100044947 /* Resolver.swift */,
+				C0EAFC172D9030D000044947 /* LicenseKeyGenerator.swift */,
+				C0EAFC192D903E7400044947 /* TrialManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -202,6 +219,7 @@
 				C097756A2B5C32AA00F4FFE6 /* Info.plist */,
 				C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */,
 				C09775642B5C31EE00F4FFE6 /* MacOSMainView.swift */,
+				C0EAF93E2D90213100044947 /* MacOSMainPopoverViewModel.swift */,
 				C09775332B5C319E00F4FFE6 /* Assets.xcassets */,
 				C09775682B5C329300F4FFE6 /* scriptnext.scpt */,
 				C09775382B5C319E00F4FFE6 /* MacMobility_MacOS.entitlements */,
@@ -426,6 +444,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C064B8C42D86EB090091E2BE /* ShortcutsView.swift in Sources */,
+				C0EAFC182D9030D000044947 /* LicenseKeyGenerator.swift in Sources */,
 				C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */,
 				C0D21D712D7A286600FEF931 /* NSVisualEffectView+Ext.swift in Sources */,
 				C064B8D22D86F37E0091E2BE /* ShortcutsViewModel.swift in Sources */,
@@ -439,12 +458,16 @@
 				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
 				C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */,
 				C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */,
+				C0EAF93F2D90213100044947 /* MacOSMainPopoverViewModel.swift in Sources */,
 				C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */,
 				C0EAF9392D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift in Sources */,
 				C0D21D652D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift in Sources */,
 				C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */,
+				C0EAF9432D90246100044947 /* ValidateLicenceView.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
 				C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */,
+				C0EAF9412D90244700044947 /* AppLicenseManager.swift in Sources */,
+				C0EAF9F92D902AB100044947 /* Resolver.swift in Sources */,
 				C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */,
 				C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */,
 				C09775632B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift in Sources */,
@@ -456,6 +479,7 @@
 				C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */,
 				C0EAF93B2D8CC67600044947 /* NewMultiSelectionUtilityView.swift in Sources */,
 				C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */,
+				C0EAFC1A2D903E7400044947 /* TrialManager.swift in Sources */,
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
 				C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */,
 				C064BA672D876FA40091E2BE /* Optional+Ext.swift in Sources */,

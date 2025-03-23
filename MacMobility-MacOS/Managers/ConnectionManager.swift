@@ -68,9 +68,8 @@ class ConnectionManager: NSObject, ObservableObject {
         super.init()
 
         runningApps = getRunningApps()
-//        webpages = UserDefaults.standard.getWebItems() ?? []
-        workspaces = UserDefaults.standard.getWorkspaceItems() ?? []
-        shortcuts = UserDefaults.standard.getShortcutsItems() ?? []
+        workspaces = UserDefaults.standard.get(key: .workspaceItems) ?? []
+        shortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         subscribeForRunningApps()
 
         session.delegate = self

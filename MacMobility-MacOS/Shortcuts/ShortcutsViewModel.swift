@@ -73,10 +73,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     init(connectionManager: ConnectionManager) {
         self.connectionManager = connectionManager
-        self.configuredShortcuts = UserDefaults.standard.getShortcutsItems() ?? []
-        self.webpages = UserDefaults.standard.getWebItems() ?? []
-        self.utilities = UserDefaults.standard.getUtilitiesItems() ?? []
-        self.pages = UserDefaults.standard.getPagesCount() ?? 1
+        self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
+        self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
+        self.utilities = UserDefaults.standard.get(key: .utilities) ?? []
+        self.pages = UserDefaults.standard.get(key: .pages) ?? 1
         fetchShortcuts()
         fetchInstalledApps()
         registerListener()
@@ -110,12 +110,12 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     func removeShortcut(id: String) {
         configuredShortcuts.removeAll { $0.id == id }
         connectionManager.shortcuts = configuredShortcuts
-        UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
+        UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
     }
     
     func addPage() {
         pages += 1
-        UserDefaults.standard.storePages(pages)
+        UserDefaults.standard.store(pages, for: .pages)
     }
     
     func removePage(with number: Int) {
@@ -129,21 +129,21 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             pages -= 1
         }
         connectionManager.shortcuts = configuredShortcuts
-        UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
-        UserDefaults.standard.storePages(pages)
+        UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+        UserDefaults.standard.store(pages, for: .pages)
     }
     
     func removeWebItem(id: String) {
         webpages.removeAll { $0.id == id }
         configuredShortcuts.removeAll { $0.id == id }
-        UserDefaults.standard.storeWebItems(webpages)
+        UserDefaults.standard.store(webpages, for: .webItems)
         connectionManager.shortcuts = configuredShortcuts
     }
     
     func removeUtilityItem(id: String) {
         utilities.removeAll { $0.id == id }
         configuredShortcuts.removeAll { $0.id == id }
-        UserDefaults.standard.storeUtilitiesItems(utilities)
+        UserDefaults.standard.store(utilities, for: .utilities)
         connectionManager.shortcuts = configuredShortcuts
     }
     
@@ -175,7 +175,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             configuredShortcuts.append(object)
         }
         connectionManager.shortcuts = configuredShortcuts
-        UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
+        UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
     }
     
     func searchWebpages() {
@@ -219,13 +219,13 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     imageData: webpageItem.imageData,
                     objects: webpageItem.objects
                 )
-                UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
+                UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
         } else {
             webpages.insert(webpageItem, at: 0)
         }
         connectionManager.shortcuts = configuredShortcuts
-        UserDefaults.standard.storeWebItems(webpages)
+        UserDefaults.standard.store(webpages, for: .webItems)
     }
     
     func saveUtility(with utilityItem: ShortcutObject) {
@@ -247,13 +247,13 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     utilityType: utilityItem.utilityType,
                     objects: utilityItem.objects
                 )
-                UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
+                UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
         } else {
             utilities.insert(utilityItem, at: 0)
         }
         connectionManager.shortcuts = configuredShortcuts
-        UserDefaults.standard.storeUtilitiesItems(utilities)
+        UserDefaults.standard.store(utilities, for: .utilities)
     }
     
     func openShortcut(name: String) {

@@ -24,6 +24,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var eventMonitor: Any?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        register()
         menuView = MacOSMainPopoverView()
         popOver.behavior = .transient
         popOver.animates = true
@@ -48,5 +49,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 popOver.contentViewController?.view.window?.makeKey()
             }
         }
+    }
+}
+
+extension AppDelegate {
+    func register() {
+        Resolver.register(AppLicenseManager(), .locked)
     }
 }

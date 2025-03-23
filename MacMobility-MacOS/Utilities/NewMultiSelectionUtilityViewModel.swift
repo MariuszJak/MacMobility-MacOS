@@ -126,7 +126,7 @@ class NewMultiSelectionUtilityViewModel: ObservableObject {
                     scriptCode: utilityItem.scriptCode,
                     utilityType: utilityItem.utilityType
                 )
-                UserDefaults.standard.storeShortcutsItems(configuredShortcuts)
+                UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
         } else {
             utilities.insert(utilityItem, at: 0)

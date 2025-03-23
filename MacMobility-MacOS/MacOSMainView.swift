@@ -16,8 +16,10 @@ enum WorkspaceControl: String, CaseIterable {
 
 struct MacOSMainPopoverView: View {
     @StateObject var connectionManager = ConnectionManager()
+    @StateObject var viewModel = MacOSMainPopoverViewModel()
     @State private var newWindow: NSWindow?
     @State private var shortcutsWindow: NSWindow?
+    @State private var licenseWindow: NSWindow?
     @State private var workspacesWindow: NSWindow?
     @State var isAccessibilityGranted: Bool = false
     private var spacing = 6.0
@@ -31,19 +33,10 @@ struct MacOSMainPopoverView: View {
             VStack(alignment: .leading, spacing: spacing) {
                 HStack(alignment: .top, spacing: spacing * 2) {
                     VStack(alignment: .leading, spacing: spacing) {
-                        permissionView
-                        shortcutsWindowButtonView
-                        pairiningView
-                        if connectionManager.isConnecting {
-                            Spacer()
-                        }
-                        Divider()
-                        quitView
+                        mainView()
+//                        debugButtons()
                     }
-                    if connectionManager.isConnecting {
-                        Divider()
-                    }
-                    qrCodeView
+                    qrCodeViewWithTrialCheck()
                 }
             }
             .buttonStyle(PlainButtonStyle())
@@ -52,6 +45,78 @@ struct MacOSMainPopoverView: View {
                 $0.frame(maxHeight: 130)
             }
             .padding()
+        }
+    }
+    
+    @ViewBuilder
+    func debugButtons() -> some View {
+        // TODO: Remove!
+        Button("Clear license") {
+            viewModel.appLincenseManager.degrade()
+        }
+        Button("Reset trial") {
+            viewModel.resetTrial()
+        }
+        // TODO: End
+    }
+    
+    @ViewBuilder
+    func mainView() -> some View {
+        if viewModel.isPaidLicense {
+            permissionView
+            shortcutsWindowButtonView
+            pairiningView
+            if connectionManager.isConnecting {
+                Spacer()
+            }
+            Divider()
+            quitView
+        } else {
+            licenseWindowButtonView
+            permissionView
+            if viewModel.isTrialExpired {
+                Button {
+                    let url = NSURL(string: "https://coderblocks.eu") as? URL
+                    NSWorkspace.shared.open(url!, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+                        if let error { print(error) }
+                    }
+                } label: {
+                    Text("Trial phase ended! Buy license.")
+                        .foregroundStyle(Color.red)
+                }
+
+            } else {
+                HStack(spacing: 2) {
+                    shortcutsWindowButtonView
+                    Text("(Demo)")
+                        .onTapGesture {
+                            openShortcutsWindow()
+                        }
+                }
+                pairiningView
+                if connectionManager.isConnecting {
+                    Spacer()
+                }
+            }
+            Divider()
+            quitView
+        }
+    }
+    
+    @ViewBuilder
+    private func qrCodeViewWithTrialCheck() -> some View {
+        if viewModel.isPaidLicense {
+            if connectionManager.isConnecting {
+                Divider()
+            }
+            qrCodeView
+        } else {
+            if !viewModel.isTrialExpired {
+                if connectionManager.isConnecting {
+                    Divider()
+                }
+                qrCodeView
+            }
         }
     }
     
@@ -82,33 +147,31 @@ struct MacOSMainPopoverView: View {
         shortcutsWindow?.makeKeyAndOrderFront(nil)
     }
     
-    private func openWorkspacesWindow() {
-        if nil == workspacesWindow {
-            workspacesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 1000, height: 550),
+    private func openLicenseWindow() {
+        if nil == licenseWindow {
+            licenseWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 280),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
-            workspacesWindow?.center()
-            workspacesWindow?.setFrameAutosaveName("Workspaces")
-            workspacesWindow?.isReleasedWhenClosed = false
-            workspacesWindow?.titlebarAppearsTransparent = true
-            workspacesWindow?.styleMask.insert(.fullSizeContentView)
+            licenseWindow?.center()
+            licenseWindow?.setFrameAutosaveName("Licence")
+            licenseWindow?.isReleasedWhenClosed = false
+            licenseWindow?.titlebarAppearsTransparent = true
+            licenseWindow?.styleMask.insert(.fullSizeContentView)
             
-            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: workspacesWindow) else {
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: licenseWindow) else {
                 return
             }
             
-            workspacesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: WorkspacesWindowView(connectionManager: connectionManager, closeAction: {
-                workspacesWindow?.close()
-            }))
-            workspacesWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = workspacesWindow?.contentView?.bounds ?? .zero
+            licenseWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: ValidateLicenceView(viewModel: .init()))
+            licenseWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = licenseWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
         }
-        workspacesWindow?.makeKeyAndOrderFront(nil)
+        licenseWindow?.makeKeyAndOrderFront(nil)
     }
     
     private var qrCodeView: some View {
@@ -151,9 +214,9 @@ struct MacOSMainPopoverView: View {
         }
     }
     
-    private var workspacesWindowButtonView: some View {
-        Button("Workspaces") {
-            openWorkspacesWindow()
+    private var licenseWindowButtonView: some View {
+        Button("Verify licence") {
+            openLicenseWindow()
         }
     }
     
