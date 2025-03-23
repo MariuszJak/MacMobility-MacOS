@@ -2,7 +2,7 @@
 //  MacMobility_MacOSUITestsLaunchTests.swift
 //  MacMobility-MacOSUITests
 //
-//  Created by Mariusz Jakowienko on 20/01/2024.
+//  Created by CoderBlocks on 20/01/2024.
 //
 
 import XCTest

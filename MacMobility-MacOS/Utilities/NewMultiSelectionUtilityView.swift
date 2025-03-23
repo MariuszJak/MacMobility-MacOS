@@ -2,7 +2,7 @@
 //  NewMultiSelectionUtilityView.swift
 //  MacMobility-MacOS
 //
-//  Created by Mariusz Jakowienko on 20/03/2025.
+//  Created by CoderBlocks on 20/03/2025.
 //
 
 import SwiftUI

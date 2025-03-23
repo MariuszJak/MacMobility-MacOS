@@ -2,7 +2,7 @@
 //  Array+Ext.swift
 //  MagicTrackpad
 //
-//  Created by Mariusz Jakowienko on 22/07/2023.
+//  Created by CoderBlocks on 22/07/2023.
 //
 
 import Foundation

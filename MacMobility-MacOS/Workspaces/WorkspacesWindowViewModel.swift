@@ -2,7 +2,7 @@
 //  WorkspacesWindowViewModel.swift
 //  MacMobility-MacOS
 //
-//  Created by Mariusz Jakowienko on 27/02/2025.
+//  Created by CoderBlocks on 27/02/2025.
 //
 
 import SwiftUI

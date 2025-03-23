@@ -2,7 +2,7 @@
 //  Optional+Ext.swift
 //  MacMobility-MacOS
 //
-//  Created by Mariusz Jakowienko on 16/03/2025.
+//  Created by CoderBlocks on 16/03/2025.
 //
 
 import Foundation

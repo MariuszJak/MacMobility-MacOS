@@ -2,7 +2,7 @@
 //  NSVisualEffectView+Ext.swift
 //  MacMobility-MacOS
 //
-//  Created by Mariusz Jakowienko on 06/03/2025.
+//  Created by CoderBlocks on 06/03/2025.
 //
 
 import SwiftUI

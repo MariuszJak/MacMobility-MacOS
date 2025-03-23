@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  MagicTrackpad
 //
-//  Created by Mariusz Jakowienko on 05/07/2023.
+//  Created by CoderBlocks on 05/07/2023.
 //
 
 import SwiftUI
