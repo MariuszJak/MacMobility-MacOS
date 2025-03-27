@@ -48,6 +48,7 @@ extension UserDefaults {
         case utilities
         case license
         case firstActivationDate
+        case userApps
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {

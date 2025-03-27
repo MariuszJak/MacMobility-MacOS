@@ -76,7 +76,7 @@ struct MacOSMainPopoverView: View {
             permissionView
             if viewModel.isTrialExpired {
                 Button {
-                    let url = NSURL(string: "https://coderblocks.eu") as? URL
+                    let url = NSURL(string: "https://coderblocks.eu/macmobility/") as? URL
                     NSWorkspace.shared.open(url!, configuration: NSWorkspace.OpenConfiguration()) { _, error in
                         if let error { print(error) }
                     }
@@ -123,7 +123,7 @@ struct MacOSMainPopoverView: View {
     private func openShortcutsWindow() {
         if nil == shortcutsWindow {
             shortcutsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 1000, height: 850),
+                contentRect: NSRect(x: 0, y: 0, width: 1300, height: 850),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

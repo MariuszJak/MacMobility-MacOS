@@ -23,82 +23,103 @@ struct ShortcutsView: View {
             HStack {
                 Text("Editor")
                     .font(.system(size: 17.0, weight: .bold))
-                    .padding([.horizontal, .top], 16)
-            }
-            Divider()
-        }
-        HStack {
-            VStack(alignment: .leading) {
-                HStack(alignment: .bottom) {
+                    
+                HStack {
+                    Text("Add page")
+                        .padding(.leading, 8.0)
                     Image(systemName: "plus.circle.fill")
                         .resizable()
                         .frame(width: 20, height: 20)
-                        .padding([.horizontal, .top], 16.0)
-                        .onTapGesture {
-                            viewModel.addPage()
-                        }
-                    Text("Add page")
                 }
-                ScrollView {
-                    ForEach(1..<viewModel.pages+1, id: \.self) { page in
-                        HStack {
-                            Text("Page: \(page)")
-                                .font(.system(size: 16, weight: .bold))
-                            Spacer()
-                            Button {
-                                viewModel.removePage(with: page)
-                            } label: {
-                                Text("Remove")
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(Color.red)
+                .background(
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(Color.gray)
+                )
+                .onTapGesture {
+                    viewModel.addPage()
+                }
+                .padding(.all, 3.0)
+                .padding()
+            }
+            .padding([.horizontal, .top], 16)
+            .padding(.leading, 21.0)
+            Divider()
+        }
+        .padding(.top, 21.0)
+        HStack {
+            VStack(alignment: .leading) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        ForEach(1..<viewModel.pages+1, id: \.self) { page in
+                            HStack {
+                                Text("Page: \(page)")
+                                    .font(.system(size: 16, weight: .bold))
+                                Spacer()
+                                Button {
+                                    viewModel.removePage(with: page)
+                                } label: {
+                                    Text("Remove")
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(Color.red)
+                                }
                             }
-                        }
-                        .padding()
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 10) {
-                            ForEach(0..<21) { index in
-                                VStack {
-                                    ZStack {
-                                        itemViews(for: index, page: page)
-                                            .frame(width: 70, height: 70)
-                                            .clipped()
-                                        if let id = viewModel.objectAt(index: index, page: page)?.id {
-                                            VStack {
-                                                HStack {
-                                                    Spacer()
-                                                    RedXButton {
-                                                        viewModel.removeShortcut(id: id)
+                            .padding()
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 10) {
+                                ForEach(0..<21) { index in
+                                    VStack {
+                                        ZStack {
+                                            itemViews(for: index, page: page)
+                                                .frame(width: 70, height: 70)
+                                                .clipped()
+                                            if let id = viewModel.objectAt(index: index, page: page)?.id {
+                                                VStack {
+                                                    HStack {
+                                                        Spacer()
+                                                        RedXButton {
+                                                            viewModel.removeShortcut(id: id)
+                                                        }
                                                     }
+                                                    Spacer()
                                                 }
-                                                Spacer()
+                                            }
+                                            
+                                        }
+                                    }
+                                    .frame(width: 70, height: 70)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: cornerRadius)
+                                            .fill(Color.black.opacity(0.4))
+                                    )
+                                    .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
+                                        view.onDrag {
+                                            NSItemProvider(object: id as NSString)
+                                        }
+                                    }
+                                    .onDrop(of: [.text], isTargeted: nil) { providers in
+                                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                                            if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
+                                                handleOnDrop(index: index, page: page, object: object)
                                             }
                                         }
-                                        
+                                        return true
                                     }
-                                }
-                                .frame(width: 70, height: 70)
-                                .background(
-                                    RoundedRectangle(cornerRadius: cornerRadius)
-                                        .fill(Color.black.opacity(0.4))
-                                )
-                                .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
-                                    view.onDrag {
-                                        NSItemProvider(object: id as NSString)
-                                    }
-                                }
-                                .onDrop(of: [.text], isTargeted: nil) { providers in
-                                    providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                                        if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
-                                            handleOnDrop(index: index, page: page, object: object)
-                                        }
-                                    }
-                                    return true
                                 }
                             }
+                            .padding([.horizontal, .top])
+                            .id(page)
                         }
-                        .padding([.horizontal, .top])
+                        Spacer()
+                            .frame(height: 80)
+                    }
+                    .frame(minWidth: 600)
+                    .scrollIndicators(.hidden)
+                    .padding(.horizontal, 100)
+                    .onChange(of: viewModel.scrollToPage) { _, page in
+                        withAnimation {
+                            proxy.scrollTo(page, anchor: .top)
+                        }
                     }
                 }
-                .frame(minWidth: 600)
             }
             VStack {
                 TextField("Search...", text: $viewModel.searchText)
@@ -125,6 +146,7 @@ struct ShortcutsView: View {
                 }
             }
         }
+        .padding(.top, 21.0)
     }
     
     private func handleOnDrop(index: Int, page: Int, object: ShortcutObject) {
@@ -263,30 +285,72 @@ struct ShortcutsView: View {
         .padding()
     }
     
+    @State private var appNameToFlash: String = ""
+    
     private var installedAppsView: some View {
         VStack(alignment: .leading) {
-            ScrollView {
-                ForEach(viewModel.installedApps) { app in
-                    HStack {
+            Button("Click to add an app") {
+                if let path = selectApp() {
+                    viewModel.addInstalledApp(for: path)
+                }
+            }
+            .padding(.bottom, 8.0)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    ForEach(viewModel.installedApps) { app in
                         HStack {
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
-                                .resizable()
-                                .frame(width: 38, height: 38)
-                                .cornerRadius(cornerRadius)
-                                .padding(.trailing, 8)
-                            Text(app.title)
-                                .padding(.vertical, 6.0)
+                            HStack {
+                                Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
+                                    .resizable()
+                                    .frame(width: 38, height: 38)
+                                    .cornerRadius(cornerRadius)
+                                    .padding(.trailing, 8)
+                                Text(app.title)
+                                    .padding(.vertical, 6.0)
+                            }
+                            .id(app.title)
+                            Spacer()
                         }
-                        Spacer()
+                        .onDrag {
+                            NSItemProvider(object: app.id as NSString)
+                        }
+                        .background(app.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
+                        .animation(.easeOut, value: appNameToFlash)
+                        .cornerRadius(10)
+                        Divider()
                     }
-                    .onDrag {
-                        NSItemProvider(object: app.id as NSString)
+                }
+                .onChange(of: viewModel.scrollToApp) { _, title in
+                    DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
+                        withAnimation {
+                            proxy.scrollTo(title, anchor: .center)
+                        } completion: {
+                            appNameToFlash = title
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                appNameToFlash = ""
+                            }
+                        }
+
                     }
-                    Divider()
                 }
             }
         }
         .padding()
+    }
+    
+    func selectApp() -> String? {
+        let openPanel = NSOpenPanel()
+        openPanel.title = "Select an Application"
+        openPanel.allowedContentTypes = [.application]
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canChooseFiles = true
+        
+        if openPanel.runModal() == .OK {
+            return openPanel.url?.path
+        }
+        
+        return nil
     }
     
     private var websitesView: some View {

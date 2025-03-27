@@ -61,22 +61,27 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []
     @Published var installedApps: [ShortcutObject] = []
+    @Published var appsAddedByUser: [ShortcutObject] = []
     @Published var webpages: [ShortcutObject] = []
     @Published var utilities: [ShortcutObject] = []
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     @Published var pages = 1
+    @Published var scrollToApp: String = ""
+    @Published var scrollToPage: Int = 0
     var close: () -> Void = {}
     private var timer: Timer?
     public var testColor = "#6DDADE"
     private var allWebpages: [ShortcutObject] = []
     
     init(connectionManager: ConnectionManager) {
+//        UserDefaults.standard.clear(key: .userApps)
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
         self.utilities = UserDefaults.standard.get(key: .utilities) ?? []
         self.pages = UserDefaults.standard.get(key: .pages) ?? 1
+        self.appsAddedByUser = UserDefaults.standard.get(key: .userApps) ?? []
         fetchShortcuts()
         fetchInstalledApps()
         registerListener()
@@ -115,6 +120,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     func addPage() {
         pages += 1
+        scrollToPage = pages
         UserDefaults.standard.store(pages, for: .pages)
     }
     
@@ -341,6 +347,31 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     .filter { $0.title.lowercased().contains(self.searchText.lowercased()) }
             }
         }
+        
+        appsAddedByUser.forEach { userApp in
+            if apps.contains(where: { $0.path != userApp.path }) {
+                apps.append(userApp)
+            }
+        }
+    }
+    
+    func addInstalledApp(for path: String) {
+        guard installedApps.first(where: { $0.path == path }) == nil else {
+            scrollToApp = path.appNameFromPath() ?? "Unknown"
+            return
+        }
+        let title = path.appNameFromPath() ?? "Unknown"
+        let app = ShortcutObject(
+            type: .app,
+            page: configuredShortcuts.first(where: { shortcut in path == shortcut.path })?.page ?? 1,
+            path: path,
+            id: appsAddedByUser.first(where: { shortcut in path == shortcut.path })?.id ?? configuredShortcuts.first(where: { shortcut in path == shortcut.path })?.id ?? UUID().uuidString,
+            title: title
+        )
+        appsAddedByUser.insert(app, at: 0)
+        fetchInstalledApps()
+        scrollToApp = title
+        UserDefaults.standard.store(appsAddedByUser, for: .userApps)
     }
     
     func findApps(in directory: String) -> [ShortcutObject] {
@@ -362,5 +393,15 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
 
         return apps
+    }
+}
+
+extension String {
+    func appNameFromPath() -> String? {
+        guard let lastComponent = self.split(separator: "/").last,
+              lastComponent.hasSuffix(".app") else {
+            return nil
+        }
+        return lastComponent.replacingOccurrences(of: ".app", with: "")
     }
 }
