@@ -11,6 +11,10 @@ public struct Pages: Codable {
     let pages: Int
 }
 
+public struct Lifecycle: Codable {
+    let openCount: Int
+}
+
 extension UserDefaults {
     func store<T: Codable>(_ entity: T, for key: Const) {
         guard let jsonData = try? JSONEncoder().encode(entity) else {
@@ -49,6 +53,7 @@ extension UserDefaults {
         case license
         case firstActivationDate
         case userApps
+        case lifecycle
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {

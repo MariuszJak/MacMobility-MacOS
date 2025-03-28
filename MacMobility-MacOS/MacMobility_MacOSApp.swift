@@ -18,6 +18,7 @@ struct MacMobility_MacOSApp: App {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    private var permissionsWindow: NSWindow?
     var statusItem: NSStatusItem?
     var popOver = NSPopover()
     var menuView: MacOSMainPopoverView?
@@ -31,12 +32,45 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popOver.contentViewController = NSViewController()
         popOver.contentViewController?.view = NSHostingView(rootView: menuView)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
+        if lifecycle.openCount < 2 {
+            openPermissionsWindow()
+            let openCount = lifecycle.openCount + 1
+            UserDefaults.standard.store(Lifecycle(openCount: openCount), for: .lifecycle)
+        }
         
         if let menuButton = statusItem?.button {
             menuButton.image = NSImage(named: "app-icon")
             menuButton.action = #selector(menuAction)
         }
         NSApp.setActivationPolicy(.accessory)
+    }
+    
+    func openPermissionsWindow() {
+        if nil == permissionsWindow {
+            permissionsWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            permissionsWindow?.center()
+            permissionsWindow?.setFrameAutosaveName("Permissions")
+            permissionsWindow?.isReleasedWhenClosed = false
+            permissionsWindow?.titlebarAppearsTransparent = true
+            permissionsWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: permissionsWindow) else {
+                return
+            }
+            
+            permissionsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: PermissionView())
+            permissionsWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = permissionsWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        permissionsWindow?.makeKeyAndOrderFront(nil)
     }
     
     @objc

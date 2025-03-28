@@ -17,7 +17,7 @@ enum WorkspaceControl: String, CaseIterable {
 struct MacOSMainPopoverView: View {
     @StateObject var connectionManager = ConnectionManager()
     @StateObject var viewModel = MacOSMainPopoverViewModel()
-    @State private var newWindow: NSWindow?
+    @State private var permissionsWindow: NSWindow?
     @State private var shortcutsWindow: NSWindow?
     @State private var licenseWindow: NSWindow?
     @State private var workspacesWindow: NSWindow?
@@ -64,6 +64,7 @@ struct MacOSMainPopoverView: View {
     func mainView() -> some View {
         if viewModel.isPaidLicense {
             permissionView
+            Divider()
             shortcutsWindowButtonView
             pairiningView
             if connectionManager.isConnecting {
@@ -74,6 +75,7 @@ struct MacOSMainPopoverView: View {
         } else {
             licenseWindowButtonView
             permissionView
+            Divider()
             if viewModel.isTrialExpired {
                 Button {
                     let url = NSURL(string: "https://coderblocks.eu/macmobility/") as? URL
@@ -147,6 +149,33 @@ struct MacOSMainPopoverView: View {
         shortcutsWindow?.makeKeyAndOrderFront(nil)
     }
     
+    func openPermissionsWindow() {
+        if nil == permissionsWindow {
+            permissionsWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            permissionsWindow?.center()
+            permissionsWindow?.setFrameAutosaveName("Permissions")
+            permissionsWindow?.isReleasedWhenClosed = false
+            permissionsWindow?.titlebarAppearsTransparent = true
+            permissionsWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: permissionsWindow) else {
+                return
+            }
+            
+            permissionsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: PermissionView())
+            permissionsWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = permissionsWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        permissionsWindow?.makeKeyAndOrderFront(nil)
+    }
+    
     private func openLicenseWindow() {
         if nil == licenseWindow {
             licenseWindow = NSWindow(
@@ -193,19 +222,9 @@ struct MacOSMainPopoverView: View {
     
     private var permissionView: some View {
         Button("Ask for permission") {
-            guard !AXIsProcessTrusted() else { return }
-            let alert = NSAlert()
-            alert.messageText = "Accessibility Access Required"
-            alert.informativeText = "Your app needs accessibility access to perform certain actions. Please enable accessibility access in System Preferences."
-            alert.addButton(withTitle: "Open System Preferences")
-            alert.addButton(withTitle: "Cancel")
-            
-            let response = alert.runModal()
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
-            }
+            openPermissionsWindow()
         }
-        .disabled(AXIsProcessTrusted())
+//        .disabled(AXIsProcessTrusted())
     }
     
     private var shortcutsWindowButtonView: some View {

@@ -63,6 +63,7 @@
 		C0F67EE42D973F070090D568 /* DBSDataProviderRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F67EE32D973F070090D568 /* DBSDataProviderRepresentable.swift */; };
 		C0F67EE72D973F1D0090D568 /* LicenseValidationAPIProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F67EE62D973F1D0090D568 /* LicenseValidationAPIProtocol.swift */; };
 		C0F67EE92D973F2B0090D568 /* LicenseValidationUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F67EE82D973F2B0090D568 /* LicenseValidationUseCase.swift */; };
+		C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F67EEB2D97417B0090D568 /* PermissionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,6 +144,7 @@
 		C0F67EE32D973F070090D568 /* DBSDataProviderRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBSDataProviderRepresentable.swift; sourceTree = "<group>"; };
 		C0F67EE62D973F1D0090D568 /* LicenseValidationAPIProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseValidationAPIProtocol.swift; sourceTree = "<group>"; };
 		C0F67EE82D973F2B0090D568 /* LicenseValidationUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseValidationUseCase.swift; sourceTree = "<group>"; };
+		C0F67EEB2D97417B0090D568 /* PermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +230,7 @@
 		C097752E2B5C319D00F4FFE6 /* MacMobility-MacOS */ = {
 			isa = PBXGroup;
 			children = (
+				C0F67EEA2D9741710090D568 /* Permissions */,
 				C0F67ED62D973E7C0090D568 /* Networking */,
 				C0EAF9332D8B491700044947 /* Utilities */,
 				C064B8C22D86EAED0091E2BE /* Shortcuts */,
@@ -347,6 +350,14 @@
 				C0F67EE82D973F2B0090D568 /* LicenseValidationUseCase.swift */,
 			);
 			path = LicenseValidation;
+			sourceTree = "<group>";
+		};
+		C0F67EEA2D9741710090D568 /* Permissions */ = {
+			isa = PBXGroup;
+			children = (
+				C0F67EEB2D97417B0090D568 /* PermissionView.swift */,
+			);
+			path = Permissions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -511,6 +522,7 @@
 				C0EAF9432D90246100044947 /* ValidateLicenseView.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
 				C0F67EDC2D973EA50090D568 /* EmptyResponse.swift in Sources */,
+				C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */,
 				C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */,
 				C0EAF9412D90244700044947 /* AppLicenseManager.swift in Sources */,
 				C0EAF9F92D902AB100044947 /* Resolver.swift in Sources */,

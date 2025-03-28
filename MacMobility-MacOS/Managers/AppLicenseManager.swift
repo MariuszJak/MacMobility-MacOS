@@ -48,11 +48,10 @@ public class AppLicenseManager: ObservableObject {
     public func validate(key: String, completion: @escaping (Bool) -> Void) async {
         if LicenseKeyGenerator().validateKey(key) {
             let result = await useCase.validateLicense(key)
-            
             switch result {
             case .success(let body):
                 if body.success {
-                    //upgrade()
+                    upgrade()
                     completion(true)
                 } else {
                     completion(false)
