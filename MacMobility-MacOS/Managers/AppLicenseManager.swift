@@ -12,12 +12,23 @@ public enum LicenseType: String, Codable {
     case paid
 }
 
+public struct ValidateKeyResponse: Codable {
+    let success: Bool
+    let message: String
+}
+
+public struct ValidateKeyBody: Codable {
+    let key: String
+}
+
 public class AppLicenseManager: ObservableObject {
+    @Inject private var useCase: LicenseValidationUseCaseProtocol
     public static let shared: AppLicenseManager = .init()
     var license: LicenseType = .free
     public var completion: ((LicenseType) -> Void)?
     
     public init() {
+//        UserDefaults.standard.clear(key: .license)
         self.license = UserDefaults.standard.get(key: .license) ?? .free
         completion?(license)
     }
@@ -33,12 +44,24 @@ public class AppLicenseManager: ObservableObject {
         UserDefaults.standard.store(license, for: .license)
     }
     
-    public func validate(key: String) -> Bool {
+    @MainActor
+    public func validate(key: String, completion: @escaping (Bool) -> Void) async {
         if LicenseKeyGenerator().validateKey(key) {
-            upgrade()
-            return true
+            let result = await useCase.validateLicense(key)
+            
+            switch result {
+            case .success(let body):
+                if body.success {
+                    //upgrade()
+                    completion(true)
+                } else {
+                    completion(false)
+                }
+            case .failure:
+                completion(false)
+            }
         } else {
-            return false
+            completion(false)
         }
     }
     

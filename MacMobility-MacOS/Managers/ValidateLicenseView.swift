@@ -42,10 +42,11 @@ public class ValidateLicenseViewModel: ObservableObject {
     @Published var licenseValidationStep: LicenseValidationStep = .trial
     @LazyInject var applicenseManager: AppLicenseManager
     
-    func validate() {
+    func validate() async {
         guard !key.isEmpty else { return }
-        let validation = applicenseManager.validate(key: key)
-        licenseValidationStep = validation ? .valid : .invalid
+        await applicenseManager.validate(key: key) { [weak self] validated in
+            self?.licenseValidationStep = validated ? .valid : .invalid
+        }
     }
 }
 
@@ -72,7 +73,9 @@ public struct ValidateLicenseView: View {
             TextField("", text: $viewModel.key)
                 .padding(.bottom, 10)
             Button {
-                viewModel.validate()
+                Task {
+                    await viewModel.validate()
+                }
             } label: {
                 Text(viewModel.licenseValidationStep.title)
                     .foregroundStyle(viewModel.licenseValidationStep.color)

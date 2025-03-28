@@ -54,6 +54,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate {
     func register() {
+        Resolver.register(Resolver.register(DBSDataProvider() as DBSDataProviderRepresentable))
+        Resolver.register(LicenseValidationAPI() as LicenseValidationAPIProtocol)
+        Resolver.register(LicenseValidationUseCase() as LicenseValidationUseCaseProtocol)
         Resolver.register(AppLicenseManager(), .locked)
     }
 }
