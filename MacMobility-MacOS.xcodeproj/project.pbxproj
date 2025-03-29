@@ -89,7 +89,7 @@
 		C064BA622D876F5E0091E2BE /* Color+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Ext.swift"; sourceTree = "<group>"; };
 		C064BA642D876F7C0091E2BE /* NSColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSColor+Ext.swift"; sourceTree = "<group>"; };
 		C064BA662D876FA40091E2BE /* Optional+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Ext.swift"; sourceTree = "<group>"; };
-		C097752C2B5C319D00F4FFE6 /* MacMobility-MacOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MacMobility-MacOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C09775362B5C319E00F4FFE6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -220,7 +220,7 @@
 		C097752D2B5C319D00F4FFE6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C097752C2B5C319D00F4FFE6 /* MacMobility-MacOS.app */,
+				C097752C2B5C319D00F4FFE6 /* MacMobility.app */,
 				C097753D2B5C319E00F4FFE6 /* MacMobility-MacOSTests.xctest */,
 				C09775472B5C319E00F4FFE6 /* MacMobility-MacOSUITests.xctest */,
 			);
@@ -380,7 +380,7 @@
 				C091AD2E2BA4E1D000C8DC8D /* QRCode */,
 			);
 			productName = "MacMobility-MacOS";
-			productReference = C097752C2B5C319D00F4FFE6 /* MacMobility-MacOS.app */;
+			productReference = C097752C2B5C319D00F4FFE6 /* MacMobility.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C097753C2B5C319E00F4FFE6 /* MacMobility-MacOSTests */ = {
@@ -710,26 +710,26 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"MacMobility-MacOS/Preview Content\"";
 				DEVELOPMENT_TEAM = VDU5LZJ85D;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MacMobility-MacOS/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "MacMobility-MacOS";
+				INFOPLIST_KEY_CFBundleDisplayName = MacMobility;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "MacMobility needs to control System Events";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Testing connection";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This will allow the app to discover, connect to, and collect data from devices on your networks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = MacMobility;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -744,26 +744,26 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"MacMobility-MacOS/Preview Content\"";
 				DEVELOPMENT_TEAM = VDU5LZJ85D;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MacMobility-MacOS/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "MacMobility-MacOS";
+				INFOPLIST_KEY_CFBundleDisplayName = MacMobility;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "MacMobility needs to control System Events";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Testing connection";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This will allow the app to discover, connect to, and collect data from devices on your networks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = MacMobility;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};

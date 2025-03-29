@@ -7,18 +7,20 @@
 
 import SwiftUI
 import Network
+import AppKit
 
-
-public class PermissionViewModel: ObservableObject {
-    @Published var isPermissionGranted: Bool? = nil
+class PermissionViewModel: ObservableObject {
+    private let connectionManager: ConnectionManager
     private var browser: NWBrowser?
     
-    public init() {
-        checkLocalNetworkPermission()
+    init(connectionManager: ConnectionManager) {
+        self.connectionManager = connectionManager
+        requestLocalNetworkAccess()
     }
     
     func askForPermission() {
         guard !AXIsProcessTrusted() else { return }
+        
         let alert = NSAlert()
         alert.messageText = "Accessibility Access Required"
         alert.informativeText = "Your app needs accessibility access to perform certain actions. Please enable accessibility access in System Preferences."
@@ -28,64 +30,23 @@ public class PermissionViewModel: ObservableObject {
         let response = alert.runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
             NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                NSApplication.shared.terminate(nil)
+            }
         }
     }
     
     func requestLocalNetworkAccess() {
-        let parameters = NWParameters()
-        parameters.includePeerToPeer = true // Enables peer-to-peer discovery
-        
-        // Looking for services on a local network (e.g., _http._tcp.)
-        let browser = NWBrowser(for: .bonjour(type: "_http._tcp", domain: nil), using: parameters)
-        self.browser = browser // Store reference to keep it alive
-        
-        browser.stateUpdateHandler = { newState in
-            switch newState {
-            case .failed(let error):
-                print("Browser failed: \(error)")
-            case .ready:
-                print("Browser ready")
-            default:
-                break
-            }
-        }
-        
-        browser.browseResultsChangedHandler = { results, changes in
-            print("Found services: \(results)")
-        }
-        
-        browser.start(queue: DispatchQueue.global())
-    }
-    
-    func checkLocalNetworkPermission() {
-        let parameters = NWParameters()
-        parameters.includePeerToPeer = true
-        
-        let testBrowser = NWBrowser(for: .bonjour(type: "_http._tcp", domain: nil), using: parameters)
-        testBrowser.stateUpdateHandler = { newState in
-            DispatchQueue.main.async {
-                switch newState {
-                case .failed(let error):
-                    print("Browser failed: \(error)")
-                    self.isPermissionGranted = false // Permission likely denied
-                case .ready:
-                    print("Browser ready")
-                    self.isPermissionGranted = true // Permission granted
-                default:
-                    break
-                }
-            }
-        }
-        
-        testBrowser.start(queue: DispatchQueue.global())
-        
-        // Store reference to prevent it from being deallocated
-        self.browser = testBrowser
+        connectionManager.startBrowsing()
     }
 }
 
-public struct PermissionView: View {
-    @ObservedObject private var viewModel = PermissionViewModel()
+struct PermissionView: View {
+    @ObservedObject private var viewModel: PermissionViewModel
+    
+    init(viewModel: PermissionViewModel) {
+        self.viewModel = viewModel
+    }
     
     public var body: some View {
         HStack {
@@ -105,23 +66,15 @@ public struct PermissionView: View {
                     .padding(.bottom, 6.0)
                 Text("We need access to your system to allow accessibility features to work correctly. Please allow this permission in your system preferences.")
                     .foregroundStyle(Color.gray)
+                    .padding(.bottom, 6.0)
+                Text("This action will close this app, please restart it after allowing the permission.")
+                    .foregroundStyle(Color.white)
                     .padding(.bottom, 18.0)
                 Button("Ask for permission") {
                     viewModel.askForPermission()
                 }
                 .disabled(AXIsProcessTrusted())
                 .padding(.bottom, 42)
-                
-                Text("Local Network Permission")
-                    .font(.system(size: 18, weight: .bold))
-                    .padding(.bottom, 6.0)
-                Text("We need access to your local network to allow accessibility features to work correctly. Please allow this permission in your system preferences.")
-                    .foregroundStyle(Color.gray)
-                    .padding(.bottom, 18.0)
-                Button("Ask for permission") {
-                    viewModel.requestLocalNetworkAccess()
-                }
-                .disabled(viewModel.isPermissionGranted == true)
                 Spacer()
             }
             .padding()

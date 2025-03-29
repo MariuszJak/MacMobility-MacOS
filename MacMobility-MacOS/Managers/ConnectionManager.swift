@@ -128,6 +128,11 @@ class ConnectionManager: NSObject, ObservableObject {
         serviceBrowser.invitePeer(peer, to: session, withContext: context, timeout: 30)
     }
     
+    func cancel() {
+        serviceBrowser.stopBrowsingForPeers()
+        pairingStatus = .notPaired
+    }
+    
     func disconnect() {
         session.disconnect()
         pairingStatus = .notPaired

@@ -19,6 +19,7 @@ struct MacMobility_MacOSApp: App {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var permissionsWindow: NSWindow?
+    private let connectionManager = ConnectionManager()
     var statusItem: NSStatusItem?
     var popOver = NSPopover()
     var menuView: MacOSMainPopoverView?
@@ -26,7 +27,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         register()
-        menuView = MacOSMainPopoverView()
+        menuView = MacOSMainPopoverView(connectionManager: connectionManager)
         popOver.behavior = .transient
         popOver.animates = true
         popOver.contentViewController = NSViewController()
@@ -49,7 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func openPermissionsWindow() {
         if nil == permissionsWindow {
             permissionsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 300),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -65,7 +66,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             permissionsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: PermissionView())
+            let hv = NSHostingController(rootView: PermissionView(viewModel: .init(connectionManager: connectionManager)))
             permissionsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = permissionsWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]

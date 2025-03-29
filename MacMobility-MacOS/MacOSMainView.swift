@@ -15,7 +15,7 @@ enum WorkspaceControl: String, CaseIterable {
 }
 
 struct MacOSMainPopoverView: View {
-    @StateObject var connectionManager = ConnectionManager()
+    @StateObject var connectionManager: ConnectionManager
     @StateObject var viewModel = MacOSMainPopoverViewModel()
     @State private var permissionsWindow: NSWindow?
     @State private var shortcutsWindow: NSWindow?
@@ -24,7 +24,8 @@ struct MacOSMainPopoverView: View {
     @State var isAccessibilityGranted: Bool = false
     private var spacing = 6.0
     
-    init() {
+    init(connectionManager: ConnectionManager) {
+        self._connectionManager = .init(wrappedValue: connectionManager)
         self.isAccessibilityGranted = AXIsProcessTrusted()
     }
     
@@ -152,7 +153,7 @@ struct MacOSMainPopoverView: View {
     func openPermissionsWindow() {
         if nil == permissionsWindow {
             permissionsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 300),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -168,7 +169,7 @@ struct MacOSMainPopoverView: View {
             }
             
             permissionsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: PermissionView())
+            let hv = NSHostingController(rootView: PermissionView(viewModel: .init(connectionManager: connectionManager)))
             permissionsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = permissionsWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
@@ -224,7 +225,6 @@ struct MacOSMainPopoverView: View {
         Button("Ask for permission") {
             openPermissionsWindow()
         }
-//        .disabled(AXIsProcessTrusted())
     }
     
     private var shortcutsWindowButtonView: some View {
@@ -261,6 +261,12 @@ struct MacOSMainPopoverView: View {
         case .pairining:
             Text("Pairining...(please wait)")
                 .foregroundStyle(.gray)
+            Button {
+                connectionManager.cancel()
+            } label: {
+                Text("Cancel pairing")
+                    .foregroundStyle(Color.red)
+            }
         }
     }
     
