@@ -64,6 +64,29 @@
 		C0F67EE72D973F1D0090D568 /* LicenseValidationAPIProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F67EE62D973F1D0090D568 /* LicenseValidationAPIProtocol.swift */; };
 		C0F67EE92D973F2B0090D568 /* LicenseValidationUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F67EE82D973F2B0090D568 /* LicenseValidationUseCase.swift */; };
 		C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F67EEB2D97417B0090D568 /* PermissionView.swift */; };
+		C0F67EEF2D9814790090D568 /* Focus Off.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EEE2D9814790090D568 /* Focus Off.shortcut */; };
+		C0F67EF12D9815270090D568 /* ShortcutInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F67EF02D9815270090D568 /* ShortcutInstallView.swift */; };
+		C0F67EF32D981CAD0090D568 /* Upcoming Events.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EF22D981CAD0090D568 /* Upcoming Events.shortcut */; };
+		C0F67F062D982E990090D568 /* ANC ON.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EF52D982E990090D568 /* ANC ON.shortcut */; };
+		C0F67F072D982E990090D568 /* Live Photo to GIF.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EFD2D982E990090D568 /* Live Photo to GIF.shortcut */; };
+		C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EFF2D982E990090D568 /* Pick Windows and Create Pairs.shortcut */; };
+		C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F052D982E990090D568 /* Word & Character Count.shortcut */; };
+		C0F67F0A2D982E990090D568 /* Weather for Upcoming Events.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F042D982E990090D568 /* Weather for Upcoming Events.shortcut */; };
+		C0F67F0B2D982E990090D568 /* ANC OFF.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EF42D982E990090D568 /* ANC OFF.shortcut */; };
+		C0F67F0C2D982E990090D568 /* Copy App Link.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EF82D982E990090D568 /* Copy App Link.shortcut */; };
+		C0F67F0D2D982E990090D568 /* Save App Store Icon.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F002D982E990090D568 /* Save App Store Icon.shortcut */; };
+		C0F67F0E2D982E990090D568 /* PDF to Markdown.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EFE2D982E990090D568 /* PDF to Markdown.shortcut */; };
+		C0F67F0F2D982E990090D568 /* Save App Store Screenshots.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F012D982E990090D568 /* Save App Store Screenshots.shortcut */; };
+		C0F67F102D982E990090D568 /* Days Until....shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EFA2D982E990090D568 /* Days Until....shortcut */; };
+		C0F67F112D982E990090D568 /* EXIF Inspector.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EFB2D982E990090D568 /* EXIF Inspector.shortcut */; };
+		C0F67F122D982E990090D568 /* Convert to JPEG and Copy.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EF72D982E990090D568 /* Convert to JPEG and Copy.shortcut */; };
+		C0F67F132D982E990090D568 /* Show Clipboard.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F022D982E990090D568 /* Show Clipboard.shortcut */; };
+		C0F67F142D982E990090D568 /* Take Screenshot and Share.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F032D982E990090D568 /* Take Screenshot and Share.shortcut */; };
+		C0F67F152D982E990090D568 /* Calendar Locations.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EF62D982E990090D568 /* Calendar Locations.shortcut */; };
+		C0F67F162D982E990090D568 /* Copy Last Photo.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67EF92D982E990090D568 /* Copy Last Photo.shortcut */; };
+		C0F67F192D98303B0090D568 /* Get Image Resolution.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F182D98303B0090D568 /* Get Image Resolution.shortcut */; };
+		C0F67F1B2D9831C90090D568 /* Focus ON.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F1A2D9831C90090D568 /* Focus ON.shortcut */; };
+		C0F67F1D2D9833030090D568 /* Live Text Extractor.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F1C2D9833030090D568 /* Live Text Extractor.shortcut */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -145,6 +168,29 @@
 		C0F67EE62D973F1D0090D568 /* LicenseValidationAPIProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseValidationAPIProtocol.swift; sourceTree = "<group>"; };
 		C0F67EE82D973F2B0090D568 /* LicenseValidationUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseValidationUseCase.swift; sourceTree = "<group>"; };
 		C0F67EEB2D97417B0090D568 /* PermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionView.swift; sourceTree = "<group>"; };
+		C0F67EEE2D9814790090D568 /* Focus Off.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Focus Off.shortcut"; sourceTree = "<group>"; };
+		C0F67EF02D9815270090D568 /* ShortcutInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutInstallView.swift; sourceTree = "<group>"; };
+		C0F67EF22D981CAD0090D568 /* Upcoming Events.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Upcoming Events.shortcut"; sourceTree = "<group>"; };
+		C0F67EF42D982E990090D568 /* ANC OFF.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ANC OFF.shortcut"; sourceTree = "<group>"; };
+		C0F67EF52D982E990090D568 /* ANC ON.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ANC ON.shortcut"; sourceTree = "<group>"; };
+		C0F67EF62D982E990090D568 /* Calendar Locations.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Calendar Locations.shortcut"; sourceTree = "<group>"; };
+		C0F67EF72D982E990090D568 /* Convert to JPEG and Copy.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Convert to JPEG and Copy.shortcut"; sourceTree = "<group>"; };
+		C0F67EF82D982E990090D568 /* Copy App Link.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Copy App Link.shortcut"; sourceTree = "<group>"; };
+		C0F67EF92D982E990090D568 /* Copy Last Photo.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Copy Last Photo.shortcut"; sourceTree = "<group>"; };
+		C0F67EFA2D982E990090D568 /* Days Until....shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Days Until....shortcut"; sourceTree = "<group>"; };
+		C0F67EFB2D982E990090D568 /* EXIF Inspector.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "EXIF Inspector.shortcut"; sourceTree = "<group>"; };
+		C0F67EFD2D982E990090D568 /* Live Photo to GIF.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Live Photo to GIF.shortcut"; sourceTree = "<group>"; };
+		C0F67EFE2D982E990090D568 /* PDF to Markdown.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PDF to Markdown.shortcut"; sourceTree = "<group>"; };
+		C0F67EFF2D982E990090D568 /* Pick Windows and Create Pairs.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pick Windows and Create Pairs.shortcut"; sourceTree = "<group>"; };
+		C0F67F002D982E990090D568 /* Save App Store Icon.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Save App Store Icon.shortcut"; sourceTree = "<group>"; };
+		C0F67F012D982E990090D568 /* Save App Store Screenshots.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Save App Store Screenshots.shortcut"; sourceTree = "<group>"; };
+		C0F67F022D982E990090D568 /* Show Clipboard.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Show Clipboard.shortcut"; sourceTree = "<group>"; };
+		C0F67F032D982E990090D568 /* Take Screenshot and Share.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Take Screenshot and Share.shortcut"; sourceTree = "<group>"; };
+		C0F67F042D982E990090D568 /* Weather for Upcoming Events.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Weather for Upcoming Events.shortcut"; sourceTree = "<group>"; };
+		C0F67F052D982E990090D568 /* Word & Character Count.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Word & Character Count.shortcut"; sourceTree = "<group>"; };
+		C0F67F182D98303B0090D568 /* Get Image Resolution.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Get Image Resolution.shortcut"; sourceTree = "<group>"; };
+		C0F67F1A2D9831C90090D568 /* Focus ON.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Focus ON.shortcut"; sourceTree = "<group>"; };
+		C0F67F1C2D9833030090D568 /* Live Text Extractor.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Live Text Extractor.shortcut"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -230,6 +276,7 @@
 		C097752E2B5C319D00F4FFE6 /* MacMobility-MacOS */ = {
 			isa = PBXGroup;
 			children = (
+				C0F67EED2D9814670090D568 /* PremadeShortcuts */,
 				C0F67EEA2D9741710090D568 /* Permissions */,
 				C0F67ED62D973E7C0090D568 /* Networking */,
 				C0EAF9332D8B491700044947 /* Utilities */,
@@ -360,6 +407,36 @@
 			path = Permissions;
 			sourceTree = "<group>";
 		};
+		C0F67EED2D9814670090D568 /* PremadeShortcuts */ = {
+			isa = PBXGroup;
+			children = (
+				C0F67F1C2D9833030090D568 /* Live Text Extractor.shortcut */,
+				C0F67EEE2D9814790090D568 /* Focus Off.shortcut */,
+				C0F67F1A2D9831C90090D568 /* Focus ON.shortcut */,
+				C0F67EF22D981CAD0090D568 /* Upcoming Events.shortcut */,
+				C0F67EF42D982E990090D568 /* ANC OFF.shortcut */,
+				C0F67EF52D982E990090D568 /* ANC ON.shortcut */,
+				C0F67EF62D982E990090D568 /* Calendar Locations.shortcut */,
+				C0F67F182D98303B0090D568 /* Get Image Resolution.shortcut */,
+				C0F67EF72D982E990090D568 /* Convert to JPEG and Copy.shortcut */,
+				C0F67EF82D982E990090D568 /* Copy App Link.shortcut */,
+				C0F67EF92D982E990090D568 /* Copy Last Photo.shortcut */,
+				C0F67EFA2D982E990090D568 /* Days Until....shortcut */,
+				C0F67EFB2D982E990090D568 /* EXIF Inspector.shortcut */,
+				C0F67EFD2D982E990090D568 /* Live Photo to GIF.shortcut */,
+				C0F67EFE2D982E990090D568 /* PDF to Markdown.shortcut */,
+				C0F67EFF2D982E990090D568 /* Pick Windows and Create Pairs.shortcut */,
+				C0F67F002D982E990090D568 /* Save App Store Icon.shortcut */,
+				C0F67F012D982E990090D568 /* Save App Store Screenshots.shortcut */,
+				C0F67F022D982E990090D568 /* Show Clipboard.shortcut */,
+				C0F67F032D982E990090D568 /* Take Screenshot and Share.shortcut */,
+				C0F67F042D982E990090D568 /* Weather for Upcoming Events.shortcut */,
+				C0F67F052D982E990090D568 /* Word & Character Count.shortcut */,
+				C0F67EF02D9815270090D568 /* ShortcutInstallView.swift */,
+			);
+			path = PremadeShortcuts;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -471,8 +548,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				C09775692B5C329300F4FFE6 /* scriptnext.scpt in Resources */,
+				C0F67F1D2D9833030090D568 /* Live Text Extractor.shortcut in Resources */,
+				C0F67EF32D981CAD0090D568 /* Upcoming Events.shortcut in Resources */,
 				C09775372B5C319E00F4FFE6 /* Preview Assets.xcassets in Resources */,
+				C0F67F062D982E990090D568 /* ANC ON.shortcut in Resources */,
+				C0F67F072D982E990090D568 /* Live Photo to GIF.shortcut in Resources */,
+				C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */,
+				C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */,
+				C0F67F0A2D982E990090D568 /* Weather for Upcoming Events.shortcut in Resources */,
+				C0F67F1B2D9831C90090D568 /* Focus ON.shortcut in Resources */,
+				C0F67F0B2D982E990090D568 /* ANC OFF.shortcut in Resources */,
+				C0F67F0C2D982E990090D568 /* Copy App Link.shortcut in Resources */,
+				C0F67F192D98303B0090D568 /* Get Image Resolution.shortcut in Resources */,
+				C0F67F0D2D982E990090D568 /* Save App Store Icon.shortcut in Resources */,
+				C0F67F0E2D982E990090D568 /* PDF to Markdown.shortcut in Resources */,
+				C0F67F0F2D982E990090D568 /* Save App Store Screenshots.shortcut in Resources */,
+				C0F67F102D982E990090D568 /* Days Until....shortcut in Resources */,
+				C0F67F112D982E990090D568 /* EXIF Inspector.shortcut in Resources */,
+				C0F67F122D982E990090D568 /* Convert to JPEG and Copy.shortcut in Resources */,
+				C0F67F132D982E990090D568 /* Show Clipboard.shortcut in Resources */,
+				C0F67F142D982E990090D568 /* Take Screenshot and Share.shortcut in Resources */,
+				C0F67F152D982E990090D568 /* Calendar Locations.shortcut in Resources */,
+				C0F67F162D982E990090D568 /* Copy Last Photo.shortcut in Resources */,
 				C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */,
+				C0F67EEF2D9814790090D568 /* Focus Off.shortcut in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,6 +646,7 @@
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
 				C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */,
 				C064BA672D876FA40091E2BE /* Optional+Ext.swift in Sources */,
+				C0F67EF12D9815270090D568 /* ShortcutInstallView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

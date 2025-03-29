@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ShortcutsView: View {
     @State private var newWindow: NSWindow?
+    @State private var shortcutsToInstallWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
     @ObservedObject private var viewModel: ShortcutsViewModel
     @State private var selectedTab = 0
@@ -261,24 +262,50 @@ struct ShortcutsView: View {
     
     private var shortcutsView: some View {
         VStack(alignment: .leading) {
-            ScrollView {
-                ForEach(viewModel.shortcuts) { shortcut in
+            Button("Click to select an premade shortcut") {
+                openInstallShortcutsWindow()
+            }
+            .padding(.bottom, 8.0)
+            if viewModel.shortcuts.isEmpty {
+                VStack {
+                    Spacer()
                     HStack {
-                        if let data = shortcut.imageData, let image = NSImage(data: data) {
-                            Image(nsImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .cornerRadius(cornerRadius)
-                                .frame(width: 38, height: 38)
+                        Spacer()
+                        VStack {
+                            Text("No shortcuts found.")
+                                .font(.system(size: 24, weight: .medium))
+                                .padding(.bottom, 12.0)
+                            Button {
+                                openInstallShortcutsWindow()
+                            } label: {
+                                Text("Add new one!")
+                                    .font(.system(size: 16.0))
+                            }
                         }
-                        Text(shortcut.title)
-                            .padding(.vertical, 6.0)
                         Spacer()
                     }
-                    .onDrag {
-                        NSItemProvider(object: shortcut.id as NSString)
+                    Spacer()
+                }
+            } else {
+                ScrollView {
+                    ForEach(viewModel.shortcuts) { shortcut in
+                        HStack {
+                            if let data = shortcut.imageData, let image = NSImage(data: data) {
+                                Image(nsImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .cornerRadius(cornerRadius)
+                                    .frame(width: 38, height: 38)
+                            }
+                            Text(shortcut.title)
+                                .padding(.vertical, 6.0)
+                            Spacer()
+                        }
+                        .onDrag {
+                            NSItemProvider(object: shortcut.id as NSString)
+                        }
+                        Divider()
                     }
-                    Divider()
                 }
             }
         }
@@ -398,6 +425,34 @@ struct ShortcutsView: View {
         hv.view.frame = newWindow?.contentView?.bounds ?? .zero
         hv.view.autoresizingMask = [.width, .height]
         newWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openInstallShortcutsWindow() {
+        if nil == shortcutsToInstallWindow {
+            shortcutsToInstallWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 500, height: 700),
+                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            shortcutsToInstallWindow?.center()
+            shortcutsToInstallWindow?.setFrameAutosaveName("ShortcutsToInstallWindow")
+            shortcutsToInstallWindow?.isReleasedWhenClosed = false
+            shortcutsToInstallWindow?.titlebarAppearsTransparent = true
+            shortcutsToInstallWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: shortcutsToInstallWindow) else {
+                return
+            }
+            shortcutsToInstallWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: ShortcutInstallView())
+            shortcutsToInstallWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = shortcutsToInstallWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            shortcutsToInstallWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+        shortcutsToInstallWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openEditUtilityWindow(item: ShortcutObject) {

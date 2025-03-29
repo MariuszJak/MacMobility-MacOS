@@ -206,6 +206,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     func fetchShortcuts() {
         shortcuts = getShortcutsList()
+        configuredShortcuts.filter { $0.type == .shortcut }.forEach { configuredShortcut in
+            let shortcutExists = shortcuts.contains(where: { $0.id == configuredShortcut.id })
+            if !shortcutExists {
+                if let index = configuredShortcuts.firstIndex(where: { $0.id == configuredShortcut.id }) {
+                    configuredShortcuts.remove(at: index)
+                    connectionManager.shortcuts = configuredShortcuts
+                    UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+                }
+            }
+        }
     }
     
     func saveWebpage(with webpageItem: ShortcutObject) {
@@ -318,7 +328,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func startMonitoring() {
-        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
             self?.fetchShortcuts()
         }
     }
