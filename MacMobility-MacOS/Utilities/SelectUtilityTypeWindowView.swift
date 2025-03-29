@@ -135,6 +135,7 @@ struct SelectUtilityTypeWindowView: View {
                 backing: .buffered,
                 defer: false
             )
+            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("CreateNewUtility")
             newWindow?.isReleasedWhenClosed = false

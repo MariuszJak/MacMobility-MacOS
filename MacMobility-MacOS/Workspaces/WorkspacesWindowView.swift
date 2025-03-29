@@ -439,6 +439,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                 backing: .buffered,
                 defer: false
             )
+            inProgressWindow?.level = .floating
             inProgressWindow?.center()
             inProgressWindow?.setFrameAutosaveName("In Progress")
             inProgressWindow?.isReleasedWhenClosed = false
@@ -474,6 +475,7 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                 backing: .buffered,
                 defer: false
             )
+            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("New Workspace")
             newWindow?.isReleasedWhenClosed = false

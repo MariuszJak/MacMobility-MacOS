@@ -151,6 +151,7 @@ struct WebpagesWindowView: View {
                 backing: .buffered,
                 defer: false
             )
+            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false

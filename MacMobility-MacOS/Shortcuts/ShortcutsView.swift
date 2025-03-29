@@ -262,10 +262,6 @@ struct ShortcutsView: View {
     
     private var shortcutsView: some View {
         VStack(alignment: .leading) {
-            Button("Click to select an premade shortcut") {
-                openInstallShortcutsWindow()
-            }
-            .padding(.bottom, 8.0)
             if viewModel.shortcuts.isEmpty {
                 VStack {
                     Spacer()
@@ -286,6 +282,7 @@ struct ShortcutsView: View {
                     }
                     Spacer()
                 }
+                .padding(.bottom, 8.0)
             } else {
                 ScrollView {
                     ForEach(viewModel.shortcuts) { shortcut in
@@ -307,7 +304,17 @@ struct ShortcutsView: View {
                         Divider()
                     }
                 }
+                .padding(.bottom, 8.0)
             }
+            Divider()
+            Text("Explore our curated selection of premade shortcuts and boost your productivity effortlessly.")
+                .font(.system(size: 14.0))
+                .foregroundStyle(Color.gray)
+                .padding(.bottom, 6.0)
+            Button("Open Shortcuts") {
+                openInstallShortcutsWindow()
+            }
+            .padding(.bottom, 8.0)
         }
         .padding()
     }
@@ -316,12 +323,6 @@ struct ShortcutsView: View {
     
     private var installedAppsView: some View {
         VStack(alignment: .leading) {
-            Button("Click to add an app") {
-                if let path = selectApp() {
-                    viewModel.addInstalledApp(for: path)
-                }
-            }
-            .padding(.bottom, 8.0)
             ScrollViewReader { proxy in
                 ScrollView {
                     ForEach(viewModel.installedApps) { app in
@@ -361,6 +362,17 @@ struct ShortcutsView: View {
                     }
                 }
             }
+            Divider()
+            Text("Can't find app in the list above? Add it from Finder by clicking the button below.")
+                .font(.system(size: 14.0))
+                .foregroundStyle(Color.gray)
+                .padding(.bottom, 6.0)
+            Button("Click to add an app") {
+                if let path = selectApp() {
+                    viewModel.addInstalledApp(for: path)
+                }
+            }
+            .padding(.bottom, 8.0)
         }
         .padding()
     }
@@ -396,6 +408,7 @@ struct ShortcutsView: View {
                 backing: .buffered,
                 defer: false
             )
+            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
@@ -435,6 +448,7 @@ struct ShortcutsView: View {
                 backing: .buffered,
                 defer: false
             )
+            shortcutsToInstallWindow?.level = .floating
             shortcutsToInstallWindow?.center()
             shortcutsToInstallWindow?.setFrameAutosaveName("ShortcutsToInstallWindow")
             shortcutsToInstallWindow?.isReleasedWhenClosed = false
@@ -463,6 +477,7 @@ struct ShortcutsView: View {
                 backing: .buffered,
                 defer: false
             )
+            editUtilitiesWindow?.level = .floating
             editUtilitiesWindow?.center()
             editUtilitiesWindow?.setFrameAutosaveName("Utilities")
             editUtilitiesWindow?.isReleasedWhenClosed = false

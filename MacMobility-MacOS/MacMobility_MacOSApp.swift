@@ -55,6 +55,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 backing: .buffered,
                 defer: false
             )
+            permissionsWindow?.level = .floating
             permissionsWindow?.center()
             permissionsWindow?.setFrameAutosaveName("Permissions")
             permissionsWindow?.isReleasedWhenClosed = false
