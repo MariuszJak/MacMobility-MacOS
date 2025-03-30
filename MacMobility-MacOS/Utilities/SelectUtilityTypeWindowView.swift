@@ -58,6 +58,7 @@ struct SelectUtilityTypeWindowView: View {
                     HStack {
                         Text("Select utility type")
                             .font(.system(size: 17.0, weight: .bold))
+                            .foregroundStyle(Color.white)
                             .padding([.horizontal, .top], 16)
                         Spacer()
                     }
@@ -109,11 +110,13 @@ struct SelectUtilityTypeWindowView: View {
                                 VStack {
                                     Text("No workspaces found.")
                                         .font(.system(size: 24, weight: .medium))
+                                        .foregroundStyle(Color.white)
                                         .padding(.bottom, 12.0)
                                     Button {
                                     } label: {
                                         Text("Add new one!")
                                             .font(.system(size: 16.0))
+                                            .foregroundStyle(Color.white)
                                     }
                                 }
                                 Spacer()

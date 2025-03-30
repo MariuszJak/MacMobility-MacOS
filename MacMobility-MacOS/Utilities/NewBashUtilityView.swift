@@ -47,6 +47,7 @@ struct NewBashUtilityView: View {
             VStack(alignment: .leading) {
                 Text("Bash Script Tool")
                     .font(.system(size: 21, weight: .bold))
+                    .foregroundStyle(Color.white)
                     .padding(.bottom, 4)
                 Text("Write bash script that can be triggered remotely.")
                     .foregroundStyle(Color.gray)
@@ -56,6 +57,7 @@ struct NewBashUtilityView: View {
             }
             Text("Script label")
                 .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(Color.white)
                 .padding(.bottom, 4)
             Text("Add a label that will be present on an icon and as the description on a list.")
                 .foregroundStyle(Color.gray)

@@ -33,6 +33,7 @@ struct UtilitiesWindowView: View {
             HStack {
                 Text("Utilities")
                     .font(.system(size: 16.0, weight: .bold))
+                    .foregroundStyle(Color.white)
                     .padding([.horizontal, .top], 16)
                 Spacer()
                 Image(systemName: "plus.circle.fill")
@@ -52,11 +53,13 @@ struct UtilitiesWindowView: View {
                         VStack {
                             Text("No utilities found.")
                                 .font(.system(size: 24, weight: .medium))
+                                .foregroundStyle(Color.white)
                                 .padding(.bottom, 12.0)
                             Button {
                                 openCreateNewUtilityWindow()
                             } label: {
                                 Text("Add new one!")
+                                    .foregroundStyle(Color.white)
                                     .font(.system(size: 16.0))
                             }
                         }

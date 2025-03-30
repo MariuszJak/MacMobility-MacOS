@@ -82,7 +82,9 @@ extension ConnectionManager {
             switch shortcutItem.utilityType {
             case .commandline:
                 if let script = shortcutItem.scriptCode {
-                    runInlineBashScript(script: script)
+                    if let message = runInlineBashScript(script: script) {
+                        send(alert: .init(title: "Script Result", message: message))
+                    }
                 }
             case .multiselection:
                 runMultiselection(for: shortcutItem)
@@ -139,8 +141,7 @@ extension ConnectionManager {
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
             return String(data: outputData, encoding: .utf8)
         } catch {
-            print("Error executing script: \(error)")
-            return nil
+            return "Error executing script: \(error)"
         }
     }
     

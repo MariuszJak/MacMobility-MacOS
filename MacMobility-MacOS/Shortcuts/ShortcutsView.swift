@@ -24,9 +24,11 @@ struct ShortcutsView: View {
             HStack {
                 Text("Editor")
                     .font(.system(size: 17.0, weight: .bold))
+                    .foregroundStyle(Color.white)
                     
                 HStack {
                     Text("Add page")
+                        .foregroundStyle(Color.white)
                         .padding(.leading, 8.0)
                     Image(systemName: "plus.circle.fill")
                         .resizable()
@@ -55,6 +57,7 @@ struct ShortcutsView: View {
                             HStack {
                                 Text("Page: \(page)")
                                     .font(.system(size: 16, weight: .bold))
+                                    .foregroundStyle(Color.white)
                                 Spacer()
                                 Button {
                                     viewModel.removePage(with: page)
@@ -270,12 +273,14 @@ struct ShortcutsView: View {
                         VStack {
                             Text("No shortcuts found.")
                                 .font(.system(size: 24, weight: .medium))
+                                .foregroundStyle(Color.white)
                                 .padding(.bottom, 12.0)
                             Button {
                                 openInstallShortcutsWindow()
                             } label: {
                                 Text("Add new one!")
                                     .font(.system(size: 16.0))
+                                    .foregroundStyle(Color.white)
                             }
                         }
                         Spacer()

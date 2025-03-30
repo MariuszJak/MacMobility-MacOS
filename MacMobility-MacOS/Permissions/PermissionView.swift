@@ -63,6 +63,7 @@ struct PermissionView: View {
                 Spacer()
                 Text("Accessibility Permission")
                     .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(Color.white)
                     .padding(.bottom, 6.0)
                 Text("We need access to your system to allow accessibility features to work correctly. Please allow this permission in your system preferences.")
                     .foregroundStyle(Color.gray)

@@ -97,4 +97,24 @@ extension ConnectionManager: ConnectionSenable {
         }
         send(data)
     }
+    
+    func send(alert: AlertMessage) {
+        let payload = AlertMessageResponse(alertTitle: "alertTitle", message: alert)
+        guard !session.connectedPeers.isEmpty,
+              let data = try? JSONEncoder().encode(payload) else {
+            return
+        }
+        send(data)
+    }
+}
+
+struct AlertMessageResponse: Codable {
+    let alertTitle: String
+    let message: AlertMessage
+}
+
+
+struct AlertMessage: Codable {
+    let title: String
+    let message: String
 }

@@ -37,6 +37,7 @@ struct NewMultiSelectionUtilityView: View {
             VStack(alignment: .leading) {
                 Text("Multiselection Tool")
                     .font(.system(size: 21, weight: .bold))
+                    .foregroundStyle(Color.white)
                     .padding(.bottom, 4)
                 Text("Drag & Drop apps, shortcuts, webpages and utilities")
                     .foregroundStyle(Color.gray)
@@ -107,6 +108,7 @@ struct NewMultiSelectionUtilityView: View {
             VStack(alignment: .leading) {
                 Text("Multiselection label")
                     .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color.white)
                     .padding(.bottom, 4)
                 Text("Add a label that will be present on an icon and as the description on a list.")
                     .foregroundStyle(Color.gray)
