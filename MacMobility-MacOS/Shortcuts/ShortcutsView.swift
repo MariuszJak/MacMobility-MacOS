@@ -481,7 +481,7 @@ struct ShortcutsView: View {
         if nil == editUtilitiesWindow {
             editUtilitiesWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 320, height: 570),
-                styleMask: [.titled, .closable, .miniaturizable],
+                styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
@@ -511,6 +511,13 @@ struct ShortcutsView: View {
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
+            case .automation:
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .none:
                 break
             }
@@ -528,6 +535,13 @@ struct ShortcutsView: View {
             hv.view.autoresizingMask = [.width, .height]
         case .multiselection:
             let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+                editUtilitiesWindow?.close()
+            })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        case .automation:
+            let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)

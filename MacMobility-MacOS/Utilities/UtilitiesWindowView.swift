@@ -153,7 +153,7 @@ struct UtilitiesWindowView: View {
     private func openCreateNewUtilityWindow(item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+                contentRect: NSRect(x: 0, y: 0, width: 800, height: 400),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -211,6 +211,13 @@ struct UtilitiesWindowView: View {
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
+            case .automation:
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .none:
                 break
             }
@@ -228,6 +235,13 @@ struct UtilitiesWindowView: View {
             hv.view.autoresizingMask = [.width, .height]
         case .multiselection:
             let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
+                editUtilitiesWindow?.close()
+            })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        case .automation:
+            let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)
