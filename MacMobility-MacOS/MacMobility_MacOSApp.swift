@@ -92,6 +92,9 @@ extension AppDelegate {
         Resolver.register(Resolver.register(DBSDataProvider() as DBSDataProviderRepresentable))
         Resolver.register(LicenseValidationAPI() as LicenseValidationAPIProtocol)
         Resolver.register(LicenseValidationUseCase() as LicenseValidationUseCaseProtocol)
+        Resolver.register(AppUpdateAPI() as AppUpdateAPIProtocol)
+        Resolver.register(AppUpdateUseCase() as AppUpdateUseCaseProtocol)
         Resolver.register(AppLicenseManager(), .locked)
+        Resolver.register(UpdatesManager(), .locked)
     }
 }

@@ -11,7 +11,10 @@ import SwiftUI
 class MacOSMainPopoverViewModel: ObservableObject {
     @Published var isPaidLicense = false
     @Published var isTrialExpired: Bool = false
+    @Published var needsUpdate: Bool = false
+    @Published var isUpdating: Bool = false
     @Inject var appLincenseManager: AppLicenseManager
+    @Inject var appUpdatesManager: UpdatesManager
     private var timer: Timer?
     var trialManager = TrialManager()
     
@@ -29,6 +32,20 @@ class MacOSMainPopoverViewModel: ObservableObject {
             timer?.invalidate()
         } else {
             isTrialExpired = trialManager.isTrialExpired
+        }
+    }
+    
+    @MainActor
+    func checkVersion() async {
+        await appUpdatesManager.checkVersion { [weak self] needsUpdate in
+            self?.needsUpdate = needsUpdate
+        }
+    }
+    
+    func updateApp() {
+        isUpdating = true
+        appUpdatesManager.downloadAndInstallUpdate { [weak self] in
+            self?.isUpdating = false
         }
     }
     

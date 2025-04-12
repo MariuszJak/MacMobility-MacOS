@@ -49,7 +49,9 @@ struct MacOSMainPopoverView: View {
             .padding()
         }
         .onAppear {
-            // Force dark mode
+            Task {
+                await viewModel.checkVersion()
+            }
             for window in NSApplication.shared.windows {
                 window.appearance = NSAppearance(named: .darkAqua)
             }
@@ -70,6 +72,9 @@ struct MacOSMainPopoverView: View {
     
     @ViewBuilder
     func mainView() -> some View {
+        if viewModel.needsUpdate {
+            updateAvailableButtonView
+        }
         if viewModel.isPaidLicense {
             permissionView
             Divider()
@@ -255,6 +260,21 @@ struct MacOSMainPopoverView: View {
     private var permissionView: some View {
         Button("Ask for permission") {
             openPermissionsWindow()
+        }
+    }
+    
+    @ViewBuilder
+    private var updateAvailableButtonView: some View {
+        if viewModel.isUpdating {
+            Text("Updating...")
+                .foregroundStyle(Color.blue)
+        } else {
+            Button {
+                viewModel.updateApp()
+            } label: {
+                Text("Install Update")
+                    .foregroundStyle(Color.green)
+            }
         }
     }
     

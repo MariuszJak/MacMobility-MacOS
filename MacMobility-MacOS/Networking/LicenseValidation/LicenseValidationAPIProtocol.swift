@@ -25,3 +25,26 @@ struct LicenseValidationAPI: LicenseValidationAPIProtocol {
         return Request<ValidateKeyResponse>(urlRequest: urlRequest, dataProvider: dataProvider)
     }
 }
+
+public struct AppUpdateResponse: Codable {
+    let latest_version: String
+    let download_url: String
+    let release_notes: String
+}
+
+protocol AppUpdateAPIProtocol {
+    func checkForUpdate() throws -> Request<AppUpdateResponse>
+}
+
+struct AppUpdateAPI: AppUpdateAPIProtocol {
+    @Inject private var dataProvider: DBSDataProviderRepresentable
+    
+    func checkForUpdate() throws -> Request<AppUpdateResponse> {
+        guard let url = dataProvider.appConfig.baseURL?.appending(path: "/macmobiliy-version") else {
+            throw ClientError.unknown
+        }
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        return Request<AppUpdateResponse>(urlRequest: urlRequest, dataProvider: dataProvider)
+    }
+}

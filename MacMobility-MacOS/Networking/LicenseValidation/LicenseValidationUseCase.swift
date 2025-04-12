@@ -30,3 +30,27 @@ struct LicenseValidationUseCase: LicenseValidationUseCaseProtocol {
         }
     }
 }
+
+protocol AppUpdateUseCaseProtocol {
+    func checkForUpdate() async -> Result<AppUpdateResponse, ClientError>
+}
+
+struct AppUpdateUseCase: AppUpdateUseCaseProtocol {
+    @Inject private var client: AppUpdateAPIProtocol
+    
+    func checkForUpdate() async -> Result<AppUpdateResponse, ClientError> {
+        do {
+            let result = try await client
+                .checkForUpdate()
+                .execute()
+            switch result {
+            case .success(let data):
+                return .success(data)
+            case .failure(let error):
+                return .failure(error)
+            }
+        } catch {
+            return .failure(.raw(error))
+        }
+    }
+}
