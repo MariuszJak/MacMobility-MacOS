@@ -448,7 +448,6 @@ extension ConnectionManager {
             inProgressWindow?.titlebarAppearsTransparent = true
             inProgressWindow?.styleMask.insert(.fullSizeContentView)
             
-            inProgressWindow?.level = .floating
             inProgressWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary]
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: inProgressWindow) else {

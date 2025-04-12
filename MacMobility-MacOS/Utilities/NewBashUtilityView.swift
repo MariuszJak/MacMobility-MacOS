@@ -66,7 +66,7 @@ struct NewBashUtilityView: View {
                 .padding(.bottom, 12)
             TextField("", text: $viewModel.title)
             TextEditor(text: $viewModel.scriptCode)
-                .frame(height: 160)
+                .font(.system(size: 16.0))
                 .padding(.bottom, 12)
             IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                 viewModel.selectedIcon = image
@@ -91,6 +91,11 @@ struct NewBashUtilityView: View {
                 Text("Save")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.green)
+            }
+        }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
             }
         }
         .padding()

@@ -78,6 +78,11 @@ struct WebpagesWindowView: View {
                 }
             }
         }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
         .padding()
     }
     
@@ -151,7 +156,6 @@ struct WebpagesWindowView: View {
                 backing: .buffered,
                 defer: false
             )
-            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false

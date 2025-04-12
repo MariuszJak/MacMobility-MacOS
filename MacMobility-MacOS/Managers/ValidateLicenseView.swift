@@ -81,7 +81,11 @@ public struct ValidateLicenseView: View {
                 Text(viewModel.licenseValidationStep.title)
                     .foregroundStyle(viewModel.licenseValidationStep.color)
             }
-
+        }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
         }
         .padding()
     }

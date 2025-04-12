@@ -112,6 +112,11 @@ struct ShortcutInstallView: View {
                 }
             }
         }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
         .padding()
     }
 }
@@ -148,6 +153,11 @@ struct InstallShortcutView: View {
                     Spacer()
                 }
                 Spacer()
+            }
+        }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
             }
         }
     }

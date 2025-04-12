@@ -127,18 +127,22 @@ struct SelectUtilityTypeWindowView: View {
                 }
             }
         }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
         .padding()
     }
     
     private func openCreateNewUtilityWindow(type: UtilityObject.UtilityType, item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 320, height: 570),
-                styleMask: [.titled, .closable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 320, height: type == .commandline ? 800 : 570),
+                styleMask: type == .commandline ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
-            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("CreateNewUtility")
             newWindow?.isReleasedWhenClosed = false

@@ -169,6 +169,11 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                 }
             }
         }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
         .padding()
     }
     
@@ -439,14 +444,12 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                 backing: .buffered,
                 defer: false
             )
-            inProgressWindow?.level = .floating
             inProgressWindow?.center()
             inProgressWindow?.setFrameAutosaveName("In Progress")
             inProgressWindow?.isReleasedWhenClosed = false
             inProgressWindow?.titlebarAppearsTransparent = true
             inProgressWindow?.styleMask.insert(.fullSizeContentView)
             
-            inProgressWindow?.level = .floating
             inProgressWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary]
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: inProgressWindow) else {
@@ -475,7 +478,6 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
                 backing: .buffered,
                 defer: false
             )
-            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("New Workspace")
             newWindow?.isReleasedWhenClosed = false

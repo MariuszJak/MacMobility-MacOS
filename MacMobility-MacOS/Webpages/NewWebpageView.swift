@@ -104,6 +104,11 @@ struct NewWebpageView: View {
                     .foregroundStyle(Color.green)
             }
         }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
         .padding()
     }
 }
@@ -196,6 +201,11 @@ struct IconPickerView: View {
             
             Button("Select Icon") {
                 viewModel.pickImage()
+            }
+        }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
             }
         }
     }

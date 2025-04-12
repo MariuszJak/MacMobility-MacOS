@@ -83,6 +83,11 @@ struct UtilitiesWindowView: View {
                 }
             }
         }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
         .padding()
     }
     
@@ -153,7 +158,6 @@ struct UtilitiesWindowView: View {
                 backing: .buffered,
                 defer: false
             )
-            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("NewUtility")
             newWindow?.isReleasedWhenClosed = false
@@ -181,7 +185,6 @@ struct UtilitiesWindowView: View {
                 backing: .buffered,
                 defer: false
             )
-            editUtilitiesWindow?.level = .floating
             editUtilitiesWindow?.center()
             editUtilitiesWindow?.setFrameAutosaveName("Utilities")
             editUtilitiesWindow?.isReleasedWhenClosed = false

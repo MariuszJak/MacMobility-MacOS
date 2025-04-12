@@ -143,6 +143,11 @@ struct NewMultiSelectionUtilityView: View {
             }
             .padding(.horizontal, 10)
         }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
         .padding()
     }
     

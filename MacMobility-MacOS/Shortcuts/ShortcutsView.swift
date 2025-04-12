@@ -150,6 +150,11 @@ struct ShortcutsView: View {
                 }
             }
         }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
         .padding(.top, 21.0)
     }
     
@@ -413,7 +418,6 @@ struct ShortcutsView: View {
                 backing: .buffered,
                 defer: false
             )
-            newWindow?.level = .floating
             newWindow?.center()
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
@@ -453,7 +457,6 @@ struct ShortcutsView: View {
                 backing: .buffered,
                 defer: false
             )
-            shortcutsToInstallWindow?.level = .floating
             shortcutsToInstallWindow?.center()
             shortcutsToInstallWindow?.setFrameAutosaveName("ShortcutsToInstallWindow")
             shortcutsToInstallWindow?.isReleasedWhenClosed = false
@@ -482,7 +485,6 @@ struct ShortcutsView: View {
                 backing: .buffered,
                 defer: false
             )
-            editUtilitiesWindow?.level = .floating
             editUtilitiesWindow?.center()
             editUtilitiesWindow?.setFrameAutosaveName("Utilities")
             editUtilitiesWindow?.isReleasedWhenClosed = false

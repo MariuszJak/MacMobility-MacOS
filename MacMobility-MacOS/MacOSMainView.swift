@@ -48,6 +48,12 @@ struct MacOSMainPopoverView: View {
             }
             .padding()
         }
+        .onAppear {
+            // Force dark mode
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
     }
     
     @ViewBuilder
@@ -132,7 +138,6 @@ struct MacOSMainPopoverView: View {
                 backing: .buffered,
                 defer: false
             )
-            shortcutsWindow?.level = .floating
             shortcutsWindow?.center()
             shortcutsWindow?.setFrameAutosaveName("Shortcuts")
             shortcutsWindow?.isReleasedWhenClosed = false
@@ -184,7 +189,6 @@ struct MacOSMainPopoverView: View {
                 backing: .buffered,
                 defer: false
             )
-            permissionsWindow?.level = .floating
             permissionsWindow?.center()
             permissionsWindow?.setFrameAutosaveName("Permissions")
             permissionsWindow?.isReleasedWhenClosed = false
@@ -212,7 +216,6 @@ struct MacOSMainPopoverView: View {
                 backing: .buffered,
                 defer: false
             )
-            licenseWindow?.level = .floating
             licenseWindow?.center()
             licenseWindow?.setFrameAutosaveName("License")
             licenseWindow?.isReleasedWhenClosed = false
