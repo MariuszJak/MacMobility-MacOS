@@ -12,6 +12,7 @@ public struct UtilityObject: Identifiable {
     public enum UtilityType: String, Codable {
         case commandline
         case multiselection
+        case automation
     }
     let type: UtilityType
     let title: String
@@ -30,7 +31,8 @@ class SelectUtilityTypeWindowViewModel: ObservableObject {
     
     @Published var utilities: [UtilityObject] = [
         .init(type: .commandline, title: "Commandline tool", description: "This tool allows creation of shortcuts for triggering Bash scripts remotely from companion device. You can define a script, assign a secure activation method and execute it instantly from phone."),
-        .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone.")
+        .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
+        .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone.")
     ]
     
     init(connectionManager: ConnectionManager, delegate: UtilitiesWindowDelegate?) {
@@ -139,7 +141,7 @@ struct SelectUtilityTypeWindowView: View {
         if nil == newWindow {
             newWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 320, height: type == .commandline ? 800 : 570),
-                styleMask: type == .commandline ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+                styleMask: type == .commandline || type == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
@@ -174,6 +176,17 @@ struct SelectUtilityTypeWindowView: View {
                 newWindow?.contentView?.addSubview(hv.view)
                 hv.view.frame = newWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
+            case .automation:
+                newWindow?.contentView = NSHostingView(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
+                    newWindow?.close()
+                })
+                
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
+                    newWindow?.close()
+                })
+                newWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             }
             newWindow?.makeKeyAndOrderFront(nil)
             return
@@ -193,6 +206,17 @@ struct SelectUtilityTypeWindowView: View {
             hv.view.autoresizingMask = [.width, .height]
         case .multiselection:
             let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
+                newWindow?.close()
+            })
+            newWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        case .automation:
+            newWindow?.contentView = NSHostingView(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
+                newWindow?.close()
+            })
+            
+            let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
                 newWindow?.close()
             })
             newWindow?.contentView?.addSubview(hv.view)
