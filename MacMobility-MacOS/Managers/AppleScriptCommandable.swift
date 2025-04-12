@@ -1,6 +1,6 @@
 //
 //  AppleScriptCommandable.swift
-//  MagicTrackpad
+//  MacMobility
 //
 //  Created by CoderBlocks on 22/07/2023.
 //

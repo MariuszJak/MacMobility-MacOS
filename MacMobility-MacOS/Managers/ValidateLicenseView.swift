@@ -44,7 +44,7 @@ public class ValidateLicenseViewModel: ObservableObject {
     
     func validate() async {
         guard !key.isEmpty else { return }
-        await applicenseManager.validate(key: key) { [weak self] validated in
+        await applicenseManager.validate(key: key.replacingOccurrences(of: " ", with: "")) { [weak self] validated in
             self?.licenseValidationStep = validated ? .valid : .invalid
         }
     }
@@ -71,6 +71,7 @@ public struct ValidateLicenseView: View {
                 .font(.system(size: 14))
                 .padding(.bottom, 8)
             TextField("", text: $viewModel.key)
+                .lineLimit(1)
                 .padding(.bottom, 10)
             Button {
                 Task {

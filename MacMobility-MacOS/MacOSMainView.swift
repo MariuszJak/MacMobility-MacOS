@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  MagicTrackpad
+//  MacMobility
 //
 //  Created by CoderBlocks on 05/07/2023.
 //
@@ -21,6 +21,7 @@ struct MacOSMainPopoverView: View {
     @State private var shortcutsWindow: NSWindow?
     @State private var licenseWindow: NSWindow?
     @State private var workspacesWindow: NSWindow?
+    @State private var desktopWallpaperWindow: NSWindow?
     @State var isAccessibilityGranted: Bool = false
     private var spacing = 6.0
     
@@ -151,6 +152,30 @@ struct MacOSMainPopoverView: View {
         shortcutsWindow?.makeKeyAndOrderFront(nil)
     }
     
+//    private func openVideoAsDesktopWallpaper() {
+//        if nil == desktopWallpaperWindow {
+//            let screenFrame = NSScreen.main?.frame ?? .zero
+//            desktopWallpaperWindow = NSWindow(
+//                contentRect: screenFrame,
+//                styleMask: .borderless,
+//                backing: .buffered,
+//                defer: false
+//            )
+//            
+//            desktopWallpaperWindow?.level = .desktop
+//            desktopWallpaperWindow?.isOpaque = false
+//            desktopWallpaperWindow?.backgroundColor = .clear
+//            desktopWallpaperWindow?.ignoresMouseEvents = true
+//            desktopWallpaperWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+//            
+//            let contentView = VideoWallpaperView()
+//            let hostingView = NSHostingView(rootView: contentView)
+//            hostingView.frame = screenFrame
+//            desktopWallpaperWindow?.contentView = hostingView
+//        }
+//        desktopWallpaperWindow?.makeKeyAndOrderFront(nil)
+//    }
+    
     func openPermissionsWindow() {
         if nil == permissionsWindow {
             permissionsWindow = NSWindow(
@@ -235,6 +260,14 @@ struct MacOSMainPopoverView: View {
             openShortcutsWindow()
         }
     }
+    
+    private var wallpaperDesktopButtonView: some View {
+        Button("Desktop Wallpaper") {
+//            openVideoAsDesktopWallpaper()
+        }
+    }
+    
+    
     
     private var licenseWindowButtonView: some View {
         Button("Verify license") {

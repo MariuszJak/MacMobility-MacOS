@@ -2,7 +2,7 @@
 //  EmptyResponse.swift
 //  MacMobility-MacOS
 //
-//  Created by Mariusz Jakowienko on 28/03/2025.
+//  Created by CoderBlocks on 28/03/2025.
 //
 
 import Foundation
