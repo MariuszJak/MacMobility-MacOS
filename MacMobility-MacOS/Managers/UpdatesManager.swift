@@ -45,7 +45,7 @@ public class UpdatesManager: ObservableObject {
             updateData = data
             completion(Version(data.latest_version) > Version(appVersion))
         case .failure(let error):
-            print(error)
+            completion(false)
         }
     }
     
@@ -78,8 +78,7 @@ public class UpdatesManager: ObservableObject {
                         try fileManager.removeItem(atPath: destinationApp)
                     }
                     try fileManager.moveItem(atPath: appPath.path, toPath: destinationApp)
-                    NSWorkspace.shared.open(URL(fileURLWithPath: destinationApp))
-//                    exit(0)
+                    self.relaunchWithDelay(newAppPath: destinationApp)
                 } catch {
                     print("Failed to update: \(error)")
                     completion()
@@ -88,5 +87,16 @@ public class UpdatesManager: ObservableObject {
             }
         }
         task.resume()
+    }
+    
+    func relaunchWithDelay(newAppPath: String) {
+        let script = """
+        /bin/bash -c 'sleep 1; open "\(newAppPath)"'
+        """
+        let task = Process()
+        task.launchPath = "/bin/sh"
+        task.arguments = ["-c", script]
+        try? task.run()
+        NSApp.terminate(nil)
     }
 }
