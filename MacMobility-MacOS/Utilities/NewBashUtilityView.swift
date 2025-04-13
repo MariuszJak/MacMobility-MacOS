@@ -104,6 +104,12 @@ struct NewBashUtilityView: View {
 
 // --
 
+struct Automation: Identifiable {
+    let id = UUID()
+    var name: String
+    var script: String
+}
+
 class NewAutomationUtilityViewModel: ObservableObject {
     var id: String?
     @Published var title: String = ""
@@ -116,6 +122,25 @@ class NewAutomationUtilityViewModel: ObservableObject {
         iconData = nil
         title = ""
         automationCode = ""
+    }
+    
+    func loadAutomationFromFile() -> Automation? {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.plainText]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.title = "Choose an Automation Script"
+
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                let scriptContent = try String(contentsOf: url)
+                let name = url.deletingPathExtension().lastPathComponent
+                return Automation(name: name, script: scriptContent)
+            } catch {
+                print("Failed to read script file: \(error)")
+            }
+        }
+        return nil
     }
 }
 
@@ -161,6 +186,11 @@ struct NewAutomationUtilityView: View {
                 .lineLimit(2)
                 .font(.system(size: 12))
                 .padding(.bottom, 12)
+            Button("Load Automation from File") {
+                if let newAutomation = viewModel.loadAutomationFromFile() {
+                    viewModel.automationCode = newAutomation.script
+                }
+            }
             TextField("", text: $viewModel.title)
             TextEditor(text: $viewModel.automationCode)
                 .font(.system(size: 16.0))
