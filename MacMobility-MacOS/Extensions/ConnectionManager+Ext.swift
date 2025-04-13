@@ -88,6 +88,10 @@ extension ConnectionManager {
                 }
             case .multiselection:
                 runMultiselection(for: shortcutItem)
+            case .automation:
+                if let script = shortcutItem.scriptCode {
+                    execute(script)
+                }
             case .none:
                 break
             @unknown default:
@@ -117,6 +121,10 @@ extension ConnectionManager {
                             objects.forEach { item in
                                 runShortuct(for: item)
                             }
+                        }
+                    case .automation:
+                        if let script = tool.scriptCode {
+                            execute(script)
                         }
                     case .none:
                         break
