@@ -8,6 +8,25 @@
 import Foundation
 import SwiftUI
 
+struct Version: Comparable {
+    let components: [Int]
+
+    init(_ versionString: String) {
+        self.components = versionString
+            .split(separator: ".")
+            .map { Int($0) ?? 0 }
+    }
+
+    static func < (lhs: Version, rhs: Version) -> Bool {
+        for (l, r) in zip(lhs.components, rhs.components) {
+            if l != r {
+                return l < r
+            }
+        }
+        return lhs.components.count < rhs.components.count
+    }
+}
+
 public class UpdatesManager: ObservableObject {
     @Inject private var useCase: AppUpdateUseCaseProtocol
     private(set) var updateData: AppUpdateResponse?
@@ -24,7 +43,7 @@ public class UpdatesManager: ObservableObject {
         switch result {
         case .success(let data):
             updateData = data
-            completion(data.latest_version > appVersion)
+            completion(Version(data.latest_version) > Version(appVersion))
         case .failure(let error):
             print(error)
         }
@@ -60,7 +79,7 @@ public class UpdatesManager: ObservableObject {
                     }
                     try fileManager.moveItem(atPath: appPath.path, toPath: destinationApp)
                     NSWorkspace.shared.open(URL(fileURLWithPath: destinationApp))
-                    exit(0)
+//                    exit(0)
                 } catch {
                     print("Failed to update: \(error)")
                     completion()
