@@ -12,11 +12,17 @@ class MacOSMainPopoverViewModel: ObservableObject {
     @Published var isPaidLicense = false
     @Published var isTrialExpired: Bool = false
     @Published var needsUpdate: Bool = false
-    @Published var isUpdating: Bool = false
+    @Published var isCheckingForUpdate = false
+    @Published var appIsUpToDate: Bool?
+    
     @Inject var appLincenseManager: AppLicenseManager
     @Inject var appUpdatesManager: UpdatesManager
     private var timer: Timer?
+    private var updatedTimer: Timer?
     var trialManager = TrialManager()
+    var updateData: AppUpdateResponse? {
+        appUpdatesManager.updateData
+    }
     
     init() {
         startMonitoring()
@@ -36,16 +42,16 @@ class MacOSMainPopoverViewModel: ObservableObject {
     }
     
     @MainActor
-    func checkVersion() async {
+    func checkVersion(_ completion: (() -> Void)? = nil) async {
+        isCheckingForUpdate = true
         await appUpdatesManager.checkVersion { [weak self] needsUpdate in
+            self?.isCheckingForUpdate = false
             self?.needsUpdate = needsUpdate
-        }
-    }
-    
-    func updateApp() {
-        isUpdating = true
-        appUpdatesManager.downloadAndInstallUpdate { [weak self] in
-            self?.isUpdating = false
+            self?.appIsUpToDate = !needsUpdate
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                self?.appIsUpToDate = nil
+            }
+            completion?()
         }
     }
     
@@ -55,6 +61,13 @@ class MacOSMainPopoverViewModel: ObservableObject {
             trialManager.checkTrialStatus()
             isTrialExpired = trialManager.isTrialExpired
         }
+        
+        updatedTimer = Timer.scheduledTimer(withTimeInterval: 60 * 60, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            Task {
+                await self.checkVersion()
+            }
+        }
     }
     
     func resetTrial() {
@@ -63,5 +76,6 @@ class MacOSMainPopoverViewModel: ObservableObject {
     
     deinit {
         timer?.invalidate()
+        updatedTimer?.invalidate()
     }
 }

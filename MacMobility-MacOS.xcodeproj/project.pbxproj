@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA7372DAC103300BD4FBA /* AboutView.swift */; };
+		C05DA73A2DAC104A00BD4FBA /* UpdateScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */; };
+		C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */; };
 		C064B8C42D86EB090091E2BE /* ShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064B8C32D86EB090091E2BE /* ShortcutsView.swift */; };
 		C064B8D22D86F37E0091E2BE /* ShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064B8D12D86F37E0091E2BE /* ShortcutsViewModel.swift */; };
 		C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064BA622D876F5E0091E2BE /* Color+Ext.swift */; };
@@ -107,6 +110,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C05DA7372DAC103300BD4FBA /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateScreenView.swift; sourceTree = "<group>"; };
+		C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatesManager.swift; sourceTree = "<group>"; };
 		C064B8C32D86EB090091E2BE /* ShortcutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsView.swift; sourceTree = "<group>"; };
 		C064B8D12D86F37E0091E2BE /* ShortcutsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsViewModel.swift; sourceTree = "<group>"; };
 		C064BA622D876F5E0091E2BE /* Color+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Ext.swift"; sourceTree = "<group>"; };
@@ -219,6 +225,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C05DA7362DAC102900BD4FBA /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C05DA7372DAC103300BD4FBA /* AboutView.swift */,
+				C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		C064B8C22D86EAED0091E2BE /* Shortcuts */ = {
 			isa = PBXGroup;
 			children = (
@@ -241,6 +256,7 @@
 				C0EAF9F82D902AB100044947 /* Resolver.swift */,
 				C0EAFC172D9030D000044947 /* LicenseKeyGenerator.swift */,
 				C0EAFC192D903E7400044947 /* TrialManager.swift */,
+				C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -276,6 +292,7 @@
 		C097752E2B5C319D00F4FFE6 /* MacMobility-MacOS */ = {
 			isa = PBXGroup;
 			children = (
+				C05DA7362DAC102900BD4FBA /* Views */,
 				C0F67EED2D9814670090D568 /* PremadeShortcuts */,
 				C0F67EEA2D9741710090D568 /* Permissions */,
 				C0F67ED62D973E7C0090D568 /* Networking */,
@@ -600,6 +617,7 @@
 				C0EAFC182D9030D000044947 /* LicenseKeyGenerator.swift in Sources */,
 				C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */,
 				C0F67EE72D973F1D0090D568 /* LicenseValidationAPIProtocol.swift in Sources */,
+				C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */,
 				C0D21D712D7A286600FEF931 /* NSVisualEffectView+Ext.swift in Sources */,
 				C064B8D22D86F37E0091E2BE /* ShortcutsViewModel.swift in Sources */,
 				C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */,
@@ -621,6 +639,7 @@
 				C0EAF9432D90246100044947 /* ValidateLicenseView.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
 				C0F67EDC2D973EA50090D568 /* EmptyResponse.swift in Sources */,
+				C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */,
 				C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */,
 				C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */,
 				C0EAF9412D90244700044947 /* AppLicenseManager.swift in Sources */,
@@ -632,6 +651,7 @@
 				C09775632B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift in Sources */,
 				C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */,
 				C09775662B5C31EE00F4FFE6 /* MacOSMainView.swift in Sources */,
+				C05DA73A2DAC104A00BD4FBA /* UpdateScreenView.swift in Sources */,
 				C0EAF93D2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift in Sources */,
 				C064BA652D876F7C0091E2BE /* NSColor+Ext.swift in Sources */,
 				C0D21D6F2D7A266100FEF931 /* AddNewScreenView.swift in Sources */,

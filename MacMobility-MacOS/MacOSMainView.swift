@@ -21,7 +21,8 @@ struct MacOSMainPopoverView: View {
     @State private var shortcutsWindow: NSWindow?
     @State private var licenseWindow: NSWindow?
     @State private var workspacesWindow: NSWindow?
-    @State private var desktopWallpaperWindow: NSWindow?
+    @State private var updatesWindow: NSWindow?
+    @State private var aboutWindow: NSWindow?
     @State var isAccessibilityGranted: Bool = false
     private var spacing = 6.0
     
@@ -36,7 +37,6 @@ struct MacOSMainPopoverView: View {
                 HStack(alignment: .top, spacing: spacing * 2) {
                     VStack(alignment: .leading, spacing: spacing) {
                         mainView()
-//                        debugButtons()
                     }
                     qrCodeViewWithTrialCheck()
                 }
@@ -44,13 +44,15 @@ struct MacOSMainPopoverView: View {
             .buttonStyle(PlainButtonStyle())
             .frame(width: connectionManager.isConnecting ? 270 : 200)
             .if(connectionManager.isConnecting) {
-                $0.frame(maxHeight: 130)
+                $0.frame(height: 200)
             }
             .padding()
         }
         .onAppear {
             Task {
-                await viewModel.checkVersion()
+                await viewModel.checkVersion {
+                    viewModel.appIsUpToDate = nil
+                }
             }
             for window in NSApplication.shared.windows {
                 window.appearance = NSAppearance(named: .darkAqua)
@@ -72,8 +74,12 @@ struct MacOSMainPopoverView: View {
     
     @ViewBuilder
     func mainView() -> some View {
+        aboutButtonView
+        Divider()
         if viewModel.needsUpdate {
             updateAvailableButtonView
+        } else {
+            checkForUpdateButtonView
         }
         if viewModel.isPaidLicense {
             permissionView
@@ -162,29 +168,35 @@ struct MacOSMainPopoverView: View {
         shortcutsWindow?.makeKeyAndOrderFront(nil)
     }
     
-//    private func openVideoAsDesktopWallpaper() {
-//        if nil == desktopWallpaperWindow {
-//            let screenFrame = NSScreen.main?.frame ?? .zero
-//            desktopWallpaperWindow = NSWindow(
-//                contentRect: screenFrame,
-//                styleMask: .borderless,
-//                backing: .buffered,
-//                defer: false
-//            )
-//            
-//            desktopWallpaperWindow?.level = .desktop
-//            desktopWallpaperWindow?.isOpaque = false
-//            desktopWallpaperWindow?.backgroundColor = .clear
-//            desktopWallpaperWindow?.ignoresMouseEvents = true
-//            desktopWallpaperWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
-//            
-//            let contentView = VideoWallpaperView()
-//            let hostingView = NSHostingView(rootView: contentView)
-//            hostingView.frame = screenFrame
-//            desktopWallpaperWindow?.contentView = hostingView
-//        }
-//        desktopWallpaperWindow?.makeKeyAndOrderFront(nil)
-//    }
+    private func openUpdatesWindow() {
+        guard let updateData = viewModel.updateData else {
+            return
+        }
+        if nil == updatesWindow {
+            updatesWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 450),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            updatesWindow?.center()
+            updatesWindow?.setFrameAutosaveName("Updates")
+            updatesWindow?.isReleasedWhenClosed = false
+            updatesWindow?.titlebarAppearsTransparent = true
+            updatesWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: updatesWindow) else {
+                return
+            }
+            
+            updatesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: UpdateScreenView(viewModel: .init(updateData: updateData)))
+            updatesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = updatesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        updatesWindow?.makeKeyAndOrderFront(nil)
+    }
     
     func openPermissionsWindow() {
         if nil == permissionsWindow {
@@ -240,6 +252,33 @@ struct MacOSMainPopoverView: View {
         licenseWindow?.makeKeyAndOrderFront(nil)
     }
     
+    private func openAboutWindow() {
+        if nil == aboutWindow {
+            aboutWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 280),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            aboutWindow?.center()
+            aboutWindow?.setFrameAutosaveName("About")
+            aboutWindow?.isReleasedWhenClosed = false
+            aboutWindow?.titlebarAppearsTransparent = true
+            aboutWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: aboutWindow) else {
+                return
+            }
+            
+            aboutWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: AboutView())
+            aboutWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = aboutWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        aboutWindow?.makeKeyAndOrderFront(nil)
+    }
+    
     private var qrCodeView: some View {
         VStack(spacing: .zero) {
             if connectionManager.isConnecting {
@@ -263,17 +302,37 @@ struct MacOSMainPopoverView: View {
         }
     }
     
+    private var aboutButtonView: some View {
+        Button("About") {
+            openAboutWindow()
+        }
+    }
+    
     @ViewBuilder
     private var updateAvailableButtonView: some View {
-        if viewModel.isUpdating {
-            Text("Updating...")
-                .foregroundStyle(Color.blue)
+        Button {
+            openUpdatesWindow()
+        } label: {
+            Text("Update Available!")
+                .foregroundStyle(Color.green)
+        }
+    }
+    
+    @ViewBuilder
+    private var checkForUpdateButtonView: some View {
+        if viewModel.isCheckingForUpdate {
+            Text("Checking for update...")
+                .foregroundStyle(.gray)
         } else {
-            Button {
-                viewModel.updateApp()
-            } label: {
-                Text("Install Update")
+            if let appIsUpToDate = viewModel.appIsUpToDate, appIsUpToDate {
+                Text("You have current version")
                     .foregroundStyle(Color.green)
+            } else {
+                Button("Check for update") {
+                    Task {
+                        await viewModel.checkVersion()
+                    }
+                }
             }
         }
     }
@@ -283,14 +342,6 @@ struct MacOSMainPopoverView: View {
             openShortcutsWindow()
         }
     }
-    
-    private var wallpaperDesktopButtonView: some View {
-        Button("Desktop Wallpaper") {
-//            openVideoAsDesktopWallpaper()
-        }
-    }
-    
-    
     
     private var licenseWindowButtonView: some View {
         Button("Verify license") {
