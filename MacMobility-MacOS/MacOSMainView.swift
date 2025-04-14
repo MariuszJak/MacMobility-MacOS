@@ -42,7 +42,7 @@ struct MacOSMainPopoverView: View {
                 }
             }
             .buttonStyle(PlainButtonStyle())
-            .frame(width: connectionManager.isConnecting ? 270 : 200)
+            .frame(width: connectionManager.isConnecting ? 320 : 200)
             .if(connectionManager.isConnecting) {
                 $0.frame(height: 200)
             }
