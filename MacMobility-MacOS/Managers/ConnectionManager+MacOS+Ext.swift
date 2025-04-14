@@ -33,23 +33,13 @@ struct ShortcutsResponse: Codable {
     let shortcuts: [ShortcutObject]
 }
 
+struct ShortcutsResponseDiff: Codable {
+    let shortcutTitle: String
+    let shortcutsDiff: [ChangeType: [SDiff]]
+}
+
 extension ConnectionManager: ConnectionSenable {
     var mouseLocation: NSPoint { NSEvent.mouseLocation }
-    
-    func subscribeForRunningApps() {
-        self.observers = [
-            NSWorkspace.shared.observe(\.runningApplications) { workspace, apps in
-                let apps = self.getRunningApps()
-                guard self.runningApps != apps, !apps.isEmpty else {
-                    return
-                }
-                self.runningApps = apps
-                self.send(runningApps: apps)
-                self.send(workspaces: self.workspaces)
-                self.send(shortcuts: self.shortcuts)
-            }
-        ]
-    }
 
     func getRunningApps() -> [RunningAppData] {
         NSWorkspace.shared.runningApplications
@@ -57,6 +47,24 @@ extension ConnectionManager: ConnectionSenable {
             .compactMap { RunningAppData(title: $0.localizedName ?? "",
                                          imageData: try? $0.icon?.imageData(for: .png(scale: 1.0,
                                                                                       excludeGPSData: false))) }
+    }
+    
+    func getHighResAppIcon(for app: NSRunningApplication) -> NSImage? {
+        guard let bundleURL = app.bundleURL,
+              let bundle = Bundle(url: bundleURL),
+              let iconFile = bundle.infoDictionary?["CFBundleIconFile"] as? String else {
+            return nil
+        }
+
+        let iconName = (iconFile as NSString).deletingPathExtension
+        let iconExtension = (iconFile as NSString).pathExtension.isEmpty ? "icns" : (iconFile as NSString).pathExtension
+        let iconPath = bundle.path(forResource: iconName, ofType: iconExtension)
+
+        if let path = iconPath {
+            return NSImage(contentsOfFile: path)
+        }
+
+        return nil
     }
 
     func send(runningApps: [RunningAppData]) {
@@ -91,6 +99,15 @@ extension ConnectionManager: ConnectionSenable {
     
     func send(shortcuts: [ShortcutObject]) {
         let payload = ShortcutsResponse(shortcutTitle: "shortcutTitle", shortcuts: shortcuts)
+        guard !session.connectedPeers.isEmpty,
+              let data = try? JSONEncoder().encode(payload) else {
+            return
+        }
+        send(data)
+    }
+    
+    func send(shortcutsDiff: [ChangeType: [SDiff]]) {
+        let payload = ShortcutsResponseDiff(shortcutTitle: "shortcutTitleDiff", shortcutsDiff: shortcutsDiff)
         guard !session.connectedPeers.isEmpty,
               let data = try? JSONEncoder().encode(payload) else {
             return

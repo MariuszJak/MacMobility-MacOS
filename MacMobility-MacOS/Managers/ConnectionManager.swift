@@ -18,6 +18,15 @@ enum PairingStatus: Equatable {
     case pairining
 }
 
+enum ChangeType: String, Codable {
+    case insert
+    case remove
+}
+
+struct SDiff: Codable {
+    var item: ShortcutObject, from: Int?, to: Int?
+}
+
 class ConnectionManager: NSObject, ObservableObject {
     @Published var screenIndex = 0
     @Published var inProgressWindow: NSWindow?
@@ -47,8 +56,32 @@ class ConnectionManager: NSObject, ObservableObject {
     }
     public var shortcuts: [ShortcutObject] = [] {
         didSet {
-            self.send(shortcuts: shortcuts)
+            let diff = shortcuts.difference(from: oldValue)
+            self.send(shortcutsDiff: handleDiff(diff))
         }
+    }
+    func handleDiff(_ diff: CollectionDifference<ShortcutObject>) -> [ChangeType: [SDiff]] {
+        var insertedItems: [SDiff] = []
+        var removedItems: [SDiff] = []
+
+        for change in diff {
+            switch change {
+            case let .insert(_, element, associatedWith):
+                if let fromIndex = associatedWith {
+                } else {
+                    // This is a new insert
+                    insertedItems.append(.init(item: element, from: nil, to: nil))
+                }
+
+            case let .remove(_, element, associatedWith):
+                if associatedWith == nil {
+                    // This is a real removal
+                    removedItems.append(.init(item: element, from: nil, to: nil))
+                }
+                // If it's part of a move, we already handled it on insert side
+            }
+        }
+        return [ChangeType.insert: insertedItems, ChangeType.remove: removedItems]
     }
     public var observers = [NSKeyValueObservation]()
     public var subscriptions = Set<AnyCancellable>()
@@ -70,7 +103,6 @@ class ConnectionManager: NSObject, ObservableObject {
         runningApps = getRunningApps()
         workspaces = UserDefaults.standard.get(key: .workspaceItems) ?? []
         shortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
-        subscribeForRunningApps()
 
         session.delegate = self
         serviceAdvertiser.delegate = self

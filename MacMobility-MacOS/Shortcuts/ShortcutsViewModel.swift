@@ -24,7 +24,7 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
     public var color: String?
     public var faviconLink: String?
     public let type: ShortcutType
-    public let imageData: Data?
+    public var imageData: Data?
     public var browser: Browsers?
     public var scriptCode: String?
     public var utilityType: UtilityObject.UtilityType?
@@ -40,16 +40,7 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         self.color = color
         self.scriptCode = scriptCode
         self.utilityType = utilityType
-        switch type {
-        case .shortcut:
-            self.imageData = imageData
-        case .app:
-            self.imageData = try? NSWorkspace.shared.icon(forFile: path ?? "").imageData(for: .png(scale: 0.2, excludeGPSData: false))
-        case .webpage:
-            self.imageData = imageData
-        case .utility:
-            self.imageData = imageData
-        }
+        self.imageData = imageData
         self.faviconLink = faviconLink
         self.browser = browser
         self.objects = objects
@@ -73,9 +64,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var timer: Timer?
     public var testColor = "#6DDADE"
     private var allWebpages: [ShortcutObject] = []
+    private var cachedIcons: [String: Data] = [:]
     
     init(connectionManager: ConnectionManager) {
-//        UserDefaults.standard.clear(key: .userApps)
+//        UserDefaults.standard.clearAll()
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
@@ -161,7 +153,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 if (object.index != shortcut.index && shortcut.id == object.id) {
                     configuredShortcuts[index] = .init(
                         type: oldObject.type,
-                        page: oldObject.page,
+                        page: configuredShortcuts[index].page,
                         index: configuredShortcuts[index].index,
                         path: oldObject.path,
                         id: oldObject.id,
@@ -396,13 +388,64 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? 1,
                         path: appURL.path,
                         id: installedApps.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
-                        title: appName
+                        title: appName,
+                        imageData: cachedIcons[appURL.path] ?? getIcon(fromAppPath: appURL.path)
                     )
                 )
             }
         }
 
         return apps
+    }
+    
+    var countMB = 0.0
+    
+    func getIcon(fromAppPath appPath: String?) -> Data? {
+        guard let appPath else {
+            return nil
+        }
+        let bundleURL = URL(fileURLWithPath: appPath)
+        
+        guard let bundle = Bundle(url: bundleURL) else {
+            return nil
+        }
+        
+        // Get icon name (may not include extension)
+        guard let iconFile = bundle.infoDictionary?["CFBundleIconFile"] as? String else {
+            return nil
+        }
+        
+        let iconName = (iconFile as NSString).deletingPathExtension
+        let iconExtension = (iconFile as NSString).pathExtension.isEmpty ? "icns" : (iconFile as NSString).pathExtension
+        
+        guard let iconPath = bundle.path(forResource: iconName, ofType: iconExtension) else {
+            return nil
+        }
+        let pngProps: [NSBitmapImageRep.PropertyKey: Any] = [
+            .compressionFactor: 0.0 // Range: 0.0 (max compression) to 1.0 (min compression)
+        ]
+        let icon = resizedImage(image: NSImage(contentsOfFile: iconPath)!, newSize: .init(width: 96.0, height: 96.0))
+        guard let tiffData = icon.tiffRepresentation,
+           let bitmap = NSBitmapImageRep(data: tiffData),
+           let pngData = bitmap.representation(using: .png, properties: pngProps) else {
+            return nil
+        }
+        cachedIcons[appPath] = pngData
+        
+//        let sizeInMB = Double(pngData.count) / (1024.0 * 1024.0)
+//        countMB += sizeInMB
+//        print(String(format: "%.8f MB", countMB))
+        
+        return pngData
+    }
+    
+    func resizedImage(image: NSImage, newSize: NSSize) -> NSImage {
+        let newImage = NSImage(size: newSize)
+        newImage.lockFocus()
+        NSGraphicsContext.current?.imageInterpolation = .high
+        image.draw(in: NSRect(origin: .zero, size: newSize), from: .zero, operation: .copy, fraction: 1.0)
+        newImage.unlockFocus()
+        return newImage
     }
 }
 

@@ -64,6 +64,8 @@ extension ConnectionManager {
                 self.send(runningApps: self.runningApps)
                 self.send(workspaces: self.workspaces)
                 self.send(shortcuts: self.shortcuts)
+                let diff = self.shortcuts.difference(from: [])
+                self.send(shortcutsDiff: handleDiff(diff))
             } else {
                 focusToApp(string)
             }
