@@ -412,7 +412,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         
         // Get icon name (may not include extension)
         guard let iconFile = bundle.infoDictionary?["CFBundleIconFile"] as? String else {
-            return nil
+            let fallbackIcon = try? NSWorkspace.shared.icon(forFile: appPath).imageData(for: .png(scale: 0.2, excludeGPSData: false))
+            return fallbackIcon
         }
         
         let iconName = (iconFile as NSString).deletingPathExtension
