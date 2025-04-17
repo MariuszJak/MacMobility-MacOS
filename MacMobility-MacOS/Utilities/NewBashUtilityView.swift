@@ -13,12 +13,14 @@ class NewBashUtilityViewModel: ObservableObject {
     @Published var iconData: Data?
     @Published var selectedIcon: NSImage? = NSImage(named: "terminal")
     @Published var scriptCode: String = ""
+    @Published var showTitleOnIcon: Bool = true
     
     func clear() {
         id = nil
         iconData = nil
         title = ""
         scriptCode = ""
+        showTitleOnIcon = true
     }
 }
 
@@ -36,6 +38,7 @@ struct NewBashUtilityView: View {
             viewModel.title = item.title
             viewModel.id = item.id
             viewModel.scriptCode = item.scriptCode ?? ""
+            viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
             if let data = item.imageData {
                 viewModel.selectedIcon = NSImage(data: data)
             }
@@ -63,6 +66,8 @@ struct NewBashUtilityView: View {
                 .foregroundStyle(Color.gray)
                 .lineLimit(2)
                 .font(.system(size: 12))
+                .padding(.bottom, 4)
+            Toggle("Show label on icon", isOn: $viewModel.showTitleOnIcon)
                 .padding(.bottom, 12)
             TextField("", text: $viewModel.title)
             TextEditor(text: $viewModel.scriptCode)
@@ -70,7 +75,7 @@ struct NewBashUtilityView: View {
                 .padding(.bottom, 12)
             IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                 viewModel.selectedIcon = image
-            }, title: $viewModel.title)
+            }, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
             Divider()
                 .padding(.top, 8)
             Button {
@@ -82,7 +87,8 @@ struct NewBashUtilityView: View {
                         title: viewModel.title,
                         imageData: viewModel.selectedIcon?.toData,
                         scriptCode: viewModel.scriptCode,
-                        utilityType: .commandline
+                        utilityType: .commandline,
+                        showTitleOnIcon: viewModel.showTitleOnIcon
                     )
                 )
                 viewModel.clear()
@@ -116,12 +122,14 @@ class NewAutomationUtilityViewModel: ObservableObject {
     @Published var iconData: Data?
     @Published var selectedIcon: NSImage? = NSImage(named: "automation")
     @Published var automationCode: String = ""
+    @Published var showTitleOnIcon: Bool = true
     
     func clear() {
         id = nil
         iconData = nil
         title = ""
         automationCode = ""
+        showTitleOnIcon = true
     }
     
     func loadAutomationFromFile() -> Automation? {
@@ -158,6 +166,7 @@ struct NewAutomationUtilityView: View {
             viewModel.title = item.title
             viewModel.id = item.id
             viewModel.automationCode = item.scriptCode ?? ""
+            viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
             if let data = item.imageData {
                 viewModel.selectedIcon = NSImage(data: data)
             }
@@ -185,6 +194,8 @@ struct NewAutomationUtilityView: View {
                 .foregroundStyle(Color.gray)
                 .lineLimit(2)
                 .font(.system(size: 12))
+                .padding(.bottom, 4.0)
+            Toggle("Show label on icon", isOn: $viewModel.showTitleOnIcon)
                 .padding(.bottom, 12)
             Button("Load Automation from File") {
                 if let newAutomation = viewModel.loadAutomationFromFile() {
@@ -197,7 +208,7 @@ struct NewAutomationUtilityView: View {
                 .padding(.bottom, 12)
             IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                 viewModel.selectedIcon = image
-            }, title: $viewModel.title)
+            }, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
             Divider()
                 .padding(.top, 8)
             Button {
@@ -209,7 +220,8 @@ struct NewAutomationUtilityView: View {
                         title: viewModel.title,
                         imageData: viewModel.selectedIcon?.toData,
                         scriptCode: viewModel.automationCode,
-                        utilityType: .automation
+                        utilityType: .automation,
+                        showTitleOnIcon: viewModel.showTitleOnIcon
                     )
                 )
                 viewModel.clear()

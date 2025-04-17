@@ -15,6 +15,7 @@ class NewWebpageViewModel: ObservableObject {
     @Published var iconData: Data?
     @Published var selectedIcon: NSImage?
     @Published var browser = Browsers.chrome
+    @Published var showTitleOnIcon: Bool = true
     
     func clear() {
         id = nil
@@ -23,6 +24,7 @@ class NewWebpageViewModel: ObservableObject {
         link = ""
         faviconLink = ""
         browser = .chrome
+        showTitleOnIcon = true
     }
 }
 
@@ -39,6 +41,7 @@ struct NewWebpageView: View {
             viewModel.link = item.path ?? ""
             viewModel.id = item.id
             viewModel.faviconLink = item.faviconLink ?? ""
+            viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
             currentPage = item.page
             if let data = item.imageData {
                 viewModel.selectedIcon = NSImage(data: data)
@@ -62,7 +65,9 @@ struct NewWebpageView: View {
                 .font(.system(size: 14, weight: .bold))
                 .padding(.bottom, 4)
             TextField("", text: $viewModel.title)
-                .padding(.bottom, 8)
+                .padding(.bottom, 4)
+            Toggle("Show title on icon", isOn: $viewModel.showTitleOnIcon)
+                .padding(.bottom, 12)
             Text("Link")
                 .font(.system(size: 14, weight: .bold))
                 .padding(.bottom, 4)
@@ -93,7 +98,8 @@ struct NewWebpageView: View {
                         title: viewModel.title,
                         faviconLink: viewModel.faviconLink,
                         browser: viewModel.browser,
-                        imageData: viewModel.selectedIcon?.toData
+                        imageData: viewModel.selectedIcon?.toData,
+                        showTitleOnIcon: viewModel.showTitleOnIcon
                     )
                 )
                 viewModel.clear()

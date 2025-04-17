@@ -10,6 +10,8 @@ import SwiftUI
 struct ShortcutsView: View {
     @State private var newWindow: NSWindow?
     @State private var shortcutsToInstallWindow: NSWindow?
+    @State private var automationsToInstallWindow: NSWindow?
+    @State private var automationItemWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
     @ObservedObject private var viewModel: ShortcutsViewModel
     @State private var selectedTab = 0
@@ -26,23 +28,15 @@ struct ShortcutsView: View {
                     .font(.system(size: 17.0, weight: .bold))
                     .foregroundStyle(Color.white)
                     
-                HStack {
-                    Text("Add page")
-                        .foregroundStyle(Color.white)
-                        .padding(.leading, 8.0)
-                    Image(systemName: "plus.circle.fill")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                }
-                .background(
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(Color.gray)
-                )
-                .onTapGesture {
+                Button("Add Page") {
                     viewModel.addPage()
                 }
                 .padding(.all, 3.0)
-                .padding()
+                
+                Button("Explore Automations") {
+                    openInstallAutomationsWindow()
+                }
+                .padding(.all, 3.0)
             }
             .padding([.horizontal, .top], 16)
             .padding(.leading, 21.0)
@@ -174,7 +168,8 @@ struct ShortcutsView: View {
                         imageData: object.imageData,
                         scriptCode: object.scriptCode,
                         utilityType: object.utilityType,
-                        objects: object.objects
+                        objects: object.objects,
+                        showTitleOnIcon: object.showTitleOnIcon ?? true
                     )
             )
         }
@@ -199,11 +194,13 @@ struct ShortcutsView: View {
                             openEditUtilityWindow(item: object)
                         }
                 }
-                Text(object.title)
-                    .font(.system(size: 12))
-                    .multilineTextAlignment(.center)
-                    .padding(.all, 3)
-                    .stroke(color: Color.black)
+                if object.showTitleOnIcon ?? true {
+                    Text(object.title)
+                        .font(.system(size: 12))
+                        .multilineTextAlignment(.center)
+                        .padding(.all, 3)
+                        .stroke(color: Color.black)
+                }
             } else if object.type == .webpage {
                 if let data = object.imageData, let image = NSImage(data: data) {
                     Image(nsImage: image)
@@ -217,14 +214,16 @@ struct ShortcutsView: View {
                         .onTapGesture {
                             openCreateNewWebpageWindow(item: object)
                         }
-                    Text(object.title)
-                        .font(.system(size: 12))
-                        .multilineTextAlignment(.center)
-                        .padding(.all, 3)
-                        .stroke(color: Color.black)
-                        .onTapGesture {
-                            openCreateNewWebpageWindow(item: object)
-                        }
+                    if object.showTitleOnIcon ?? true {
+                        Text(object.title)
+                            .font(.system(size: 12))
+                            .multilineTextAlignment(.center)
+                            .padding(.all, 3)
+                            .stroke(color: Color.black)
+                            .onTapGesture {
+                                openCreateNewWebpageWindow(item: object)
+                            }
+                    }
                 } else if let path = object.browser?.icon {
                     Image(path)
                         .resizable()
@@ -233,14 +232,16 @@ struct ShortcutsView: View {
                         .onTapGesture {
                             openCreateNewWebpageWindow(item: object)
                         }
-                    Text(object.title)
-                        .font(.system(size: 12))
-                        .multilineTextAlignment(.center)
-                        .padding(.all, 3)
-                        .stroke(color: Color.black)
-                        .onTapGesture {
-                            openCreateNewWebpageWindow(item: object)
-                        }
+                    if object.showTitleOnIcon ?? true {
+                        Text(object.title)
+                            .font(.system(size: 12))
+                            .multilineTextAlignment(.center)
+                            .padding(.all, 3)
+                            .stroke(color: Color.black)
+                            .onTapGesture {
+                                openCreateNewWebpageWindow(item: object)
+                            }
+                    }
                 }
             } else if object.type == .utility {
                 if let data = object.imageData, let image = NSImage(data: data) {
@@ -254,15 +255,17 @@ struct ShortcutsView: View {
                         }
                 }
                 if !object.title.isEmpty {
-                    Text(object.title)
-                        .font(.system(size: 11))
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                        .frame(maxWidth: 80)
-                        .stroke(color: Color.black)
-                        .onTapGesture {
-                            openEditUtilityWindow(item: object)
-                        }
+                    if object.showTitleOnIcon ?? true {
+                        Text(object.title)
+                            .font(.system(size: 11))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .frame(maxWidth: 80)
+                            .stroke(color: Color.black)
+                            .onTapGesture {
+                                openEditUtilityWindow(item: object)
+                            }
+                    }
                 }
             }
         }
@@ -475,6 +478,73 @@ struct ShortcutsView: View {
             return
         }
         shortcutsToInstallWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openInstallAutomationsWindow() {
+        if nil == automationsToInstallWindow {
+            automationsToInstallWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 500, height: 700),
+                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            automationsToInstallWindow?.center()
+            automationsToInstallWindow?.setFrameAutosaveName("AutomationsToInstallWindow")
+            automationsToInstallWindow?.isReleasedWhenClosed = false
+            automationsToInstallWindow?.titlebarAppearsTransparent = true
+            automationsToInstallWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: automationsToInstallWindow) else {
+                return
+            }
+            automationsToInstallWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: ExploreAutomationsView(openDetailsPage: { item in
+                openAutomationItemWindow(item)
+            }))
+            automationsToInstallWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = automationsToInstallWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            automationsToInstallWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+        automationsToInstallWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openAutomationItemWindow(_ item: AutomationItem) {
+        if nil == automationItemWindow {
+            automationItemWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 500, height: 700),
+                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            automationItemWindow?.center()
+            automationItemWindow?.setFrameAutosaveName("AutomationsToInstallWindow")
+            automationItemWindow?.isReleasedWhenClosed = false
+            automationItemWindow?.titlebarAppearsTransparent = true
+            automationItemWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: automationItemWindow) else {
+                return
+            }
+            automationItemWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: AutomationInstallView(automationItem: item, selectedScriptsAction: { scripts in
+                viewModel.addAutomations(from: scripts)
+            }))
+            automationItemWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = automationItemWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            automationItemWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+        automationItemWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
+        let hv = NSHostingController(rootView: AutomationInstallView(automationItem: item, selectedScriptsAction: { scripts in
+            viewModel.addAutomations(from: scripts)
+        }))
+        automationItemWindow?.contentView?.addSubview(hv.view)
+        hv.view.frame = automationItemWindow?.contentView?.bounds ?? .zero
+        hv.view.autoresizingMask = [.width, .height]
+        automationItemWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openEditUtilityWindow(item: ShortcutObject) {

@@ -29,8 +29,24 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
     public var scriptCode: String?
     public var utilityType: UtilityObject.UtilityType?
     public var objects: [ShortcutObject]?
+    public var showTitleOnIcon: Bool?
     
-    public init(type: ShortcutType, page: Int, index: Int? = nil, path: String? = nil, id: String, title: String, color: String? = nil, faviconLink: String? = nil, browser: Browsers? = nil, imageData: Data? = nil, scriptCode: String? = nil, utilityType: UtilityObject.UtilityType? = nil, objects: [ShortcutObject]? = nil) {
+    public init(
+        type: ShortcutType,
+        page: Int,
+        index: Int? = nil,
+        path: String? = nil,
+        id: String,
+        title: String,
+        color: String? = nil,
+        faviconLink: String? = nil,
+        browser: Browsers? = nil,
+        imageData: Data? = nil,
+        scriptCode: String? = nil,
+        utilityType: UtilityObject.UtilityType? = nil,
+        objects: [ShortcutObject]? = nil,
+        showTitleOnIcon: Bool = true
+    ) {
         self.page = page
         self.type = type
         self.index = index
@@ -44,6 +60,7 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         self.faviconLink = faviconLink
         self.browser = browser
         self.objects = objects
+        self.showTitleOnIcon = showTitleOnIcon
     }
 }
 
@@ -145,6 +162,13 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         connectionManager.shortcuts = configuredShortcuts
     }
     
+    func addAutomations(from scripts: [AutomationScript]) {
+        let shortcuts: [ShortcutObject] = scripts.map { ShortcutObject.from(script: $0) }
+        shortcuts.forEach { object in
+            saveUtility(with: object)
+        }
+    }
+    
     func addConfiguredShortcut(object: ShortcutObject) {
         if let index = configuredShortcuts.firstIndex(where: { $0.index == object.index && $0.page == object.page }) {
             let oldObject = configuredShortcuts[index]
@@ -164,7 +188,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         imageData: oldObject.imageData,
                         scriptCode: oldObject.scriptCode,
                         utilityType: oldObject.utilityType,
-                        objects: oldObject.objects
+                        objects: oldObject.objects,
+                        showTitleOnIcon: oldObject.showTitleOnIcon ?? true
                     )
                 }
             }
@@ -225,7 +250,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     faviconLink: webpageItem.faviconLink,
                     browser: webpageItem.browser,
                     imageData: webpageItem.imageData,
-                    objects: webpageItem.objects
+                    objects: webpageItem.objects,
+                    showTitleOnIcon: webpageItem.showTitleOnIcon ?? true
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
@@ -253,7 +279,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     imageData: utilityItem.imageData,
                     scriptCode: utilityItem.scriptCode,
                     utilityType: utilityItem.utilityType,
-                    objects: utilityItem.objects
+                    objects: utilityItem.objects,
+                    showTitleOnIcon: utilityItem.showTitleOnIcon ?? true
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
@@ -368,7 +395,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             page: configuredShortcuts.first(where: { shortcut in path == shortcut.path })?.page ?? 1,
             path: path,
             id: appsAddedByUser.first(where: { shortcut in path == shortcut.path })?.id ?? configuredShortcuts.first(where: { shortcut in path == shortcut.path })?.id ?? UUID().uuidString,
-            title: title
+            title: title,
+            imageData: cachedIcons[path] ?? getIcon(fromAppPath: path)
         )
         appsAddedByUser.insert(app, at: 0)
         fetchInstalledApps()
@@ -412,7 +440,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         
         // Get icon name (may not include extension)
         guard let iconFile = bundle.infoDictionary?["CFBundleIconFile"] as? String else {
-            let fallbackIcon = try? NSWorkspace.shared.icon(forFile: appPath).imageData(for: .png(scale: 0.2, excludeGPSData: false))
+            let icon = NSWorkspace.shared.icon(forFile: appPath)
+            let resizedIcon = resizedImage(image: icon, newSize: .init(width: 128.0, height: 128.0))
+            let fallbackIcon = try? resizedIcon.imageData(for: .png(scale: 0.2, excludeGPSData: false))
             return fallbackIcon
         }
         
@@ -457,5 +487,268 @@ extension String {
             return nil
         }
         return lastComponent.replacingOccurrences(of: ".app", with: "")
+    }
+}
+
+// ---
+
+struct AutomationsList: Codable {
+    let automations: [AutomationItem]
+}
+
+enum AutomationType: String, Codable {
+    case bash
+    case automator
+}
+
+struct AutomationScript: Identifiable, Codable, Equatable {
+    var id = UUID()
+    var name: String
+    var description: String
+    var script: String
+    var imageData: Data?
+    var imageName: String?
+    var type: AutomationType?
+}
+
+struct AutomationItem: Identifiable, Codable {
+    var id = UUID()
+    var title: String
+    var description: String
+    var imageData: Data?
+    var imageName: String?
+    var scripts: [AutomationScript]
+}
+
+class ExploreAutomationsViewModel: ObservableObject, JSONLoadable {
+    @Published var automations: [AutomationItem] = []
+    
+    func loadJSONFromDirectory() {
+        let test: AutomationsList = loadJSON("automations")
+        self.automations = test.automations
+    }
+}
+
+struct ExploreAutomationsView: View {
+    @ObservedObject private var viewModel = ExploreAutomationsViewModel()
+    var openDetailsPage: (AutomationItem) -> Void
+    
+    var body: some View {
+        VStack {
+            Text("Install Automations")
+                .font(.system(size: 21, weight: .bold))
+                .padding(.bottom, 18.0)
+            Divider()
+                .padding(.bottom, 14.0)
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 400))], spacing: 6) {
+                    ForEach(viewModel.automations) { automationItem in
+                        InstallAutomationsView(automationItem: automationItem) {
+                            openDetailsPage(automationItem)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+        .onAppear {
+            viewModel.loadJSONFromDirectory()
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
+        .padding()
+    }
+}
+
+struct InstallAutomationsView: View {
+    let automationItem: AutomationItem
+    let action: () -> Void
+    
+    var body: some View {
+        VStack {
+            HStack(alignment: .top) {
+                VStack {
+                    if let data = automationItem.imageData, let image = NSImage(data: data)  {
+                        Image(nsImage: image)
+                            .resizable()
+                            .frame(width: 128, height: 128)
+                            .cornerRadius(20)
+                            .padding(.bottom, 21.0)
+                        Button("Open") {
+                            action()
+                        }
+                    }
+                }
+                .padding(.trailing, 21.0)
+                VStack(alignment: .leading) {
+                    Spacer()
+                    Text(automationItem.title)
+                        .font(.system(size: 21, weight: .bold))
+                        .padding(.bottom, 4.0)
+                    Text(automationItem.description)
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.gray)
+                        .padding(.bottom, 8.0)
+                    
+                    Spacer()
+                }
+            }
+            .padding(.all, 8.0)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.gray.opacity(0.1))
+            )
+        }
+        .onAppear {
+            for window in NSApplication.shared.windows {
+                window.appearance = NSAppearance(named: .darkAqua)
+            }
+        }
+    }
+}
+
+// -----
+
+struct AutomationInstallView: View {
+    var automationItem: AutomationItem
+    var selectedScriptsAction: ([AutomationScript]) -> Void
+    
+    @State private var selectedScriptIDs: Set<UUID>
+    
+    init(automationItem: AutomationItem, selectedScriptsAction: @escaping ([AutomationScript]) -> Void) {
+        self.automationItem = automationItem
+        self.selectedScriptsAction = selectedScriptsAction
+        _selectedScriptIDs = State(initialValue: Set(automationItem.scripts.map { $0.id }))
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .center, spacing: 12) {
+                if let imageData = automationItem.imageData,
+                   let nsImage = NSImage(data: imageData) {
+                    Image(nsImage: nsImage)
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                } else {
+                    Image(systemName: "bolt.fill")
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .foregroundColor(.accentColor)
+                }
+                
+                Text(automationItem.title)
+                    .font(.title)
+                    .bold()
+            }
+            .padding(.top)
+            
+            Divider()
+            
+            // Scripts section
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Scripts")
+                    .font(.headline)
+                
+                ScrollView {
+                    ForEach(automationItem.scripts) { script in
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading) {
+                                Toggle(isOn: Binding(
+                                    get: {
+                                        selectedScriptIDs.contains(script.id)
+                                    },
+                                    set: { isSelected in
+                                        if isSelected {
+                                            selectedScriptIDs.insert(script.id)
+                                        } else {
+                                            selectedScriptIDs.remove(script.id)
+                                        }
+                                    }
+                                )) {
+                                    Text(script.name)
+                                        .font(.system(size: 14))
+                                        .padding(.bottom, 8.0)
+                                }
+                                Text(script.description)
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Color.gray)
+                                    .padding(.bottom, 8.0)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Spacer()
+            
+            HStack {
+                Spacer()
+                Button("Install") {
+                    let selectedScripts = automationItem.scripts.filter { selectedScriptIDs.contains($0.id) }
+                    selectedScriptsAction(selectedScripts)
+                }
+                .keyboardShortcut(.defaultAction)
+                Spacer()
+            }
+            .padding(.bottom)
+        }
+        .padding()
+        .frame(minWidth: 400, minHeight: 400)
+    }
+}
+
+
+//------
+
+protocol JSONLoadable {
+    func loadJSON<T: Decodable>(_ filename: String) -> T
+}
+
+extension JSONLoadable {
+    func loadJSON<T: Decodable>(_ filename: String) -> T {
+        guard let url = Bundle.main.url(forResource: filename, withExtension: "json") else {
+            fatalError("Failed to locate \(filename).json in bundle.")
+        }
+
+        guard let data = try? Data(contentsOf: url) else {
+            fatalError("Failed to load \(filename).json from bundle.")
+        }
+
+        let decoder = JSONDecoder()
+        guard let loaded = try? decoder.decode(T.self, from: data) else {
+            fatalError("Failed to decode \(filename).json from bundle.")
+        }
+
+        return loaded
+    }
+}
+
+extension ShortcutObject {
+    static func from(script: AutomationScript) -> ShortcutObject {
+        var utilityType: UtilityObject.UtilityType?
+        switch script.type {
+        case .automator, .none:
+            utilityType = .automation
+        case .bash:
+            utilityType = .commandline
+        }
+        return .init(
+            type: .utility,
+            page: 1,
+            index: nil,
+            path: nil,
+            id: script.id.uuidString,
+            title: script.name,
+            color: nil,
+            faviconLink: nil,
+            browser: nil,
+            imageData: script.imageData,
+            scriptCode: script.script,
+            utilityType: utilityType,
+            objects: nil,
+            showTitleOnIcon: false
+        )
     }
 }
