@@ -16,6 +16,7 @@
 		C064BA652D876F7C0091E2BE /* NSColor+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064BA642D876F7C0091E2BE /* NSColor+Ext.swift */; };
 		C064BA672D876FA40091E2BE /* Optional+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064BA662D876FA40091E2BE /* Optional+Ext.swift */; };
 		C071D7102DB17C6E00ADD746 /* automations.json in Resources */ = {isa = PBXBuildFile; fileRef = C071D70F2DB17C6E00ADD746 /* automations.json */; };
+		C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071D7172DB43A3100ADD746 /* WelcomeView.swift */; };
 		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
 		C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */; };
 		C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775332B5C319E00F4FFE6 /* Assets.xcassets */; };
@@ -120,6 +121,7 @@
 		C064BA642D876F7C0091E2BE /* NSColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSColor+Ext.swift"; sourceTree = "<group>"; };
 		C064BA662D876FA40091E2BE /* Optional+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Ext.swift"; sourceTree = "<group>"; };
 		C071D70F2DB17C6E00ADD746 /* automations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = automations.json; sourceTree = "<group>"; };
+		C071D7172DB43A3100ADD746 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -232,6 +234,7 @@
 			children = (
 				C05DA7372DAC103300BD4FBA /* AboutView.swift */,
 				C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */,
+				C071D7172DB43A3100ADD746 /* WelcomeView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -675,6 +678,7 @@
 				C0F67EE92D973F2B0090D568 /* LicenseValidationUseCase.swift in Sources */,
 				C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */,
 				C0EAFC1A2D903E7400044947 /* TrialManager.swift in Sources */,
+				C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */,
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
 				C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */,
 				C064BA672D876FA40091E2BE /* Optional+Ext.swift in Sources */,

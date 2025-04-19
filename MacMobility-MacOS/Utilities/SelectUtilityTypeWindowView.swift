@@ -159,10 +159,6 @@ struct SelectUtilityTypeWindowView: View {
             
             switch type {
             case .commandline:
-                newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
-                    newWindow?.close()
-                })
-                
                 let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
                     newWindow?.close()
                 })
@@ -177,13 +173,10 @@ struct SelectUtilityTypeWindowView: View {
                 hv.view.frame = newWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                newWindow?.contentView = NSHostingView(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
-                    newWindow?.close()
-                })
-                
                 let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
                     newWindow?.close()
                 })
+                
                 newWindow?.contentView?.addSubview(hv.view)
                 hv.view.frame = newWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
@@ -191,38 +184,6 @@ struct SelectUtilityTypeWindowView: View {
             newWindow?.makeKeyAndOrderFront(nil)
             return
         }
-        newWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
-        switch type {
-        case .commandline:
-            newWindow?.contentView = NSHostingView(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
-                newWindow?.close()
-            })
-            
-            let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
-                newWindow?.close()
-            })
-            newWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-        case .multiselection:
-            let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
-                newWindow?.close()
-            })
-            newWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-        case .automation:
-            newWindow?.contentView = NSHostingView(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
-                newWindow?.close()
-            })
-            
-            let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
-                newWindow?.close()
-            })
-            newWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-        }
-        newWindow?.makeKeyAndOrderFront(nil)
+        
     }
 }

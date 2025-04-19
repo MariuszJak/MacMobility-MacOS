@@ -19,6 +19,7 @@ struct MacMobility_MacOSApp: App {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var permissionsWindow: NSWindow?
+    private var welcomeWindow: NSWindow?
     private let connectionManager = ConnectionManager()
     var statusItem: NSStatusItem?
     var popOver = NSPopover()
@@ -34,6 +35,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popOver.contentViewController?.view = NSHostingView(rootView: menuView)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
+        openWelcomeWindow()
         if lifecycle.openCount < 2 {
             openPermissionsWindow()
             let openCount = lifecycle.openCount + 1
@@ -45,6 +47,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             menuButton.action = #selector(menuAction)
         }
         NSApp.setActivationPolicy(.accessory)
+    }
+    
+    func openWelcomeWindow() {
+        if nil == welcomeWindow {
+            welcomeWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
+                styleMask: [.titled],
+                backing: .buffered,
+                defer: false
+            )
+            welcomeWindow?.center()
+            welcomeWindow?.setFrameAutosaveName("Welcome")
+            welcomeWindow?.isReleasedWhenClosed = false
+            welcomeWindow?.titlebarAppearsTransparent = true
+            welcomeWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: welcomeWindow) else {
+                return
+            }
+            
+            welcomeWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: {
+                self.welcomeWindow?.close()
+            })))
+            welcomeWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = welcomeWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        welcomeWindow?.makeKeyAndOrderFront(nil)
     }
     
     func openPermissionsWindow() {

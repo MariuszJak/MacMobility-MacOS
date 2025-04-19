@@ -181,7 +181,7 @@ struct UtilitiesWindowView: View {
         if nil == editUtilitiesWindow {
             editUtilitiesWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 320, height: 570),
-                styleMask: [.titled, .closable, .miniaturizable],
+                styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )

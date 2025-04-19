@@ -22,6 +22,7 @@ struct NewMultiSelectionUtilityView: View {
             currentPage = item.page
             viewModel.title = item.title
             viewModel.id = item.id
+            viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
             currentPage = item.page
             if let objects = item.objects {
                 viewModel.configuredShortcuts = objects
@@ -110,6 +111,8 @@ struct NewMultiSelectionUtilityView: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Color.white)
                     .padding(.bottom, 4)
+                Toggle("Show label on icon", isOn: $viewModel.showTitleOnIcon)
+                    .padding(.bottom, 4)
                 Text("Add a label that will be present on an icon and as the description on a list.")
                     .foregroundStyle(Color.gray)
                     .lineLimit(2)
@@ -118,7 +121,7 @@ struct NewMultiSelectionUtilityView: View {
                 TextField("", text: $viewModel.title)
                 IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                     viewModel.selectedIcon = image
-                }, title: $viewModel.title)
+                }, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
                 Divider()
                     .padding(.top, 8)
                 Button {
@@ -130,7 +133,8 @@ struct NewMultiSelectionUtilityView: View {
                                 title: viewModel.title,
                                 imageData: viewModel.selectedIcon?.toData,
                                 utilityType: .multiselection,
-                                objects: viewModel.configuredShortcuts
+                                objects: viewModel.configuredShortcuts,
+                                showTitleOnIcon: viewModel.showTitleOnIcon
                             )
                     )
                     viewModel.clear()

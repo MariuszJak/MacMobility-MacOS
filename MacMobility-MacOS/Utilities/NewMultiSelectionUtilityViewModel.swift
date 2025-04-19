@@ -19,6 +19,7 @@ class NewMultiSelectionUtilityViewModel: ObservableObject {
     @Published var installedApps: [ShortcutObject] = []
     @Published var webpages: [ShortcutObject] = []
     @Published var utilities: [ShortcutObject] = []
+    @Published var showTitleOnIcon: Bool = true
     var close: () -> Void = {}
     
     init(allObjects: [ShortcutObject]) {
