@@ -13,10 +13,22 @@ public enum ShortcutType: String, Codable {
     case app
     case webpage
     case utility
+    case controler
+    
+    var size: CGSize {
+        switch self {
+        case .shortcut, .app, .webpage, .utility:
+            return .init(width: 70, height: 70)
+        case .controler:
+            return .init(width: 230, height: 70)
+        }
+    }
 }
 
 public struct ShortcutObject: Identifiable, Codable, Equatable {
     public let index: Int?
+    public let offsetX: Int
+    public let offsetY: Int
     public var page: Int
     public let id: String
     public let title: String
@@ -30,11 +42,14 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
     public var utilityType: UtilityObject.UtilityType?
     public var objects: [ShortcutObject]?
     public var showTitleOnIcon: Bool?
+    public var additions: [String: String]?
     
     public init(
         type: ShortcutType,
         page: Int,
         index: Int? = nil,
+        offsetX: Int = 0,
+        offsetY: Int = 0,
         path: String? = nil,
         id: String,
         title: String,
@@ -45,11 +60,14 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         scriptCode: String? = nil,
         utilityType: UtilityObject.UtilityType? = nil,
         objects: [ShortcutObject]? = nil,
-        showTitleOnIcon: Bool = true
+        showTitleOnIcon: Bool = true,
+        additions: [String: String]?
     ) {
         self.page = page
         self.type = type
         self.index = index
+        self.offsetX = offsetX
+        self.offsetY = offsetY
         self.path = path
         self.id = id
         self.title = title
@@ -61,6 +79,13 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         self.browser = browser
         self.objects = objects
         self.showTitleOnIcon = showTitleOnIcon
+        self.additions = additions
+    }
+    
+    func containsWithOffset(_ otherIndex: Int?) -> Bool {
+        guard let index, let otherIndex else { return false }
+        print(index, offsetX, otherIndex)
+        return (otherIndex >= index) && otherIndex <= (index + offsetX)
     }
 }
 
@@ -95,6 +120,21 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchInstalledApps()
         registerListener()
         startMonitoring()
+        
+        let additions = ["down": """
+         set currentVolume to output volume of (get volume settings)
+         if currentVolume ≥ 10 then
+             set volume output volume (currentVolume - 10)
+         end if
+        """, "up": """
+            set currentVolume to output volume of (get volume settings)
+            if currentVolume ≤ 90 then
+                set volume output volume (currentVolume + 10)
+            end if
+            """]
+        
+        let test: ShortcutObject = .init(type: .controler, page: 1, offsetX: 2, id: "horizontal-scroll", title: "UI-controller", additions: additions)
+        saveUtility(with: test)
     }
     
     func registerListener() {
@@ -170,7 +210,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func addConfiguredShortcut(object: ShortcutObject) {
-        if let index = configuredShortcuts.firstIndex(where: { $0.index == object.index && $0.page == object.page }) {
+        if let index = configuredShortcuts.firstIndex(where: { $0.containsWithOffset(object.index) && $0.page == object.page }) {
             let oldObject = configuredShortcuts[index]
             configuredShortcuts[index] = object
             configuredShortcuts.enumerated().forEach { (index, shortcut) in
@@ -179,6 +219,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         type: oldObject.type,
                         page: configuredShortcuts[index].page,
                         index: configuredShortcuts[index].index,
+                        offsetX: configuredShortcuts[index].offsetX,
+                        offsetY: configuredShortcuts[index].offsetY,
                         path: oldObject.path,
                         id: oldObject.id,
                         title: oldObject.title,
@@ -189,7 +231,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         scriptCode: oldObject.scriptCode,
                         utilityType: oldObject.utilityType,
                         objects: oldObject.objects,
-                        showTitleOnIcon: oldObject.showTitleOnIcon ?? true
+                        showTitleOnIcon: oldObject.showTitleOnIcon ?? true,
+                        additions: oldObject.additions
                     )
                 }
             }
@@ -251,7 +294,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     browser: webpageItem.browser,
                     imageData: webpageItem.imageData,
                     objects: webpageItem.objects,
-                    showTitleOnIcon: webpageItem.showTitleOnIcon ?? true
+                    showTitleOnIcon: webpageItem.showTitleOnIcon ?? true,
+                    additions: webpageItem.additions
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
@@ -280,7 +324,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     scriptCode: utilityItem.scriptCode,
                     utilityType: utilityItem.utilityType,
                     objects: utilityItem.objects,
-                    showTitleOnIcon: utilityItem.showTitleOnIcon ?? true
+                    showTitleOnIcon: utilityItem.showTitleOnIcon ?? true,
+                    additions: utilityItem.additions
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
@@ -322,7 +367,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         ?? UUID().uuidString,
                         title: item,
                         color: testColor,
-                        imageData: NSImage(named: "shortcuts")?.tiffRepresentation
+                        imageData: NSImage(named: "shortcuts")?.tiffRepresentation,
+                        additions: [:]
                     )
                 } ?? []
             } else {
@@ -336,7 +382,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                             ?? UUID().uuidString,
                             title: item,
                             color: testColor,
-                            imageData: NSImage(named: "shortcuts")?.tiffRepresentation
+                            imageData: NSImage(named: "shortcuts")?.tiffRepresentation,
+                            additions: [:]
                         )
                     } ?? []
             }
@@ -396,7 +443,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             path: path,
             id: appsAddedByUser.first(where: { shortcut in path == shortcut.path })?.id ?? configuredShortcuts.first(where: { shortcut in path == shortcut.path })?.id ?? UUID().uuidString,
             title: title,
-            imageData: cachedIcons[path] ?? getIcon(fromAppPath: path)
+            imageData: cachedIcons[path] ?? getIcon(fromAppPath: path),
+            additions: [:]
         )
         appsAddedByUser.insert(app, at: 0)
         fetchInstalledApps()
@@ -417,7 +465,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         path: appURL.path,
                         id: installedApps.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
                         title: appName,
-                        imageData: cachedIcons[appURL.path] ?? getIcon(fromAppPath: appURL.path)
+                        imageData: cachedIcons[appURL.path] ?? getIcon(fromAppPath: appURL.path),
+                        additions: [:]
                     )
                 )
             }
@@ -748,7 +797,8 @@ extension ShortcutObject {
             scriptCode: script.script,
             utilityType: utilityType,
             objects: nil,
-            showTitleOnIcon: false
+            showTitleOnIcon: false,
+            additions: nil
         )
     }
 }

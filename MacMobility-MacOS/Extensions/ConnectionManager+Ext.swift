@@ -80,6 +80,15 @@ extension ConnectionManager {
             openShortcut(name: shortcutItem.title)
         case .webpage:
             openWebPage(for: shortcutItem)
+        case .controler:
+            if let additions = shortcutItem.additions {
+                print(additions)
+                if additions["value"] == "up", let scriptUp = additions["up"] {
+                    execute(scriptUp)
+                } else if additions["value"] == "down", let scriptDown = additions["down"] {
+                    execute(scriptDown)
+                }
+            }
         case .utility:
             switch shortcutItem.utilityType {
             case .commandline:
@@ -112,6 +121,10 @@ extension ConnectionManager {
                     openShortcut(name: tool.title)
                 case .webpage:
                     openWebPage(for: tool)
+                case .controler:
+                    if let script = tool.scriptCode {
+                        execute(script)
+                    }
                 case .utility:
                     switch tool.utilityType {
                     case .commandline:

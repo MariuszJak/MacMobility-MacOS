@@ -77,7 +77,8 @@ class NewMultiSelectionUtilityViewModel: ObservableObject {
                         browser: oldObject.browser,
                         imageData: oldObject.imageData,
                         scriptCode: oldObject.scriptCode,
-                        utilityType: oldObject.utilityType
+                        utilityType: oldObject.utilityType,
+                        additions: oldObject.additions
                     )
                 }
             }
@@ -101,7 +102,8 @@ class NewMultiSelectionUtilityViewModel: ObservableObject {
                     color: webpageItem.color,
                     faviconLink: webpageItem.faviconLink,
                     browser: webpageItem.browser,
-                    imageData: webpageItem.imageData
+                    imageData: webpageItem.imageData,
+                    additions: webpageItem.additions
                 )
             }
         } else {
@@ -125,7 +127,8 @@ class NewMultiSelectionUtilityViewModel: ObservableObject {
                     browser: utilityItem.browser,
                     imageData: utilityItem.imageData,
                     scriptCode: utilityItem.scriptCode,
-                    utilityType: utilityItem.utilityType
+                    utilityType: utilityItem.utilityType,
+                    additions: utilityItem.additions
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }

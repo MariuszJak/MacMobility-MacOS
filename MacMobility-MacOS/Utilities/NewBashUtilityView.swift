@@ -88,7 +88,8 @@ struct NewBashUtilityView: View {
                         imageData: viewModel.selectedIcon?.toData,
                         scriptCode: viewModel.scriptCode,
                         utilityType: .commandline,
-                        showTitleOnIcon: viewModel.showTitleOnIcon
+                        showTitleOnIcon: viewModel.showTitleOnIcon,
+                        additions: nil
                     )
                 )
                 viewModel.clear()
@@ -221,7 +222,8 @@ struct NewAutomationUtilityView: View {
                         imageData: viewModel.selectedIcon?.toData,
                         scriptCode: viewModel.automationCode,
                         utilityType: .automation,
-                        showTitleOnIcon: viewModel.showTitleOnIcon
+                        showTitleOnIcon: viewModel.showTitleOnIcon,
+                        additions: nil
                     )
                 )
                 viewModel.clear()

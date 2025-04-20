@@ -99,7 +99,8 @@ struct NewWebpageView: View {
                         faviconLink: viewModel.faviconLink,
                         browser: viewModel.browser,
                         imageData: viewModel.selectedIcon?.toData,
-                        showTitleOnIcon: viewModel.showTitleOnIcon
+                        showTitleOnIcon: viewModel.showTitleOnIcon,
+                        additions: nil
                     )
                 )
                 viewModel.clear()

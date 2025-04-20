@@ -62,13 +62,14 @@ struct ShortcutsView: View {
                                 }
                             }
                             .padding()
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 10) {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 70), alignment: .leading)], spacing: 10) {
                                 ForEach(0..<21) { index in
-                                    VStack {
+                                    VStack(alignment: .leading) {
                                         ZStack {
+                                            Spacer()
                                             itemViews(for: index, page: page)
-                                                .frame(width: 70, height: 70)
-                                                .clipped()
+                                                .frame(width: viewModel.objectAt(index: index, page: page)?.type.size.width ?? 70,
+                                                       height: viewModel.objectAt(index: index, page: page)?.type.size.height ?? 70)
                                             if let id = viewModel.objectAt(index: index, page: page)?.id {
                                                 VStack {
                                                     HStack {
@@ -80,14 +81,19 @@ struct ShortcutsView: View {
                                                     Spacer()
                                                 }
                                             }
-                                            
                                         }
                                     }
-                                    .frame(width: 70, height: 70)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: cornerRadius)
-                                            .fill(Color.black.opacity(0.4))
-                                    )
+                                    .frame(width: viewModel.objectAt(index: index, page: page)?.type.size.width ?? 70,
+                                           height: viewModel.objectAt(index: index, page: page)?.type.size.height ?? 70)
+                                    .if(
+                                        viewModel.objectAt(index: index - 1, page: page)?.type != .controler &&
+                                        viewModel.objectAt(index: index - 2, page: page)?.type != .controler
+                                    ) {
+                                        $0.background(
+                                                RoundedRectangle(cornerRadius: cornerRadius)
+                                                    .fill(Color.black.opacity(0.4))
+                                            )
+                                    }
                                     .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
                                         view.onDrag {
                                             NSItemProvider(object: id as NSString)
@@ -159,6 +165,8 @@ struct ShortcutsView: View {
                         type: object.type,
                         page: page,
                         index: index,
+                        offsetX: object.offsetX,
+                        offsetY: object.offsetY,
                         path: object.path,
                         id: object.id,
                         title: object.title,
@@ -169,7 +177,8 @@ struct ShortcutsView: View {
                         scriptCode: object.scriptCode,
                         utilityType: object.utilityType,
                         objects: object.objects,
-                        showTitleOnIcon: object.showTitleOnIcon ?? true
+                        showTitleOnIcon: object.showTitleOnIcon ?? true,
+                        additions: object.additions
                     )
             )
         }
@@ -266,6 +275,10 @@ struct ShortcutsView: View {
                                 openEditUtilityWindow(item: object)
                             }
                     }
+                }
+            } else if object.type == .controler {
+                if object.id == "horizontal-scroll" {
+                    BrightnessVolumeContainerView()
                 }
             }
         }

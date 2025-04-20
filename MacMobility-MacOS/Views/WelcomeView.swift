@@ -523,3 +523,61 @@ struct FinalScreenView: View {
         }
     }
 }
+
+struct BrightnessVolumeContainerView: View {
+    var body: some View {
+        ZStack {
+            // Background container
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.gray)
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                .shadow(color: .white.opacity(0.05), radius: 4, x: 0, y: -2)
+
+            // Content inside container
+            BrightnessVolumeBarView()
+                .padding()
+        }
+        .frame(width: 230, height: 70)
+        .padding()
+    }
+}
+
+struct BrightnessVolumeBarView: View {
+    @State private var progress: Double = 0.5 // Initial value
+
+    var body: some View {
+        ZStack(alignment: .trailing) {
+            // Background bar
+            RoundedRectangle(cornerRadius: 20)
+//                .fill(.ultraThinMaterial)
+                .frame(height: 30)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                )
+                .shadow(radius: 6)
+
+            // Progress bar
+            GeometryReader { geometry in
+                HStack(spacing: 0) {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color.white.opacity(0.8))
+                        .frame(width: geometry.size.width * progress)
+                    Spacer(minLength: 0)
+                }
+                .frame(height: 30)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .contentShape(Rectangle())
+//                .gesture(
+//                    DragGesture(minimumDistance: 0)
+//                        .onChanged { value in
+//                            let newProgress = min(max(0, value.location.x / geometry.size.width), 1)
+//                            progress = newProgress
+//                        }
+//                )
+            }
+            .frame(height: 30)
+        }
+        .frame(width: 200, height: 30)
+    }
+}
