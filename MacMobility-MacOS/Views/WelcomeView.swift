@@ -11,9 +11,11 @@ import QRCode
 class WelcomeViewModel: ObservableObject {
     @Published var currentPage = 0
     let pageLimit = 5
-    let closeAction: () -> Void
+    let closeAction: (SetupMode?, [AutomationOption]?) -> Void
+    private(set) var setupMode: SetupMode?
+    private(set) var automationOptions: [AutomationOption]?
     
-    init(closeAction: @escaping () -> Void) {
+    init(closeAction: @escaping (SetupMode?, [AutomationOption]?) -> Void) {
         self.closeAction = closeAction
     }
     
@@ -28,7 +30,15 @@ class WelcomeViewModel: ObservableObject {
     }
     
     func close() {
-        closeAction()
+        closeAction(setupMode, automationOptions)
+    }
+    
+    func updateSetupMode(_ setupMode: SetupMode) {
+        self.setupMode = setupMode
+    }
+    
+    func updateAutomationOptions(_ automationOptions: [AutomationOption]) {
+        self.automationOptions = automationOptions
     }
 }
 
@@ -52,9 +62,13 @@ struct WelcomeView: View {
                 case 2:
                     thirdPage
                 case 3:
-                    AppSetupChoiceView()
+                    AppSetupChoiceView(viewModel.setupMode) { setupMode in
+                        viewModel.updateSetupMode(setupMode)
+                    }
                 case 4:
-                    AutodetectAutomationInstallView()
+                    AutodetectAutomationInstallView(viewModel: .init(viewModel.automationOptions) { options in
+                        viewModel.updateAutomationOptions(options)
+                    })
                 case 5:
                     FinalScreenView {
                         viewModel.close()
@@ -197,25 +211,37 @@ struct PageIndicatorView: View {
     }
 }
 
-struct SetupMode: Identifiable {
+struct SetupMode: Identifiable, Equatable {
     let id: UUID = UUID()
     let title: String
     let description: String
     let imageName: String
+    
+    static func ==(lhs: SetupMode, rhs: SetupMode) -> Bool {
+        lhs.imageName == rhs.imageName && lhs.title == rhs.title && lhs.description == rhs.description
+    }
 }
 
 struct AppSetupChoiceView: View {
     @State private var selectedMode: String = "prepared"
+    private let action: (SetupMode) -> Void
     
     let options: [SetupMode] = [
-        SetupMode(title: "Start with Basic Actions",
-                  description: "Get started quickly with a few handy automations and shortcuts already set up for you.",
+        SetupMode(title: "Start with Advanced Actions",
+                  description: "Get started quickly with a few more adcanced automations, scripts and actions already set up for you.",
                   imageName: "sparkles"),
         
-        SetupMode(title: "Start Blank",
-                  description: "Build your workspace from scratch with no predefined actions or shortcuts.",
+        SetupMode(title: "Start Basic",
+                  description: "Start with some basic automations and scripts to get you up and running.",
                   imageName: "square.dashed")
     ]
+    
+    init(_ setupMode: SetupMode?, action: @escaping (SetupMode) -> Void) {
+        if let setupMode {
+            self.selectedMode = setupMode == options.first ? "prepared" : "blank"
+        }
+        self.action = action
+    }
     
     var body: some View {
         VStack(spacing: 32) {
@@ -263,6 +289,7 @@ struct AppSetupChoiceView: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         selectedMode = (index == 0) ? "prepared" : "blank"
+                        action(options[index])
                     }
                 }
             }
@@ -276,30 +303,77 @@ struct AutomationOption: Identifiable {
     let id = UUID()
     let title: String
     let description: String
-    let imageName: String
+    let imageName: String?
+    let imageData: Data?
     var isSelected: Bool = true
+    var isOptional: Bool = true
+}
+
+class AutodetectAutomationInstallViewModel: ObservableObject, JSONLoadable {
+    @Published var options: [AutomationOption] = [
+        .init(title: "macOS System",
+              description: "Essential system-level automations to help you work faster on your Mac.",
+              imageName: "gearshape",
+              imageData: nil,
+              isOptional: false)
+    ]
+    
+    var updateAction: ([AutomationOption]) -> Void
+    
+    init(_ options: [AutomationOption]?, updateAction: @escaping ([AutomationOption]) -> Void) {
+        self.updateAction = updateAction
+        if let options {
+            self.options = options
+        } else {
+            fetchInstalledApps()
+        }
+    }
+    
+    func fetchInstalledApps() {
+        let appDirectories = [
+            "/Applications",
+            "/System/Applications/Utilities"
+        ]
+
+        var apps: [String] = []
+
+        for directory in appDirectories {
+            apps.append(contentsOf: findApps(in: directory))
+        }
+        
+        let automations: AutomationsList = loadJSON("automations")
+        automations.automations.forEach { automation in
+            if apps.contains(where: { $0 == automation.title }) {
+                options.append(.init(title: automation.title, description: automation.description, imageName: nil, imageData: automation.imageData))
+            }
+        }
+    }
+    
+    func findApps(in directory: String) -> [String] {
+        var apps: [String] = []
+
+        if let appURLs = try? FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: directory), includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
+            for appURL in appURLs where appURL.pathExtension == "app" {
+                let appName = appURL.deletingPathExtension().lastPathComponent
+                apps.append(appName)
+            }
+        }
+
+        return apps
+    }
+    
+    func updateMainModel() {
+        self.updateAction(self.options)
+    }
 }
 
 struct AutodetectAutomationInstallView: View {
-    @State private var options: [AutomationOption] = [
-        AutomationOption(title: "macOS System",
-                         description: "Essential system-level automations to help you work faster on your Mac.",
-                         imageName: "gearshape"),
-        
-        AutomationOption(title: "Xcode",
-                         description: "Useful automations for running builds, cleaning, and opening projects quickly.",
-                         imageName: "hammer"),
-        
-        AutomationOption(title: "Safari",
-                         description: "Quick actions for opening bookmarks, private windows, and clearing tabs.",
-                         imageName: "safari"),
-        
-        AutomationOption(title: "Safari",
-                         description: "Quick actions for opening bookmarks, private windows, and clearing tabs.",
-                         imageName: "safari")
-    ]
-    
+    @ObservedObject private var viewModel: AutodetectAutomationInstallViewModel
     @State private var allSelected: Bool = true
+    
+    init(viewModel: AutodetectAutomationInstallViewModel) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         VStack(spacing: 24) {
@@ -321,23 +395,30 @@ struct AutodetectAutomationInstallView: View {
                     Text(allSelected ? "Deselect All" : "Select All")
                     Toggle("", isOn: $allSelected)
                         .onChange(of: allSelected) { _, newValue in
-                            for index in options.indices {
-                                options[index].isSelected = newValue
+                            for index in viewModel.options.indices {
+                                viewModel.options[index].isSelected = newValue
                             }
                         }
                         .toggleStyle(.switch)
                         .labelsHidden()
-                        .help(allSelected ? "Turn off all automations" : "Turn on all automations")
                 }
                 .padding(.trailing, 16.0)
                 ScrollView {
-                    ForEach($options) { $option in
+                    ForEach($viewModel.options) { $option in
                         HStack(spacing: 16) {
-                            Image(systemName: option.imageName)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 40, height: 40)
-                                .foregroundColor(.blue)
+                            if let imageName = option.imageName {
+                                Image(systemName: imageName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 40, height: 40)
+                                    .foregroundColor(.blue)
+                            } else if let data = option.imageData, let image = NSImage(data: data) {
+                                Image(nsImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .cornerRadius(10.0)
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(option.title)
@@ -350,9 +431,18 @@ struct AutodetectAutomationInstallView: View {
                             
                             Spacer()
                             
-                            Toggle("", isOn: $option.isSelected)
-                                .toggleStyle(.switch)
-                                .labelsHidden()
+                            if option.isOptional {
+                                Toggle("", isOn: $option.isSelected)
+                                    .toggleStyle(.switch)
+                                    .labelsHidden()
+                                    .onChange(of: option.isSelected) { _, _ in
+                                        viewModel.updateMainModel()
+                                    }
+                            } else {
+                                Text("Required")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(Color.gray)
+                            }
                         }
                         .padding()
                         .background(
@@ -370,13 +460,10 @@ struct AutodetectAutomationInstallView: View {
             }
         }
         .padding()
-        .onAppear {
-            allSelected = options.allSatisfy { $0.isSelected }
-        }
     }
     
     private func updateMasterToggleState() {
-        allSelected = options.allSatisfy { $0.isSelected }
+        allSelected = viewModel.options.allSatisfy { $0.isSelected }
     }
 }
 

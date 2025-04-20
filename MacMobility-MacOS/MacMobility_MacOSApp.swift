@@ -68,7 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             welcomeWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: {
+            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions in
                 self.welcomeWindow?.close()
             })))
             welcomeWindow?.contentView?.addSubview(hv.view)
