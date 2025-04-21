@@ -12,4 +12,11 @@ public extension String {
     static let POST = "POST"
     static let PUT = "PUT"
     static let DELETE = "DELETE"
+    
+    func applyHTTPS() -> String {
+        if self.hasPrefix("https://") {
+            return self
+        }
+        return "https://\(self)"
+    }
 }

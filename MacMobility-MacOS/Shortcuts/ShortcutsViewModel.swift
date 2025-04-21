@@ -438,10 +438,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             return nil
         }
         
-        // Get icon name (may not include extension)
         guard let iconFile = bundle.infoDictionary?["CFBundleIconFile"] as? String else {
             let icon = NSWorkspace.shared.icon(forFile: appPath)
-            let resizedIcon = resizedImage(image: icon, newSize: .init(width: 128.0, height: 128.0))
+            let resizedIcon = icon.resizedImage(newSize: .init(width: 128.0, height: 128.0))
             let fallbackIcon = try? resizedIcon.imageData(for: .png(scale: 0.2, excludeGPSData: false))
             return fallbackIcon
         }
@@ -453,10 +452,13 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             return nil
         }
         let pngProps: [NSBitmapImageRep.PropertyKey: Any] = [
-            .compressionFactor: 0.0 // Range: 0.0 (max compression) to 1.0 (min compression)
+            .compressionFactor: 0.0
         ]
-        let icon = resizedImage(image: NSImage(contentsOfFile: iconPath)!, newSize: .init(width: 96.0, height: 96.0))
-        guard let tiffData = icon.tiffRepresentation,
+        guard let icon = NSImage(contentsOfFile: iconPath) else {
+            return nil
+        }
+        let resized = icon.resizedImage(newSize: .init(width: 96.0, height: 96.0))
+        guard let tiffData = resized.tiffRepresentation,
            let bitmap = NSBitmapImageRep(data: tiffData),
            let pngData = bitmap.representation(using: .png, properties: pngProps) else {
             return nil
@@ -468,15 +470,6 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
 //        print(String(format: "%.8f MB", countMB))
         
         return pngData
-    }
-    
-    func resizedImage(image: NSImage, newSize: NSSize) -> NSImage {
-        let newImage = NSImage(size: newSize)
-        newImage.lockFocus()
-        NSGraphicsContext.current?.imageInterpolation = .high
-        image.draw(in: NSRect(origin: .zero, size: newSize), from: .zero, operation: .copy, fraction: 1.0)
-        newImage.unlockFocus()
-        return newImage
     }
 }
 

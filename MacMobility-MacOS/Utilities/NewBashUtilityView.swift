@@ -75,7 +75,7 @@ struct NewBashUtilityView: View {
                 .padding(.bottom, 12)
             IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                 viewModel.selectedIcon = image
-            }, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
+            }, userSelectedIcon: $viewModel.selectedIcon, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
             Divider()
                 .padding(.top, 8)
             Button {
@@ -208,7 +208,7 @@ struct NewAutomationUtilityView: View {
                 .padding(.bottom, 12)
             IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                 viewModel.selectedIcon = image
-            }, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
+            }, userSelectedIcon: $viewModel.selectedIcon, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
             Divider()
                 .padding(.top, 8)
             Button {
