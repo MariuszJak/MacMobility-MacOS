@@ -46,13 +46,14 @@ class ShortcutInstallViewModel: ObservableObject {
         startMonitoring()
     }
     
-    func installShortcut(named shortcutFileName: String) {
+    func installShortcut(named shortcutFileName: String, completion: @escaping () -> Void) {
         guard let shortcutURL = Bundle.main.url(forResource: shortcutFileName, withExtension: "shortcut") else {
             print("Shortcut file not found")
             return
         }
         
         NSWorkspace.shared.open(shortcutURL)
+        completion()
     }
     
     func getShortcutsList() -> [String] {
@@ -97,6 +98,7 @@ class ShortcutInstallViewModel: ObservableObject {
 
 struct ShortcutInstallView: View {
     @ObservedObject private var viewModel = ShortcutInstallViewModel()
+    var completion: (() -> Void)?
     
     var body: some View {
         VStack {
@@ -107,7 +109,9 @@ struct ShortcutInstallView: View {
             ScrollView {
                 ForEach(viewModel.shortcuts) { shortcut in
                     InstallShortcutView(shortcut: shortcut) {
-                        viewModel.installShortcut(named: shortcut.name)
+                        viewModel.installShortcut(named: shortcut.name) {
+                            completion?()
+                        }
                     }
                 }
             }

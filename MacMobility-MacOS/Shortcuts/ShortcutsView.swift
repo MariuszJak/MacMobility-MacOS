@@ -9,37 +9,111 @@ import SwiftUI
 
 struct ShortcutsView: View {
     @State private var newWindow: NSWindow?
+    @State private var newUtilityWindow: NSWindow?
     @State private var shortcutsToInstallWindow: NSWindow?
     @State private var automationsToInstallWindow: NSWindow?
     @State private var automationItemWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
     @ObservedObject private var viewModel: ShortcutsViewModel
     @State private var selectedTab = 0
+    @State private var tab: Tab = .apps
+    @Namespace private var animation
     let cornerRadius = 17.0
     
     init(viewModel: ShortcutsViewModel) {
         self.viewModel = viewModel
     }
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("Editor")
-                    .font(.system(size: 17.0, weight: .bold))
-                    .foregroundStyle(Color.white)
-                    
-                Button("Add Page") {
+                BlueButton(
+                    title: "Explore Automations",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: "sparkle",
+                    backgroundColor: .accentColor
+                ) {
+                    openInstallAutomationsWindow()
+                }
+                .padding(.all, 3.0)
+                
+                Divider()
+                    .frame(height: 14.0)
+                
+                BlueButton(
+                    title: "New Page",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: "square.dashed",
+                    backgroundColor: .gray
+                ) {
                     viewModel.addPage()
                 }
                 .padding(.all, 3.0)
                 
-                Button("Explore Automations") {
-                    openInstallAutomationsWindow()
+                Divider()
+                    .frame(height: 14.0)
+                
+                BlueButton(
+                    title: "Add App",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: "plus.app",
+                    backgroundColor: .gray
+                ) {
+                    tab = .apps
+                    if let path = selectApp() {
+                        
+                        viewModel.addInstalledApp(for: path)
+                    }
                 }
                 .padding(.all, 3.0)
+                
+                BlueButton(
+                    title: "Install Shortcuts",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: Tab.shortcuts.icon,
+                    backgroundColor: .gray
+                ) {
+                    openInstallShortcutsWindow()
+                }
+                .padding(.all, 3.0)
+                
+                BlueButton(
+                    title: "Add Link",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: Tab.webpages.icon,
+                    backgroundColor: .gray
+                ) {
+                    openCreateNewWebpageWindow()
+                }
+                .padding(.all, 3.0)
+                
+                BlueButton(
+                    title: "Add Utility",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: Tab.utilities.icon,
+                    backgroundColor: .gray
+                ) {
+                    openCreateNewUtilityWindow()
+                }
+                .padding(.all, 3.0)
+                
+                Spacer()
+                AnimatedSearchBar(searchText: $viewModel.searchText)
+                    .padding(.trailing, 48.0)
             }
             .padding([.horizontal, .top], 16)
-            .padding(.leading, 21.0)
             Divider()
         }
         .padding(.top, 21.0)
@@ -85,8 +159,7 @@ struct ShortcutsView: View {
                                     }
                                     .frame(width: 70, height: 70)
                                     .background(
-                                        RoundedRectangle(cornerRadius: cornerRadius)
-                                            .fill(Color.black.opacity(0.4))
+                                        PlusButtonView()
                                     )
                                     .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
                                         view.onDrag {
@@ -109,9 +182,9 @@ struct ShortcutsView: View {
                         Spacer()
                             .frame(height: 80)
                     }
-                    .frame(minWidth: 600)
+                    .frame(minWidth: 600.0, maxWidth: 600.0)
                     .scrollIndicators(.hidden)
-                    .padding(.horizontal, 100)
+                    .padding(.horizontal, 28.0)
                     .onChange(of: viewModel.scrollToPage) { _, page in
                         withAnimation {
                             proxy.scrollTo(page, anchor: .top)
@@ -120,28 +193,26 @@ struct ShortcutsView: View {
                 }
             }
             VStack {
-                TextField("Search...", text: $viewModel.searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding([.horizontal, .bottom], 16.0)
-                TabView(selection: $selectedTab) {
-                    installedAppsView
-                        .tabItem( { Text("Applications") })
-                        .tag(0)
-                    shortcutsView
-                        .tabItem( { Text("Shortcuts") })
-                        .tag(1)
-                    websitesView
-                        .tabItem( { Text("Websites") })
-                        .tag(2)
-                    utilitiesView
-                        .tabItem( { Text("Utilities") })
-                        .tag(3)
-                }
-                .tabViewStyle(.automatic)
-                .padding([.horizontal, .bottom])
-                .onChange(of: selectedTab) { _, _ in
+                CustomTabBar(selectedTab: $tab, animation: animation) {
                     viewModel.searchText = ""
                 }
+                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 2)
+                .padding(.bottom, 16.0)
+                .frame(minWidth: 500.0)
+                
+                Group {
+                    switch tab {
+                    case .apps:
+                        installedAppsView
+                    case .shortcuts:
+                        shortcutsView
+                    case .webpages:
+                        websitesView
+                    case .utilities:
+                        utilitiesView
+                    }
+                }
+                .frame(maxWidth: 500.0, maxHeight: .infinity)
             }
         }
         .onAppear {
@@ -298,6 +369,8 @@ struct ShortcutsView: View {
                 .padding(.bottom, 8.0)
             } else {
                 ScrollView {
+                    Spacer()
+                        .frame(height: 16.0)
                     ForEach(viewModel.shortcuts) { shortcut in
                         HStack {
                             if let data = shortcut.imageData, let image = NSImage(data: data) {
@@ -314,22 +387,23 @@ struct ShortcutsView: View {
                         .onDrag {
                             NSItemProvider(object: shortcut.id as NSString)
                         }
+                        .padding(.horizontal, 16.0)
+                        .padding(.vertical, 6.0)
                         Divider()
                     }
                 }
                 .padding(.bottom, 8.0)
             }
-            Divider()
-            Text("Explore our curated selection of premade shortcuts and boost your productivity effortlessly.")
-                .font(.system(size: 14.0))
-                .foregroundStyle(Color.gray)
-                .padding(.bottom, 6.0)
-            Button("Open Shortcuts") {
-                openInstallShortcutsWindow()
-            }
-            .padding(.bottom, 8.0)
         }
-        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(NSColor.windowBackgroundColor))
+                )
+        )
+        .padding(.bottom, 16.0)
     }
     
     @State private var appNameToFlash: String = ""
@@ -338,12 +412,14 @@ struct ShortcutsView: View {
         VStack(alignment: .leading) {
             ScrollViewReader { proxy in
                 ScrollView {
+                    Spacer()
+                        .frame(height: 16.0)
                     ForEach(viewModel.installedApps) { app in
                         HStack {
                             HStack {
                                 Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
                                     .resizable()
-                                    .frame(width: 38, height: 38)
+                                    .frame(width: 46, height: 46)
                                     .cornerRadius(cornerRadius)
                                     .padding(.trailing, 8)
                                 Text(app.title)
@@ -358,6 +434,8 @@ struct ShortcutsView: View {
                         .background(app.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
                         .animation(.easeOut, value: appNameToFlash)
                         .cornerRadius(10)
+                        .padding(.horizontal, 16.0)
+                        .padding(.vertical, 6.0)
                         Divider()
                     }
                 }
@@ -375,19 +453,16 @@ struct ShortcutsView: View {
                     }
                 }
             }
-            Divider()
-            Text("Can't find app in the list above? Add it from Finder by clicking the button below.")
-                .font(.system(size: 14.0))
-                .foregroundStyle(Color.gray)
-                .padding(.bottom, 6.0)
-            Button("Click to add an app") {
-                if let path = selectApp() {
-                    viewModel.addInstalledApp(for: path)
-                }
-            }
-            .padding(.bottom, 8.0)
         }
-        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(NSColor.windowBackgroundColor))
+                )
+        )
+        .padding(.bottom, 16.0)
     }
     
     func selectApp() -> String? {
@@ -433,6 +508,7 @@ struct ShortcutsView: View {
             newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
             viewModel.close = {
+                tab = .webpages
                 newWindow?.close()
             }
             newWindow?.contentView?.addSubview(hv.view)
@@ -470,7 +546,10 @@ struct ShortcutsView: View {
                 return
             }
             shortcutsToInstallWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: ShortcutInstallView())
+            let hv = NSHostingController(rootView: ShortcutInstallView() {
+                shortcutsToInstallWindow?.close()
+                tab = .shortcuts
+            })
             shortcutsToInstallWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = shortcutsToInstallWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
@@ -508,6 +587,35 @@ struct ShortcutsView: View {
             return
         }
         automationsToInstallWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openCreateNewUtilityWindow() {
+        if nil == newUtilityWindow {
+            newUtilityWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 800, height: 400),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            newUtilityWindow?.center()
+            newUtilityWindow?.setFrameAutosaveName("NewUtility")
+            newUtilityWindow?.isReleasedWhenClosed = false
+            newUtilityWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
+                connectionManager: viewModel.connectionManager,
+                delegate: viewModel,
+                closeAction: {
+                    tab = .utilities
+                    newUtilityWindow?.close()
+                }))
+        }
+        newUtilityWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
+            connectionManager: viewModel.connectionManager,
+            delegate: viewModel,
+            closeAction: {
+                tab = .utilities
+                newUtilityWindow?.close()
+            }))
+        newUtilityWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openAutomationItemWindow(_ item: AutomationItem) {

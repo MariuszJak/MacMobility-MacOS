@@ -7,6 +7,7 @@
 
 import SwiftUI
 import QRCode
+import AppKit
 
 class WelcomeViewModel: ObservableObject {
     @Published var currentPage = 0
@@ -496,21 +497,9 @@ struct FinalScreenView: View {
                 .padding(.horizontal)
                         
             if showButton {
-                Button(action: {
+                BlueButton(title: "Let's Start", font: .title2) {
                     closeAction()
-                }) {
-                    Text("Let's Start")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 5)
                 }
-                .buttonStyle(PlainButtonStyle())
-                .transition(.opacity)
                 .padding(.top, 24.0)
                 .frame(width: 200.0)
             }
@@ -521,5 +510,218 @@ struct FinalScreenView: View {
                 showButton = true
             }
         }
+    }
+}
+
+struct BlueButton: View {
+    let title: String
+    let font: Font
+    let padding: CGFloat
+    let cornerRadius: CGFloat
+    let leadingImage: String?
+    let backgroundColor: Color
+    let closeAction: () -> Void
+    
+    init(
+        title: String,
+        font: Font,
+        padding: CGFloat = 16.0,
+        cornerRadius: CGFloat = 10.0,
+        leadingImage: String? = nil,
+        backgroundColor: Color = .accentColor,
+        closeAction: @escaping () -> Void
+    ) {
+        self.title = title
+        self.font = font
+        self.padding = padding
+        self.cornerRadius = cornerRadius
+        self.leadingImage = leadingImage
+        self.backgroundColor = backgroundColor
+        self.closeAction = closeAction
+    }
+    
+    var body: some View {
+        Button(action: {
+            closeAction()
+        }) {
+            HStack {
+                if let leadingImage {
+                    Image(systemName: leadingImage)
+                        .resizable()
+                        .frame(width: 18, height: 18)
+                        .padding(.trailing, 6.0)
+                }
+                Text(title)
+                    .font(font)
+                    .fontWeight(.semibold)
+                    .if(leadingImage != nil) {
+                        $0.padding(.trailing, 6.0)
+                    }
+            }
+            .padding(.all, padding)
+            .background(backgroundColor)
+            .foregroundColor(.white)
+            .cornerRadius(cornerRadius)
+            .shadow(radius: 5)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .transition(.opacity)
+    }
+}
+
+enum Tab: Int, CaseIterable {
+    case apps, shortcuts, webpages, utilities
+
+    var title: String {
+        switch self {
+        case .apps: return "Apps"
+        case .shortcuts: return "Shortcuts"
+        case .webpages: return "Webpages"
+        case .utilities: return "Utilities"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .apps: return "app"
+        case .shortcuts: return "square.and.arrow.down.on.square.fill"
+        case .webpages: return "link"
+        case .utilities: return "text.and.command.macwindow"
+        }
+    }
+}
+
+struct CustomTabBar: View {
+    @Binding var selectedTab: Tab
+    var animation: Namespace.ID
+    var didSwitch: () -> Void
+    
+    init(selectedTab: Binding<Tab>, animation: Namespace.ID, didSwitch: @escaping () -> Void) {
+        self._selectedTab = selectedTab
+        self.animation = animation
+        self.didSwitch = didSwitch
+    }
+
+    var body: some View {
+        HStack(spacing: 16) {
+            ForEach(Tab.allCases, id: \.self) { tab in
+                Button(action: {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                        selectedTab = tab
+                        didSwitch()
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: tab.icon)
+                            .imageScale(.medium)
+                        Text(tab.title)
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .foregroundStyle(selectedTab == tab ? .white : .primary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
+                    .background(
+                        ZStack {
+                            if selectedTab == tab {
+                                Capsule()
+                                    .fill(Color.accentColor)
+                                    .matchedGeometryEffect(id: "tabBackground", in: animation)
+                            }
+                        }
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(NSColor.windowBackgroundColor))
+                .shadow(color: .black.opacity(0.1), radius: 10, y: 4)
+        )
+        .padding(.horizontal)
+    }
+}
+
+import SwiftUI
+
+struct AnimatedSearchBar: View {
+    @State private var isExpanded = false
+    @Binding private var searchText: String
+    @FocusState private var isFocused: Bool
+    
+    init(searchText: Binding<String>) {
+        self._searchText = searchText
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if isExpanded {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.secondary)
+
+                    TextField("Search...", text: $searchText)
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .focused($isFocused)
+                        .frame(minWidth: 100, maxWidth: 400.0)
+
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            searchText = ""
+                            isExpanded = false
+                        }
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .transition(.scale)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(RoundedRectangle(cornerRadius: 10).fill(Color(nsColor: .quaternaryLabelColor)))
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+                .onAppear {
+                    isFocused = true
+                }
+            } else {
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        isExpanded = true
+                    }
+                }) {
+                    Image(systemName: "magnifyingglass")
+                        .padding(8)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(nsColor: .quaternaryLabelColor)))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: isExpanded)
+    }
+}
+
+struct PlusButtonView: View {
+    var body: some View {
+        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1) // very dark
+        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1) // dark gray
+
+        return ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(backgroundColor)
+
+            Image(systemName: "plus")
+                .foregroundColor(accentColor)
+                .font(.system(size: 20, weight: .bold))
+        }
+        .frame(width: 70, height: 70)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(accentColor, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
     }
 }

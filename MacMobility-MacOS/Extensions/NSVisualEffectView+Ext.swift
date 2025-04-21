@@ -15,7 +15,7 @@ extension NSVisualEffectView {
         visualEffectView.autoresizingMask = [.width, .height]
         visualEffectView.blendingMode = .behindWindow
         visualEffectView.state = .active
-        visualEffectView.appearance = NSAppearance(named: .vibrantDark)
+        visualEffectView.appearance = NSAppearance(named: .darkAqua)
         
         return visualEffectView
     }

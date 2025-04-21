@@ -144,8 +144,8 @@ struct MacOSMainPopoverView: View {
     private func openShortcutsWindow() {
         if nil == shortcutsWindow {
             shortcutsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 1300, height: 850),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 1300, height: 700),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
@@ -154,12 +154,13 @@ struct MacOSMainPopoverView: View {
             shortcutsWindow?.isReleasedWhenClosed = false
             shortcutsWindow?.titlebarAppearsTransparent = true
             shortcutsWindow?.styleMask.insert(.fullSizeContentView)
+            shortcutsWindow?.title = "Editor"
             
-            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: shortcutsWindow) else {
-                return
-            }
-            
-            shortcutsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+//            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: shortcutsWindow) else {
+//                return
+//            }
+//            
+//            shortcutsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: ShortcutsView(viewModel: .init(connectionManager: connectionManager)))
             shortcutsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = shortcutsWindow?.contentView?.bounds ?? .zero
