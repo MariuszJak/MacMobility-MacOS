@@ -17,6 +17,7 @@ class IconPickerViewModel: ObservableObject {
     var userSelectedIconAction: (() -> Void)?
     var completion: (NSImage) -> Void
     private var cancellables = Set<AnyCancellable>()
+    let resizeSize: CGSize = .init(width: 150, height: 150)
     
     init(selectedImage: NSImage?,
          shouldAutofetchImage: Bool = true,
@@ -73,14 +74,15 @@ class IconPickerViewModel: ObservableObject {
         
         if panel.runModal() == .OK, let url = panel.url {
             if let image = NSImage(contentsOf: url) {
-                completion(image)
+                let resized = image.resizedImage(newSize: resizeSize)
+                completion(resized)
             }
         }
     }
     
     func assignImage(_ image: NSImage, userSelected: Bool = false) {
         DispatchQueue.main.async {
-            let resized = image.resizedImage(newSize: .init(width: 300, height: 300))
+            let resized = image.resizedImage(newSize: self.resizeSize)
             self.selectedImage = resized
             self.completion(resized)
             if userSelected {
