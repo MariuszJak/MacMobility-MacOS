@@ -153,6 +153,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         configuredShortcuts.removeAll { $0.id == id }
         UserDefaults.standard.store(webpages, for: .webItems)
         connectionManager.shortcuts = configuredShortcuts
+        UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
     }
     
     func removeUtilityItem(id: String) {
@@ -160,6 +161,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         configuredShortcuts.removeAll { $0.id == id }
         UserDefaults.standard.store(utilities, for: .utilities)
         connectionManager.shortcuts = configuredShortcuts
+        UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
     }
     
     func addAutomations(from scripts: [AutomationScript]) {
