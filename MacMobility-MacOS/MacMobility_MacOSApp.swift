@@ -35,7 +35,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popOver.contentViewController?.view = NSHostingView(rootView: menuView)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
-        openWelcomeWindow()
+//        openWelcomeWindow()
         if lifecycle.openCount < 2 {
             openPermissionsWindow()
             let openCount = lifecycle.openCount + 1
