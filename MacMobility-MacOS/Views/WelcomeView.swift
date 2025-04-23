@@ -705,9 +705,15 @@ struct AnimatedSearchBar: View {
 }
 
 struct PlusButtonView: View {
+    var size: CGSize
+    
+    init(size: CGSize = .init(width: 70, height: 70)) {
+        self.size = size
+    }
+    
     var body: some View {
-        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1) // very dark
-        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1) // dark gray
+        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
 
         return ZStack {
             RoundedRectangle(cornerRadius: 20)
@@ -717,7 +723,7 @@ struct PlusButtonView: View {
                 .foregroundColor(accentColor)
                 .font(.system(size: 20, weight: .bold))
         }
-        .frame(width: 70, height: 70)
+        .frame(width: size.width, height: size.height)
         .overlay(
             RoundedRectangle(cornerRadius: 20)
                 .stroke(accentColor, lineWidth: 1)

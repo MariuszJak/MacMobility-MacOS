@@ -60,39 +60,44 @@ struct NewWebpageView: View {
     }
     
     var body: some View {
+        VStack(alignment: .center) {
+            Text("Add Link")
+                .font(.system(size: 18.0, weight: .bold))
+        }
         VStack(alignment: .leading) {
-            VStack(alignment: .leading) {
-                Text("Websites Link")
-                    .font(.system(size: 21, weight: .bold))
-                    .padding(.bottom, 4)
-                Text("Create a shortcut for a website link. Add url, title, icon or favicon to customise your shortcut.")
-                    .foregroundStyle(Color.gray)
-                    .lineLimit(2)
-                    .font(.system(size: 12))
-                    .padding(.bottom, 12)
+            HStack {
+                Text("Title")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 20.0)
+                RoundedTextField(placeholder: "", text: $viewModel.title)
             }
-            Text("Webpage link title")
-                .font(.system(size: 14, weight: .bold))
-                .padding(.bottom, 4)
-            TextField("", text: $viewModel.title)
-                .padding(.bottom, 4)
-            Toggle("Show title on icon", isOn: $viewModel.showTitleOnIcon)
-                .padding(.bottom, 12)
-            Text("Link")
-                .font(.system(size: 14, weight: .bold))
-                .padding(.bottom, 4)
-            TextField("", text: $viewModel.link)
-                .padding(.bottom, 8)
-            Text("Favicon")
-                .font(.system(size: 14, weight: .bold))
-                .padding(.bottom, 4)
-            TextField("", text: $viewModel.faviconLink)
-                .padding(.bottom, 8)
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
+            HStack {
+                Text("Link")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 20.0)
+                RoundedTextField(placeholder: "", text: $viewModel.link)
+            }
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
+            HStack {
+                Text("Image")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 8.0)
+                RoundedTextField(placeholder: "https://example.com/icon.png", text: $viewModel.faviconLink)
+            }
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
             Picker("Browser", selection: $viewModel.browser) {
                 Text("Chrome").tag(Browsers.chrome)
                 Text("Safari").tag(Browsers.safari)
             }
             .pickerStyle(.menu)
+            .frame(width: 200.0)
+            .padding(.bottom, 12.0)
+            .padding(.leading, 70.0)
+            
             IconPickerView(viewModel: .init(
                 selectedImage: viewModel.selectedIcon ?? viewModel.savedIcon,
                 shouldAutofetchImage: viewModel.userSelectedIcon == nil,
@@ -101,29 +106,43 @@ struct NewWebpageView: View {
                     viewModel.savedIcon = image
                 }), userSelectedIcon: $viewModel.userSelectedIcon
             )
-            Divider()
-                .padding(.top, 8)
-            Button {
-                delegate?.saveWebpage(with:
-                    .init(
-                        type: .webpage,
-                        page: currentPage ?? 1,
-                        path: viewModel.fullLink(),
-                        id: viewModel.id ?? UUID().uuidString,
-                        title: viewModel.title,
-                        faviconLink: viewModel.faviconLink,
-                        browser: viewModel.browser,
-                        imageData: viewModel.userSelectedIcon?.toData ?? viewModel.savedIcon?.toData,
-                        showTitleOnIcon: viewModel.showTitleOnIcon
-                    )
-                )
-                viewModel.clear()
-                delegate?.close()
-            } label: {
-                Text("Save")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.green)
+            .padding(.bottom, 12.0)
+            .padding(.leading, 70.0)
+            HStack(alignment: .center) {
+                Toggle("", isOn: $viewModel.showTitleOnIcon)
+                    .padding(.trailing, 6.0)
+                    .toggleStyle(.switch)
+                Text("Show title on icon")
+                    .font(.system(size: 14.0))
             }
+            .padding(.leading, 65.0)
+            
+            HStack {
+                Spacer()
+                BlueButton(title: "Cancel", font: .callout, padding: 12.0, backgroundColor: .gray) {
+                    viewModel.clear()
+                    delegate?.close()
+                }
+                .padding(.trailing, 6.0)
+                BlueButton(title: "Save", font: .callout, padding: 12.0) {
+                    delegate?.saveWebpage(with:
+                        .init(
+                            type: .webpage,
+                            page: currentPage ?? 1,
+                            path: viewModel.fullLink(),
+                            id: viewModel.id ?? UUID().uuidString,
+                            title: viewModel.title,
+                            faviconLink: viewModel.faviconLink,
+                            browser: viewModel.browser,
+                            imageData: viewModel.userSelectedIcon?.toData ?? viewModel.savedIcon?.toData,
+                            showTitleOnIcon: viewModel.showTitleOnIcon
+                        )
+                    )
+                    viewModel.clear()
+                    delegate?.close()
+                }
+            }
+            .padding(.trailing, 28.0)
         }
         .onAppear {
             for window in NSApplication.shared.windows {
@@ -131,5 +150,28 @@ struct NewWebpageView: View {
             }
         }
         .padding()
+    }
+}
+
+struct RoundedTextField: View {
+    let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 0.7)
+    @Binding private var text: String
+    private let placeholder: String
+    
+    init(placeholder: String, text: Binding<String>) {
+        self.placeholder = placeholder
+        self._text = text
+    }
+
+    var body: some View {
+        TextField(placeholder, text: $text)
+            .textFieldStyle(PlainTextFieldStyle())
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(backgroundColor)
+                    .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+            )
+            .padding(.horizontal)
     }
 }

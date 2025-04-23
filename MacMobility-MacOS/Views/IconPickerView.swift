@@ -33,11 +33,9 @@ struct IconPickerView: View {
                         .scaledToFill()
                         .frame(width: 100, height: 100)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
-                } else {
-                    Text(viewModel.isFetchingIcon ? "" : "No Icon Selected")
-                        .frame(width: 100, height: 100)
-                        .background(Color.gray.opacity(0.2))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                } else {                    
+                    PlusButtonView(size: .init(width: 100, height: 100))
+                        .opacity(0.7)
                 }
                 if !viewModel.isFetchingIcon && !title.isEmpty {
                     Text(title)

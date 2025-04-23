@@ -77,6 +77,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var pages = 1
     @Published var scrollToApp: String = ""
     @Published var scrollToPage: Int = 0
+    @Published var availablePeerName: String = ""
     var close: () -> Void = {}
     private var timer: Timer?
     public var testColor = "#6DDADE"

@@ -140,7 +140,7 @@ struct SelectUtilityTypeWindowView: View {
     private func openCreateNewUtilityWindow(type: UtilityObject.UtilityType, item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 320, height: type == .commandline ? 800 : 570),
+                contentRect: NSRect(x: 0, y: 0, width: 520, height: type == .commandline ? 800 : 470),
                 styleMask: type == .commandline || type == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

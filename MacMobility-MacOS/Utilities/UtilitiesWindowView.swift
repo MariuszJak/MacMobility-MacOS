@@ -177,7 +177,7 @@ struct UtilitiesWindowView: View {
     private func openEditUtilityWindow(item: ShortcutObject) {
         if nil == editUtilitiesWindow {
             editUtilitiesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 320, height: 570),
+                contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
                 styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

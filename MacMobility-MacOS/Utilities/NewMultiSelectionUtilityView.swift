@@ -34,21 +34,28 @@ struct NewMultiSelectionUtilityView: View {
     }
     
     var body: some View {
+        VStack(alignment: .center) {
+            Text("Multiselection Tool")
+                .font(.system(size: 18.0, weight: .bold))
+        }
         VStack(alignment: .leading) {
-            VStack(alignment: .leading) {
-                Text("Multiselection Tool")
-                    .font(.system(size: 21, weight: .bold))
-                    .foregroundStyle(Color.white)
-                    .padding(.bottom, 4)
-                Text("Drag & Drop apps, shortcuts, webpages and utilities")
-                    .foregroundStyle(Color.gray)
-                    .lineLimit(2)
-                    .font(.system(size: 12))
-                    .padding(.bottom, 12)
+            HStack {
+                Text("Title")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 4.0)
+                RoundedTextField(placeholder: "", text: $viewModel.title)
+                HStack(alignment: .center) {
+                    Toggle("", isOn: $viewModel.showTitleOnIcon)
+                        .padding(.trailing, 6.0)
+                        .toggleStyle(.switch)
+                    Text("Show title on icon")
+                        .font(.system(size: 14.0))
+                }
             }
-            .padding(.horizontal, 10)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 6) {
-                ForEach(0..<6) { index in
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 16) {
+                ForEach(0..<12) { index in
                     VStack {
                         ZStack {
                             itemViews(for: index)
@@ -69,8 +76,7 @@ struct NewMultiSelectionUtilityView: View {
                     }
                     .frame(width: 70, height: 70)
                     .background(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(Color.black.opacity(0.4))
+                        PlusButtonView()
                     )
                     .ifLet(viewModel.objectAt(index: index)?.id) { view, id in
                         view.onDrag {
@@ -95,7 +101,8 @@ struct NewMultiSelectionUtilityView: View {
                                                 imageData: object.imageData,
                                                 scriptCode: object.scriptCode,
                                                 utilityType: object.utilityType,
-                                                objects: object.objects
+                                                objects: object.objects,
+                                                showTitleOnIcon: object.showTitleOnIcon ?? true
                                             )
                                     )
                                 }
@@ -106,25 +113,19 @@ struct NewMultiSelectionUtilityView: View {
                 }
             }
             .padding(.bottom, 12)
-            VStack(alignment: .leading) {
-                Text("Multiselection label")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Color.white)
-                    .padding(.bottom, 4)
-                Toggle("Show label on icon", isOn: $viewModel.showTitleOnIcon)
-                    .padding(.bottom, 4)
-                Text("Add a label that will be present on an icon and as the description on a list.")
-                    .foregroundStyle(Color.gray)
-                    .lineLimit(2)
-                    .font(.system(size: 12))
-                    .padding(.bottom, 12)
-                TextField("", text: $viewModel.title)
+            
+            HStack {
                 IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                     viewModel.selectedIcon = image
                 }, userSelectedIcon: $viewModel.selectedIcon, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
-                Divider()
-                    .padding(.top, 8)
-                Button {
+                
+                Spacer()
+                BlueButton(title: "Cancel", font: .callout, padding: 12.0, backgroundColor: .gray) {
+                    viewModel.clear()
+                    closeAction()
+                }
+                .padding(.trailing, 6.0)
+                BlueButton(title: "Save", font: .callout, padding: 12.0) {
                     delegate?.saveUtility(with:
                             .init(
                                 type: .utility,
@@ -139,13 +140,9 @@ struct NewMultiSelectionUtilityView: View {
                     )
                     viewModel.clear()
                     closeAction()
-                } label: {
-                    Text("Save")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.green)
                 }
             }
-            .padding(.horizontal, 10)
+            .padding(.trailing, 6.0)
         }
         .onAppear {
             for window in NSApplication.shared.windows {
@@ -171,11 +168,13 @@ struct NewMultiSelectionUtilityView: View {
                         .cornerRadius(cornerRadius)
                         .frame(width: 70, height: 70)
                 }
-                Text(object.title)
-                    .font(.system(size: 12))
-                    .multilineTextAlignment(.center)
-                    .padding(.all, 3)
-                    .stroke(color: Color.black)
+                if object.showTitleOnIcon ?? true {
+                    Text(object.title)
+                        .font(.system(size: 12))
+                        .multilineTextAlignment(.center)
+                        .padding(.all, 3)
+                        .stroke(color: Color.black)
+                }
             } else if object.type == .webpage {
                 if let data = object.imageData, let image = NSImage(data: data) {
                     Image(nsImage: image)
@@ -186,21 +185,25 @@ struct NewMultiSelectionUtilityView: View {
                         .clipShape(
                             RoundedRectangle(cornerRadius: cornerRadius)
                         )
-                    Text(object.title)
-                        .font(.system(size: 12))
-                        .multilineTextAlignment(.center)
-                        .padding(.all, 3)
-                        .stroke(color: Color.black)
+                    if object.showTitleOnIcon ?? true {
+                        Text(object.title)
+                            .font(.system(size: 12))
+                            .multilineTextAlignment(.center)
+                            .padding(.all, 3)
+                            .stroke(color: Color.black)
+                    }
                 } else if let path = object.browser?.icon {
                     Image(path)
                         .resizable()
                         .frame(width: 80, height: 80)
                         .cornerRadius(cornerRadius)
-                    Text(object.title)
-                        .font(.system(size: 12))
-                        .multilineTextAlignment(.center)
-                        .padding(.all, 3)
-                        .stroke(color: Color.black)
+                    if object.showTitleOnIcon ?? true {
+                        Text(object.title)
+                            .font(.system(size: 12))
+                            .multilineTextAlignment(.center)
+                            .padding(.all, 3)
+                            .stroke(color: Color.black)
+                    }
                 }
             } else if object.type == .utility {
                 if let data = object.imageData, let image = NSImage(data: data) {
@@ -210,7 +213,7 @@ struct NewMultiSelectionUtilityView: View {
                         .cornerRadius(cornerRadius)
                         .frame(width: 70, height: 70)
                 }
-                if !object.title.isEmpty {
+                if !object.title.isEmpty && object.showTitleOnIcon ?? true {
                     Text(object.title)
                         .font(.system(size: 11))
                         .multilineTextAlignment(.center)

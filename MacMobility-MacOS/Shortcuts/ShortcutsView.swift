@@ -14,6 +14,7 @@ struct ShortcutsView: View {
     @State private var automationsToInstallWindow: NSWindow?
     @State private var automationItemWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
+    @State private var shouldShowCompanionRequestPopup: Bool = false
     @ObservedObject private var viewModel: ShortcutsViewModel
     @State private var selectedTab = 0
     @State private var tab: Tab = .apps
@@ -27,8 +28,13 @@ struct ShortcutsView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
+                pairiningView
+                
+                Divider()
+                    .frame(height: 14.0)
+                
                 BlueButton(
-                    title: "Explore Automations",
+                    title: "Automations",
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
@@ -47,8 +53,9 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-                    leadingImage: "square.dashed",
-                    backgroundColor: .gray
+//                    leadingImage: "square.dashed",
+//                    backgroundColor: Color(hex: "#00C851")
+                    backgroundColor: .clear
                 ) {
                     viewModel.addPage()
                 }
@@ -62,8 +69,8 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-                    leadingImage: "plus.app",
-                    backgroundColor: .gray
+//                    leadingImage: "plus.app",
+                    backgroundColor: .clear
                 ) {
                     tab = .apps
                     if let path = selectApp() {
@@ -78,8 +85,8 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-                    leadingImage: Tab.shortcuts.icon,
-                    backgroundColor: .gray
+//                    leadingImage: Tab.shortcuts.icon,
+                    backgroundColor: .clear
                 ) {
                     openInstallShortcutsWindow()
                 }
@@ -90,8 +97,8 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-                    leadingImage: Tab.webpages.icon,
-                    backgroundColor: .gray
+//                    leadingImage: Tab.webpages.icon,
+                    backgroundColor: .clear
                 ) {
                     openCreateNewWebpageWindow()
                 }
@@ -102,8 +109,8 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-                    leadingImage: Tab.utilities.icon,
-                    backgroundColor: .gray
+//                    leadingImage: Tab.utilities.icon,
+                    backgroundColor: .clear
                 ) {
                     openCreateNewUtilityWindow()
                 }
@@ -114,9 +121,11 @@ struct ShortcutsView: View {
                     .padding(.trailing, 48.0)
             }
             .padding([.horizontal, .top], 16)
+            .animation(.easeInOut, value: viewModel.connectionManager.pairingStatus)
             Divider()
         }
         .padding(.top, 21.0)
+        .frame(minWidth: 1300.0)
         HStack {
             VStack(alignment: .leading) {
                 ScrollViewReader { proxy in
@@ -220,6 +229,22 @@ struct ShortcutsView: View {
                 window.appearance = NSAppearance(named: .darkAqua)
             }
         }
+        .sheet(isPresented: $shouldShowCompanionRequestPopup) {
+            CompanionRequestPopup(
+                deviceName: viewModel.availablePeerName,
+                onAccept: {
+                    print("Accepted")
+                    shouldShowCompanionRequestPopup = false
+                },
+                onDeny: {
+                    print("Denied")
+                    shouldShowCompanionRequestPopup = false
+                }
+            )
+            .transition(.scale)
+            .zIndex(1)
+        }
+        .frame(minWidth: 1300.0)
         .padding(.top, 21.0)
     }
     
@@ -244,6 +269,55 @@ struct ShortcutsView: View {
                     )
             )
         }
+    }
+    
+    @ViewBuilder
+    private var pairiningView: some View {
+        VStack {
+            switch viewModel.connectionManager.pairingStatus {
+            case .notPaired:
+                if let availablePeer = viewModel.connectionManager.availablePeer {
+                    BlueButton(
+                        title: "Connect to \(availablePeer.displayName)",
+                        font: .callout,
+                        padding: 10.0,
+                        cornerRadius: 6.0,
+                        leadingImage: nil,
+                        backgroundColor: .accentColor
+                    ) {
+                        viewModel.connectionManager.invitePeer(with: availablePeer)
+                        viewModel.connectionManager.pairingStatus = .pairining
+                    }
+                    .padding(.all, 3.0)
+                }
+            case .paired:
+                BlueButton(
+                    title: "Disconnect from \(viewModel.connectionManager.connectedPeerName ?? "")",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: nil,
+                    backgroundColor: .red
+                ) {
+                    viewModel.connectionManager.disconnect()
+                    viewModel.connectionManager.pairingStatus = .notPaired
+                }
+                .padding(.all, 3.0)
+            case .pairining:
+                BlueButton(
+                    title: "Cancel pairing",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: nil,
+                    backgroundColor: .red
+                ) {
+                    viewModel.connectionManager.cancel()
+                }
+                .padding(.all, 3.0)
+            }
+        }
+        .animation(.easeInOut, value: viewModel.connectionManager.pairingStatus)
     }
     
     @ViewBuilder
@@ -658,7 +732,7 @@ struct ShortcutsView: View {
     private func openEditUtilityWindow(item: ShortcutObject) {
         if nil == editUtilitiesWindow {
             editUtilitiesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 320, height: 570),
+                contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
                 styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -703,6 +777,23 @@ struct ShortcutsView: View {
             return
         }
         editUtilitiesWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
+        editUtilitiesWindow = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
+            styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+            backing: .buffered,
+            defer: false
+        )
+        editUtilitiesWindow?.center()
+        editUtilitiesWindow?.setFrameAutosaveName("Utilities")
+        editUtilitiesWindow?.isReleasedWhenClosed = false
+        editUtilitiesWindow?.titlebarAppearsTransparent = true
+        editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
+        
+        guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
+            return
+        }
+        
+        editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
         switch item.utilityType {
         case .commandline:
             let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
@@ -729,5 +820,46 @@ struct ShortcutsView: View {
             break
         }
         editUtilitiesWindow?.makeKeyAndOrderFront(nil)
+    }
+}
+
+struct CompanionRequestPopup: View {
+    let deviceName: String
+    let onAccept: () -> Void
+    let onDeny: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Companion Device Detected")
+                .font(.title2)
+                .fontWeight(.bold)
+
+            Text("“\(deviceName)” wants to connect to this Mac.")
+                .multilineTextAlignment(.center)
+                .font(.body)
+                .foregroundColor(.secondary)
+
+            HStack(spacing: 16) {
+                Button("Deny") {
+                    onDeny()
+                }
+                .keyboardShortcut(.cancelAction)
+                .buttonStyle(.bordered)
+
+                Button("Accept") {
+                    onAccept()
+                }
+                .keyboardShortcut(.defaultAction)
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding()
+        .frame(minWidth: 320)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.thinMaterial)
+                .shadow(radius: 10)
+        )
+        .padding()
     }
 }
