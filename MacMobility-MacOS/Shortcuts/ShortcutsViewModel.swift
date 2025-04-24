@@ -125,6 +125,47 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 self.searchUtilities()
             }
             .store(in: &cancellables)
+        
+        connectionManager.$initialSetup
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] setupMode in
+                self?.handleInitialSetup(setupMode)
+            }
+            .store(in: &cancellables)
+        
+        connectionManager.$automatedActions
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] options in
+                self?.handleAutomatedActions(options)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func handleInitialSetup(_ setupMode: SetupMode?) {
+        guard let setupMode else {
+            return
+        }
+        switch setupMode.type {
+        case .basic:
+            print("basic")
+        case .advanced:
+            print("advanced")
+        }
+    }
+    
+    func handleAutomatedActions(_ options: [AutomationOption]?) {
+        guard let options else {
+            return
+        }
+        options.forEach { option in
+            addAutomations(from: option.scripts)
+            if option.title == "macOS System" {
+                option.scripts.enumerated().forEach { (index, script) in
+                    let so: ShortcutObject = .from(script: script, at: index)
+                    addConfiguredShortcut(object: so)
+                }
+            }
+        }
     }
     
     func objectAt(index: Int, page: Int) -> ShortcutObject? {
@@ -464,7 +505,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         
         guard let iconFile = bundle.infoDictionary?["CFBundleIconFile"] as? String else {
             let icon = NSWorkspace.shared.icon(forFile: appPath)
-            let resizedIcon = icon.resizedImage(newSize: .init(width: 128.0, height: 128.0))
+            let resizedIcon = icon.resizedImage(newSize: .init(width: 68.0, height: 68.0))
             let fallbackIcon = try? resizedIcon.imageData(for: .png(scale: 0.2, excludeGPSData: false))
             return fallbackIcon
         }
@@ -743,7 +784,7 @@ extension JSONLoadable {
 }
 
 extension ShortcutObject {
-    static func from(script: AutomationScript) -> ShortcutObject {
+    static func from(script: AutomationScript, at index: Int? = nil) -> ShortcutObject {
         var utilityType: UtilityObject.UtilityType?
         switch script.type {
         case .automator, .none:
@@ -754,7 +795,7 @@ extension ShortcutObject {
         return .init(
             type: .utility,
             page: 1,
-            index: nil,
+            index: index,
             path: nil,
             id: script.id.uuidString,
             title: script.name,

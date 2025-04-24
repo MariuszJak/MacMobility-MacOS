@@ -42,9 +42,6 @@ struct MacOSMainPopoverView: View {
             }
             .buttonStyle(PlainButtonStyle())
             .frame(width: 200)
-            .if(connectionManager.isConnecting) {
-                $0.frame(height: 200)
-            }
             .padding()
         }
         .onAppear {
@@ -85,9 +82,6 @@ struct MacOSMainPopoverView: View {
             Divider()
             shortcutsWindowButtonView
             pairiningView
-            if connectionManager.isConnecting {
-                Spacer()
-            }
             Divider()
             quitView
         } else {
@@ -114,9 +108,6 @@ struct MacOSMainPopoverView: View {
                         }
                 }
                 pairiningView
-                if connectionManager.isConnecting {
-                    Spacer()
-                }
             }
             Divider()
             quitView
@@ -137,12 +128,6 @@ struct MacOSMainPopoverView: View {
             shortcutsWindow?.titlebarAppearsTransparent = true
             shortcutsWindow?.styleMask.insert(.fullSizeContentView)
             shortcutsWindow?.title = "Editor"
-            
-//            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: shortcutsWindow) else {
-//                return
-//            }
-//            
-//            shortcutsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: ShortcutsView(viewModel: .init(connectionManager: connectionManager)))
             shortcutsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = shortcutsWindow?.contentView?.bounds ?? .zero
@@ -372,7 +357,10 @@ struct MacOSMainPopoverView: View {
                     } label: {
                         HStack {
                             Image(systemName: "link.circle.fill")
+                                .foregroundStyle(Color.accentColor)
                             Text("Connect to \(availablePeer.displayName)")
+                                .font(.system(size: 14.0, weight: .bold))
+                                .foregroundStyle(Color.accentColor)
                         }
                     }
 
@@ -380,9 +368,16 @@ struct MacOSMainPopoverView: View {
             }
         case .paired:
             VStack(alignment: .leading, spacing: spacing) {
-                Button("Disconnect from \(connectionManager.connectedPeerName ?? "")") {
+                Button {
                     connectionManager.disconnect()
                     connectionManager.pairingStatus = .notPaired
+                } label: {
+                    HStack {
+                        Image(systemName: "iphone.slash.circle")
+                            .foregroundStyle(Color.orange)
+                        Text("Disconnect from \(connectionManager.connectedPeerName ?? "")")
+                            .foregroundStyle(Color.orange)
+                    }
                 }
             }
         case .pairining:

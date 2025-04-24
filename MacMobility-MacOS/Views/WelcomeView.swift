@@ -212,11 +212,17 @@ struct PageIndicatorView: View {
     }
 }
 
+enum SetupModeType {
+    case basic
+    case advanced
+}
+
 struct SetupMode: Identifiable, Equatable {
     let id: UUID = UUID()
     let title: String
     let description: String
     let imageName: String
+    let type: SetupModeType
     
     static func ==(lhs: SetupMode, rhs: SetupMode) -> Bool {
         lhs.imageName == rhs.imageName && lhs.title == rhs.title && lhs.description == rhs.description
@@ -230,16 +236,20 @@ struct AppSetupChoiceView: View {
     let options: [SetupMode] = [
         SetupMode(title: "Start with Advanced Actions",
                   description: "Get started quickly with a few more adcanced automations, scripts and actions already set up for you.",
-                  imageName: "sparkles"),
+                  imageName: "sparkles",
+                  type: .advanced),
         
         SetupMode(title: "Start Basic",
                   description: "Start with some basic automations and scripts to get you up and running.",
-                  imageName: "square.dashed")
+                  imageName: "square.dashed",
+                  type: .basic)
     ]
     
     init(_ setupMode: SetupMode?, action: @escaping (SetupMode) -> Void) {
         if let setupMode {
             self.selectedMode = setupMode == options.first ? "prepared" : "blank"
+        } else {
+            action(options[0])
         }
         self.action = action
     }
@@ -306,6 +316,7 @@ struct AutomationOption: Identifiable {
     let description: String
     let imageName: String?
     let imageData: Data?
+    var scripts: [AutomationScript]
     var isSelected: Bool = true
     var isOptional: Bool = true
 }
@@ -316,6 +327,7 @@ class AutodetectAutomationInstallViewModel: ObservableObject, JSONLoadable {
               description: "Essential system-level automations to help you work faster on your Mac.",
               imageName: "gearshape",
               imageData: nil,
+              scripts: [],
               isOptional: false)
     ]
     
@@ -326,11 +338,11 @@ class AutodetectAutomationInstallViewModel: ObservableObject, JSONLoadable {
         if let options {
             self.options = options
         } else {
-            fetchInstalledApps()
+            fetchInstalledApps(isInitial: true)
         }
     }
     
-    func fetchInstalledApps() {
+    func fetchInstalledApps(isInitial: Bool = false) {
         let appDirectories = [
             "/Applications",
             "/System/Applications/Utilities"
@@ -343,10 +355,20 @@ class AutodetectAutomationInstallViewModel: ObservableObject, JSONLoadable {
         }
         
         let automations: AutomationsList = loadJSON("automations")
+        if let macOsAutomations = automations.automations.first(where: { $0.title == "MacOS" }) {
+            options[0].scripts = macOsAutomations.scripts
+        }
         automations.automations.forEach { automation in
             if apps.contains(where: { $0 == automation.title }) {
-                options.append(.init(title: automation.title, description: automation.description, imageName: nil, imageData: automation.imageData))
+                options.append(.init(title: automation.title,
+                                     description: automation.description,
+                                     imageName: nil,
+                                     imageData: automation.imageData,
+                                     scripts: automation.scripts))
             }
+        }
+        if isInitial {
+            updateAction(options)
         }
     }
     
