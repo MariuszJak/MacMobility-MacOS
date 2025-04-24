@@ -484,46 +484,73 @@ struct ShortcutsView: View {
     
     private var installedAppsView: some View {
         VStack(alignment: .leading) {
-            ScrollViewReader { proxy in
-                ScrollView {
+            if viewModel.installedApps.isEmpty {
+                VStack {
                     Spacer()
-                        .frame(height: 16.0)
-                    ForEach(viewModel.installedApps) { app in
-                        HStack {
-                            HStack {
-                                Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
-                                    .resizable()
-                                    .frame(width: 46, height: 46)
-                                    .cornerRadius(cornerRadius)
-                                    .padding(.trailing, 8)
-                                Text(app.title)
-                                    .padding(.vertical, 6.0)
+                    HStack {
+                        Spacer()
+                        VStack {
+                            Text("No app found.")
+                                .font(.system(size: 24, weight: .medium))
+                                .foregroundStyle(Color.white)
+                                .padding(.bottom, 12.0)
+                            Button {
+                                if let path = selectApp() {
+                                    viewModel.addInstalledApp(for: path)
+                                }
+                            } label: {
+                                Text("Search in Finder")
+                                    .font(.system(size: 16.0))
+                                    .foregroundStyle(Color.white)
                             }
-                            .id(app.title)
-                            Spacer()
                         }
-                        .onDrag {
-                            NSItemProvider(object: app.id as NSString)
-                        }
-                        .background(app.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
-                        .animation(.easeOut, value: appNameToFlash)
-                        .cornerRadius(10)
-                        .padding(.horizontal, 16.0)
-                        .padding(.vertical, 6.0)
-                        Divider()
+                        Spacer()
                     }
+                    Spacer()
                 }
-                .onChange(of: viewModel.scrollToApp) { _, title in
-                    DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
-                        withAnimation {
-                            proxy.scrollTo(title, anchor: .center)
-                        } completion: {
-                            appNameToFlash = title
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                appNameToFlash = ""
+                .padding(.bottom, 8.0)
+            } else {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        Spacer()
+                            .frame(height: 16.0)
+                        ForEach(viewModel.installedApps) { app in
+                            HStack {
+                                HStack {
+                                    Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
+                                        .resizable()
+                                        .frame(width: 46, height: 46)
+                                        .cornerRadius(cornerRadius)
+                                        .padding(.trailing, 8)
+                                    Text(app.title)
+                                        .padding(.vertical, 6.0)
+                                }
+                                .id(app.title)
+                                Spacer()
                             }
+                            .onDrag {
+                                NSItemProvider(object: app.id as NSString)
+                            }
+                            .background(app.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
+                            .animation(.easeOut, value: appNameToFlash)
+                            .cornerRadius(10)
+                            .padding(.horizontal, 16.0)
+                            .padding(.vertical, 6.0)
+                            Divider()
                         }
-
+                    }
+                    .onChange(of: viewModel.scrollToApp) { _, title in
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
+                            withAnimation {
+                                proxy.scrollTo(title, anchor: .center)
+                            } completion: {
+                                appNameToFlash = title
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    appNameToFlash = ""
+                                }
+                            }
+                            
+                        }
                     }
                 }
             }

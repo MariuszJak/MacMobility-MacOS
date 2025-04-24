@@ -172,12 +172,18 @@ class ConnectionManager: NSObject, ObservableObject {
     }
 }
 
+struct ConnectionRequest: Codable {
+    let shouldConnect: Bool
+}
+
 extension ConnectionManager: MCNearbyServiceAdvertiserDelegate {
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         if let context, let data = String(data: context, encoding: .utf8), isValidUUID(data) {
             connectedPeerName = availablePeer?.displayName
             invitationHandler(true, session)
             _ = generateUUID()
+        } else if let context, let connectionRequest = try? JSONDecoder().decode(ConnectionRequest.self, from: context) {
+            invitationHandler(connectionRequest.shouldConnect, session)
         } else {
             invitationHandler(false, nil)
         }

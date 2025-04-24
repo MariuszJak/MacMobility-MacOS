@@ -38,11 +38,10 @@ struct MacOSMainPopoverView: View {
                     VStack(alignment: .leading, spacing: spacing) {
                         mainView()
                     }
-                    qrCodeViewWithTrialCheck()
                 }
             }
             .buttonStyle(PlainButtonStyle())
-            .frame(width: connectionManager.isConnecting ? 320 : 200)
+            .frame(width: 200)
             .if(connectionManager.isConnecting) {
                 $0.frame(height: 200)
             }
@@ -121,23 +120,6 @@ struct MacOSMainPopoverView: View {
             }
             Divider()
             quitView
-        }
-    }
-    
-    @ViewBuilder
-    private func qrCodeViewWithTrialCheck() -> some View {
-        if viewModel.isPaidLicense {
-            if connectionManager.isConnecting {
-                Divider()
-            }
-            qrCodeView
-        } else {
-            if !viewModel.isTrialExpired {
-                if connectionManager.isConnecting {
-                    Divider()
-                }
-                qrCodeView
-            }
         }
     }
     
@@ -298,14 +280,24 @@ struct MacOSMainPopoverView: View {
     }
     
     private var permissionView: some View {
-        Button("Ask for permission") {
+        Button {
             openPermissionsWindow()
+        } label: {
+            HStack {
+                Image(systemName: "lock.app.dashed")
+                Text("Check permissions")
+            }
         }
     }
     
     private var aboutButtonView: some View {
-        Button("About") {
+        Button {
             openAboutWindow()
+        } label: {
+            HStack {
+                Image(systemName: "info.circle")
+                Text("About")
+            }
         }
     }
     
@@ -314,8 +306,11 @@ struct MacOSMainPopoverView: View {
         Button {
             openUpdatesWindow()
         } label: {
-            Text("Update Available!")
-                .foregroundStyle(Color.green)
+            HStack {
+                Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
+                    .foregroundStyle(Color.green)
+                Text("Update Available!")
+            }
         }
     }
     
@@ -329,9 +324,14 @@ struct MacOSMainPopoverView: View {
                 Text("You have current version")
                     .foregroundStyle(Color.green)
             } else {
-                Button("Check for update") {
+                Button {
                     Task {
                         await viewModel.checkVersion()
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
+                        Text("Check for update")
                     }
                 }
             }
@@ -339,14 +339,24 @@ struct MacOSMainPopoverView: View {
     }
     
     private var shortcutsWindowButtonView: some View {
-        Button("Workspace") {
+        Button {
             openShortcutsWindow()
+        } label: {
+            HStack {
+                Image(systemName: "macwindow.on.rectangle")
+                Text("Workspace")
+            }
         }
     }
     
     private var licenseWindowButtonView: some View {
-        Button("Verify license") {
+        Button {
             openLicenseWindow()
+        } label: {
+            HStack {
+                Image(systemName: "checkmark.shield")
+                Text("Verify license")
+            }
         }
     }
     
@@ -356,10 +366,16 @@ struct MacOSMainPopoverView: View {
         case .notPaired:
             if let availablePeer = connectionManager.availablePeer {
                 VStack(alignment: .leading, spacing: spacing) {
-                    Button("Connect to \(availablePeer.displayName)") {
+                    Button {
                         connectionManager.invitePeer(with: availablePeer)
                         connectionManager.pairingStatus = .pairining
+                    } label: {
+                        HStack {
+                            Image(systemName: "link.circle.fill")
+                            Text("Connect to \(availablePeer.displayName)")
+                        }
                     }
+
                 }
             }
         case .paired:
@@ -389,7 +405,8 @@ struct MacOSMainPopoverView: View {
     
     func generateQRCode() -> NSImage? {
         let code = connectionManager.generateUUID()
-        let doc = QRCode.Document(utf8String: code, errorCorrection: .high)
+        let message = "mobilitycontrol://\(code)"
+        let doc = QRCode.Document(utf8String: message, errorCorrection: .high)
         guard let generated = doc.cgImage(CGSize(width: 800, height: 800)) else { return nil }
         return NSImage(cgImage: generated, size: .init(width: 80, height: 80))
     }

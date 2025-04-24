@@ -15,6 +15,16 @@ public enum ShortcutType: String, Codable {
     case utility
 }
 
+extension Array where Element: Equatable {
+    mutating func appendUnique(contentsOf newElements: [Element]) {
+        for element in newElements {
+            if !self.contains(element) {
+                self.append(element)
+            }
+        }
+    }
+}
+
 public struct ShortcutObject: Identifiable, Codable, Equatable {
     public let index: Int?
     public var page: Int
@@ -83,6 +93,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     public var testColor = "#6DDADE"
     private var allWebpages: [ShortcutObject] = []
     private var cachedIcons: [String: Data] = [:]
+    private var tmpAllItems: [ShortcutObject] = []
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clearAll()
@@ -101,11 +112,17 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     func registerListener() {
         $searchText
             .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.fetchShortcuts()
-                self?.fetchInstalledApps()
-                self?.searchWebpages()
-                self?.searchUtilities()
+            .sink { [weak self] text in
+                guard let self else { return }
+                if text.isEmpty {
+                    self.tmpAllItems.removeAll()
+                } else {
+                    tmpAllItems.appendUnique(contentsOf: installedApps + shortcuts + webpages + utilities + appsAddedByUser)
+                }
+                self.fetchShortcuts()
+                self.fetchInstalledApps()
+                self.searchWebpages()
+                self.searchUtilities()
             }
             .store(in: &cancellables)
     }
@@ -115,7 +132,11 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func object(for id: String) -> ShortcutObject? {
-        shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id } ?? utilities.first { $0.id == id }
+        if searchText.isEmpty {
+            shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id } ?? utilities.first { $0.id == id }
+        } else {
+            tmpAllItems.first { $0.id == id }
+        }
     }
     
     func allObjects() -> [ShortcutObject] {
