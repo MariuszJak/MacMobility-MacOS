@@ -524,6 +524,12 @@ struct ShortcutsView: View {
                                         .padding(.trailing, 8)
                                     Text(app.title)
                                         .padding(.vertical, 6.0)
+                                    if viewModel.isAppAddedByUser(path: app.path ?? "") {
+                                        Spacer()
+                                        Button("Remove") {
+                                            viewModel.removeAppInstalledByUser(path: app.path ?? "")
+                                        }
+                                    }
                                 }
                                 .id(app.title)
                                 Spacer()

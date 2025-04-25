@@ -68,7 +68,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             welcomeWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions in
+            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions, website in
+                self.connectionManager.website = website
                 self.connectionManager.initialSetup = setupMode
                 self.connectionManager.automatedActions = automatedActions
                 self.welcomeWindow?.close()

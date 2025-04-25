@@ -94,6 +94,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var allWebpages: [ShortcutObject] = []
     private var cachedIcons: [String: Data] = [:]
     private var tmpAllItems: [ShortcutObject] = []
+    private var setupMode: SetupMode?
+    private var website: WebsiteTest?
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clearAll()
@@ -129,7 +131,14 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         connectionManager.$initialSetup
             .receive(on: DispatchQueue.main)
             .sink { [weak self] setupMode in
-                self?.handleInitialSetup(setupMode)
+                self?.setupMode = setupMode
+            }
+            .store(in: &cancellables)
+        
+        connectionManager.$website
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] website in
+                self?.website = website
             }
             .store(in: &cancellables)
         
@@ -141,27 +150,43 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             .store(in: &cancellables)
     }
     
-    func handleInitialSetup(_ setupMode: SetupMode?) {
-        guard let setupMode else {
-            return
-        }
-        switch setupMode.type {
-        case .basic:
-            print("basic")
-        case .advanced:
-            print("advanced")
-        }
+    func isAppAddedByUser(path: String) -> Bool {
+        appsAddedByUser.contains(where: { $0.path == path })
+    }
+    
+    func removeAppInstalledByUser(path: String) {
+        appsAddedByUser = appsAddedByUser.filter { $0.path != path }
+        installedApps = installedApps.filter { $0.path != path }
+        configuredShortcuts.removeAll { $0.path == path }
+        connectionManager.shortcuts = configuredShortcuts
+        UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+        UserDefaults.standard.store(appsAddedByUser, for: .userApps)
     }
     
     func handleAutomatedActions(_ options: [AutomationOption]?) {
-        guard let options else {
+        guard let options, let setupMode else {
             return
         }
+        
         options.forEach { option in
-            addAutomations(from: option.scripts)
+            addAutomations(
+                from: setupMode.type == .advanced
+                ? option.scripts
+                : option.scripts.filter { !($0.isAdvanced ?? false) }
+            )
             if option.title == "macOS System" {
-                option.scripts.enumerated().forEach { (index, script) in
+                let filtered = setupMode.type == .advanced
+                ? option.scripts
+                : option.scripts.filter { !($0.isAdvanced ?? false) }
+                var i: Int = 0
+                filtered.enumerated().forEach { (index, script) in
+                    i += 1
                     let so: ShortcutObject = .from(script: script, at: index)
+                    addConfiguredShortcut(object: so)
+                }
+                if let website = website {
+                    let so: ShortcutObject = .init(type: .webpage, page: 1, index: i, path: website.url, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: .safari, imageData: website.nsImage?.toData, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
+                    saveWebpage(with: so)
                     addConfiguredShortcut(object: so)
                 }
             }
@@ -451,6 +476,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     func addInstalledApp(for path: String) {
         guard installedApps.first(where: { $0.path == path }) == nil else {
+            if let index = installedApps.firstIndex(where: { $0.path == path }) {
+                installedApps[index].imageData = getIcon(fromAppPath: path)
+            }
             scrollToApp = path.appNameFromPath() ?? "Unknown"
             return
         }
@@ -467,6 +495,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchInstalledApps()
         scrollToApp = title
         UserDefaults.standard.store(appsAddedByUser, for: .userApps)
+        searchText = searchText
     }
     
     func findApps(in directory: String) -> [ShortcutObject] {
@@ -567,6 +596,7 @@ struct AutomationScript: Identifiable, Codable, Equatable {
     var imageData: Data?
     var imageName: String?
     var type: AutomationType?
+    var isAdvanced: Bool?
 }
 
 struct AutomationItem: Identifiable, Codable {

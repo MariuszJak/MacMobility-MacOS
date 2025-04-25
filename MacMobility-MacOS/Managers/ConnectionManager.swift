@@ -39,6 +39,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var pairingStatus: PairingStatus = .notPaired
     @Published var initialSetup: SetupMode?
     @Published var automatedActions: [AutomationOption]?
+    @Published var website: WebsiteTest?
     private var cancellables = Set<AnyCancellable>()
     public var currentIndex = 0
     public let serviceType = "magic-trackpad"

@@ -36,23 +36,21 @@ class IconPickerViewModel: ObservableObject {
         guard shouldAutofetchImage else { return }
         $searchText
             .receive(on: RunLoop.main)
+            .removeDuplicates()
             .sink { text in
                 if let text, !text.isEmpty, text.containsValidDomain {
                     self.isFetchingIcon = true
                     self.fetchHighResIcon(from: text) { image in
                         if let image {
                             self.assignImage(image)
-                            print("Assigned from 1")
                             self.isFetchingIcon = false
                         } else {
                             self.fetchFaviconFromHTML(for: text) { image in
                                 if let image {
                                     self.assignImage(image)
-                                    print("Assigned from 2")
                                     self.isFetchingIcon = false
                                 } else {
                                     self.fetchFavicon(for: text) { _ in
-                                        print("Assigned from 3")
                                         self.isFetchingIcon = false
                                     }
                                 }

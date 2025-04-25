@@ -9,14 +9,20 @@ import SwiftUI
 import QRCode
 import AppKit
 
+struct WebsiteTest {
+    let nsImage: NSImage?
+    let url: String
+}
+
 class WelcomeViewModel: ObservableObject {
     @Published var currentPage = 0
-    let pageLimit = 5
-    let closeAction: (SetupMode?, [AutomationOption]?) -> Void
+    let pageLimit = 6
+    let closeAction: (SetupMode?, [AutomationOption]?, WebsiteTest?) -> Void
     private(set) var setupMode: SetupMode?
     private(set) var automationOptions: [AutomationOption]?
+    private(set) var website: WebsiteTest?
     
-    init(closeAction: @escaping (SetupMode?, [AutomationOption]?) -> Void) {
+    init(closeAction: @escaping (SetupMode?, [AutomationOption]?, WebsiteTest?) -> Void) {
         self.closeAction = closeAction
     }
     
@@ -31,7 +37,7 @@ class WelcomeViewModel: ObservableObject {
     }
     
     func close() {
-        closeAction(setupMode, automationOptions)
+        closeAction(setupMode, automationOptions, website)
     }
     
     func updateSetupMode(_ setupMode: SetupMode) {
@@ -40,6 +46,10 @@ class WelcomeViewModel: ObservableObject {
     
     func updateAutomationOptions(_ automationOptions: [AutomationOption]) {
         self.automationOptions = automationOptions
+    }
+    
+    func updateWebsite(_ website: WebsiteTest) {
+        self.website = website
     }
 }
 
@@ -71,6 +81,10 @@ struct WelcomeView: View {
                         viewModel.updateAutomationOptions(options)
                     })
                 case 5:
+                    PredefinedWebsitesCreationView() { website in
+                        viewModel.updateWebsite(website)
+                    }
+                case 6:
                     FinalScreenView {
                         viewModel.close()
                     }
@@ -751,5 +765,48 @@ struct PlusButtonView: View {
                 .stroke(accentColor, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
+    }
+}
+
+class PredefinedWebsitesCreationViewModel: ObservableObject {
+    @Published var firstLink: String = ""
+    @Published var selectedIcon: NSImage?
+}
+
+struct PredefinedWebsitesCreationView: View {
+    @ObservedObject var viewModel = PredefinedWebsitesCreationViewModel()
+    var action: (WebsiteTest) -> Void
+    
+    var body: some View {
+        VStack(spacing: 32) {
+            Text("Do you have your favourite website?")
+                .font(.title)
+                .fontWeight(.bold)
+            
+            Text("Add url to get started! This website will be displayed in your workspaces automatically!")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            HStack {
+                Text("Link")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 20.0)
+                RoundedTextField(placeholder: "", text: $viewModel.firstLink)
+                IconPickerView(viewModel: .init(
+                    selectedImage: viewModel.selectedIcon,
+                    shouldAutofetchImage: true,
+                    searchText: viewModel.firstLink,
+                    completion: { image in
+                        viewModel.selectedIcon = image
+                        action(.init(nsImage: image, url: viewModel.firstLink))
+                    }), userSelectedIcon: .constant(nil), imageSize: .init(width: 50.0, height: 50.0)
+                )
+            }
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
+        }
+        .padding()
     }
 }
