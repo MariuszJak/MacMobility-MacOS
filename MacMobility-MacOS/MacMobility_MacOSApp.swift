@@ -37,11 +37,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
         if lifecycle.openCount == 0 {
             openWelcomeWindow()
+            UserDefaults.standard.store(Lifecycle(openCount: lifecycle.openCount + 1), for: .lifecycle)
         }
-        if lifecycle.openCount < 2 {
+        if lifecycle.openCount == 1 {
             openPermissionsWindow()
-            let openCount = lifecycle.openCount + 1
-            UserDefaults.standard.store(Lifecycle(openCount: openCount), for: .lifecycle)
+            UserDefaults.standard.store(Lifecycle(openCount: lifecycle.openCount + 1), for: .lifecycle)
         }
         
         if let menuButton = statusItem?.button {
