@@ -10,11 +10,11 @@ import AppKit
 import os
 
 protocol AppleScriptCommandable {
-    func execute(_ scriptString: String)
+    func execute(_ scriptString: String, completion: ((NSDictionary) -> Void)?)
 }
 
 extension AppleScriptCommandable {
-    func execute(_ scriptString: String) {
+    func execute(_ scriptString: String, completion: ((NSDictionary) -> Void)? = nil) {
         DispatchQueue.main.async {
             guard let script = NSAppleScript(source: scriptString) else {
                 return
@@ -23,6 +23,7 @@ extension AppleScriptCommandable {
             script.executeAndReturnError(&errorInfo)
             if let error = errorInfo {
                 Logger().error("Error executing AppleScript: \(error)")
+                completion?(error)
             }
         }
     }

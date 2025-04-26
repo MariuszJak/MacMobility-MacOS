@@ -92,7 +92,9 @@ extension ConnectionManager {
                 runMultiselection(for: shortcutItem)
             case .automation:
                 if let script = shortcutItem.scriptCode {
-                    execute(script)
+                    execute(script) { error in
+                        self.send(alert: .init(title: "Automation Error", message: error.description))
+                    }
                 }
             case .none:
                 break
@@ -126,7 +128,9 @@ extension ConnectionManager {
                         }
                     case .automation:
                         if let script = tool.scriptCode {
-                            execute(script)
+                            execute(script) { error in
+                                self.send(alert: .init(title: "Automation Error", message: error.description))
+                            }
                         }
                     case .none:
                         break
