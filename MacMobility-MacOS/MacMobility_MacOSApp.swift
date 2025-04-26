@@ -34,6 +34,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popOver.contentViewController = NSViewController()
         popOver.contentViewController?.view = NSHostingView(rootView: menuView)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+//        UserDefaults.standard.clearAll()
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
         if lifecycle.openCount == 0 {
             openWelcomeWindow()
@@ -70,7 +71,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             welcomeWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions, websites in
+            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions, websites, createMultiactions in
+                self.connectionManager.createMultiactions = createMultiactions
                 self.connectionManager.websites = websites
                 self.connectionManager.initialSetup = setupMode
                 self.connectionManager.automatedActions = automatedActions

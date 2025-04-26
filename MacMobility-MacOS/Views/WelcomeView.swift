@@ -18,7 +18,8 @@ struct WebsiteTest {
 class WelcomeViewModel: ObservableObject {
     @Published var currentPage = 0
     let pageLimit = 6
-    let closeAction: (SetupMode?, [AutomationOption]?, [WebsiteTest]) -> Void
+    let closeAction: (SetupMode?, [AutomationOption]?, [WebsiteTest], Bool) -> Void
+    private(set) var createMultiactions: Bool = true
     private(set) var setupMode: SetupMode?
     private(set) var automationOptions: [AutomationOption]?
     private(set) var websites: [WebsiteTest] = [
@@ -27,7 +28,7 @@ class WelcomeViewModel: ObservableObject {
         .init(id: UUID().uuidString, nsImage: nil, url: "")
     ]
     
-    init(closeAction: @escaping (SetupMode?, [AutomationOption]?, [WebsiteTest]) -> Void) {
+    init(closeAction: @escaping (SetupMode?, [AutomationOption]?, [WebsiteTest], Bool) -> Void) {
         self.closeAction = closeAction
     }
     
@@ -42,7 +43,7 @@ class WelcomeViewModel: ObservableObject {
     }
     
     func close() {
-        closeAction(setupMode, automationOptions, websites)
+        closeAction(setupMode, automationOptions, websites, createMultiactions)
     }
     
     func updateSetupMode(_ setupMode: SetupMode) {
@@ -63,6 +64,10 @@ class WelcomeViewModel: ObservableObject {
         if let index = websites.firstIndex(where: { $0.id == id }) {
             websites[index].url = url
         }
+    }
+    
+    func updateMultiaction(_ createMultiactions: Bool) {
+        self.createMultiactions = createMultiactions
     }
 }
 
@@ -98,12 +103,14 @@ struct WelcomeView: View {
                     PredefinedWebsitesCreationView(viewModel: .init(
                         websiteOne: viewModel.websites[0],
                         webstiteTwo: viewModel.websites[1],
-                        websiteThree: viewModel.websites[2])) { website in
+                        websiteThree: viewModel.websites[2],
+                        createMultiactions: viewModel.createMultiactions)) { website in
                             viewModel.updateWebsite(website)
                         } urlUpdate: { id, url in
                             viewModel.updateURL(for: id, url: url)
+                        } createMultiactions: { value in
+                            viewModel.updateMultiaction(value)
                         }
-
                 case 6:
                     FinalScreenView {
                         viewModel.close()
@@ -121,6 +128,8 @@ struct WelcomeView: View {
             if showWelcomeText {
                 HStack {
                     Spacer()
+                    Spacer()
+                        .frame(width: 30.0)
                     if viewModel.currentPage > 0 {
                         Button("Previous") {
                             self.viewModel.previousPage()
@@ -811,6 +820,7 @@ class PredefinedWebsitesCreationViewModel: ObservableObject {
     @Published var selectedIcon: NSImage?
     @Published var selectedIconTwo: NSImage?
     @Published var selectedIconThree: NSImage?
+    @Published var createMultiactions: Bool
     var savedIcon: NSImage?
     var savedIconTwo: NSImage?
     var savedIconThree: NSImage?
@@ -818,7 +828,7 @@ class PredefinedWebsitesCreationViewModel: ObservableObject {
     var idTwo: String
     var idThree: String
     
-    init(websiteOne: WebsiteTest, webstiteTwo: WebsiteTest, websiteThree: WebsiteTest) {
+    init(websiteOne: WebsiteTest, webstiteTwo: WebsiteTest, websiteThree: WebsiteTest, createMultiactions: Bool) {
         self.firstLink = websiteOne.url
         self.secondLink = webstiteTwo.url
         self.thirdLink = websiteThree.url
@@ -831,6 +841,7 @@ class PredefinedWebsitesCreationViewModel: ObservableObject {
         self.idOne = websiteOne.id
         self.idTwo = webstiteTwo.id
         self.idThree = websiteThree.id
+        self.createMultiactions = createMultiactions
     }
 }
 
@@ -838,6 +849,7 @@ struct PredefinedWebsitesCreationView: View {
     @ObservedObject var viewModel: PredefinedWebsitesCreationViewModel
     var action: (WebsiteTest) -> Void
     var urlUpdate: (String, String) -> Void
+    var createMultiactions: (Bool) -> Void
     
     var body: some View {
         VStack(spacing: 32) {
@@ -916,6 +928,24 @@ struct PredefinedWebsitesCreationView: View {
             }
             .onChange(of: viewModel.thirdLink) { oldValue, newValue in
                 urlUpdate(viewModel.idThree, newValue)
+            }
+            HStack {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("Multiaction for websites")
+                            .font(.system(size: 14, weight: .regular))
+                        Toggle("", isOn: $viewModel.createMultiactions)
+                            .toggleStyle(.switch)
+                            .onChange(of: viewModel.createMultiactions) { oldValue, newValue in
+                                createMultiactions(newValue)
+                            }
+                    }
+                    .padding(.bottom, 6.0)
+                    Text("This will create single button which will open all websites at once!")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color.gray)
+                }
+                Spacer()
             }
         }
         .padding()

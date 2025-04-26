@@ -40,6 +40,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var initialSetup: SetupMode?
     @Published var automatedActions: [AutomationOption]?
     @Published var websites: [WebsiteTest] = []
+    @Published var createMultiactions: Bool?
     private var cancellables = Set<AnyCancellable>()
     public var currentIndex = 0
     public let serviceType = "magic-trackpad"

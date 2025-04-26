@@ -30,7 +30,7 @@ struct UtilitiesWindowView: View {
     
     var body: some View {
         VStack {
-            if viewModel.utilities.isEmpty {
+            if viewModel.utilities.isEmpty || viewModel.utilities.allSatisfy({ $0.path == "Hidden" }) {
                 VStack {
                     Spacer()
                     HStack {
@@ -56,33 +56,51 @@ struct UtilitiesWindowView: View {
                 ScrollView {
                     Spacer()
                         .frame(height: 16.0)
-                    ForEach(viewModel.sections) { section in
-                        Section {
-                            if section.isExpanded {
-                                ForEach(section.items) { item in
-                                    if let path = item.path {
-                                        if path.isEmpty {
-                                            itemView(item: item)
+                    if viewModel.searchText.isEmpty {
+                        ForEach(viewModel.sections) { section in
+                            Section {
+                                if section.isExpanded {
+                                    ForEach(section.items) { item in
+                                        if let path = item.path {
+                                            if path.isEmpty {
+                                                itemView(item: item)
+                                            } else {
+                                                EmptyView()
+                                            }
                                         } else {
-                                            EmptyView()
+                                            itemView(item: item)
                                         }
-                                    } else {
-                                        itemView(item: item)
                                     }
+                                } else {
+                                    EmptyView()
                                 }
-                            } else {
-                                EmptyView()
-                            }
-                        } header: {
-                            Text(section.title)
-                                .font(.headline)
-                                .padding(.vertical, 12)
-                                .padding(.horizontal)
+                            } header: {
+                                HStack {
+                                    Image(systemName: section.isExpanded ? "arrowtriangle.up.fill" : "arrowtriangle.down.fill")
+                                        .padding(.leading, 16.0)
+                                    Text(section.title)
+                                        .font(.headline)
+                                        .padding(.vertical, 12)
+                                        .padding(.horizontal)
+                                }
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(Color.gray.opacity(0.2))
                                 .onTapGesture {
                                     viewModel.toggleCollapseForSection(for: section.title)
                                 }
+                            }
+                        }
+                    } else {
+                        ForEach(viewModel.utilities) { item in
+                            if let path = item.path {
+                                if path.isEmpty {
+                                    itemView(item: item)
+                                } else {
+                                    EmptyView()
+                                }
+                            } else {
+                                itemView(item: item)
+                            }
                         }
                     }
                 }

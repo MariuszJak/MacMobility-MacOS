@@ -70,14 +70,6 @@ struct NewBashUtilityView: View {
             }
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
-            HStack {
-                Text("Category")
-                    .font(.system(size: 14, weight: .regular))
-                    .padding(.trailing, 4.0)
-                RoundedTextField(placeholder: "", text: $viewModel.category)
-            }
-            .padding(.bottom, 6.0)
-            .frame(maxWidth: .infinity)
             
             HStack(alignment: .top) {
                 Text("Code")
@@ -102,7 +94,14 @@ struct NewBashUtilityView: View {
                 )
                 .padding(.leading, 16.0)
             }
-            
+            HStack {
+                Text("Category")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 4.0)
+                RoundedTextField(placeholder: "", text: $viewModel.category)
+            }
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
             HStack {
                 IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                     viewModel.selectedIcon = image
@@ -238,15 +237,6 @@ struct NewAutomationUtilityView: View {
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
             
-            HStack {
-                Text("Category")
-                    .font(.system(size: 14, weight: .regular))
-                    .padding(.trailing, 4.0)
-                RoundedTextField(placeholder: "", text: $viewModel.category)
-            }
-            .padding(.bottom, 6.0)
-            .frame(maxWidth: .infinity)
-            
             BlueButton(title: "Load Automation from File", font: .callout, padding: 8.0, backgroundColor: .gray) {
                 if let newAutomation = viewModel.loadAutomationFromFile() {
                     viewModel.automationCode = newAutomation.script
@@ -277,6 +267,14 @@ struct NewAutomationUtilityView: View {
                 )
                 .padding(.leading, 16.0)
             }
+            HStack {
+                Text("Category")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 4.0)
+                RoundedTextField(placeholder: "", text: $viewModel.category)
+            }
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
             HStack {
                 IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
                     viewModel.selectedIcon = image

@@ -53,8 +53,6 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-//                    leadingImage: "square.dashed",
-//                    backgroundColor: Color(hex: "#00C851")
                     backgroundColor: .clear
                 ) {
                     viewModel.addPage()
@@ -69,7 +67,6 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-//                    leadingImage: "plus.app",
                     backgroundColor: .clear
                 ) {
                     tab = .apps
@@ -85,7 +82,6 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-//                    leadingImage: Tab.shortcuts.icon,
                     backgroundColor: .clear
                 ) {
                     openInstallShortcutsWindow()
@@ -97,7 +93,6 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-//                    leadingImage: Tab.webpages.icon,
                     backgroundColor: .clear
                 ) {
                     openCreateNewWebpageWindow()
@@ -109,7 +104,6 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-//                    leadingImage: Tab.utilities.icon,
                     backgroundColor: .clear
                 ) {
                     openCreateNewUtilityWindow()
@@ -121,6 +115,7 @@ struct ShortcutsView: View {
                     .padding(.trailing, 48.0)
             }
             .padding([.horizontal, .top], 16)
+            .padding(.bottom, 8.0)
             .animation(.easeInOut, value: viewModel.connectionManager.pairingStatus)
             Divider()
         }
@@ -530,6 +525,14 @@ struct ShortcutsView: View {
                                     .onDrag {
                                         NSItemProvider(object: app.id as NSString)
                                     }
+                                    if let automation = viewModel.appHasAutomation(path: app.path ?? "") {
+                                        Spacer()
+                                        Button("Automation") {
+                                            openAutomationItemWindow(automation)
+                                        }
+                                        .buttonStyle(.borderedProminent)
+                                        .tint(.blue)
+                                    }
                                     if viewModel.isAppAddedByUser(path: app.path ?? "") {
                                         Spacer()
                                         Button("Remove") {
@@ -690,6 +693,7 @@ struct ShortcutsView: View {
             automationsToInstallWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: ExploreAutomationsView(openDetailsPage: { item in
                 openAutomationItemWindow(item)
+                automationsToInstallWindow?.close()
             }))
             automationsToInstallWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = automationsToInstallWindow?.contentView?.bounds ?? .zero
@@ -749,6 +753,8 @@ struct ShortcutsView: View {
             automationItemWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: AutomationInstallView(automationItem: item, selectedScriptsAction: { scripts in
                 viewModel.addAutomations(from: scripts)
+                automationItemWindow?.close()
+                tab = .utilities
             }))
             automationItemWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = automationItemWindow?.contentView?.bounds ?? .zero

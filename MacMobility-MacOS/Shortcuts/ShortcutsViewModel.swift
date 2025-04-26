@@ -26,7 +26,7 @@ extension Array where Element: Equatable {
 }
 
 public struct ShortcutObject: Identifiable, Codable, Equatable {
-    public let index: Int?
+    public var index: Int?
     public var page: Int
     public let id: String
     public let title: String
@@ -90,7 +90,7 @@ class ShortcutSection: Identifiable {
     }
 }
 
-public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate {
+public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
     let connectionManager: ConnectionManager
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []
@@ -117,6 +117,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var tmpAllItems: [ShortcutObject] = []
     private var setupMode: SetupMode?
     private var websites: [WebsiteTest] = []
+    private var automations: AutomationsList?
+    private var createMultiactions: Bool?
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clearAll()
@@ -126,6 +128,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         self.utilities = UserDefaults.standard.get(key: .utilities) ?? []
         self.pages = UserDefaults.standard.get(key: .pages) ?? 1
         self.appsAddedByUser = UserDefaults.standard.get(key: .userApps) ?? []
+        self.automations = loadJSON("automations")
         fetchShortcuts()
         fetchInstalledApps()
         registerListener()
@@ -145,11 +148,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
             }
         }
+        
         utilities.forEach { so in
             if sections.contains(where: { $0.title.lowercased() == so.category?.lowercased() }) {
                 if let index = sections.firstIndex(where: { $0.title.lowercased() == so.category?.lowercased() }) {
                     if !sections[index].items.contains(where: { $0.id == so.id }) {
                         sections[index].items.append(so)
+                    } else {
+                        if let itemIndex = sections[index].items.firstIndex(where: { $0.id == so.id }) {
+                            sections[index].items[itemIndex] = so
+                        }
                     }
                 }
             } else if let category = so.category {
@@ -161,7 +169,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         }
                     }
                 } else {
-                    sections.append(.init(title: title, isExpanded: true, items: [so]))
+                    sections.insert(.init(title: title, isExpanded: true, items: [so]), at: 0)
                 }
             }
         }
@@ -193,6 +201,13 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             }
             .store(in: &cancellables)
         
+        connectionManager.$createMultiactions
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] createMultiactions in
+                self?.createMultiactions = createMultiactions
+            }
+            .store(in: &cancellables)
+        
         connectionManager.$initialSetup
             .receive(on: DispatchQueue.main)
             .sink { [weak self] setupMode in
@@ -217,6 +232,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     func isAppAddedByUser(path: String) -> Bool {
         appsAddedByUser.contains(where: { $0.path == path })
+    }
+    
+    func appHasAutomation(path: String) -> AutomationItem? {
+        guard let name = path.appNameFromPath() else {
+            return nil
+        }
+        if let automation = automations?.automations.first(where: { $0.title.lowercased() == name.lowercased() }) {
+            return automation
+        }
+        return nil
     }
     
     func removeAppInstalledByUser(path: String) {
@@ -249,14 +274,24 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     let so: ShortcutObject = .from(script: script, at: index)
                     addConfiguredShortcut(object: so)
                 }
+                var websitesSO: [ShortcutObject] = []
                 websites.forEach { website in
                     if website.url.containsValidDomain {
                         let updatedURL = website.url.applyHTTPS()
                         let so: ShortcutObject = .init(type: .webpage, page: 1, index: i, path: updatedURL, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: .safari, imageData: website.nsImage?.toData, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
                         saveWebpage(with: so)
                         addConfiguredShortcut(object: so)
+                        websitesSO.append(so)
                         i += 1
                     }
+                }
+                if let createMultiactions, createMultiactions {
+                    websitesSO.enumerated().forEach { (index, _) in
+                        websitesSO[index].index = index
+                    }
+                    let ma: ShortcutObject = .init(type: .utility, page: 1, index: i, path: nil, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData, scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: false, category: "Multiselection")
+                    saveUtility(with: ma)
+                    addConfiguredShortcut(object: ma)
                 }
             }
         }
