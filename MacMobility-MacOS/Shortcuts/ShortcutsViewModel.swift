@@ -40,6 +40,7 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
     public var utilityType: UtilityObject.UtilityType?
     public var objects: [ShortcutObject]?
     public var showTitleOnIcon: Bool?
+    public var category: String?
     
     public init(
         type: ShortcutType,
@@ -55,7 +56,8 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         scriptCode: String? = nil,
         utilityType: UtilityObject.UtilityType? = nil,
         objects: [ShortcutObject]? = nil,
-        showTitleOnIcon: Bool = true
+        showTitleOnIcon: Bool = true,
+        category: String? = nil
     ) {
         self.page = page
         self.type = type
@@ -71,6 +73,20 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         self.browser = browser
         self.objects = objects
         self.showTitleOnIcon = showTitleOnIcon
+        self.category = category
+    }
+}
+
+class ShortcutSection: Identifiable {
+    var id: String = UUID().uuidString
+    var title: String
+    @Published var isExpanded: Bool
+    var items: [ShortcutObject]
+    
+    init(title: String, isExpanded: Bool, items: [ShortcutObject]) {
+        self.title = title
+        self.isExpanded = isExpanded
+        self.items = items
     }
 }
 
@@ -81,13 +97,18 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var installedApps: [ShortcutObject] = []
     @Published var appsAddedByUser: [ShortcutObject] = []
     @Published var webpages: [ShortcutObject] = []
-    @Published var utilities: [ShortcutObject] = []
+    @Published var utilities: [ShortcutObject] = [] {
+        didSet {
+            sections = utilitiesWithSections()
+        }
+    }
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     @Published var pages = 1
     @Published var scrollToApp: String = ""
     @Published var scrollToPage: Int = 0
     @Published var availablePeerName: String = ""
+    @Published var sections: [ShortcutSection] = []
     var close: () -> Void = {}
     private var timer: Timer?
     public var testColor = "#6DDADE"
@@ -109,6 +130,50 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchInstalledApps()
         registerListener()
         startMonitoring()
+    }
+    
+    func utilitiesWithSections(removeId: String? = nil) -> [ShortcutSection] {
+        if let removeId {
+            sections.enumerated().forEach { sectionIndex, section in
+                section.items.enumerated().forEach { itemIndex, item in
+                    if item.id == removeId {
+                        sections[sectionIndex].items.remove(at: itemIndex)
+                        if sections[sectionIndex].items.isEmpty {
+                            sections.remove(at: sectionIndex)
+                        }
+                    }
+                }
+            }
+        }
+        utilities.forEach { so in
+            if sections.contains(where: { $0.title.lowercased() == so.category?.lowercased() }) {
+                if let index = sections.firstIndex(where: { $0.title.lowercased() == so.category?.lowercased() }) {
+                    if !sections[index].items.contains(where: { $0.id == so.id }) {
+                        sections[index].items.append(so)
+                    }
+                }
+            } else if let category = so.category {
+                let title = category.isEmpty ? "Other" : category
+                if sections.contains(where: { $0.title.lowercased() == title.lowercased() }) {
+                    if let index = sections.firstIndex(where: { $0.title.lowercased() == title.lowercased() }) {
+                        if !sections[index].items.contains(where: { $0.id == so.id }) {
+                            sections[index].items.append(so)
+                        }
+                    }
+                } else {
+                    sections.append(.init(title: title, isExpanded: true, items: [so]))
+                }
+            }
+        }
+        
+        return sections
+    }
+    
+    func toggleCollapseForSection(for title: String) {
+        if let index = sections.firstIndex(where: { $0.title.lowercased() == title.lowercased() }) {
+            sections[index].isExpanded.toggle()
+        }
+        utilities = UserDefaults.standard.get(key: .utilities) ?? []
     }
     
     func registerListener() {
@@ -254,6 +319,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         UserDefaults.standard.store(utilities, for: .utilities)
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+        sections = utilitiesWithSections(removeId: id)
     }
     
     func addAutomations(from scripts: [AutomationScript]) {
@@ -283,7 +349,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         scriptCode: oldObject.scriptCode,
                         utilityType: oldObject.utilityType,
                         objects: oldObject.objects,
-                        showTitleOnIcon: oldObject.showTitleOnIcon ?? true
+                        showTitleOnIcon: oldObject.showTitleOnIcon ?? true,
+                        category: oldObject.category
                     )
                 }
             }
@@ -345,7 +412,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     browser: webpageItem.browser,
                     imageData: webpageItem.imageData,
                     objects: webpageItem.objects,
-                    showTitleOnIcon: webpageItem.showTitleOnIcon ?? true
+                    showTitleOnIcon: webpageItem.showTitleOnIcon ?? true,
+                    category: webpageItem.category
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
@@ -374,7 +442,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     scriptCode: utilityItem.scriptCode,
                     utilityType: utilityItem.utilityType,
                     objects: utilityItem.objects,
-                    showTitleOnIcon: utilityItem.showTitleOnIcon ?? true
+                    showTitleOnIcon: utilityItem.showTitleOnIcon ?? true,
+                    category: utilityItem.category
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
@@ -441,7 +510,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func startMonitoring() {
-        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 6, repeats: true) { [weak self] _ in
             self?.fetchShortcuts()
         }
     }
@@ -601,6 +670,7 @@ struct AutomationScript: Identifiable, Codable, Equatable {
     var imageName: String?
     var type: AutomationType?
     var isAdvanced: Bool?
+    var category: String?
 }
 
 struct AutomationItem: Identifiable, Codable {
@@ -840,7 +910,8 @@ extension ShortcutObject {
             scriptCode: script.script,
             utilityType: utilityType,
             objects: nil,
-            showTitleOnIcon: false
+            showTitleOnIcon: false,
+            category: script.category
         )
     }
 }

@@ -265,7 +265,8 @@ struct ShortcutsView: View {
                         scriptCode: object.scriptCode,
                         utilityType: object.utilityType,
                         objects: object.objects,
-                        showTitleOnIcon: object.showTitleOnIcon ?? true
+                        showTitleOnIcon: object.showTitleOnIcon ?? true,
+                        category: object.category
                     )
             )
         }

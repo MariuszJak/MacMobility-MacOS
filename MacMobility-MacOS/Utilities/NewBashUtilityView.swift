@@ -10,6 +10,7 @@ import SwiftUI
 class NewBashUtilityViewModel: ObservableObject {
     var id: String?
     @Published var title: String = ""
+    @Published var category: String = ""
     @Published var iconData: Data?
     @Published var selectedIcon: NSImage? = NSImage(named: "terminal")
     @Published var scriptCode: String = ""
@@ -19,6 +20,7 @@ class NewBashUtilityViewModel: ObservableObject {
         id = nil
         iconData = nil
         title = ""
+        category = ""
         scriptCode = ""
         showTitleOnIcon = true
     }
@@ -40,6 +42,7 @@ struct NewBashUtilityView: View {
             viewModel.id = item.id
             viewModel.scriptCode = item.scriptCode ?? ""
             viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
+            viewModel.category = item.category ?? ""
             if let data = item.imageData {
                 viewModel.selectedIcon = NSImage(data: data)
             }
@@ -64,6 +67,14 @@ struct NewBashUtilityView: View {
                     Text("Show title on icon")
                         .font(.system(size: 14.0))
                 }
+            }
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
+            HStack {
+                Text("Category")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 4.0)
+                RoundedTextField(placeholder: "", text: $viewModel.category)
             }
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
@@ -114,7 +125,8 @@ struct NewBashUtilityView: View {
                             imageData: viewModel.selectedIcon?.toData,
                             scriptCode: viewModel.scriptCode,
                             utilityType: .commandline,
-                            showTitleOnIcon: viewModel.showTitleOnIcon
+                            showTitleOnIcon: viewModel.showTitleOnIcon,
+                            category: viewModel.category
                         )
                     )
                     viewModel.clear()
@@ -146,6 +158,7 @@ struct Automation: Identifiable {
 class NewAutomationUtilityViewModel: ObservableObject {
     var id: String?
     @Published var title: String = ""
+    @Published var category: String = ""
     @Published var iconData: Data?
     @Published var selectedIcon: NSImage? = NSImage(named: "automation")
     @Published var automationCode: String = ""
@@ -155,6 +168,7 @@ class NewAutomationUtilityViewModel: ObservableObject {
         id = nil
         iconData = nil
         title = ""
+        category = ""
         automationCode = ""
         showTitleOnIcon = true
     }
@@ -195,6 +209,7 @@ struct NewAutomationUtilityView: View {
             viewModel.id = item.id
             viewModel.automationCode = item.scriptCode ?? ""
             viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
+            viewModel.category = item.category ?? ""
             if let data = item.imageData {
                 viewModel.selectedIcon = NSImage(data: data)
             }
@@ -219,6 +234,15 @@ struct NewAutomationUtilityView: View {
                     Text("Show title on icon")
                         .font(.system(size: 14.0))
                 }
+            }
+            .padding(.bottom, 6.0)
+            .frame(maxWidth: .infinity)
+            
+            HStack {
+                Text("Category")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 4.0)
+                RoundedTextField(placeholder: "", text: $viewModel.category)
             }
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
@@ -275,7 +299,8 @@ struct NewAutomationUtilityView: View {
                                 imageData: viewModel.selectedIcon?.toData,
                                 scriptCode: viewModel.automationCode,
                                 utilityType: .automation,
-                                showTitleOnIcon: viewModel.showTitleOnIcon
+                                showTitleOnIcon: viewModel.showTitleOnIcon,
+                                category: viewModel.category
                             )
                     )
                     viewModel.clear()

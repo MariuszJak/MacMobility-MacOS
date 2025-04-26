@@ -102,7 +102,8 @@ struct NewMultiSelectionUtilityView: View {
                                                 scriptCode: object.scriptCode,
                                                 utilityType: object.utilityType,
                                                 objects: object.objects,
-                                                showTitleOnIcon: object.showTitleOnIcon ?? true
+                                                showTitleOnIcon: object.showTitleOnIcon ?? true,
+                                                category: object.category
                                             )
                                     )
                                 }
@@ -135,7 +136,8 @@ struct NewMultiSelectionUtilityView: View {
                                 imageData: viewModel.selectedIcon?.toData,
                                 utilityType: .multiselection,
                                 objects: viewModel.configuredShortcuts,
-                                showTitleOnIcon: viewModel.showTitleOnIcon
+                                showTitleOnIcon: viewModel.showTitleOnIcon,
+                                category: "Multiselection"
                             )
                     )
                     viewModel.clear()

@@ -56,15 +56,33 @@ struct UtilitiesWindowView: View {
                 ScrollView {
                     Spacer()
                         .frame(height: 16.0)
-                    ForEach(viewModel.utilities) { item in
-                        if let path = item.path {
-                            if path.isEmpty {
-                                itemView(item: item)
+                    ForEach(viewModel.sections) { section in
+                        Section {
+                            if section.isExpanded {
+                                ForEach(section.items) { item in
+                                    if let path = item.path {
+                                        if path.isEmpty {
+                                            itemView(item: item)
+                                        } else {
+                                            EmptyView()
+                                        }
+                                    } else {
+                                        itemView(item: item)
+                                    }
+                                }
                             } else {
                                 EmptyView()
                             }
-                        } else {
-                            itemView(item: item)
+                        } header: {
+                            Text(section.title)
+                                .font(.headline)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.gray.opacity(0.2))
+                                .onTapGesture {
+                                    viewModel.toggleCollapseForSection(for: section.title)
+                                }
                         }
                     }
                 }

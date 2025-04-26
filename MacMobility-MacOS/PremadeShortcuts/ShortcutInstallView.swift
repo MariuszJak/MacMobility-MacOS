@@ -86,7 +86,7 @@ class ShortcutInstallViewModel: ObservableObject {
     }
     
     func startMonitoring() {
-        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 6, repeats: true) { [weak self] _ in
             self?.updateInstallationInfo()
         }
     }

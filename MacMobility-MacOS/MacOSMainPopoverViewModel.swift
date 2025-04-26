@@ -56,7 +56,7 @@ class MacOSMainPopoverViewModel: ObservableObject {
     }
     
     func startMonitoring() {
-        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 60 * 60, repeats: true) { [weak self] _ in
             guard let self else { return }
             trialManager.checkTrialStatus()
             isTrialExpired = trialManager.isTrialExpired
