@@ -43,15 +43,19 @@ class IconPickerViewModel: ObservableObject {
                     self.fetchHighResIcon(from: text) { image in
                         if let image {
                             self.assignImage(image)
+                            print("Assigned from 1")
                             self.isFetchingIcon = false
                         } else {
                             self.fetchFaviconFromHTML(for: text) { image in
                                 if let image {
                                     self.assignImage(image)
+                                    print("Assigned from 2")
                                     self.isFetchingIcon = false
                                 } else {
                                     self.fetchFavicon(for: text) { _ in
-                                        self.isFetchingIcon = false
+                                        DispatchQueue.main.async {
+                                            self.isFetchingIcon = false
+                                        }
                                     }
                                 }
                             }
@@ -107,6 +111,7 @@ class IconPickerViewModel: ObservableObject {
             if let image = NSImage(data: data) {
                 DispatchQueue.main.async {
                     completion(true)
+                    print("Assigned from 3")
                     self.assignImage(image)
                 }
             }

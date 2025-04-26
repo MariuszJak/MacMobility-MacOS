@@ -77,7 +77,17 @@ struct NewWebpageView: View {
                 Text("Link")
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 20.0)
-                RoundedTextField(placeholder: "", text: $viewModel.link)
+                    .padding(.bottom, 16.0)
+                VStack {
+                    RoundedTextField(placeholder: "", text: $viewModel.link)
+                        .padding(.bottom, 4.0)
+                    Text("Start typing url, and icon will be automatically downloaded. If it fails, use direct url or select icon from disc.")
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(2)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.gray)
+                        .padding(.leading, 20.0)
+                }
             }
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
@@ -85,7 +95,14 @@ struct NewWebpageView: View {
                 Text("Image")
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 8.0)
-                RoundedTextField(placeholder: "https://example.com/icon.png", text: $viewModel.faviconLink)
+                VStack(alignment: .leading) {
+                    RoundedTextField(placeholder: "https://example.com/icon.png", text: $viewModel.faviconLink)
+                        .padding(.bottom, 4.0)
+                    Text("You can add any image URL here. Image will be cached after download.")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.gray)
+                        .padding(.leading, 20.0)
+                }
             }
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
@@ -104,7 +121,8 @@ struct NewWebpageView: View {
                 searchText: viewModel.link,
                 completion: { image in
                     viewModel.savedIcon = image
-                }), userSelectedIcon: $viewModel.userSelectedIcon
+                }), userSelectedIcon: $viewModel.userSelectedIcon,
+                           favicon: $viewModel.faviconLink
             )
             .padding(.bottom, 12.0)
             .padding(.leading, 70.0)

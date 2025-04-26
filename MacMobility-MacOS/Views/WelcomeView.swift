@@ -10,19 +10,24 @@ import QRCode
 import AppKit
 
 struct WebsiteTest {
+    let id: String
     let nsImage: NSImage?
-    let url: String
+    var url: String
 }
 
 class WelcomeViewModel: ObservableObject {
     @Published var currentPage = 0
     let pageLimit = 6
-    let closeAction: (SetupMode?, [AutomationOption]?, WebsiteTest?) -> Void
+    let closeAction: (SetupMode?, [AutomationOption]?, [WebsiteTest]) -> Void
     private(set) var setupMode: SetupMode?
     private(set) var automationOptions: [AutomationOption]?
-    private(set) var website: WebsiteTest?
+    private(set) var websites: [WebsiteTest] = [
+        .init(id: UUID().uuidString, nsImage: nil, url: ""),
+        .init(id: UUID().uuidString, nsImage: nil, url: ""),
+        .init(id: UUID().uuidString, nsImage: nil, url: "")
+    ]
     
-    init(closeAction: @escaping (SetupMode?, [AutomationOption]?, WebsiteTest?) -> Void) {
+    init(closeAction: @escaping (SetupMode?, [AutomationOption]?, [WebsiteTest]) -> Void) {
         self.closeAction = closeAction
     }
     
@@ -37,7 +42,7 @@ class WelcomeViewModel: ObservableObject {
     }
     
     func close() {
-        closeAction(setupMode, automationOptions, website)
+        closeAction(setupMode, automationOptions, websites)
     }
     
     func updateSetupMode(_ setupMode: SetupMode) {
@@ -49,7 +54,15 @@ class WelcomeViewModel: ObservableObject {
     }
     
     func updateWebsite(_ website: WebsiteTest) {
-        self.website = website
+        if let index = websites.firstIndex(where: { $0.id == website.id }) {
+            websites[index] = website
+        }
+    }
+    
+    func updateURL(for id: String, url: String) {
+        if let index = websites.firstIndex(where: { $0.id == id }) {
+            websites[index].url = url
+        }
     }
 }
 
@@ -57,6 +70,7 @@ struct WelcomeView: View {
     @ObservedObject private var viewModel: WelcomeViewModel
     @State private var showWelcomeText = false
     @State private var scaleEffect: CGFloat = 0.8
+    @State private var showSkipAlert: Bool = false
     
     init(viewModel: WelcomeViewModel) {
         self.viewModel = viewModel
@@ -81,9 +95,15 @@ struct WelcomeView: View {
                         viewModel.updateAutomationOptions(options)
                     })
                 case 5:
-                    PredefinedWebsitesCreationView() { website in
-                        viewModel.updateWebsite(website)
-                    }
+                    PredefinedWebsitesCreationView(viewModel: .init(
+                        websiteOne: viewModel.websites[0],
+                        webstiteTwo: viewModel.websites[1],
+                        websiteThree: viewModel.websites[2])) { website in
+                            viewModel.updateWebsite(website)
+                        } urlUpdate: { id, url in
+                            viewModel.updateURL(for: id, url: url)
+                        }
+
                 case 6:
                     FinalScreenView {
                         viewModel.close()
@@ -114,9 +134,25 @@ struct WelcomeView: View {
                         .tint(.blue)
                     }
                     Spacer()
+                    Button("Skip") {
+                        self.showSkipAlert = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
                 }
                 .padding()
             }
+        }
+        .alert("Skip Onboarding?", isPresented: $showSkipAlert) {
+            Button("Continue Onboarding", role: .none) {
+                showSkipAlert = false
+            }
+            Button("Skip", role: .cancel) {
+                showSkipAlert = false
+                self.viewModel.close()
+            }
+        } message: {
+            Text("Are you sure you want to skip onboarding? You might miss important setup information.")
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 5)) {
@@ -770,20 +806,46 @@ struct PlusButtonView: View {
 
 class PredefinedWebsitesCreationViewModel: ObservableObject {
     @Published var firstLink: String = ""
+    @Published var secondLink: String = ""
+    @Published var thirdLink: String = ""
     @Published var selectedIcon: NSImage?
+    @Published var selectedIconTwo: NSImage?
+    @Published var selectedIconThree: NSImage?
+    var savedIcon: NSImage?
+    var savedIconTwo: NSImage?
+    var savedIconThree: NSImage?
+    var idOne: String
+    var idTwo: String
+    var idThree: String
+    
+    init(websiteOne: WebsiteTest, webstiteTwo: WebsiteTest, websiteThree: WebsiteTest) {
+        self.firstLink = websiteOne.url
+        self.secondLink = webstiteTwo.url
+        self.thirdLink = websiteThree.url
+        self.selectedIcon = websiteOne.nsImage
+        self.selectedIconTwo = webstiteTwo.nsImage
+        self.selectedIconThree = websiteThree.nsImage
+        self.savedIcon = websiteOne.nsImage
+        self.savedIconTwo = webstiteTwo.nsImage
+        self.savedIconThree = websiteThree.nsImage
+        self.idOne = websiteOne.id
+        self.idTwo = webstiteTwo.id
+        self.idThree = websiteThree.id
+    }
 }
 
 struct PredefinedWebsitesCreationView: View {
-    @ObservedObject var viewModel = PredefinedWebsitesCreationViewModel()
+    @ObservedObject var viewModel: PredefinedWebsitesCreationViewModel
     var action: (WebsiteTest) -> Void
+    var urlUpdate: (String, String) -> Void
     
     var body: some View {
         VStack(spacing: 32) {
-            Text("Do you have your favourite website?")
+            Text("Do you have your favourite websites?")
                 .font(.title)
                 .fontWeight(.bold)
             
-            Text("Add url to get started! This website will be displayed in your workspaces automatically!")
+            Text("Add urls of your three favourite websites here. Those will appar in yor workspace!")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -795,17 +857,66 @@ struct PredefinedWebsitesCreationView: View {
                     .padding(.trailing, 20.0)
                 RoundedTextField(placeholder: "", text: $viewModel.firstLink)
                 IconPickerView(viewModel: .init(
-                    selectedImage: viewModel.selectedIcon,
-                    shouldAutofetchImage: true,
+                    selectedImage: viewModel.selectedIcon ?? viewModel.savedIcon,
+                    shouldAutofetchImage: viewModel.selectedIcon == nil,
                     searchText: viewModel.firstLink,
                     completion: { image in
-                        viewModel.selectedIcon = image
-                        action(.init(nsImage: image, url: viewModel.firstLink))
-                    }), userSelectedIcon: .constant(nil), imageSize: .init(width: 50.0, height: 50.0)
+                        viewModel.savedIcon = image
+                        action(.init(id: viewModel.idOne, nsImage: viewModel.selectedIcon ?? image, url: viewModel.firstLink))
+                    }), userSelectedIcon: $viewModel.selectedIcon, imageSize: .init(width: 50.0, height: 50.0)
                 )
             }
-            .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
+            .onChange(of: viewModel.selectedIcon) { oldValue, newValue in
+                action(.init(id: viewModel.idOne, nsImage: newValue, url: viewModel.firstLink))
+            }
+            .onChange(of: viewModel.firstLink) { oldValue, newValue in
+                urlUpdate(viewModel.idOne, newValue)
+            }
+            HStack {
+                Text("Link")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 20.0)
+                RoundedTextField(placeholder: "", text: $viewModel.secondLink)
+                IconPickerView(viewModel: .init(
+                    selectedImage: viewModel.selectedIconTwo ?? viewModel.savedIconTwo,
+                    shouldAutofetchImage: viewModel.selectedIconTwo == nil,
+                    searchText: viewModel.secondLink,
+                    completion: { image in
+                        viewModel.savedIconTwo = image
+                        action(.init(id: viewModel.idTwo, nsImage: image, url: viewModel.secondLink))
+                    }), userSelectedIcon: $viewModel.selectedIconTwo, imageSize: .init(width: 50.0, height: 50.0)
+                )
+            }
+            .frame(maxWidth: .infinity)
+            .onChange(of: viewModel.selectedIconTwo) { oldValue, newValue in
+                action(.init(id: viewModel.idTwo, nsImage: newValue, url: viewModel.secondLink))
+            }
+            .onChange(of: viewModel.secondLink) { oldValue, newValue in
+                urlUpdate(viewModel.idTwo, newValue)
+            }
+            HStack {
+                Text("Link")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 20.0)
+                RoundedTextField(placeholder: "", text: $viewModel.thirdLink)
+                IconPickerView(viewModel: .init(
+                    selectedImage: viewModel.selectedIconThree ?? viewModel.savedIconThree,
+                    shouldAutofetchImage: viewModel.selectedIconThree == nil,
+                    searchText: viewModel.thirdLink,
+                    completion: { image in
+                        viewModel.savedIconThree = image
+                        action(.init(id: viewModel.idThree, nsImage: image, url: viewModel.thirdLink))
+                    }), userSelectedIcon: $viewModel.selectedIconThree, imageSize: .init(width: 50.0, height: 50.0)
+                )
+            }
+            .frame(maxWidth: .infinity)
+            .onChange(of: viewModel.selectedIconThree) { oldValue, newValue in
+                action(.init(id: viewModel.idThree, nsImage: newValue, url: viewModel.thirdLink))
+            }
+            .onChange(of: viewModel.thirdLink) { oldValue, newValue in
+                urlUpdate(viewModel.idThree, newValue)
+            }
         }
         .padding()
     }

@@ -517,13 +517,18 @@ struct ShortcutsView: View {
                         ForEach(viewModel.installedApps) { app in
                             HStack {
                                 HStack {
-                                    Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
-                                        .resizable()
-                                        .frame(width: 46, height: 46)
-                                        .cornerRadius(cornerRadius)
-                                        .padding(.trailing, 8)
-                                    Text(app.title)
-                                        .padding(.vertical, 6.0)
+                                    HStack {
+                                        Image(nsImage: NSWorkspace.shared.icon(forFile: app.path ?? ""))
+                                            .resizable()
+                                            .frame(width: 46, height: 46)
+                                            .cornerRadius(cornerRadius)
+                                            .padding(.trailing, 8)
+                                        Text(app.title)
+                                            .padding(.vertical, 6.0)
+                                    }
+                                    .onDrag {
+                                        NSItemProvider(object: app.id as NSString)
+                                    }
                                     if viewModel.isAppAddedByUser(path: app.path ?? "") {
                                         Spacer()
                                         Button("Remove") {
@@ -534,9 +539,7 @@ struct ShortcutsView: View {
                                 .id(app.title)
                                 Spacer()
                             }
-                            .onDrag {
-                                NSItemProvider(object: app.id as NSString)
-                            }
+                            
                             .background(app.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
                             .animation(.easeOut, value: appNameToFlash)
                             .cornerRadius(10)
@@ -598,7 +601,7 @@ struct ShortcutsView: View {
     private func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

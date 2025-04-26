@@ -35,7 +35,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popOver.contentViewController?.view = NSHostingView(rootView: menuView)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
-//        openWelcomeWindow()
+        if lifecycle.openCount == 0 {
+            openWelcomeWindow()
+        }
         if lifecycle.openCount < 2 {
             openPermissionsWindow()
             let openCount = lifecycle.openCount + 1
@@ -68,8 +70,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             welcomeWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions, website in
-                self.connectionManager.website = website
+            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions, websites in
+                self.connectionManager.websites = websites
                 self.connectionManager.initialSetup = setupMode
                 self.connectionManager.automatedActions = automatedActions
                 self.welcomeWindow?.close()

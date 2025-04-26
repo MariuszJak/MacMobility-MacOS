@@ -95,7 +95,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var cachedIcons: [String: Data] = [:]
     private var tmpAllItems: [ShortcutObject] = []
     private var setupMode: SetupMode?
-    private var website: WebsiteTest?
+    private var websites: [WebsiteTest] = []
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clearAll()
@@ -135,10 +135,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             }
             .store(in: &cancellables)
         
-        connectionManager.$website
+        connectionManager.$websites
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] website in
-                self?.website = website
+            .sink { [weak self] websites in
+                self?.websites = websites
             }
             .store(in: &cancellables)
         
@@ -184,10 +184,14 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     let so: ShortcutObject = .from(script: script, at: index)
                     addConfiguredShortcut(object: so)
                 }
-                if let website = website {
-                    let so: ShortcutObject = .init(type: .webpage, page: 1, index: i, path: website.url, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: .safari, imageData: website.nsImage?.toData, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
-                    saveWebpage(with: so)
-                    addConfiguredShortcut(object: so)
+                websites.forEach { website in
+                    if website.url.containsValidDomain {
+                        let updatedURL = website.url.applyHTTPS()
+                        let so: ShortcutObject = .init(type: .webpage, page: 1, index: i, path: updatedURL, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: .safari, imageData: website.nsImage?.toData, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
+                        saveWebpage(with: so)
+                        addConfiguredShortcut(object: so)
+                        i += 1
+                    }
                 }
             }
         }

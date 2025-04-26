@@ -119,7 +119,7 @@ struct WebpagesWindowView: View {
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
                         }
                     }
-                    Text(item.title)
+                    Text(item.title.isEmpty ? item.path ?? "Untitled" : item.title)
                 }
                 .onDrag {
                     NSItemProvider(object: item.id as NSString)
@@ -148,7 +148,7 @@ struct WebpagesWindowView: View {
     private func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
