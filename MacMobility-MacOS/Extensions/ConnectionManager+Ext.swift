@@ -96,6 +96,11 @@ extension ConnectionManager {
                         self.send(alert: .init(title: "Automation Error", message: error.description))
                     }
                 }
+            case .macro:
+                if let script = shortcutItem.scriptCode {
+                    keyRecorder.recordedKeys = script.split(separator: ",").map { .init(key: $0.base) }
+                    keyRecorder.playMacro()
+                }
             case .none:
                 break
             @unknown default:
@@ -132,12 +137,22 @@ extension ConnectionManager {
                                 self.send(alert: .init(title: "Automation Error", message: error.description))
                             }
                         }
+                    case .macro:
+                        if let script = tool.scriptCode {
+                            keyRecorder.recordedKeys = script.split(separator: ",").map { .init(key: $0.base) }
+                            keyRecorder.playMacro()
+                        }
                     case .none:
                         break
                     }
                 }
             }
         }
+    }
+    
+    func activateApp(named appName: String) {
+        let apps = NSRunningApplication.runningApplications(withBundleIdentifier: appName)
+        apps.first?.activate(options: [.activateAllWindows])
     }
     
     @discardableResult

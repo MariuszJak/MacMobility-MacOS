@@ -41,6 +41,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var automatedActions: [AutomationOption]?
     @Published var websites: [WebsiteTest] = []
     @Published var createMultiactions: Bool?
+    let keyRecorder = KeyRecorder()
     private var cancellables = Set<AnyCancellable>()
     public var currentIndex = 0
     public let serviceType = "magic-trackpad"

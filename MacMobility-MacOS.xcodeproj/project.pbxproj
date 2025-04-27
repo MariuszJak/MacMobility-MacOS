@@ -38,6 +38,8 @@
 		C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */; };
 		C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */; };
 		C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */; };
+		C0D0941F2DBE35A100C8EAA4 /* MacroRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */; };
+		C0D094212DBE35B900C8EAA4 /* KeyRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D094202DBE35B900C8EAA4 /* KeyRecorder.swift */; };
 		C0D21D632D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D622D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift */; };
 		C0D21D652D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D642D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift */; };
 		C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D21D662D7A25D700FEF931 /* ScreenItem.swift */; };
@@ -152,6 +154,8 @@
 		C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionSenable.swift; sourceTree = "<group>"; };
 		C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacesWindowView.swift; sourceTree = "<group>"; };
 		C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacesWindowViewModel.swift; sourceTree = "<group>"; };
+		C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroRecorderView.swift; sourceTree = "<group>"; };
+		C0D094202DBE35B900C8EAA4 /* KeyRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyRecorder.swift; sourceTree = "<group>"; };
 		C0D21D622D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateWorkspaceWithMultipleScreens.swift; sourceTree = "<group>"; };
 		C0D21D642D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateWorkspaceWithMultipleScreensViewModel.swift; sourceTree = "<group>"; };
 		C0D21D662D7A25D700FEF931 /* ScreenItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenItem.swift; sourceTree = "<group>"; };
@@ -283,6 +287,7 @@
 				C0EAFC172D9030D000044947 /* LicenseKeyGenerator.swift */,
 				C0EAFC192D903E7400044947 /* TrialManager.swift */,
 				C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */,
+				C0D094202DBE35B900C8EAA4 /* KeyRecorder.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -418,6 +423,7 @@
 				C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */,
 				C0EAF93A2D8CC67600044947 /* NewMultiSelectionUtilityView.swift */,
 				C0EAF93C2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift */,
+				C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -661,6 +667,7 @@
 				C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */,
 				C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */,
 				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
+				C0D0941F2DBE35A100C8EAA4 /* MacroRecorderView.swift in Sources */,
 				C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */,
 				C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */,
 				C03581082DB6501E009E22F5 /* IconPickerView.swift in Sources */,
@@ -686,6 +693,7 @@
 				C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */,
 				C09775662B5C31EE00F4FFE6 /* MacOSMainView.swift in Sources */,
 				C05DA73A2DAC104A00BD4FBA /* UpdateScreenView.swift in Sources */,
+				C0D094212DBE35B900C8EAA4 /* KeyRecorder.swift in Sources */,
 				C0EAF93D2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift in Sources */,
 				C064BA652D876F7C0091E2BE /* NSColor+Ext.swift in Sources */,
 				C0D21D6F2D7A266100FEF931 /* AddNewScreenView.swift in Sources */,

@@ -62,7 +62,7 @@ struct UtilitiesWindowView: View {
                                 if section.isExpanded {
                                     ForEach(section.items) { item in
                                         if let path = item.path {
-                                            if path.isEmpty {
+                                            if path.isEmpty || path != "Hidden" {
                                                 itemView(item: item)
                                             } else {
                                                 EmptyView()
@@ -93,7 +93,7 @@ struct UtilitiesWindowView: View {
                     } else {
                         ForEach(viewModel.utilities) { item in
                             if let path = item.path {
-                                if path.isEmpty {
+                                if path.isEmpty || path != "Hidden" {
                                     itemView(item: item)
                                 } else {
                                     EmptyView()
@@ -251,6 +251,13 @@ struct UtilitiesWindowView: View {
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
+            case .macro:
+                let hv = NSHostingController(rootView: MacroRecorderView(item: item, delegate: viewModel){
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .none:
                 break
             }
@@ -275,6 +282,13 @@ struct UtilitiesWindowView: View {
             hv.view.autoresizingMask = [.width, .height]
         case .automation:
             let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
+                editUtilitiesWindow?.close()
+            })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        case .macro:
+            let hv = NSHostingController(rootView: MacroRecorderView(item: item, delegate: viewModel){
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)

@@ -13,6 +13,7 @@ public struct UtilityObject: Identifiable {
         case commandline
         case multiselection
         case automation
+        case macro
     }
     let type: UtilityType
     let title: String
@@ -32,7 +33,8 @@ class SelectUtilityTypeWindowViewModel: ObservableObject {
     @Published var utilities: [UtilityObject] = [
         .init(type: .commandline, title: "Commandline tool", description: "This tool allows creation of shortcuts for triggering Bash scripts remotely from companion device. You can define a script, assign a secure activation method and execute it instantly from phone."),
         .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
-        .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone.")
+        .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
+        .init(type: .macro, title: "Macros", description: "This tool allows creation of macros that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone.")
     ]
     
     init(connectionManager: ConnectionManager, delegate: UtilitiesWindowDelegate?) {
@@ -177,6 +179,13 @@ struct SelectUtilityTypeWindowView: View {
                     newWindow?.close()
                 })
                 
+                newWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
+            case .macro:
+                let hv = NSHostingController(rootView: MacroRecorderView(item: item, delegate: viewModel.delegate){
+                    newWindow?.close()
+                })
                 newWindow?.contentView?.addSubview(hv.view)
                 hv.view.frame = newWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]

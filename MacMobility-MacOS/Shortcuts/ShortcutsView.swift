@@ -71,7 +71,6 @@ struct ShortcutsView: View {
                 ) {
                     tab = .apps
                     if let path = selectApp() {
-                        
                         viewModel.addInstalledApp(for: path)
                     }
                 }
@@ -813,6 +812,13 @@ struct ShortcutsView: View {
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
+            case .macro:
+                let hv = NSHostingController(rootView: MacroRecorderView(item: item, delegate: viewModel){
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .none:
                 break
             }
@@ -854,6 +860,13 @@ struct ShortcutsView: View {
             hv.view.autoresizingMask = [.width, .height]
         case .automation:
             let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
+                editUtilitiesWindow?.close()
+            })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        case .macro:
+            let hv = NSHostingController(rootView: MacroRecorderView(item: item, delegate: viewModel){
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)
