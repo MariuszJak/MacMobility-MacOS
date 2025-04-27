@@ -56,7 +56,11 @@ class KeyRecorder: ObservableObject {
             keyDescription += characters.uppercased()
         }
 
-        recordedKeys.append(.init(key: keyDescription))
+        if recordedKeys.count < 6 {
+            recordedKeys.append(.init(key: keyDescription))
+        } else {
+            stopRecording()
+        }
     }
 }
 

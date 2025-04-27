@@ -52,13 +52,19 @@ struct MacroRecorderView: View {
     }
 
     var body: some View {
-        VStack(alignment: .center, spacing: 20) {
+        VStack(alignment: .center) {
             Text("Macro Recorder")
-                .font(.largeTitle)
-                .padding()
-
-            ScrollView(.horizontal) {
-                HStack {
+                .font(.system(size: 18.0, weight: .bold))
+        }
+        .padding(.bottom, 26.0)
+        VStack(alignment: .center, spacing: 20) {
+            HStack {
+                if recorder.recordedKeys.isEmpty {
+                    Text("Press `Start Recording and enter your macro.`")
+                        .padding(8)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                } else {
                     ForEach(recorder.recordedKeys) { record in
                         Text(record.key)
                             .padding(8)
@@ -66,8 +72,8 @@ struct MacroRecorderView: View {
                             .cornerRadius(8)
                     }
                 }
-                .padding()
             }
+            .padding()
             .frame(height: 60)
 
             HStack(spacing: 20) {
@@ -77,12 +83,30 @@ struct MacroRecorderView: View {
                             .frame(width: 150)
                     }
                     .disabled(recorder.isRecording)
+                    .if(!recorder.isRecording) {
+                        $0
+                            .buttonStyle(.borderedProminent)
+                            .tint(.blue)
+                    }
 
                     Button(action: recorder.stopRecording) {
                         Text("Stop Recording")
                             .frame(width: 150)
                     }
                     .disabled(!recorder.isRecording)
+                    .if(recorder.isRecording) {
+                        $0
+                            .buttonStyle(.borderedProminent)
+                            .tint(.blue)
+                    }
+                }
+                HStack(alignment: .center) {
+                    Toggle("", isOn: $viewModel.showTitleOnIcon)
+                        .padding(.trailing, 6.0)
+                        .toggleStyle(.switch)
+                        .disabled(recorder.isRecording)
+                    Text("Show title on icon")
+                        .font(.system(size: 14.0))
                 }
             }
             .padding()
@@ -93,12 +117,13 @@ struct MacroRecorderView: View {
                 }, userSelectedIcon: $viewModel.selectedIcon, title: viewModel.showTitleOnIcon
                                ? .constant(recorder.recordedKeys.map { $0.key }.joined())
                                : .constant(""))
-                .padding(.leading, 60.0)
+                .disabled(recorder.isRecording)
                 
                 BlueButton(title: "Cancel", font: .callout, padding: 12.0, backgroundColor: .gray) {
                     viewModel.clear()
                     closeAction()
                 }
+                .padding(.leading, 30.0)
                 .disabled(recorder.isRecording)
                 .padding(.trailing, 6.0)
                 BlueButton(title: "Save", font: .callout, padding: 12.0) {
