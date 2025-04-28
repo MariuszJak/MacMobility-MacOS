@@ -234,6 +234,32 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 self?.handleAutomatedActions(options)
             }
             .store(in: &cancellables)
+        
+        connectionManager.$safariWebsites
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] urls in
+                self?.addSafariURLsToMultiactions(urls: urls, browser: .safari)
+            }
+            .store(in: &cancellables)
+        
+        connectionManager.$chromeWebsites
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] urls in
+                self?.addSafariURLsToMultiactions(urls: urls, browser: .chrome)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func addSafariURLsToMultiactions(urls: [String], browser: Browsers) {
+        var websitesSO: [ShortcutObject] = []
+        let name = urls.extractWebsiteNames().joined(separator: ", ")
+        urls.enumerated().forEach { (index, url) in
+            let so: ShortcutObject = .init(type: .webpage, page: 1, index: index, path: url, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: browser, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
+            saveWebpage(with: so)
+            websitesSO.append(so)
+        }
+        let ma: ShortcutObject = .init(type: .utility, page: 1, index: 0, path: nil, id: UUID().uuidString, title: name, color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData, scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: true, category: "Multiselection")
+        saveUtility(with: ma)
     }
     
     func isAppAddedByUser(path: String) -> Bool {
@@ -418,7 +444,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             if searchText.isEmpty {
                 utilities[index].path = ""
             } else {
-                utilities[index].path = utility.title.lowercased().contains(self.searchText.lowercased()) ? "" : "Hidden"
+                utilities[index].path = (utility.title.lowercased().contains(self.searchText.lowercased()) ||
+                                         utility.category?.lowercased().contains(self.searchText.lowercased()) ?? false) ? "" : "Hidden"
             }
         }
     }

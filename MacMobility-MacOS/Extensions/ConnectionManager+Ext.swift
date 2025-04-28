@@ -43,9 +43,6 @@ extension ConnectionManager {
                         self.inProgressWindow?.close()
                     }
                 }
-                DispatchQueue.main.async {
-                    self.appOpeningInProgressWindow()
-                }
             }
             return
         }
@@ -94,6 +91,23 @@ extension ConnectionManager {
             case .multiselection:
                 runMultiselection(for: shortcutItem)
             case .automation:
+                if shortcutItem.scriptCode == "TEST" {
+                    let safariURLs = getSafariURLs()
+                    if !safariURLs.isEmpty {
+                        DispatchQueue.main.async {
+                            self.safariWebsites = safariURLs
+                        }
+                    }
+                    return
+                } else if shortcutItem.scriptCode == "TEST CHROME" {
+                    let chromeWebsites = getChromeURLs()
+                    if !chromeWebsites.isEmpty {
+                        DispatchQueue.main.async {
+                            self.chromeWebsites = chromeWebsites
+                        }
+                    }
+                    return
+                }
                 if let script = shortcutItem.scriptCode {
                     execute(script) { error in
                         if error.description.lowercased().contains("error") {
@@ -113,6 +127,94 @@ extension ConnectionManager {
                 break
             }
         }
+    }
+    
+    func getSafariURLs() -> [String] {
+        let script = """
+        set urlList to ""
+        tell application "Safari"
+            repeat with w in windows
+                repeat with t in tabs of w
+                    set urlList to urlList & (URL of t) & linefeed
+                end repeat
+            end repeat
+        end tell
+        return urlList
+        """
+        
+        let process = Process()
+        process.launchPath = "/usr/bin/osascript"
+        
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+        
+        process.arguments = ["-e", script]
+        
+        do {
+            try process.run()
+        } catch {
+            print("Failed to run script:", error)
+            return []
+        }
+        
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        
+        guard let output = String(data: data, encoding: .utf8) else {
+            print("Failed to read output")
+            return []
+        }
+        
+        let urls = output
+            .split(separator: "\n")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        
+        return urls
+    }
+    
+    func getChromeURLs() -> [String] {
+        let script = """
+        set urlList to ""
+        tell application "Google Chrome"
+            repeat with w in windows
+                repeat with t in tabs of w
+                    set urlList to urlList & (URL of t) & linefeed
+                end repeat
+            end repeat
+        end tell
+        return urlList
+        """
+
+        let process = Process()
+        process.launchPath = "/usr/bin/osascript"
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        process.arguments = ["-e", script]
+
+        do {
+            try process.run()
+        } catch {
+            print("Failed to run script:", error)
+            return []
+        }
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+
+        guard let output = String(data: data, encoding: .utf8) else {
+            print("Failed to read output")
+            return []
+        }
+
+        let urls = output
+            .split(separator: "\n")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        return urls
     }
     
     func runMultiselection(for item: ShortcutObject) {
@@ -467,44 +569,27 @@ extension ConnectionManager {
         }
         return nil
     }
-    
-    private func appOpeningInProgressWindow() {
-        let windowWidth: CGFloat = 400
-        let windowHeight: CGFloat = 140
-        if nil == inProgressWindow {
-            let screenFrame = getFrameOfScreen() ?? .zero
-            
-            let windowX = (screenFrame.width - windowWidth) / 2
-            let windowY = (screenFrame.height - windowHeight) / 2
-            inProgressWindow = NSWindow(
-                contentRect: NSRect(x: windowX, y: windowY, width: windowWidth, height: windowHeight),
-                styleMask: [.borderless],
-                backing: .buffered,
-                defer: false
-            )
-            inProgressWindow?.center()
-            inProgressWindow?.setFrameAutosaveName("In Progress")
-            inProgressWindow?.isReleasedWhenClosed = false
-            inProgressWindow?.titlebarAppearsTransparent = true
-            inProgressWindow?.styleMask.insert(.fullSizeContentView)
-            
-            inProgressWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary]
-            
-            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: inProgressWindow) else {
-                return
+}
+
+extension Collection where Element == String {
+    func extractWebsiteNames() -> [String] {
+        return self.compactMap { urlString in
+            var formattedUrlString = urlString
+            if !formattedUrlString.starts(with: "http") {
+                formattedUrlString = "https://" + formattedUrlString
             }
-            let test = InProgressView(width: windowWidth, height: windowHeight) { [weak self] in
-                self?.screenIndex = -1
+            
+            guard let url = URL(string: formattedUrlString),
+                  let host = url.host else {
+                return nil
             }
-            inProgressWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: test)
-            inProgressWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = inProgressWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
+            
+            var name = host.replacingOccurrences(of: "www.", with: "")
+            if let firstComponent = name.split(separator: ".").first {
+                name = String(firstComponent)
+            }
+            
+            return name.prefix(1).uppercased() + name.dropFirst()
         }
-        inProgressWindow?.contentView = NSHostingView(rootView: InProgressView(width: windowWidth, height: windowHeight) { [weak self] in
-            self?.screenIndex = -1
-        })
-        inProgressWindow?.makeKeyAndOrderFront(nil)
     }
 }

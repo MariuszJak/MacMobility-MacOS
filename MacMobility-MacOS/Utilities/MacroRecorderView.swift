@@ -11,7 +11,7 @@ class MacroUtilityViewModel: ObservableObject {
     var id: String?
     @Published var title: String = ""
     @Published var iconData: Data?
-    @Published var selectedIcon: NSImage? = NSImage(named: "terminal")
+    @Published var selectedIcon: NSImage? = NSImage(named: "macroIcon")
     @Published var scriptCode: String = ""
     @Published var path: String = ""
     @Published var showTitleOnIcon: Bool = true
