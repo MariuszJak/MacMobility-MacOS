@@ -135,20 +135,12 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         startMonitoring()
     }
     
+    func allCategories() -> [String] {
+        utilities.compactMap { $0.category }.removingDuplicates()
+    }
+    
     func utilitiesWithSections(removeId: String? = nil) -> [ShortcutSection] {
-        if let removeId {
-            sections.enumerated().forEach { sectionIndex, section in
-                section.items.enumerated().forEach { itemIndex, item in
-                    if item.id == removeId {
-                        sections[sectionIndex].items.remove(at: itemIndex)
-                        if sections[sectionIndex].items.isEmpty {
-                            sections.remove(at: sectionIndex)
-                        }
-                    }
-                }
-            }
-        }
-        
+        removeFromSections(with: removeId)
         utilities.forEach { so in
             if sections.contains(where: { $0.title.lowercased() == so.category?.lowercased() }) {
                 if let index = sections.firstIndex(where: { $0.title.lowercased() == so.category?.lowercased() }) {
@@ -175,6 +167,20 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
         
         return sections
+    }
+    
+    func removeFromSections(with removeId: String?) {
+        guard let removeId else { return }
+        sections.enumerated().forEach { sectionIndex, section in
+            section.items.enumerated().forEach { itemIndex, item in
+                if item.id == removeId {
+                    sections[sectionIndex].items.remove(at: itemIndex)
+                    if sections[sectionIndex].items.isEmpty {
+                        sections.remove(at: sectionIndex)
+                    }
+                }
+            }
+        }
     }
     
     func toggleCollapseForSection(for title: String) {
@@ -460,6 +466,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func saveUtility(with utilityItem: ShortcutObject) {
+        removeFromSections(with: utilityItem.id)
         if let index = utilities.firstIndex(where: { $0.id == utilityItem.id }) {
             utilities[index] = utilityItem
             if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == utilityItem.id }) {
@@ -838,6 +845,7 @@ struct AutomationInstallView: View {
                 Text(automationItem.title)
                     .font(.title)
                     .bold()
+                Spacer()
             }
             .padding(.top)
             
@@ -852,18 +860,20 @@ struct AutomationInstallView: View {
                     ForEach(automationItem.scripts) { script in
                         HStack(alignment: .top) {
                             VStack(alignment: .leading) {
-                                Toggle(isOn: Binding(
-                                    get: {
-                                        selectedScriptIDs.contains(script.id)
-                                    },
-                                    set: { isSelected in
-                                        if isSelected {
-                                            selectedScriptIDs.insert(script.id)
-                                        } else {
-                                            selectedScriptIDs.remove(script.id)
+                                HStack {
+                                    Toggle("", isOn: Binding(
+                                        get: {
+                                            selectedScriptIDs.contains(script.id)
+                                        },
+                                        set: { isSelected in
+                                            if isSelected {
+                                                selectedScriptIDs.insert(script.id)
+                                            } else {
+                                                selectedScriptIDs.remove(script.id)
+                                            }
                                         }
-                                    }
-                                )) {
+                                    ))
+                                    .toggleStyle(.switch)
                                     Text(script.name)
                                         .font(.system(size: 14))
                                         .padding(.bottom, 8.0)
@@ -873,6 +883,7 @@ struct AutomationInstallView: View {
                                     .foregroundStyle(Color.gray)
                                     .padding(.bottom, 8.0)
                             }
+                            Spacer()
                         }
                     }
                 }

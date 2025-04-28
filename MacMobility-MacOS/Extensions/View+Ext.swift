@@ -71,3 +71,19 @@ public struct StrokeModifier: ViewModifier {
         }
     }
 }
+
+import SwiftUI
+
+extension View {
+    func outlinedText(strokeColor: Color = .black, lineWidth: CGFloat = 2) -> some View {
+        ZStack {
+            ForEach(0..<16, id: \.self) { i in
+                self
+                    .offset(x: CGFloat(cos(Double(i) / 16 * 2 * .pi)) * lineWidth,
+                            y: CGFloat(sin(Double(i) / 16 * 2 * .pi)) * lineWidth)
+                    .foregroundColor(strokeColor)
+            }
+            self
+        }
+    }
+}

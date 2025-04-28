@@ -47,11 +47,13 @@ struct SelectUtilityTypeWindowView: View {
     @StateObject var viewModel: SelectUtilityTypeWindowViewModel
     @State var newWindow: NSWindow?
     let connectionManager: ConnectionManager
+    let categories: [String]
     let closeAction: () -> Void
     
-    init(connectionManager: ConnectionManager, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
+    init(connectionManager: ConnectionManager, categories: [String], delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
         self.connectionManager = connectionManager
         self.closeAction = closeAction
+        self.categories = categories
         self._viewModel = .init(wrappedValue: .init(connectionManager: connectionManager, delegate: delegate))
     }
     
@@ -161,7 +163,7 @@ struct SelectUtilityTypeWindowView: View {
             
             switch type {
             case .commandline:
-                let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel.delegate) {
+                let hv = NSHostingController(rootView: NewBashUtilityView(categories: categories, item: item, delegate: viewModel.delegate) {
                     newWindow?.close()
                 })
                 newWindow?.contentView?.addSubview(hv.view)
@@ -175,7 +177,7 @@ struct SelectUtilityTypeWindowView: View {
                 hv.view.frame = newWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel.delegate) {
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: categories, item: item, delegate: viewModel.delegate) {
                     newWindow?.close()
                 })
                 

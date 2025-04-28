@@ -7,14 +7,19 @@
 
 import SwiftUI
 
-class NewBashUtilityViewModel: ObservableObject {
+class NewBashUtilityViewModel: ObservableObject, JSONLoadable {
     var id: String?
     @Published var title: String = ""
-    @Published var category: String = ""
+    @Published var category: String = "Other"
     @Published var iconData: Data?
     @Published var selectedIcon: NSImage? = NSImage(named: "terminal")
     @Published var scriptCode: String = ""
     @Published var showTitleOnIcon: Bool = true
+    @Published var categories: [String] = []
+    
+    init(categories: [String]) {
+        self.categories = categories
+    }
     
     func clear() {
         id = nil
@@ -27,15 +32,16 @@ class NewBashUtilityViewModel: ObservableObject {
 }
 
 struct NewBashUtilityView: View {
-    @ObservedObject var viewModel = NewBashUtilityViewModel()
+    @ObservedObject var viewModel: NewBashUtilityViewModel
     var closeAction: () -> Void
     weak var delegate: UtilitiesWindowDelegate?
     var currentPage: Int?
     let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 0.7)
     
-    init(item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
+    init(categories: [String], item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
         self.delegate = delegate
         self.closeAction = closeAction
+        self.viewModel = NewBashUtilityViewModel(categories: categories)
         if let item {
             currentPage = item.page
             viewModel.title = item.title
@@ -98,9 +104,30 @@ struct NewBashUtilityView: View {
                 Text("Category")
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 4.0)
+                Picker("", selection: Binding(
+                    get: {
+                        viewModel.categories.contains(viewModel.category) ? viewModel.category : "Other"
+                    },
+                    set: { newValue in
+                        if viewModel.categories.contains(newValue) {
+                            viewModel.category = newValue
+                        } else {
+                            viewModel.category = ""
+                        }
+                    }
+                )) {
+                    ForEach(viewModel.categories, id: \.self) { option in
+                        Text(option)
+                            .tag(option)
+                    }
+                    Text("Other")
+                        .tag("Other")
+                }
+                .pickerStyle(MenuPickerStyle())
                 RoundedTextField(placeholder: "", text: $viewModel.category)
             }
             .padding(.bottom, 6.0)
+            .padding(.leading, 60.0)
             .frame(maxWidth: .infinity)
             HStack {
                 IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
@@ -154,7 +181,7 @@ struct Automation: Identifiable {
     var script: String
 }
 
-class NewAutomationUtilityViewModel: ObservableObject {
+class NewAutomationUtilityViewModel: ObservableObject, JSONLoadable {
     var id: String?
     @Published var title: String = ""
     @Published var category: String = ""
@@ -162,6 +189,11 @@ class NewAutomationUtilityViewModel: ObservableObject {
     @Published var selectedIcon: NSImage? = NSImage(named: "automation")
     @Published var automationCode: String = ""
     @Published var showTitleOnIcon: Bool = true
+    @Published var categories: [String] = []
+    
+    init(categories: [String]) {
+        self.categories = categories
+    }
     
     func clear() {
         id = nil
@@ -193,13 +225,14 @@ class NewAutomationUtilityViewModel: ObservableObject {
 }
 
 struct NewAutomationUtilityView: View {
-    @ObservedObject var viewModel = NewAutomationUtilityViewModel()
+    @ObservedObject var viewModel: NewAutomationUtilityViewModel
     var closeAction: () -> Void
     weak var delegate: UtilitiesWindowDelegate?
     var currentPage: Int?
     let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 0.7)
     
-    init(item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
+    init(categories: [String], item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
+        self.viewModel = .init(categories: categories)
         self.delegate = delegate
         self.closeAction = closeAction
         if let item {
@@ -271,9 +304,30 @@ struct NewAutomationUtilityView: View {
                 Text("Category")
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 4.0)
+                Picker("", selection: Binding(
+                    get: {
+                        viewModel.categories.contains(viewModel.category) ? viewModel.category : "Other"
+                    },
+                    set: { newValue in
+                        if viewModel.categories.contains(newValue) {
+                            viewModel.category = newValue
+                        } else {
+                            viewModel.category = ""
+                        }
+                    }
+                )) {
+                    ForEach(viewModel.categories, id: \.self) { option in
+                        Text(option)
+                            .tag(option)
+                    }
+                    Text("Other")
+                        .tag("Other")
+                }
+                .pickerStyle(MenuPickerStyle())
                 RoundedTextField(placeholder: "", text: $viewModel.category)
             }
             .padding(.bottom, 6.0)
+            .padding(.leading, 60.0)
             .frame(maxWidth: .infinity)
             HStack {
                 IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
@@ -314,5 +368,18 @@ struct NewAutomationUtilityView: View {
             }
         }
         .padding()
+    }
+}
+
+extension Array where Element: Hashable {
+    func removingDuplicates() -> [Element] {
+        var seen = Set<Element>()
+        return self.filter { element in
+            seen.insert(element).inserted
+        }
+    }
+
+    mutating func removeDuplicates() {
+        self = self.removingDuplicates()
     }
 }

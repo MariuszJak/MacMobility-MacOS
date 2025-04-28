@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftFX
 
 struct ShortcutsView: View {
     @State private var newWindow: NSWindow?
@@ -339,7 +340,7 @@ struct ShortcutsView: View {
                         .font(.system(size: 12))
                         .multilineTextAlignment(.center)
                         .padding(.all, 3)
-                        .stroke(color: Color.black)
+                        .outlinedText()
                 }
             } else if object.type == .webpage {
                 if let data = object.imageData, let image = NSImage(data: data) {
@@ -359,7 +360,7 @@ struct ShortcutsView: View {
                             .font(.system(size: 12))
                             .multilineTextAlignment(.center)
                             .padding(.all, 3)
-                            .stroke(color: Color.black)
+                            .outlinedText()
                             .onTapGesture {
                                 openCreateNewWebpageWindow(item: object)
                             }
@@ -377,7 +378,7 @@ struct ShortcutsView: View {
                             .font(.system(size: 12))
                             .multilineTextAlignment(.center)
                             .padding(.all, 3)
-                            .stroke(color: Color.black)
+                            .outlinedText()
                             .onTapGesture {
                                 openCreateNewWebpageWindow(item: object)
                             }
@@ -401,7 +402,7 @@ struct ShortcutsView: View {
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                             .frame(maxWidth: 80)
-                            .stroke(color: Color.black)
+                            .outlinedText()
                             .onTapGesture {
                                 openEditUtilityWindow(item: object)
                             }
@@ -716,6 +717,7 @@ struct ShortcutsView: View {
             newUtilityWindow?.isReleasedWhenClosed = false
             newUtilityWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
                 connectionManager: viewModel.connectionManager,
+                categories: viewModel.allCategories(),
                 delegate: viewModel,
                 closeAction: {
                     tab = .utilities
@@ -724,6 +726,7 @@ struct ShortcutsView: View {
         }
         newUtilityWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
             connectionManager: viewModel.connectionManager,
+            categories: viewModel.allCategories(),
             delegate: viewModel,
             closeAction: {
                 tab = .utilities
@@ -792,7 +795,7 @@ struct ShortcutsView: View {
             editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             switch item.utilityType {
             case .commandline:
-                let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
+                let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
                 })
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)
@@ -806,7 +809,7 @@ struct ShortcutsView: View {
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
                 })
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)
@@ -845,7 +848,7 @@ struct ShortcutsView: View {
         editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
         switch item.utilityType {
         case .commandline:
-            let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
+            let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)
@@ -859,7 +862,7 @@ struct ShortcutsView: View {
             hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
         case .automation:
-            let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
+            let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)

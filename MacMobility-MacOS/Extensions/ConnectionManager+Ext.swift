@@ -84,8 +84,11 @@ extension ConnectionManager {
             switch shortcutItem.utilityType {
             case .commandline:
                 if let script = shortcutItem.scriptCode {
-                    if let message = runInlineBashScript(script: script) {
-                        send(alert: .init(title: "Script Result", message: message))
+                    if let message = runInlineBashScript(script: script), message.lowercased().contains("error") {
+                        DispatchQueue.main.async {
+                            self.localError = message
+                            self.showsLocalError = true
+                        }
                     }
                 }
             case .multiselection:
@@ -93,7 +96,10 @@ extension ConnectionManager {
             case .automation:
                 if let script = shortcutItem.scriptCode {
                     execute(script) { error in
-                        self.send(alert: .init(title: "Automation Error", message: error.description))
+                        if error.description.lowercased().contains("error") {
+                            self.localError = error.description
+                            self.showsLocalError = true
+                        }
                     }
                 }
             case .macro:
@@ -134,7 +140,12 @@ extension ConnectionManager {
                     case .automation:
                         if let script = tool.scriptCode {
                             execute(script) { error in
-                                self.send(alert: .init(title: "Automation Error", message: error.description))
+                                if error.description.lowercased().contains("error") {
+                                    DispatchQueue.main.async {
+                                        self.localError = error.description
+                                        self.showsLocalError = true
+                                    }
+                                }
                             }
                         }
                     case .macro:

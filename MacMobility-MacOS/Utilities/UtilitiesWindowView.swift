@@ -196,6 +196,7 @@ struct UtilitiesWindowView: View {
             newWindow?.isReleasedWhenClosed = false
             newWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
                 connectionManager: viewModel.connectionManager,
+                categories: viewModel.allCategories(),
                 delegate: viewModel,
                 closeAction: {
                     newWindow?.close()
@@ -203,6 +204,7 @@ struct UtilitiesWindowView: View {
         }
         newWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
             connectionManager: viewModel.connectionManager,
+            categories: viewModel.allCategories(),
             delegate: viewModel,
             closeAction: {
                 newWindow?.close()
@@ -231,7 +233,7 @@ struct UtilitiesWindowView: View {
             editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             switch item.utilityType {
             case .commandline:
-                let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
+                let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
                 })
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)
@@ -245,7 +247,7 @@ struct UtilitiesWindowView: View {
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
                 })
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)
@@ -267,7 +269,7 @@ struct UtilitiesWindowView: View {
         editUtilitiesWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
         switch item.utilityType {
         case .commandline:
-            let hv = NSHostingController(rootView: NewBashUtilityView(item: item, delegate: viewModel) {
+            let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)
@@ -281,7 +283,7 @@ struct UtilitiesWindowView: View {
             hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
         case .automation:
-            let hv = NSHostingController(rootView: NewAutomationUtilityView(item: item, delegate: viewModel) {
+            let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)

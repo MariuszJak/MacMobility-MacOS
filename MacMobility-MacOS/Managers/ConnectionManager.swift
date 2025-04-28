@@ -41,6 +41,8 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var automatedActions: [AutomationOption]?
     @Published var websites: [WebsiteTest] = []
     @Published var createMultiactions: Bool?
+    @Published var showsLocalError: Bool = false
+    @Published var localError: String?
     let keyRecorder = KeyRecorder()
     private var cancellables = Set<AnyCancellable>()
     public var currentIndex = 0

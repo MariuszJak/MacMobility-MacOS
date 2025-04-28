@@ -22,7 +22,6 @@ extension AppleScriptCommandable {
             var errorInfo: NSDictionary?
             script.executeAndReturnError(&errorInfo)
             if let error = errorInfo {
-                Logger().error("Error executing AppleScript: \(error)")
                 completion?(error)
             }
         }

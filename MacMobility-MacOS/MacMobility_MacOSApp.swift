@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 @main
 struct MacMobility_MacOSApp: App {
@@ -25,6 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var popOver = NSPopover()
     var menuView: MacOSMainPopoverView?
     var eventMonitor: Any?
+    var cancellables = Set<AnyCancellable>()
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         register()
@@ -34,6 +36,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popOver.contentViewController = NSViewController()
         popOver.contentViewController?.view = NSHostingView(rootView: menuView)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        connectionManager.$showsLocalError.receive(on: DispatchQueue.main).sink { shouldShow in
+            if shouldShow, let error = self.connectionManager.localError {
+                self.showGlobalAlert(title: "Alert", message: error)
+            }
+        }
+        .store(in: &cancellables)
 //        UserDefaults.standard.clearAll()
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
         if lifecycle.openCount == 0 {
@@ -50,6 +58,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             menuButton.action = #selector(menuAction)
         }
         NSApp.setActivationPolicy(.accessory)
+    }
+    
+    func showGlobalAlert(title: String, message: String) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.addButton(withTitle: "Dismiss")
+        alert.alertStyle = .informational
+
+        if let window = NSApp.mainWindow {
+            alert.beginSheetModal(for: window) { response in
+                self.performDismissAction()
+            }
+        } else {
+            // Fallback if no window available
+            let response = alert.runModal()
+            if response == .alertFirstButtonReturn {
+                performDismissAction()
+            }
+        }
+    }
+
+    func performDismissAction() {
+        connectionManager.showsLocalError = false
     }
     
     func openWelcomeWindow() {
