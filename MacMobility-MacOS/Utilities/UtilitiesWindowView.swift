@@ -53,6 +53,15 @@ struct UtilitiesWindowView: View {
                     Spacer()
                 }
             } else {
+                if viewModel.searchText.isEmpty {
+                    HStack {
+                        Spacer()
+                        Button(viewModel.allSectionsExpanded ? "Collapse All" : "Expand All") {
+                            viewModel.toggleAllSections()
+                        }
+                    }
+                    .padding([.trailing, .top], 16.0)
+                }
                 ScrollView {
                     Spacer()
                         .frame(height: 16.0)

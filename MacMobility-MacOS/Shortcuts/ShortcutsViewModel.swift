@@ -22,6 +22,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var scrollToPage: Int = 0
     @Published var availablePeerName: String = ""
     @Published var sections: [ShortcutSection] = []
+    @Published var allSectionsExpanded = true
     @Published var utilities: [ShortcutObject] = [] {
         didSet {
             sections = utilitiesWithSections()
@@ -99,6 +100,17 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
             }
         }
+    }
+    
+    func toggleAllSections() {
+        var tmp: [ShortcutSection] = []
+        allSectionsExpanded.toggle()
+        
+        sections.forEach {
+            $0.isExpanded = allSectionsExpanded
+            tmp.append($0)
+        }
+        sections = tmp
     }
     
     func toggleCollapseForSection(for title: String) {
