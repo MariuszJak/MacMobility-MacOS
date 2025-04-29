@@ -591,7 +591,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         
         guard let iconFile = bundle.infoDictionary?["CFBundleIconFile"] as? String else {
             let icon = NSWorkspace.shared.icon(forFile: appPath)
-            let resizedIcon = icon.resizedImage(newSize: .init(width: 68.0, height: 68.0))
+            let resizedIcon = icon.resizedImage(newSize: .init(width: 96.0, height: 96.0))
             let fallbackIcon = try? resizedIcon.imageData(for: .png(scale: 0.2, excludeGPSData: false))
             return fallbackIcon
         }

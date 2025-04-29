@@ -27,7 +27,9 @@ protocol ConnectionManagerWorskpaceCapable {
 extension ConnectionManager {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let shortcutItem = try? JSONDecoder().decode(ShortcutObject.self, from: data) {
-            runShortuct(for: shortcutItem)
+            DispatchQueue.main.async {
+                self.runShortuct(for: shortcutItem)
+            }
             return
         }
         if let string = String(data: data, encoding: .utf8) {

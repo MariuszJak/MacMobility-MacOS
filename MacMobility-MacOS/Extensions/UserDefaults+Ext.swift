@@ -17,31 +17,83 @@ public struct Lifecycle: Codable {
 
 extension UserDefaults {
     func store<T: Codable>(_ entity: T, for key: Const) {
-        guard let jsonData = try? JSONEncoder().encode(entity) else {
-            return
+        guard let data = try? JSONEncoder().encode(entity) else { return }
+        let url = Self.fileURL(for: key)
+        try? data.write(to: url, options: [.atomic])
+    }
+
+    func get<T: Codable>(key: Const) -> T? {
+        let url = Self.fileURL(for: key)
+
+        // If file exists, use it
+        if let data = try? Data(contentsOf: url),
+           let decoded = try? JSONDecoder().decode(T.self, from: data) {
+            return decoded
         }
 
-        set(jsonData, forKey: key)
-    }
-    
-    func get<T: Codable>(key: Const) -> T? {
+        // Otherwise, try loading from old UserDefaults and migrate it
         guard let itemsData = object(forKey: key) as? Data,
               let object = try? JSONDecoder().decode(T.self, from: itemsData) else {
             return nil
         }
+
+        // Store the legacy object in file and remove from UserDefaults
+        store(object, for: key)
+        set(nil, forKey: key) // Cleanup
         return object
     }
-    
+
     func clear(key: Const) {
-        set(nil, forKey: key)
+        let url = Self.fileURL(for: key)
+        try? FileManager.default.removeItem(at: url)
+        set(nil, forKey: key) // Optional: also clean legacy UserDefaults
     }
-    
+
     func clearAll() {
         for key in Const.allCases {
-            set(nil, forKey: key)
+            clear(key: key)
         }
     }
+
+    private static func fileURL(for key: Const) -> URL {
+        let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let folder = directory.appendingPathComponent("MacMobilityStorage", isDirectory: true)
+
+        if !FileManager.default.fileExists(atPath: folder.path) {
+            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        }
+
+        return folder.appendingPathComponent("\(key.rawValue).json")
+    }
 }
+
+//extension UserDefaults {
+//    func store<T: Codable>(_ entity: T, for key: Const) {
+//        guard let jsonData = try? JSONEncoder().encode(entity) else {
+//            return
+//        }
+//
+//        set(jsonData, forKey: key)
+//    }
+//    
+//    func get<T: Codable>(key: Const) -> T? {
+//        guard let itemsData = object(forKey: key) as? Data,
+//              let object = try? JSONDecoder().decode(T.self, from: itemsData) else {
+//            return nil
+//        }
+//        return object
+//    }
+//    
+//    func clear(key: Const) {
+//        set(nil, forKey: key)
+//    }
+//    
+//    func clearAll() {
+//        for key in Const.allCases {
+//            set(nil, forKey: key)
+//        }
+//    }
+//}
 
 extension UserDefaults {
     enum Const: String, CaseIterable {
