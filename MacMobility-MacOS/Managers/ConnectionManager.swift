@@ -43,8 +43,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var createMultiactions: Bool?
     @Published var showsLocalError: Bool = false
     @Published var localError: String?
-    @Published var safariWebsites: [String] = []
-    @Published var chromeWebsites: [String] = []
+    @Published var dynamicUrls: (Browsers, [String]) = (.chrome, [])
     let keyRecorder = KeyRecorder()
     private var cancellables = Set<AnyCancellable>()
     public var currentIndex = 0

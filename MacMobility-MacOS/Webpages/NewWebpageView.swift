@@ -109,6 +109,7 @@ struct NewWebpageView: View {
             Picker("Browser", selection: $viewModel.browser) {
                 Text("Chrome").tag(Browsers.chrome)
                 Text("Safari").tag(Browsers.safari)
+                Text("Orion").tag(Browsers.orion)
             }
             .pickerStyle(.menu)
             .frame(width: 200.0)

@@ -12,6 +12,18 @@ public enum Browsers: String, CaseIterable, Identifiable, Codable {
     
     case chrome
     case safari
+    case orion
+    
+    var name: String {
+        switch self {
+        case .chrome:
+            return "Chrome"
+        case .safari:
+            return "Safari"
+        case .orion:
+            return "Orion"
+        }
+    }
     
     var bundleIdentifier: String {
         switch self {
@@ -19,6 +31,8 @@ public enum Browsers: String, CaseIterable, Identifiable, Codable {
             return "com.google.chrome"
         case .safari:
             return "com.apple.safari"
+        case .orion:
+            return "com.kagi.kagimacOS"
         }
     }
     
@@ -28,6 +42,8 @@ public enum Browsers: String, CaseIterable, Identifiable, Codable {
             return "chrome-logo"
         case .safari:
             return "safari-logo"
+        case .orion:
+            return "orion-browser-logo"
         }
     }
 }

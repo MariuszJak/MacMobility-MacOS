@@ -8,88 +8,6 @@
 import SwiftUI
 import Combine
 
-public enum ShortcutType: String, Codable {
-    case shortcut
-    case app
-    case webpage
-    case utility
-}
-
-extension Array where Element: Equatable {
-    mutating func appendUnique(contentsOf newElements: [Element]) {
-        for element in newElements {
-            if !self.contains(element) {
-                self.append(element)
-            }
-        }
-    }
-}
-
-public struct ShortcutObject: Identifiable, Codable, Equatable {
-    public var index: Int?
-    public var page: Int
-    public let id: String
-    public let title: String
-    public var path: String?
-    public var color: String?
-    public var faviconLink: String?
-    public let type: ShortcutType
-    public var imageData: Data?
-    public var browser: Browsers?
-    public var scriptCode: String?
-    public var utilityType: UtilityObject.UtilityType?
-    public var objects: [ShortcutObject]?
-    public var showTitleOnIcon: Bool?
-    public var category: String?
-    
-    public init(
-        type: ShortcutType,
-        page: Int,
-        index: Int? = nil,
-        path: String? = nil,
-        id: String,
-        title: String,
-        color: String? = nil,
-        faviconLink: String? = nil,
-        browser: Browsers? = nil,
-        imageData: Data? = nil,
-        scriptCode: String? = nil,
-        utilityType: UtilityObject.UtilityType? = nil,
-        objects: [ShortcutObject]? = nil,
-        showTitleOnIcon: Bool = true,
-        category: String? = nil
-    ) {
-        self.page = page
-        self.type = type
-        self.index = index
-        self.path = path
-        self.id = id
-        self.title = title
-        self.color = color
-        self.scriptCode = scriptCode
-        self.utilityType = utilityType
-        self.imageData = imageData
-        self.faviconLink = faviconLink
-        self.browser = browser
-        self.objects = objects
-        self.showTitleOnIcon = showTitleOnIcon
-        self.category = category
-    }
-}
-
-class ShortcutSection: Identifiable {
-    var id: String = UUID().uuidString
-    var title: String
-    @Published var isExpanded: Bool
-    var items: [ShortcutObject]
-    
-    init(title: String, isExpanded: Bool, items: [ShortcutObject]) {
-        self.title = title
-        self.isExpanded = isExpanded
-        self.items = items
-    }
-}
-
 public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
     let connectionManager: ConnectionManager
     @Published var configuredShortcuts: [ShortcutObject] = []
@@ -97,11 +15,6 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var installedApps: [ShortcutObject] = []
     @Published var appsAddedByUser: [ShortcutObject] = []
     @Published var webpages: [ShortcutObject] = []
-    @Published var utilities: [ShortcutObject] = [] {
-        didSet {
-            sections = utilitiesWithSections()
-        }
-    }
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     @Published var pages = 1
@@ -109,6 +22,11 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var scrollToPage: Int = 0
     @Published var availablePeerName: String = ""
     @Published var sections: [ShortcutSection] = []
+    @Published var utilities: [ShortcutObject] = [] {
+        didSet {
+            sections = utilitiesWithSections()
+        }
+    }
     var close: () -> Void = {}
     private var timer: Timer?
     public var testColor = "#6DDADE"
@@ -235,17 +153,12 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             }
             .store(in: &cancellables)
         
-        connectionManager.$safariWebsites
+        connectionManager.$dynamicUrls
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] urls in
-                self?.addSafariURLsToMultiactions(urls: urls, browser: .safari)
-            }
-            .store(in: &cancellables)
-        
-        connectionManager.$chromeWebsites
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] urls in
-                self?.addSafariURLsToMultiactions(urls: urls, browser: .chrome)
+            .sink { [weak self] (browser, urls) in
+                if !urls.isEmpty {
+                    self?.addSafariURLsToMultiactions(urls: urls, browser: browser)
+                }
             }
             .store(in: &cancellables)
     }
@@ -255,7 +168,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         let name = urls.extractWebsiteNames().joined(separator: ", ")
         urls.enumerated().forEach { (index, url) in
             let so: ShortcutObject = .init(type: .webpage, page: 1, index: index, path: url, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: browser, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
-            saveWebpage(with: so)
+            if !webpages.contains(where: { $0.browser == so.browser && $0.path == so.path }) {
+                saveWebpage(with: so)
+            }
             websitesSO.append(so)
         }
         let ma: ShortcutObject = .init(type: .utility, page: 1, index: 0, path: nil, id: UUID().uuidString, title: name, color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData, scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: true, category: "Multiselection")
@@ -706,285 +621,5 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
 //        print(String(format: "%.8f MB", countMB))
         
         return pngData
-    }
-}
-
-extension String {
-    func appNameFromPath() -> String? {
-        guard let lastComponent = self.split(separator: "/").last,
-              lastComponent.hasSuffix(".app") else {
-            return nil
-        }
-        return lastComponent.replacingOccurrences(of: ".app", with: "")
-    }
-}
-
-// ---
-
-struct AutomationsList: Codable {
-    let automations: [AutomationItem]
-}
-
-enum AutomationType: String, Codable {
-    case bash
-    case automator
-}
-
-struct AutomationScript: Identifiable, Codable, Equatable {
-    var id = UUID()
-    var name: String
-    var description: String
-    var script: String
-    var imageData: Data?
-    var imageName: String?
-    var type: AutomationType?
-    var isAdvanced: Bool?
-    var category: String?
-}
-
-struct AutomationItem: Identifiable, Codable {
-    var id = UUID()
-    var title: String
-    var description: String
-    var imageData: Data?
-    var imageName: String?
-    var scripts: [AutomationScript]
-}
-
-class ExploreAutomationsViewModel: ObservableObject, JSONLoadable {
-    @Published var automations: [AutomationItem] = []
-    
-    func loadJSONFromDirectory() {
-        let test: AutomationsList = loadJSON("automations")
-        self.automations = test.automations
-    }
-}
-
-struct ExploreAutomationsView: View {
-    @ObservedObject private var viewModel = ExploreAutomationsViewModel()
-    var openDetailsPage: (AutomationItem) -> Void
-    
-    var body: some View {
-        VStack {
-            Text("Install Automations")
-                .font(.system(size: 21, weight: .bold))
-                .padding(.bottom, 18.0)
-            Divider()
-                .padding(.bottom, 14.0)
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 400))], spacing: 6) {
-                    ForEach(viewModel.automations) { automationItem in
-                        InstallAutomationsView(automationItem: automationItem) {
-                            openDetailsPage(automationItem)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-        .onAppear {
-            viewModel.loadJSONFromDirectory()
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
-        .padding()
-    }
-}
-
-struct InstallAutomationsView: View {
-    let automationItem: AutomationItem
-    let action: () -> Void
-    
-    var body: some View {
-        VStack {
-            HStack(alignment: .top) {
-                VStack {
-                    if let data = automationItem.imageData, let image = NSImage(data: data)  {
-                        Image(nsImage: image)
-                            .resizable()
-                            .frame(width: 128, height: 128)
-                            .cornerRadius(20)
-                            .padding(.bottom, 21.0)
-                        Button("Open") {
-                            action()
-                        }
-                    }
-                }
-                .padding(.trailing, 21.0)
-                VStack(alignment: .leading) {
-                    Spacer()
-                    Text(automationItem.title)
-                        .font(.system(size: 21, weight: .bold))
-                        .padding(.bottom, 4.0)
-                    Text(automationItem.description)
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.gray)
-                        .padding(.bottom, 8.0)
-                    
-                    Spacer()
-                }
-            }
-            .padding(.all, 8.0)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.gray.opacity(0.1))
-            )
-        }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
-    }
-}
-
-// -----
-
-struct AutomationInstallView: View {
-    var automationItem: AutomationItem
-    var selectedScriptsAction: ([AutomationScript]) -> Void
-    
-    @State private var selectedScriptIDs: Set<UUID>
-    
-    init(automationItem: AutomationItem, selectedScriptsAction: @escaping ([AutomationScript]) -> Void) {
-        self.automationItem = automationItem
-        self.selectedScriptsAction = selectedScriptsAction
-        _selectedScriptIDs = State(initialValue: Set(automationItem.scripts.map { $0.id }))
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .center, spacing: 12) {
-                if let imageData = automationItem.imageData,
-                   let nsImage = NSImage(data: imageData) {
-                    Image(nsImage: nsImage)
-                        .resizable()
-                        .frame(width: 48, height: 48)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else {
-                    Image(systemName: "bolt.fill")
-                        .resizable()
-                        .frame(width: 48, height: 48)
-                        .foregroundColor(.accentColor)
-                }
-                
-                Text(automationItem.title)
-                    .font(.title)
-                    .bold()
-                Spacer()
-            }
-            .padding(.top)
-            
-            Divider()
-            
-            // Scripts section
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Scripts")
-                    .font(.headline)
-                
-                ScrollView {
-                    ForEach(automationItem.scripts) { script in
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Toggle("", isOn: Binding(
-                                        get: {
-                                            selectedScriptIDs.contains(script.id)
-                                        },
-                                        set: { isSelected in
-                                            if isSelected {
-                                                selectedScriptIDs.insert(script.id)
-                                            } else {
-                                                selectedScriptIDs.remove(script.id)
-                                            }
-                                        }
-                                    ))
-                                    .toggleStyle(.switch)
-                                    Text(script.name)
-                                        .font(.system(size: 14))
-                                        .padding(.bottom, 8.0)
-                                }
-                                Text(script.description)
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Color.gray)
-                                    .padding(.bottom, 8.0)
-                            }
-                            Spacer()
-                        }
-                    }
-                }
-            }
-            
-            Spacer()
-            
-            HStack {
-                Spacer()
-                Button("Install") {
-                    let selectedScripts = automationItem.scripts.filter { selectedScriptIDs.contains($0.id) }
-                    selectedScriptsAction(selectedScripts)
-                }
-                .keyboardShortcut(.defaultAction)
-                Spacer()
-            }
-            .padding(.bottom)
-        }
-        .padding()
-        .frame(minWidth: 400, minHeight: 400)
-    }
-}
-
-
-//------
-
-protocol JSONLoadable {
-    func loadJSON<T: Decodable>(_ filename: String) -> T
-}
-
-extension JSONLoadable {
-    func loadJSON<T: Decodable>(_ filename: String) -> T {
-        guard let url = Bundle.main.url(forResource: filename, withExtension: "json") else {
-            fatalError("Failed to locate \(filename).json in bundle.")
-        }
-
-        guard let data = try? Data(contentsOf: url) else {
-            fatalError("Failed to load \(filename).json from bundle.")
-        }
-
-        let decoder = JSONDecoder()
-        guard let loaded = try? decoder.decode(T.self, from: data) else {
-            fatalError("Failed to decode \(filename).json from bundle.")
-        }
-
-        return loaded
-    }
-}
-
-extension ShortcutObject {
-    static func from(script: AutomationScript, at index: Int? = nil) -> ShortcutObject {
-        var utilityType: UtilityObject.UtilityType?
-        switch script.type {
-        case .automator, .none:
-            utilityType = .automation
-        case .bash:
-            utilityType = .commandline
-        }
-        return .init(
-            type: .utility,
-            page: 1,
-            index: index,
-            path: nil,
-            id: script.id.uuidString,
-            title: script.name,
-            color: nil,
-            faviconLink: nil,
-            browser: nil,
-            imageData: script.imageData,
-            scriptCode: script.script,
-            utilityType: utilityType,
-            objects: nil,
-            showTitleOnIcon: false,
-            category: script.category
-        )
     }
 }

@@ -19,6 +19,13 @@
 		C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064BA622D876F5E0091E2BE /* Color+Ext.swift */; };
 		C064BA652D876F7C0091E2BE /* NSColor+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064BA642D876F7C0091E2BE /* NSColor+Ext.swift */; };
 		C064BA672D876FA40091E2BE /* Optional+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C064BA662D876FA40091E2BE /* Optional+Ext.swift */; };
+		C065EBFC2DC0DDF300000B8C /* ExploreAutomationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */; };
+		C065EBFE2DC0DE1500000B8C /* InstallAutomationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EBFD2DC0DE1500000B8C /* InstallAutomationsView.swift */; };
+		C065EC002DC0DE2400000B8C /* AutomationInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EBFF2DC0DE2400000B8C /* AutomationInstallView.swift */; };
+		C065EC022DC0DE3E00000B8C /* JSONLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EC012DC0DE3E00000B8C /* JSONLoadable.swift */; };
+		C065EC042DC0DE5100000B8C /* ShortcutObject+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EC032DC0DE5100000B8C /* ShortcutObject+Ext.swift */; };
+		C065EC062DC0DE7400000B8C /* ShortcutObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EC052DC0DE7400000B8C /* ShortcutObject.swift */; };
+		C065EC082DC0DE8900000B8C /* ShortcutSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EC072DC0DE8900000B8C /* ShortcutSection.swift */; };
 		C071D7102DB17C6E00ADD746 /* automations.json in Resources */ = {isa = PBXBuildFile; fileRef = C071D70F2DB17C6E00ADD746 /* automations.json */; };
 		C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071D7172DB43A3100ADD746 /* WelcomeView.swift */; };
 		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
@@ -131,6 +138,13 @@
 		C064BA622D876F5E0091E2BE /* Color+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Ext.swift"; sourceTree = "<group>"; };
 		C064BA642D876F7C0091E2BE /* NSColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSColor+Ext.swift"; sourceTree = "<group>"; };
 		C064BA662D876FA40091E2BE /* Optional+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Ext.swift"; sourceTree = "<group>"; };
+		C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreAutomationsView.swift; sourceTree = "<group>"; };
+		C065EBFD2DC0DE1500000B8C /* InstallAutomationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallAutomationsView.swift; sourceTree = "<group>"; };
+		C065EBFF2DC0DE2400000B8C /* AutomationInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationInstallView.swift; sourceTree = "<group>"; };
+		C065EC012DC0DE3E00000B8C /* JSONLoadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONLoadable.swift; sourceTree = "<group>"; };
+		C065EC032DC0DE5100000B8C /* ShortcutObject+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShortcutObject+Ext.swift"; sourceTree = "<group>"; };
+		C065EC052DC0DE7400000B8C /* ShortcutObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutObject.swift; sourceTree = "<group>"; };
+		C065EC072DC0DE8900000B8C /* ShortcutSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSection.swift; sourceTree = "<group>"; };
 		C071D70F2DB17C6E00ADD746 /* automations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = automations.json; sourceTree = "<group>"; };
 		C071D7172DB43A3100ADD746 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -252,6 +266,9 @@
 				C03581072DB6501E009E22F5 /* IconPickerView.swift */,
 				C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */,
 				C035810D2DB65091009E22F5 /* VisualEffect.swift */,
+				C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */,
+				C065EBFD2DC0DE1500000B8C /* InstallAutomationsView.swift */,
+				C065EBFF2DC0DE2400000B8C /* AutomationInstallView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -261,6 +278,8 @@
 			children = (
 				C064B8C32D86EB090091E2BE /* ShortcutsView.swift */,
 				C064B8D12D86F37E0091E2BE /* ShortcutsViewModel.swift */,
+				C065EC052DC0DE7400000B8C /* ShortcutObject.swift */,
+				C065EC072DC0DE8900000B8C /* ShortcutSection.swift */,
 			);
 			path = Shortcuts;
 			sourceTree = "<group>";
@@ -411,6 +430,7 @@
 				C0F67EDF2D973ECA0090D568 /* String+Ext.swift */,
 				C0F67EE12D973EF90090D568 /* URL+Ext.swift */,
 				C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */,
+				C065EC032DC0DE5100000B8C /* ShortcutObject+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -424,6 +444,7 @@
 				C0EAF93A2D8CC67600044947 /* NewMultiSelectionUtilityView.swift */,
 				C0EAF93C2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift */,
 				C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */,
+				C065EC012DC0DE3E00000B8C /* JSONLoadable.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -651,13 +672,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				C064B8C42D86EB090091E2BE /* ShortcutsView.swift in Sources */,
+				C065EC062DC0DE7400000B8C /* ShortcutObject.swift in Sources */,
 				C0EAFC182D9030D000044947 /* LicenseKeyGenerator.swift in Sources */,
 				C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */,
 				C0F67EE72D973F1D0090D568 /* LicenseValidationAPIProtocol.swift in Sources */,
 				C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */,
+				C065EBFC2DC0DDF300000B8C /* ExploreAutomationsView.swift in Sources */,
 				C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */,
 				C0D21D712D7A286600FEF931 /* NSVisualEffectView+Ext.swift in Sources */,
 				C064B8D22D86F37E0091E2BE /* ShortcutsViewModel.swift in Sources */,
+				C065EC002DC0DE2400000B8C /* AutomationInstallView.swift in Sources */,
 				C0E037032BA37FD400BFBD2A /* Browsers.swift in Sources */,
 				C097755D2B5C31CA00F4FFE6 /* Array+Ext.swift in Sources */,
 				C0D21D632D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift in Sources */,
@@ -665,8 +689,10 @@
 				C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */,
 				C097755F2B5C31D700F4FFE6 /* ConnectionManager.swift in Sources */,
 				C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */,
+				C065EC022DC0DE3E00000B8C /* JSONLoadable.swift in Sources */,
 				C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */,
 				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
+				C065EC082DC0DE8900000B8C /* ShortcutSection.swift in Sources */,
 				C0D0941F2DBE35A100C8EAA4 /* MacroRecorderView.swift in Sources */,
 				C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */,
 				C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */,
@@ -679,6 +705,7 @@
 				C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */,
 				C0EAF9432D90246100044947 /* ValidateLicenseView.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
+				C065EBFE2DC0DE1500000B8C /* InstallAutomationsView.swift in Sources */,
 				C0F67EDC2D973EA50090D568 /* EmptyResponse.swift in Sources */,
 				C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */,
 				C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */,
@@ -700,6 +727,7 @@
 				C0F67ED82D973E840090D568 /* ClientError.swift in Sources */,
 				C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */,
 				C0EAF93B2D8CC67600044947 /* NewMultiSelectionUtilityView.swift in Sources */,
+				C065EC042DC0DE5100000B8C /* ShortcutObject+Ext.swift in Sources */,
 				C0F67EE22D973EF90090D568 /* URL+Ext.swift in Sources */,
 				C035810E2DB65091009E22F5 /* VisualEffect.swift in Sources */,
 				C0F67EDE2D973EB20090D568 /* DBSDataProvider.swift in Sources */,

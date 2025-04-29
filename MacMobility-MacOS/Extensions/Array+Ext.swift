@@ -18,3 +18,26 @@ extension Array {
         return indices.contains(index) ? self[index] : nil
     }
 }
+
+extension Collection where Element == String {
+    func extractWebsiteNames() -> [String] {
+        return self.compactMap { urlString in
+            var formattedUrlString = urlString
+            if !formattedUrlString.starts(with: "http") {
+                formattedUrlString = "https://" + formattedUrlString
+            }
+            
+            guard let url = URL(string: formattedUrlString),
+                  let host = url.host else {
+                return nil
+            }
+            
+            var name = host.replacingOccurrences(of: "www.", with: "")
+            if let firstComponent = name.split(separator: ".").first {
+                name = String(firstComponent)
+            }
+            
+            return name.prefix(1).uppercased() + name.dropFirst()
+        }
+    }
+}

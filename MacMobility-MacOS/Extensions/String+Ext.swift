@@ -20,3 +20,13 @@ public extension String {
         return "https://\(self)"
     }
 }
+
+extension String {
+    func appNameFromPath() -> String? {
+        guard let lastComponent = self.split(separator: "/").last,
+              lastComponent.hasSuffix(".app") else {
+            return nil
+        }
+        return lastComponent.replacingOccurrences(of: ".app", with: "")
+    }
+}
