@@ -767,6 +767,8 @@ struct ShortcutsView: View {
         automationItemWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
         let hv = NSHostingController(rootView: AutomationInstallView(automationItem: item, selectedScriptsAction: { scripts in
             viewModel.addAutomations(from: scripts)
+            automationItemWindow?.close()
+            tab = .utilities
         }))
         automationItemWindow?.contentView?.addSubview(hv.view)
         hv.view.frame = automationItemWindow?.contentView?.bounds ?? .zero
