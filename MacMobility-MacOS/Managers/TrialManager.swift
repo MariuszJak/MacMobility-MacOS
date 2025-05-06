@@ -9,7 +9,7 @@ import Foundation
 
 class TrialManager: ObservableObject {
     private let firstActivationKey = UserDefaults.Const.firstActivationDate.rawValue
-    private let trialDuration: TimeInterval = 7 * 24 * 60 * 60 // 7 days
+    private let trialDuration: TimeInterval = 14 * 24 * 60 * 60 // 14 days
 //    private let trialDuration: TimeInterval = 30 // 30 seconds
 
     @Published var isTrialExpired: Bool = false

@@ -67,33 +67,33 @@ extension UserDefaults {
     }
 }
 
-//extension UserDefaults {
-//    func store<T: Codable>(_ entity: T, for key: Const) {
-//        guard let jsonData = try? JSONEncoder().encode(entity) else {
-//            return
-//        }
-//
-//        set(jsonData, forKey: key)
-//    }
-//    
-//    func get<T: Codable>(key: Const) -> T? {
-//        guard let itemsData = object(forKey: key) as? Data,
-//              let object = try? JSONDecoder().decode(T.self, from: itemsData) else {
-//            return nil
-//        }
-//        return object
-//    }
-//    
-//    func clear(key: Const) {
-//        set(nil, forKey: key)
-//    }
-//    
-//    func clearAll() {
-//        for key in Const.allCases {
-//            set(nil, forKey: key)
-//        }
-//    }
-//}
+extension UserDefaults {
+    func storeUserDefaults<T: Codable>(_ entity: T, for key: Const) {
+        guard let jsonData = try? JSONEncoder().encode(entity) else {
+            return
+        }
+
+        set(jsonData, forKey: key)
+    }
+    
+    func getUserDefaults<T: Codable>(key: Const) -> T? {
+        guard let itemsData = object(forKey: key) as? Data,
+              let object = try? JSONDecoder().decode(T.self, from: itemsData) else {
+            return nil
+        }
+        return object
+    }
+    
+    func clearUserDefaults(key: Const) {
+        set(nil, forKey: key)
+    }
+    
+    func clearAllUserDefaults() {
+        for key in Const.allCases {
+            set(nil, forKey: key)
+        }
+    }
+}
 
 extension UserDefaults {
     enum Const: String, CaseIterable {

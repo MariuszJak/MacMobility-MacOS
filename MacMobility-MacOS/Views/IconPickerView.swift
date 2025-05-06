@@ -66,7 +66,7 @@ struct IconPickerView: View {
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .frame(maxWidth: imageSize.width)
-                        .stroke(color: .black)
+                        .outlinedText()
                 }
                 if viewModel.isFetchingIcon {
                     ProgressView()

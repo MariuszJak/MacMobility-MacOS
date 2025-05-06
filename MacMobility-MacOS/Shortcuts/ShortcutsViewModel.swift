@@ -380,6 +380,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     func fetchShortcuts() {
         shortcuts = getShortcutsList()
         configuredShortcuts.filter { $0.type == .shortcut }.forEach { configuredShortcut in
+            guard self.searchText.isEmpty else { return }
             let shortcutExists = shortcuts.contains(where: { $0.id == configuredShortcut.id })
             if !shortcutExists {
                 if let index = configuredShortcuts.firstIndex(where: { $0.id == configuredShortcut.id }) {

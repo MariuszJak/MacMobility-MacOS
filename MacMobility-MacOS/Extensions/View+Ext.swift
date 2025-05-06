@@ -27,12 +27,6 @@ extension View {
     }
 }
 
-public extension View {
-    func stroke(color: Color, width: CGFloat = 1) -> some View {
-        modifier(StrokeModifier(strokeSize: width, strokeColor: color))
-    }
-}
-
 public struct StrokeModifier: ViewModifier {
     private let id = UUID()
     var strokeSize: CGFloat = 1

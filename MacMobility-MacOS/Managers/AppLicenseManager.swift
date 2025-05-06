@@ -30,7 +30,7 @@ public class AppLicenseManager: ObservableObject {
     
     public init() {
 //        UserDefaults.standard.clear(key: .license)
-        self.license = UserDefaults.standard.get(key: .license) ?? .free
+        self.license = UserDefaults.standard.getUserDefaults(key: .license) ?? .free
         completion?(license)
     }
     
@@ -42,7 +42,7 @@ public class AppLicenseManager: ObservableObject {
     public func degrade() {
         license = .free
         completion?(license)
-        UserDefaults.standard.store(license, for: .license)
+        UserDefaults.standard.storeUserDefaults(license, for: .license)
     }
     
     @MainActor
@@ -68,6 +68,6 @@ public class AppLicenseManager: ObservableObject {
     private func upgrade() {
         license = .paid
         completion?(license)
-        UserDefaults.standard.store(license, for: .license)
+        UserDefaults.standard.storeUserDefaults(license, for: .license)
     }
 }

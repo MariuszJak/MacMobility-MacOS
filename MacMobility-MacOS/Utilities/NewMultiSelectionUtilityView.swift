@@ -175,7 +175,7 @@ struct NewMultiSelectionUtilityView: View {
                         .font(.system(size: 12))
                         .multilineTextAlignment(.center)
                         .padding(.all, 3)
-                        .stroke(color: Color.black)
+                        .outlinedText()
                 }
             } else if object.type == .webpage {
                 if let data = object.imageData, let image = NSImage(data: data) {
@@ -192,7 +192,7 @@ struct NewMultiSelectionUtilityView: View {
                             .font(.system(size: 12))
                             .multilineTextAlignment(.center)
                             .padding(.all, 3)
-                            .stroke(color: Color.black)
+                            .outlinedText()
                     }
                 } else if let path = object.browser?.icon {
                     Image(path)
@@ -204,7 +204,7 @@ struct NewMultiSelectionUtilityView: View {
                             .font(.system(size: 12))
                             .multilineTextAlignment(.center)
                             .padding(.all, 3)
-                            .stroke(color: Color.black)
+                            .outlinedText()
                     }
                 }
             } else if object.type == .utility {
@@ -221,7 +221,7 @@ struct NewMultiSelectionUtilityView: View {
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .frame(maxWidth: 80)
-                        .stroke(color: Color.black)
+                        .outlinedText()
                 }
             }
         }

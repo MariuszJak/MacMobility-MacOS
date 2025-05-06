@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftFX
 
 struct ShortcutsView: View {
     @State private var newWindow: NSWindow?
