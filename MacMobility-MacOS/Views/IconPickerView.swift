@@ -13,17 +13,22 @@ struct IconPickerView: View {
     @Binding private var userSelectedIcon: NSImage?
     @Binding private var favicon: String
     private var imageSize: CGSize
+    private let canSelectImage: Bool
     
-    init(viewModel: IconPickerViewModel,
-         userSelectedIcon: Binding<NSImage?> = .constant(nil),
-         title: Binding<String> = .constant(""),
-         favicon: Binding<String> = .constant(""),
-         imageSize: CGSize = .init(width: 100.0, height: 100.0)) {
+    init(
+        viewModel: IconPickerViewModel,
+        userSelectedIcon: Binding<NSImage?> = .constant(nil),
+        title: Binding<String> = .constant(""),
+        favicon: Binding<String> = .constant(""),
+        imageSize: CGSize = .init(width: 100.0, height: 100.0),
+        canSelectImage: Bool = true
+    ) {
         self._viewModel = .init(wrappedValue: viewModel)
         self._title = title
         self._favicon = favicon
         self._userSelectedIcon = userSelectedIcon
         self.imageSize = imageSize
+        self.canSelectImage = canSelectImage
     }
     
     var body: some View {
@@ -74,10 +79,11 @@ struct IconPickerView: View {
                         .scaleEffect(0.7)
                 }
             }
-            
-            Button("Select Icon") {
-                viewModel.pickImage() { icon in
-                    userSelectedIcon = icon
+            if canSelectImage {
+                Button("Select Icon") {
+                    viewModel.pickImage() { icon in
+                        userSelectedIcon = icon
+                    }
                 }
             }
         }

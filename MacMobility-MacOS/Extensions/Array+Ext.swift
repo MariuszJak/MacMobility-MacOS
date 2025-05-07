@@ -41,3 +41,16 @@ extension Collection where Element == String {
         }
     }
 }
+
+extension Array where Element: Hashable {
+    func removingDuplicates() -> [Element] {
+        var seen = Set<Element>()
+        return self.filter { element in
+            seen.insert(element).inserted
+        }
+    }
+
+    mutating func removeDuplicates() {
+        self = self.removingDuplicates()
+    }
+}

@@ -706,7 +706,7 @@ struct ShortcutsView: View {
     private func openCreateNewUtilityWindow() {
         if nil == newUtilityWindow {
             newUtilityWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 800, height: 400),
+                contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -777,12 +777,21 @@ struct ShortcutsView: View {
     
     private func openEditUtilityWindow(item: ShortcutObject) {
         if nil == editUtilitiesWindow {
-            editUtilitiesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
-                styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
+            if item.color == .convert {
+                editUtilitiesWindow = NSWindow(
+                    contentRect: NSRect(x: 0, y: 0, width: 520, height: 300),
+                    styleMask: [.titled, .closable, .miniaturizable],
+                    backing: .buffered,
+                    defer: false
+                )
+            } else {
+                editUtilitiesWindow = NSWindow(
+                    contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
+                    styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+                    backing: .buffered,
+                    defer: false
+                )
+            }
             editUtilitiesWindow?.center()
             editUtilitiesWindow?.setFrameAutosaveName("Utilities")
             editUtilitiesWindow?.isReleasedWhenClosed = false
@@ -796,12 +805,21 @@ struct ShortcutsView: View {
             editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             switch item.utilityType {
             case .commandline:
-                let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
-                    editUtilitiesWindow?.close()
-                })
-                editUtilitiesWindow?.contentView?.addSubview(hv.view)
-                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-                hv.view.autoresizingMask = [.width, .height]
+                if item.color == .convert {
+                    let hv = NSHostingController(rootView: ConverterView(item: item, delegate: viewModel){
+                        editUtilitiesWindow?.close()
+                    })
+                    editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                    hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                    hv.view.autoresizingMask = [.width, .height]
+                } else {
+                    let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                        editUtilitiesWindow?.close()
+                    })
+                    editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                    hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                    hv.view.autoresizingMask = [.width, .height]
+                }
             case .multiselection:
                 let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
@@ -830,12 +848,21 @@ struct ShortcutsView: View {
             return
         }
         editUtilitiesWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
-        editUtilitiesWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
-            styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
-            backing: .buffered,
-            defer: false
-        )
+        if item.color == .convert {
+            editUtilitiesWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 520, height: 300),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+        } else {
+            editUtilitiesWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
+                styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+        }
         editUtilitiesWindow?.center()
         editUtilitiesWindow?.setFrameAutosaveName("Utilities")
         editUtilitiesWindow?.isReleasedWhenClosed = false
@@ -849,12 +876,21 @@ struct ShortcutsView: View {
         editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
         switch item.utilityType {
         case .commandline:
-            let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
-                editUtilitiesWindow?.close()
-            })
-            editUtilitiesWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
+            if item.color == .convert {
+                let hv = NSHostingController(rootView: ConverterView(item: item, delegate: viewModel){
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
+            } else {
+                let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
+            }
         case .multiselection:
             let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()

@@ -43,6 +43,8 @@
 		C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09775652B5C31EE00F4FFE6 /* AppleScriptCommandable.swift */; };
 		C09775692B5C329300F4FFE6 /* scriptnext.scpt in Resources */ = {isa = PBXBuildFile; fileRef = C09775682B5C329300F4FFE6 /* scriptnext.scpt */; };
 		C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */; };
+		C0C9B78B2DCAACA40068BCAB /* NewAutomationUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */; };
+		C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */; };
 		C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */; };
 		C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */; };
 		C0D0941F2DBE35A100C8EAA4 /* MacroRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */; };
@@ -166,6 +168,8 @@
 		C09775682B5C329300F4FFE6 /* scriptnext.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scriptnext.scpt; sourceTree = "<group>"; };
 		C097756A2B5C32AA00F4FFE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionSenable.swift; sourceTree = "<group>"; };
+		C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAutomationUtilityView.swift; sourceTree = "<group>"; };
+		C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConverterView.swift; sourceTree = "<group>"; };
 		C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacesWindowView.swift; sourceTree = "<group>"; };
 		C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacesWindowViewModel.swift; sourceTree = "<group>"; };
 		C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroRecorderView.swift; sourceTree = "<group>"; };
@@ -445,6 +449,8 @@
 				C0EAF93C2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift */,
 				C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */,
 				C065EC012DC0DE3E00000B8C /* JSONLoadable.swift */,
+				C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */,
+				C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -694,6 +700,7 @@
 				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
 				C065EC082DC0DE8900000B8C /* ShortcutSection.swift in Sources */,
 				C0D0941F2DBE35A100C8EAA4 /* MacroRecorderView.swift in Sources */,
+				C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */,
 				C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */,
 				C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */,
 				C03581082DB6501E009E22F5 /* IconPickerView.swift in Sources */,
@@ -739,6 +746,7 @@
 				C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */,
 				C064BA672D876FA40091E2BE /* Optional+Ext.swift in Sources */,
 				C0F67EF12D9815270090D568 /* ShortcutInstallView.swift in Sources */,
+				C0C9B78B2DCAACA40068BCAB /* NewAutomationUtilityView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

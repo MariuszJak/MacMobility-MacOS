@@ -34,7 +34,8 @@ class SelectUtilityTypeWindowViewModel: ObservableObject {
         .init(type: .commandline, title: "Commandline tool", description: "This tool allows creation of shortcuts for triggering Bash scripts remotely from companion device. You can define a script, assign a secure activation method and execute it instantly from phone."),
         .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
         .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
-        .init(type: .macro, title: "Macros", description: "This tool allows creation of macros that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone.")
+        .init(type: .macro, title: "Macros", description: "This tool allows creation of macros that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
+        .init(type: .commandline, title: "File Converter", description: "This tool allows conversion of files between different formats. You can define a file format input and output and trigger it from MobilityControl.")
     ]
     
     init(connectionManager: ConnectionManager, delegate: UtilitiesWindowDelegate?) {
@@ -90,7 +91,7 @@ struct SelectUtilityTypeWindowView: View {
                                                     .frame(width: 16, height: 16)
                                                     .onTapGesture {
                                                         closeAction()
-                                                        openCreateNewUtilityWindow(type: utility.type)
+                                                        openCreateNewUtilityWindow(type: utility.type, title: utility.title)
                                                     }
                                                 Spacer()
                                             }
@@ -141,19 +142,33 @@ struct SelectUtilityTypeWindowView: View {
         .padding()
     }
     
-    private func openCreateNewUtilityWindow(type: UtilityObject.UtilityType, item: ShortcutObject? = nil) {
+    private func openCreateNewUtilityWindow(type: UtilityObject.UtilityType, title: String, item: ShortcutObject? = nil) {
         if nil == newWindow {
-            newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 520, height: type == .commandline ? 800 : 470),
-                styleMask: type == .commandline || type == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
-            newWindow?.center()
-            newWindow?.setFrameAutosaveName("CreateNewUtility")
-            newWindow?.isReleasedWhenClosed = false
-            newWindow?.titlebarAppearsTransparent = true
-            newWindow?.styleMask.insert(.fullSizeContentView)
+            if title == "File Converter" {
+                newWindow = NSWindow(
+                    contentRect: NSRect(x: 0, y: 0, width: 520, height: 300),
+                    styleMask: [.titled, .closable, .miniaturizable],
+                    backing: .buffered,
+                    defer: false
+                )
+                newWindow?.center()
+                newWindow?.setFrameAutosaveName("CreateNewUtility")
+                newWindow?.isReleasedWhenClosed = false
+                newWindow?.titlebarAppearsTransparent = true
+                newWindow?.styleMask.insert(.fullSizeContentView)
+            } else {
+                newWindow = NSWindow(
+                    contentRect: NSRect(x: 0, y: 0, width: 520, height: type == .commandline ? 800 : 470),
+                    styleMask: type == .commandline || type == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+                    backing: .buffered,
+                    defer: false
+                )
+                newWindow?.center()
+                newWindow?.setFrameAutosaveName("CreateNewUtility")
+                newWindow?.isReleasedWhenClosed = false
+                newWindow?.titlebarAppearsTransparent = true
+                newWindow?.styleMask.insert(.fullSizeContentView)
+            }
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
                 return
@@ -163,12 +178,21 @@ struct SelectUtilityTypeWindowView: View {
             
             switch type {
             case .commandline:
-                let hv = NSHostingController(rootView: NewBashUtilityView(categories: categories, item: item, delegate: viewModel.delegate) {
-                    newWindow?.close()
-                })
-                newWindow?.contentView?.addSubview(hv.view)
-                hv.view.frame = newWindow?.contentView?.bounds ?? .zero
-                hv.view.autoresizingMask = [.width, .height]
+                if title == "File Converter" {
+                    let hv = NSHostingController(rootView: ConverterView(item: item, delegate: viewModel.delegate){
+                        newWindow?.close()
+                    })
+                    newWindow?.contentView?.addSubview(hv.view)
+                    hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+                    hv.view.autoresizingMask = [.width, .height]
+                } else {
+                    let hv = NSHostingController(rootView: NewBashUtilityView(categories: categories, item: item, delegate: viewModel.delegate) {
+                        newWindow?.close()
+                    })
+                    newWindow?.contentView?.addSubview(hv.view)
+                    hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+                    hv.view.autoresizingMask = [.width, .height]
+                }
             case .multiselection:
                 let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
                     newWindow?.close()

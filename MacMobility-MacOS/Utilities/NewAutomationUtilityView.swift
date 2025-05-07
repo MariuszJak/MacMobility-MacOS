@@ -1,20 +1,26 @@
 //
-//  NewBashUtilityView.swift
+//  NewAutomationUtilityView.swift
 //  MacMobility-MacOS
 //
-//  Created by CoderBlocks on 19/03/2025.
+//  Created by Mariusz Jakowienko on 06/05/2025.
 //
 
 import SwiftUI
 import CodeEditor
 
-class NewBashUtilityViewModel: ObservableObject, JSONLoadable {
+struct Automation: Identifiable {
+    let id = UUID()
+    var name: String
+    var script: String
+}
+
+class NewAutomationUtilityViewModel: ObservableObject, JSONLoadable {
     var id: String?
     @Published var title: String = ""
-    @Published var category: String = "Other"
+    @Published var category: String = ""
     @Published var iconData: Data?
-    @Published var selectedIcon: NSImage? = NSImage(named: "terminal")
-    @Published var scriptCode: String = ""
+    @Published var selectedIcon: NSImage? = NSImage(named: "automation")
+    @Published var automationCode: String = ""
     @Published var showTitleOnIcon: Bool = true
     @Published var categories: [String] = []
     
@@ -27,27 +33,46 @@ class NewBashUtilityViewModel: ObservableObject, JSONLoadable {
         iconData = nil
         title = ""
         category = ""
-        scriptCode = ""
+        automationCode = ""
         showTitleOnIcon = true
+    }
+    
+    func loadAutomationFromFile() -> Automation? {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.plainText]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.title = "Choose an Automation Script"
+
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                let scriptContent = try String(contentsOf: url)
+                let name = url.deletingPathExtension().lastPathComponent
+                return Automation(name: name, script: scriptContent)
+            } catch {
+                print("Failed to read script file: \(error)")
+            }
+        }
+        return nil
     }
 }
 
-struct NewBashUtilityView: View {
-    @ObservedObject var viewModel: NewBashUtilityViewModel
+struct NewAutomationUtilityView: View {
+    @ObservedObject var viewModel: NewAutomationUtilityViewModel
     var closeAction: () -> Void
     weak var delegate: UtilitiesWindowDelegate?
     var currentPage: Int?
     let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 0.7)
     
     init(categories: [String], item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
+        self.viewModel = .init(categories: categories)
         self.delegate = delegate
         self.closeAction = closeAction
-        self.viewModel = NewBashUtilityViewModel(categories: categories)
         if let item {
             currentPage = item.page
             viewModel.title = item.title
             viewModel.id = item.id
-            viewModel.scriptCode = item.scriptCode ?? ""
+            viewModel.automationCode = item.scriptCode ?? ""
             viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
             viewModel.category = item.category ?? ""
             if let data = item.imageData {
@@ -58,7 +83,7 @@ struct NewBashUtilityView: View {
     
     var body: some View {
         VStack(alignment: .center) {
-            Text("Bash Script")
+            Text("Automation Tool")
                 .font(.system(size: 18.0, weight: .bold))
         }
         VStack(alignment: .leading) {
@@ -78,13 +103,20 @@ struct NewBashUtilityView: View {
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
             
+            BlueButton(title: "Load Automation from File", font: .callout, padding: 8.0, backgroundColor: .gray) {
+                if let newAutomation = viewModel.loadAutomationFromFile() {
+                    viewModel.automationCode = newAutomation.script
+                }
+            }
+            .padding(.leading, 60.0)
+            .padding(.bottom, 6.0)
             HStack(alignment: .top) {
                 Text("Code")
                     .font(.system(size: 14, weight: .regular))
                 
                 CodeEditor(
-                    source: $viewModel.scriptCode,
-                    language: .bash,
+                    source: $viewModel.automationCode,
+                    language: .applescript,
                     theme: .pojoaque,
                     fontSize: .constant(14.0),
                     flags: .defaultEditorFlags,
@@ -144,17 +176,17 @@ struct NewBashUtilityView: View {
                 .padding(.trailing, 6.0)
                 BlueButton(title: "Save", font: .callout, padding: 12.0) {
                     delegate?.saveUtility(with:
-                        .init(
-                            type: .utility,
-                            page: currentPage ?? 1,
-                            id: viewModel.id ?? UUID().uuidString,
-                            title: viewModel.title,
-                            imageData: viewModel.selectedIcon?.toData,
-                            scriptCode: viewModel.scriptCode,
-                            utilityType: .commandline,
-                            showTitleOnIcon: viewModel.showTitleOnIcon,
-                            category: viewModel.category
-                        )
+                            .init(
+                                type: .utility,
+                                page: currentPage ?? 1,
+                                id: viewModel.id ?? UUID().uuidString,
+                                title: viewModel.title,
+                                imageData: viewModel.selectedIcon?.toData,
+                                scriptCode: viewModel.automationCode,
+                                utilityType: .automation,
+                                showTitleOnIcon: viewModel.showTitleOnIcon,
+                                category: viewModel.category
+                            )
                     )
                     viewModel.clear()
                     closeAction()
@@ -171,3 +203,4 @@ struct NewBashUtilityView: View {
         .padding()
     }
 }
+

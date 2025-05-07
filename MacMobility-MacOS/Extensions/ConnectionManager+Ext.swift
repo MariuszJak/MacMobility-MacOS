@@ -57,6 +57,12 @@ extension ConnectionManager {
             switch shortcutItem.utilityType {
             case .commandline:
                 if let script = shortcutItem.scriptCode {
+                    if script.contains("FILE_CONVERTER") {
+                        let input = script.split(separator: ",")[1]
+                        let output = script.split(separator: ",")[2]
+                        convertSelectedFiles(from: String(input), to: String(output))
+                        return
+                    }
                     if let message = runInlineBashScript(script: script), message.lowercased().contains("error") {
                         DispatchQueue.main.async {
                             self.localError = message
@@ -172,7 +178,18 @@ extension ConnectionManager {
                     switch tool.utilityType {
                     case .commandline:
                         if let script = tool.scriptCode {
-                            runInlineBashScript(script: script)
+                            if script.contains("FILE_CONVERTER") {
+                                let input = script.split(separator: ",")[1]
+                                let output = script.split(separator: ",")[2]
+                                convertSelectedFiles(from: String(input), to: String(output))
+                                return
+                            }
+                            if let message = runInlineBashScript(script: script), message.lowercased().contains("error") {
+                                DispatchQueue.main.async {
+                                    self.localError = message
+                                    self.showsLocalError = true
+                                }
+                            }
                         }
                     case .multiselection:
                         if let objects = tool.objects {
@@ -201,6 +218,76 @@ extension ConnectionManager {
                     }
                 }
             }
+        }
+    }
+    
+    func convertSelectedFiles(from inputFormat: String, to outputFormat: String) {
+        let appleScript = """
+        tell application "Finder"
+            set selectedFiles to selection
+            set filePaths to ""
+            repeat with aFile in selectedFiles
+                set filePaths to filePaths & (POSIX path of (aFile as text)) & linefeed
+            end repeat
+            return filePaths
+        end tell
+        """
+
+        let scriptProcess = Process()
+        scriptProcess.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        scriptProcess.arguments = ["-e", appleScript]
+
+        let outputPipe = Pipe()
+        scriptProcess.standardOutput = outputPipe
+        scriptProcess.standardError = outputPipe
+
+        do {
+            try scriptProcess.run()
+            scriptProcess.waitUntilExit()
+
+            let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            guard let output = String(data: data, encoding: .utf8) else {
+                print("Failed to decode AppleScript output.")
+                return
+            }
+
+            let selectedFiles = output
+                .split(separator: "\n")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { $0.lowercased().hasSuffix(".\(inputFormat.lowercased())") }
+
+            if selectedFiles.isEmpty {
+                print("No files with .\(inputFormat) extension selected.")
+                return
+            }
+
+            let outputDir = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Desktop/converted_\(outputFormat.lowercased())_output")
+
+            try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+
+            for file in selectedFiles {
+                let inputURL = URL(fileURLWithPath: file)
+                let outputFileName = inputURL.deletingPathExtension().lastPathComponent + ".\(outputFormat)"
+                let outputPath = outputDir.appendingPathComponent(outputFileName).path
+
+                let sipsProcess = Process()
+                sipsProcess.executableURL = URL(fileURLWithPath: "/usr/bin/sips")
+                sipsProcess.arguments = ["-s", "format", outputFormat, file, "--out", outputPath]
+
+                let sipsPipe = Pipe()
+                sipsProcess.standardOutput = sipsPipe
+                sipsProcess.standardError = sipsPipe
+
+                try sipsProcess.run()
+                sipsProcess.waitUntilExit()
+
+                print("Converted: \(file) -> \(outputPath)")
+            }
+
+            print("Done. Files saved in: \(outputDir.path)")
+        } catch {
+            print("Error during conversion: \(error)")
         }
     }
     

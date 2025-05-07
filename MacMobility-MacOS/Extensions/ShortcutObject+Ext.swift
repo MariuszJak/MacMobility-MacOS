@@ -16,6 +16,10 @@ extension ShortcutObject {
         case .bash:
             utilityType = .commandline
         }
+        var color: String?
+        if script.script.contains("FILE_CONVERTER") {
+            color = .convert
+        }
         return .init(
             type: .utility,
             page: 1,
@@ -23,14 +27,14 @@ extension ShortcutObject {
             path: nil,
             id: script.id.uuidString,
             title: script.name,
-            color: nil,
+            color: color,
             faviconLink: nil,
             browser: nil,
             imageData: script.imageData,
             scriptCode: script.script,
             utilityType: utilityType,
             objects: nil,
-            showTitleOnIcon: false,
+            showTitleOnIcon: color != nil,
             category: script.category
         )
     }
