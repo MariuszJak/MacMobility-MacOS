@@ -31,11 +31,11 @@ class SelectUtilityTypeWindowViewModel: ObservableObject {
     weak var delegate: UtilitiesWindowDelegate?
     
     @Published var utilities: [UtilityObject] = [
-        .init(type: .commandline, title: "Commandline tool", description: "This tool allows creation of shortcuts for triggering Bash scripts remotely from companion device. You can define a script, assign a secure activation method and execute it instantly from phone."),
-        .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
-        .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
-        .init(type: .macro, title: "Macros", description: "This tool allows creation of macros that can be triggered remotely from companion device. You can define a sequence of actions, assign a secure activation method and execute them instantly from phone."),
-        .init(type: .commandline, title: "File Converter", description: "This tool allows conversion of files between different formats. You can define a file format input and output and trigger it from MobilityControl.")
+        .init(type: .commandline, title: "Commandline tool", description: "This tool allows creation of shortcuts for triggering Bash scripts remotely from companion device."),
+        .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device."),
+        .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device."),
+        .init(type: .macro, title: "Macros", description: "This tool allows creation of macros that can be triggered remotely from companion device."),
+        .init(type: .commandline, title: "File Converter", description: "This tool allows conversion of files between different formats. You can define a file format input and output.")
     ]
     
     init(connectionManager: ConnectionManager, delegate: UtilitiesWindowDelegate?) {
