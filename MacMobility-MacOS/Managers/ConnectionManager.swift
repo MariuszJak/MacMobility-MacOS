@@ -41,6 +41,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var automatedActions: [AutomationOption]?
     @Published var websites: [WebsiteTest] = []
     @Published var createMultiactions: Bool?
+    @Published var browser: Browsers?
     @Published var showsLocalError: Bool = false
     @Published var localError: String?
     @Published var dynamicUrls: (Browsers, [String]) = (.chrome, [])

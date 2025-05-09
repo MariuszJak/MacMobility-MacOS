@@ -38,6 +38,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var websites: [WebsiteTest] = []
     private var automations: AutomationsList?
     private var createMultiactions: Bool?
+    private var browser: Browsers?
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clearAll()
@@ -137,6 +138,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             }
             .store(in: &cancellables)
         
+        connectionManager.$browser
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] browser in
+                if let browser {
+                    self?.browser = browser
+                    UserDefaults.standard.store(browser, for: .browser)
+                }
+            }
+            .store(in: &cancellables)
+        
         connectionManager.$createMultiactions
             .receive(on: DispatchQueue.main)
             .sink { [weak self] createMultiactions in
@@ -230,14 +241,25 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 var i: Int = 0
                 filtered.enumerated().forEach { (index, script) in
                     i += 1
-                    let so: ShortcutObject = .from(script: script, at: index)
-                    addConfiguredShortcut(object: so)
+                    if script.script.contains("URLs"), let browser {
+                        if script.script.contains(browser.name.uppercased()) {
+                            let so: ShortcutObject = .from(script: script, at: index)
+                            addConfiguredShortcut(object: so)
+                        }
+                    } else {
+                        let so: ShortcutObject = .from(script: script, at: index)
+                        addConfiguredShortcut(object: so)
+                    }
                 }
                 var websitesSO: [ShortcutObject] = []
                 websites.forEach { website in
                     if website.url.containsValidDomain {
                         let updatedURL = website.url.applyHTTPS()
-                        let so: ShortcutObject = .init(type: .webpage, page: 1, index: i, path: updatedURL, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: .safari, imageData: website.nsImage?.toData, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
+                        let so: ShortcutObject = .init(
+                            type: .webpage, page: 1, index: i, path: updatedURL, id: UUID().uuidString,
+                            title: "", color: nil, faviconLink: nil, browser: browser ?? .safari, imageData: website.nsImage?.toData,
+                            scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false
+                        )
                         saveWebpage(with: so)
                         addConfiguredShortcut(object: so)
                         websitesSO.append(so)
@@ -248,7 +270,12 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     websitesSO.enumerated().forEach { (index, _) in
                         websitesSO[index].index = index
                     }
-                    let ma: ShortcutObject = .init(type: .utility, page: 1, index: i, path: nil, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData, scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: false, category: "Multiselection")
+                    let ma: ShortcutObject = .init(
+                        type: .utility, page: 1, index: i, path: nil, id: UUID().uuidString,
+                        title: "", color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData,
+                        scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: false,
+                        category: "Multiselection"
+                    )
                     saveUtility(with: ma)
                     addConfiguredShortcut(object: ma)
                 }

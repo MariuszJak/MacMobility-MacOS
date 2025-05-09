@@ -106,6 +106,7 @@ extension UserDefaults {
         case firstActivationDate
         case userApps
         case lifecycle
+        case browser
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {

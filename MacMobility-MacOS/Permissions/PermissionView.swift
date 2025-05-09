@@ -30,9 +30,6 @@ class PermissionViewModel: ObservableObject {
         let response = alert.runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
             NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                NSApplication.shared.terminate(nil)
-            }
         }
     }
     
@@ -49,7 +46,7 @@ struct PermissionView: View {
     }
     
     public var body: some View {
-        HStack {
+        VStack {
             VStack {
                 Spacer()
                 Image(.logo)
@@ -59,7 +56,7 @@ struct PermissionView: View {
                 Spacer()
             }
             .padding()
-            VStack(alignment: .leading) {
+            VStack {
                 Spacer()
                 Text("Accessibility Permission")
                     .font(.system(size: 18, weight: .bold))
@@ -68,9 +65,6 @@ struct PermissionView: View {
                 Text("We need access to your system to allow accessibility features to work correctly. Please allow this permission in your system preferences.")
                     .foregroundStyle(Color.gray)
                     .padding(.bottom, 6.0)
-                Text("This action will close this app, please restart it after allowing the permission.")
-                    .foregroundStyle(Color.white)
-                    .padding(.bottom, 18.0)
                 Button("Ask for permission") {
                     viewModel.askForPermission()
                 }

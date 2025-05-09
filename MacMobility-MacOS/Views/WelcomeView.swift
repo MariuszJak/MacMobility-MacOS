@@ -8,6 +8,8 @@
 import SwiftUI
 import QRCode
 import AppKit
+import SwiftUI
+import AVKit
 
 struct WebsiteTest {
     let id: String
@@ -17,18 +19,19 @@ struct WebsiteTest {
 
 class WelcomeViewModel: ObservableObject {
     @Published var currentPage = 0
-    let pageLimit = 6
-    let closeAction: (SetupMode?, [AutomationOption]?, [WebsiteTest], Bool) -> Void
+    let pageLimit = 7
+    let closeAction: (SetupMode?, [AutomationOption]?, [WebsiteTest], Bool, Browsers) -> Void
     private(set) var createMultiactions: Bool = true
     private(set) var setupMode: SetupMode?
     private(set) var automationOptions: [AutomationOption]?
+    private(set) var favoriteBrowser: Browsers = .safari
     private(set) var websites: [WebsiteTest] = [
         .init(id: UUID().uuidString, nsImage: nil, url: ""),
         .init(id: UUID().uuidString, nsImage: nil, url: ""),
         .init(id: UUID().uuidString, nsImage: nil, url: "")
     ]
     
-    init(closeAction: @escaping (SetupMode?, [AutomationOption]?, [WebsiteTest], Bool) -> Void) {
+    init(closeAction: @escaping (SetupMode?, [AutomationOption]?, [WebsiteTest], Bool, Browsers) -> Void) {
         self.closeAction = closeAction
     }
     
@@ -43,7 +46,7 @@ class WelcomeViewModel: ObservableObject {
     }
     
     func close() {
-        closeAction(setupMode, automationOptions, websites, createMultiactions)
+        closeAction(setupMode, automationOptions, websites, createMultiactions, favoriteBrowser)
     }
     
     func updateSetupMode(_ setupMode: SetupMode) {
@@ -69,6 +72,10 @@ class WelcomeViewModel: ObservableObject {
     func updateMultiaction(_ createMultiactions: Bool) {
         self.createMultiactions = createMultiactions
     }
+    
+    func updateBrowser(_ browser: Browsers) {
+        self.favoriteBrowser = browser
+    }
 }
 
 struct WelcomeView: View {
@@ -76,9 +83,11 @@ struct WelcomeView: View {
     @State private var showWelcomeText = false
     @State private var scaleEffect: CGFloat = 0.8
     @State private var showSkipAlert: Bool = false
+    private let connectionManager: ConnectionManager
     
-    init(viewModel: WelcomeViewModel) {
+    init(viewModel: WelcomeViewModel, connectionManager: ConnectionManager) {
         self.viewModel = viewModel
+        self.connectionManager = connectionManager
     }
     
     public var body: some View {
@@ -86,32 +95,37 @@ struct WelcomeView: View {
             Group {
                 switch viewModel.currentPage {
                 case 0:
-                    firstPage
+                    titlePageView
                 case 1:
-                    secondPage
+                    companionAppView
                 case 2:
-                    thirdPage
+                    OnboardingVideoComparisonView()
                 case 3:
+                    PermissionView(viewModel: .init(connectionManager: connectionManager))
+                case 4:
                     AppSetupChoiceView(viewModel.setupMode) { setupMode in
                         viewModel.updateSetupMode(setupMode)
                     }
-                case 4:
+                case 5:
                     AutodetectAutomationInstallView(viewModel: .init(viewModel.automationOptions) { options in
                         viewModel.updateAutomationOptions(options)
                     })
-                case 5:
+                case 6:
                     PredefinedWebsitesCreationView(viewModel: .init(
                         websiteOne: viewModel.websites[0],
                         webstiteTwo: viewModel.websites[1],
                         websiteThree: viewModel.websites[2],
-                        createMultiactions: viewModel.createMultiactions)) { website in
+                        createMultiactions: viewModel.createMultiactions,
+                        browser: viewModel.favoriteBrowser)) { website in
                             viewModel.updateWebsite(website)
                         } urlUpdate: { id, url in
                             viewModel.updateURL(for: id, url: url)
                         } createMultiactions: { value in
                             viewModel.updateMultiaction(value)
+                        } browser: { browser in
+                            viewModel.updateBrowser(browser)
                         }
-                case 6:
+                case 7:
                     FinalScreenView {
                         viewModel.close()
                     }
@@ -174,7 +188,7 @@ struct WelcomeView: View {
         .padding(.horizontal, 21.0)
     }
     
-    private var firstPage: some View {
+    private var titlePageView: some View {
         VStack {
             Image(.logo)
                 .resizable()
@@ -220,7 +234,7 @@ struct WelcomeView: View {
         .padding()
     }
     
-    private var thirdPage: some View {
+    private var companionAppView: some View {
         VStack(spacing: 24) {
             Text("Get the Companion App")
                 .font(.largeTitle)
@@ -251,6 +265,99 @@ struct WelcomeView: View {
                                   errorCorrection: .high)
         guard let generated = doc.cgImage(CGSize(width: 800, height: 800)) else { return nil }
         return NSImage(cgImage: generated, size: .init(width: 200, height: 200))
+    }
+}
+
+struct OnboardingVideoComparisonView: View {
+    private let leftPlayer = AVQueuePlayer()
+    private let rightPlayer = AVQueuePlayer()
+
+    init() {
+        setupLoopingVideo(player: leftPlayer, resource: "ipad-connect")
+        setupLoopingVideo(player: rightPlayer, resource: "mac-connect")
+    }
+
+    var body: some View {
+        VStack(spacing: 32) {
+            Text("How to connect Macbook to mobile device")
+                .font(.title)
+                .fontWeight(.bold)
+
+            Text("After downloading the app on mobile device, you can now connect your Macbook to your device using the following methods.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            HStack(spacing: 24) {
+                VideoPreviewView(player: leftPlayer, title: "From mobile device", description: "If app on Macbook is already open, you can connect your device to Macbook using the Connect button from the mobile device.")
+
+                VideoPreviewView(player: rightPlayer, title: "From Macbook", description: "Open the app on Macbook and select the device you want to connect with.")
+            }
+            .frame(height: 240)
+        }
+        .padding()
+        .onAppear {
+            leftPlayer.play()
+            rightPlayer.play()
+        }
+    }
+
+    private func setupLoopingVideo(player: AVQueuePlayer, resource: String) {
+        guard let url = Bundle.main.url(forResource: resource, withExtension: "mp4") else { return }
+        let item = AVPlayerItem(url: url)
+        player.insert(item, after: nil)
+        player.actionAtItemEnd = .none
+
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { _ in
+            player.seek(to: .zero)
+            player.play()
+        }
+    }
+}
+
+struct AVPlayerViewNoControls: NSViewRepresentable {
+    let player: AVPlayer
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.videoGravity = .resizeAspect
+        playerLayer.isHidden = false
+        playerLayer.needsDisplayOnBoundsChange = true
+        view.layer = playerLayer
+        view.wantsLayer = true
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        (nsView.layer as? AVPlayerLayer)?.player = player
+    }
+}
+
+struct VideoPreviewView: View {
+    let player: AVPlayer
+    let title: String
+    let description: String
+
+    var body: some View {
+        VStack(spacing: 12) {
+            AVPlayerViewNoControls(player: player)
+                .disabled(true)
+                .cornerRadius(12)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                .frame(height: 200)
+
+            Text(title)
+                .font(.headline)
+
+            Text(description)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -821,6 +928,7 @@ class PredefinedWebsitesCreationViewModel: ObservableObject {
     @Published var selectedIconTwo: NSImage?
     @Published var selectedIconThree: NSImage?
     @Published var createMultiactions: Bool
+    @Published var selectedBrowser: Browsers
     var savedIcon: NSImage?
     var savedIconTwo: NSImage?
     var savedIconThree: NSImage?
@@ -828,7 +936,7 @@ class PredefinedWebsitesCreationViewModel: ObservableObject {
     var idTwo: String
     var idThree: String
     
-    init(websiteOne: WebsiteTest, webstiteTwo: WebsiteTest, websiteThree: WebsiteTest, createMultiactions: Bool) {
+    init(websiteOne: WebsiteTest, webstiteTwo: WebsiteTest, websiteThree: WebsiteTest, createMultiactions: Bool, browser: Browsers) {
         self.firstLink = websiteOne.url
         self.secondLink = webstiteTwo.url
         self.thirdLink = websiteThree.url
@@ -842,14 +950,17 @@ class PredefinedWebsitesCreationViewModel: ObservableObject {
         self.idTwo = webstiteTwo.id
         self.idThree = websiteThree.id
         self.createMultiactions = createMultiactions
+        self.selectedBrowser = browser
     }
 }
 
 struct PredefinedWebsitesCreationView: View {
     @ObservedObject var viewModel: PredefinedWebsitesCreationViewModel
+    
     var action: (WebsiteTest) -> Void
     var urlUpdate: (String, String) -> Void
     var createMultiactions: (Bool) -> Void
+    var browser: (Browsers) -> Void
     
     var body: some View {
         VStack(spacing: 32) {
@@ -946,6 +1057,20 @@ struct PredefinedWebsitesCreationView: View {
                         .foregroundStyle(Color.gray)
                 }
                 Spacer()
+                VStack(alignment: .leading) {
+                    Text("Select your favorite browser:")
+                        .font(.headline)
+                    
+                    Picker("Select: ", selection: $viewModel.selectedBrowser) {
+                        ForEach(Browsers.allCases) { browser in
+                            Text(browser.rawValue).tag(browser)
+                        }
+                    }
+                    .onChange(of: viewModel.selectedBrowser) { oldValue, newValue in
+                        browser(newValue)
+                    }
+                }
+                .frame(width: 300)
             }
         }
         .padding()

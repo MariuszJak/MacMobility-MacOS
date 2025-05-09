@@ -15,9 +15,13 @@ class NewWebpageViewModel: ObservableObject {
     @Published var iconData: Data?
     @Published var selectedIcon: NSImage?
     var savedIcon: NSImage?
-    @Published var browser = Browsers.chrome
+    @Published var browser: Browsers
     @Published var showTitleOnIcon: Bool = true
     @Published var userSelectedIcon: NSImage?
+    
+    init() {
+        self.browser = UserDefaults.standard.get(key: .browser) ?? .chrome
+    }
     
     func clear() {
         id = nil

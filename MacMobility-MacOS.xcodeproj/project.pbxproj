@@ -45,6 +45,8 @@
 		C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */; };
 		C0C9B78B2DCAACA40068BCAB /* NewAutomationUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */; };
 		C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */; };
+		C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */; };
+		C0C9B7942DCD35AD0068BCAB /* ipad-connect.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0C9B7932DCD35AD0068BCAB /* ipad-connect.mp4 */; };
 		C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */; };
 		C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */; };
 		C0D0941F2DBE35A100C8EAA4 /* MacroRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */; };
@@ -170,6 +172,8 @@
 		C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionSenable.swift; sourceTree = "<group>"; };
 		C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAutomationUtilityView.swift; sourceTree = "<group>"; };
 		C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConverterView.swift; sourceTree = "<group>"; };
+		C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mac-connect.mp4"; sourceTree = "<group>"; };
+		C0C9B7932DCD35AD0068BCAB /* ipad-connect.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ipad-connect.mp4"; sourceTree = "<group>"; };
 		C0CEDBAB2D7098BD00E1A041 /* WorkspacesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacesWindowView.swift; sourceTree = "<group>"; };
 		C0CEDBAD2D70992700E1A041 /* WorkspacesWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacesWindowViewModel.swift; sourceTree = "<group>"; };
 		C0D0941E2DBE35A100C8EAA4 /* MacroRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroRecorderView.swift; sourceTree = "<group>"; };
@@ -346,6 +350,7 @@
 		C097752E2B5C319D00F4FFE6 /* MacMobility-MacOS */ = {
 			isa = PBXGroup;
 			children = (
+				C0C9B78E2DCD31D80068BCAB /* Video */,
 				C071D6452DB0402F00ADD746 /* Automations */,
 				C05DA7362DAC102900BD4FBA /* Views */,
 				C0F67EED2D9814670090D568 /* PremadeShortcuts */,
@@ -392,6 +397,15 @@
 				C097754D2B5C319E00F4FFE6 /* MacMobility_MacOSUITestsLaunchTests.swift */,
 			);
 			path = "MacMobility-MacOSUITests";
+			sourceTree = "<group>";
+		};
+		C0C9B78E2DCD31D80068BCAB /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				C0C9B7932DCD35AD0068BCAB /* ipad-connect.mp4 */,
+				C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */,
+			);
+			path = Video;
 			sourceTree = "<group>";
 		};
 		C0CEDBAA2D7098B700E1A041 /* Workspaces */ = {
@@ -635,6 +649,7 @@
 				C0F67F072D982E990090D568 /* Live Photo to GIF.shortcut in Resources */,
 				C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */,
 				C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */,
+				C0C9B7942DCD35AD0068BCAB /* ipad-connect.mp4 in Resources */,
 				C0F67F0A2D982E990090D568 /* Weather for Upcoming Events.shortcut in Resources */,
 				C0F67F1B2D9831C90090D568 /* Focus ON.shortcut in Resources */,
 				C0F67F0B2D982E990090D568 /* ANC OFF.shortcut in Resources */,
@@ -648,6 +663,7 @@
 				C0F67F112D982E990090D568 /* EXIF Inspector.shortcut in Resources */,
 				C0F67F122D982E990090D568 /* Convert to JPEG and Copy.shortcut in Resources */,
 				C0F67F132D982E990090D568 /* Show Clipboard.shortcut in Resources */,
+				C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */,
 				C0F67F142D982E990090D568 /* Take Screenshot and Share.shortcut in Resources */,
 				C0F67F152D982E990090D568 /* Calendar Locations.shortcut in Resources */,
 				C0F67F162D982E990090D568 /* Copy Last Photo.shortcut in Resources */,
@@ -927,7 +943,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.17;
+				MARKETING_VERSION = 1.0.19;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -962,7 +978,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.17;
+				MARKETING_VERSION = 1.0.19;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				PROVISIONING_PROFILE_SPECIFIER = "";

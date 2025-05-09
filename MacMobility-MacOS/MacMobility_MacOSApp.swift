@@ -103,13 +103,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             welcomeWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions, websites, createMultiactions in
+            let hv = NSHostingController(rootView: WelcomeView(viewModel: .init(closeAction: { setupMode, automatedActions, websites, createMultiactions, browser in
                 self.connectionManager.createMultiactions = createMultiactions
+                self.connectionManager.browser = browser
                 self.connectionManager.websites = websites
                 self.connectionManager.initialSetup = setupMode
                 self.connectionManager.automatedActions = automatedActions
                 self.welcomeWindow?.close()
-            })))
+            }), connectionManager: connectionManager))
             welcomeWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = welcomeWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
