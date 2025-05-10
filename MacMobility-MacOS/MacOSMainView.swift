@@ -223,7 +223,7 @@ struct MacOSMainPopoverView: View {
     private func openAboutWindow() {
         if nil == aboutWindow {
             aboutWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 280),
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 350),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

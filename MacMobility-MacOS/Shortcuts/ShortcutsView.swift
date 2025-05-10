@@ -14,6 +14,7 @@ struct ShortcutsView: View {
     @State private var automationsToInstallWindow: NSWindow?
     @State private var automationItemWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
+    @State private var companionAppWindow: NSWindow?
     @State private var shouldShowCompanionRequestPopup: Bool = false
     @ObservedObject private var viewModel: ShortcutsViewModel
     @State private var selectedTab = 0
@@ -111,7 +112,17 @@ struct ShortcutsView: View {
                 
                 Spacer()
                 AnimatedSearchBar(searchText: $viewModel.searchText)
-                    .padding(.trailing, 48.0)
+                    .padding(.all, 3.0)
+                BlueButton(
+                    title: "Get Companion App",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    backgroundColor: .clear
+                ) {
+                    openCompanionAppWindow()
+                }
+                .padding(.all, 3.0)
             }
             .padding([.horizontal, .top], 16)
             .padding(.bottom, 8.0)
@@ -641,6 +652,39 @@ struct ShortcutsView: View {
         newWindow?.makeKeyAndOrderFront(nil)
     }
     
+    private func openCompanionAppWindow() {
+        if nil == newWindow {
+            companionAppWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            companionAppWindow?.center()
+            companionAppWindow?.setFrameAutosaveName("Webpages")
+            companionAppWindow?.isReleasedWhenClosed = false
+            companionAppWindow?.titlebarAppearsTransparent = true
+            companionAppWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: companionAppWindow) else {
+                return
+            }
+            companionAppWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: CompanionAppView())
+            companionAppWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = companionAppWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            companionAppWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+        companionAppWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
+        let hv = NSHostingController(rootView: CompanionAppView())
+        companionAppWindow?.contentView?.addSubview(hv.view)
+        hv.view.frame = companionAppWindow?.contentView?.bounds ?? .zero
+        hv.view.autoresizingMask = [.width, .height]
+        companionAppWindow?.makeKeyAndOrderFront(nil)
+    }
+    
     private func openInstallShortcutsWindow() {
         if nil == shortcutsToInstallWindow {
             shortcutsToInstallWindow = NSWindow(
@@ -957,5 +1001,42 @@ struct CompanionRequestPopup: View {
                 .shadow(radius: 10)
         )
         .padding()
+    }
+}
+
+import QRCode
+
+struct CompanionAppView: View {
+    var body: some View {
+        VStack(spacing: 24) {
+            Text("Get the Companion App")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            Text("Scan the QR code below to download the iOS / iPadOS companion app from the App Store.")
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+
+            if let image = generateQRCode() {
+                Text("Scan to connect")
+                Image(nsImage: image)
+                    .resizable()
+                    .frame(width: 200, height: 200)
+            }
+
+            Text("Or search for “MobilityControl” on the App Store.")
+                .font(.footnote)
+                .foregroundColor(.gray)
+        }
+        .padding()
+    }
+    
+    func generateQRCode() -> NSImage? {
+        let doc = QRCode.Document(utf8String: "https://apps.apple.com/pl/app/mobilitycontrol/id6744455092",
+                                  errorCorrection: .high)
+        guard let generated = doc.cgImage(CGSize(width: 800, height: 800)) else { return nil }
+        return NSImage(cgImage: generated, size: .init(width: 200, height: 200))
     }
 }

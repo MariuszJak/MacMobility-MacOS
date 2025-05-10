@@ -103,6 +103,7 @@ extension UserDefaults {
         case pages
         case utilities
         case license
+        case licenseKey
         case firstActivationDate
         case userApps
         case lifecycle

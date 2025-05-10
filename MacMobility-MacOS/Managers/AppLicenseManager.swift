@@ -53,6 +53,7 @@ public class AppLicenseManager: ObservableObject {
             case .success(let body):
                 if body.success {
                     upgrade()
+                    UserDefaults.standard.storeUserDefaults(key, for: .licenseKey)
                     completion(true)
                 } else {
                     completion(false)

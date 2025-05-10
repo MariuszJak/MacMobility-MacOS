@@ -253,7 +253,7 @@ struct WelcomeView: View {
                     .frame(width: 200, height: 200)
             }
 
-            Text("Or search for “MacMobility” on the App Store.")
+            Text("Or search for “MobilityControl” on the App Store.")
                 .font(.footnote)
                 .foregroundColor(.gray)
         }
