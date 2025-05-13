@@ -57,6 +57,12 @@ extension ConnectionManager {
             switch shortcutItem.utilityType {
             case .commandline:
                 if let script = shortcutItem.scriptCode {
+                    if script.contains("raycast://") {
+                        if let url = URL(string: script) {
+                            NSWorkspace.shared.open(url)
+                        }
+                        return
+                    }
                     if script.contains("FILE_CONVERTER") {
                         let input = script.split(separator: ",")[1]
                         let output = script.split(separator: ",")[2]
@@ -178,6 +184,12 @@ extension ConnectionManager {
                     switch tool.utilityType {
                     case .commandline:
                         if let script = tool.scriptCode {
+                            if script.contains("raycast://") {
+                                if let url = URL(string: script) {
+                                    NSWorkspace.shared.open(url)
+                                }
+                                return
+                            }
                             if script.contains("FILE_CONVERTER") {
                                 let input = script.split(separator: ",")[1]
                                 let output = script.split(separator: ",")[2]

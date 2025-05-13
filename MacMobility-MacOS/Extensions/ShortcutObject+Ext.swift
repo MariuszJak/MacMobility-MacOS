@@ -20,6 +20,9 @@ extension ShortcutObject {
         if script.script.contains("FILE_CONVERTER") {
             color = .convert
         }
+        if script.script.contains("raycast://") {
+            color = .raycast
+        }
         if script.name == "MOV to MP4" || script.name == "MP4 to MOV" {
             color = "test"
         }

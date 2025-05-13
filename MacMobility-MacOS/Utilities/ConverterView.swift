@@ -152,4 +152,8 @@ extension String {
     static var convert: String {
         return "convert"
     }
+    
+    static var raycast: String {
+        return "raycast"
+    }
 }

@@ -820,6 +820,7 @@ struct ShortcutsView: View {
     }
     
     private func openEditUtilityWindow(item: ShortcutObject) {
+        editUtilitiesWindow?.close()
         if nil == editUtilitiesWindow {
             if item.color == .convert {
                 editUtilitiesWindow = NSWindow(
@@ -851,6 +852,13 @@ struct ShortcutsView: View {
             case .commandline:
                 if item.color == .convert {
                     let hv = NSHostingController(rootView: ConverterView(item: item, delegate: viewModel){
+                        editUtilitiesWindow?.close()
+                    })
+                    editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                    hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                    hv.view.autoresizingMask = [.width, .height]
+                } else if item.color == .raycast {
+                    let hv = NSHostingController(rootView: RaycastUtilityView(item: item, delegate: viewModel){
                         editUtilitiesWindow?.close()
                     })
                     editUtilitiesWindow?.contentView?.addSubview(hv.view)
@@ -922,6 +930,13 @@ struct ShortcutsView: View {
         case .commandline:
             if item.color == .convert {
                 let hv = NSHostingController(rootView: ConverterView(item: item, delegate: viewModel){
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
+            } else if item.color == .raycast {
+                let hv = NSHostingController(rootView: RaycastUtilityView(item: item, delegate: viewModel){
                     editUtilitiesWindow?.close()
                 })
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)

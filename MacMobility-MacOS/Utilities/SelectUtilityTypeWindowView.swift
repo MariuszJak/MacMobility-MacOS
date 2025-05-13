@@ -35,7 +35,8 @@ class SelectUtilityTypeWindowViewModel: ObservableObject {
         .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device."),
         .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device."),
         .init(type: .macro, title: "Macros", description: "This tool allows creation of macros that can be triggered remotely from companion device."),
-        .init(type: .commandline, title: "File Converter", description: "This tool allows conversion of files between different formats. You can define a file format input and output.")
+        .init(type: .commandline, title: "File Converter", description: "This tool allows conversion of files between different formats. You can define a file format input and output."),
+        .init(type: .commandline, title: "Raycast", description: "This tool allows triggering Raycast commands remotely from companion device using deeplinks.")
     ]
     
     init(connectionManager: ConnectionManager, delegate: UtilitiesWindowDelegate?) {
@@ -180,6 +181,13 @@ struct SelectUtilityTypeWindowView: View {
             case .commandline:
                 if title == "File Converter" {
                     let hv = NSHostingController(rootView: ConverterView(item: item, delegate: viewModel.delegate){
+                        newWindow?.close()
+                    })
+                    newWindow?.contentView?.addSubview(hv.view)
+                    hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+                    hv.view.autoresizingMask = [.width, .height]
+                } else if title == "Raycast" {
+                    let hv = NSHostingController(rootView: RaycastUtilityView(item: item, delegate: viewModel.delegate){
                         newWindow?.close()
                     })
                     newWindow?.contentView?.addSubview(hv.view)
