@@ -349,7 +349,8 @@ struct MacOSMainPopoverView: View {
     private var pairiningView: some View {
         switch connectionManager.pairingStatus {
         case .notPaired:
-            if let availablePeer = connectionManager.availablePeer {
+            if let availablePeerWithName = connectionManager.availablePeerWithName,
+               let availablePeer = availablePeerWithName.0 {
                 VStack(alignment: .leading, spacing: spacing) {
                     Button {
                         connectionManager.invitePeer(with: availablePeer)
@@ -358,7 +359,7 @@ struct MacOSMainPopoverView: View {
                         HStack {
                             Image(systemName: "link.circle.fill")
                                 .foregroundStyle(Color.accentColor)
-                            Text("Connect to \(availablePeer.displayName)")
+                            Text("Connect to \(availablePeerWithName.1)")
                                 .font(.system(size: 14.0, weight: .bold))
                                 .foregroundStyle(Color.accentColor)
                         }

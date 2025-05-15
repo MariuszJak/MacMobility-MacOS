@@ -27,10 +27,15 @@ struct SDiff: Codable {
     var item: ShortcutObject, from: Int?, to: Int?
 }
 
+struct DeviceName: Codable {
+    let name: String
+}
+
 class ConnectionManager: NSObject, ObservableObject {
     @Published var screenIndex = 0
     @Published var inProgressWindow: NSWindow?
     @Published var availablePeer: MCPeerID?
+    @Published var availablePeerWithName: (MCPeerID?, String)?
     @Published var connectedPeerName: String?
     @Published var receivedInvite: Bool = false
     @Published var receivedInviteFrom: MCPeerID?
@@ -99,13 +104,16 @@ class ConnectionManager: NSObject, ObservableObject {
     public var isConnecting: Bool {
         availablePeer != nil && pairingStatus == .notPaired
     }
+    private var deviceName: String {
+        Host.current().localizedName ?? ""
+    }
 
     public var cursorPosition: CGPoint = .zero
     private var uuidCode: String?
     
     override init() {
         session = MCSession(peer: myPeerId, securityIdentity: nil, encryptionPreference: .none)
-        serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
+        serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: ["name": Host.current().localizedName ?? ""], serviceType: serviceType)
         serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: serviceType)
 
         super.init()
@@ -167,7 +175,8 @@ class ConnectionManager: NSObject, ObservableObject {
     }
     
     func invitePeer(with peer: MCPeerID, context: Data? = nil) {
-        serviceBrowser.invitePeer(peer, to: session, withContext: context, timeout: 30)
+        let name = try? JSONEncoder().encode(DeviceName(name: deviceName))
+        serviceBrowser.invitePeer(peer, to: session, withContext: name, timeout: 30)
     }
     
     func cancel() {
@@ -189,7 +198,7 @@ struct ConnectionRequest: Codable {
 extension ConnectionManager: MCNearbyServiceAdvertiserDelegate {
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         if let context, let data = String(data: context, encoding: .utf8), isValidUUID(data) {
-            connectedPeerName = availablePeer?.displayName
+            connectedPeerName = availablePeerWithName?.1
             invitationHandler(true, session)
             _ = generateUUID()
         } else if let context, let connectionRequest = try? JSONDecoder().decode(ConnectionRequest.self, from: context) {
@@ -207,9 +216,9 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
 
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
         DispatchQueue.main.async {
-            if self.availablePeer == nil {
-                self.availablePeer = peerID
-                self.connectedPeerName = peerID.displayName
+            if self.availablePeer == nil, !peerID.displayName.contains(".local"), let name = info?["name"] {
+                self.availablePeerWithName = (peerID, name)
+                self.connectedPeerName = name
             }
         }
     }

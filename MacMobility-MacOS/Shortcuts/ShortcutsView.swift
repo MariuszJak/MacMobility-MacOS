@@ -282,9 +282,10 @@ struct ShortcutsView: View {
         VStack {
             switch viewModel.connectionManager.pairingStatus {
             case .notPaired:
-                if let availablePeer = viewModel.connectionManager.availablePeer {
+                if let availablePeerWithName = viewModel.connectionManager.availablePeerWithName,
+                   let availablePeer = availablePeerWithName.0 {
                     BlueButton(
-                        title: "Connect to \(availablePeer.displayName)",
+                        title: "Connect to \(availablePeerWithName.1)",
                         font: .callout,
                         padding: 10.0,
                         cornerRadius: 6.0,
