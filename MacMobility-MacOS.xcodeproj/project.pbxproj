@@ -151,6 +151,7 @@
 		C065EC072DC0DE8900000B8C /* ShortcutSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSection.swift; sourceTree = "<group>"; };
 		C071D70F2DB17C6E00ADD746 /* automations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = automations.json; sourceTree = "<group>"; };
 		C071D7172DB43A3100ADD746 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "MacMobility-MacOSDebug.entitlements"; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -350,6 +351,8 @@
 		C097752E2B5C319D00F4FFE6 /* MacMobility-MacOS */ = {
 			isa = PBXGroup;
 			children = (
+				C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */,
+				C09775382B5C319E00F4FFE6 /* MacMobility_MacOS.entitlements */,
 				C0C9B78E2DCD31D80068BCAB /* Video */,
 				C071D6452DB0402F00ADD746 /* Automations */,
 				C05DA7362DAC102900BD4FBA /* Views */,
@@ -368,7 +371,6 @@
 				C0EAF93E2D90213100044947 /* MacOSMainPopoverViewModel.swift */,
 				C09775332B5C319E00F4FFE6 /* Assets.xcassets */,
 				C09775682B5C329300F4FFE6 /* scriptnext.scpt */,
-				C09775382B5C319E00F4FFE6 /* MacMobility_MacOS.entitlements */,
 				C09775352B5C319E00F4FFE6 /* Preview Content */,
 			);
 			path = "MacMobility-MacOS";
@@ -922,7 +924,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "MacMobility-MacOS/MacMobility_MacOS.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "MacMobility-MacOS/MacMobility-MacOSDebug.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -943,7 +945,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.22;
+				MARKETING_VERSION = 1.0.23;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -978,7 +980,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.22;
+				MARKETING_VERSION = 1.0.23;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				PROVISIONING_PROFILE_SPECIFIER = "";
