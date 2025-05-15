@@ -216,7 +216,8 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
 
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
         DispatchQueue.main.async {
-            if self.availablePeer == nil, !peerID.displayName.contains(".local"), let name = info?["name"] {
+            if self.availablePeer == nil, !peerID.displayName.contains(".local") {
+                let name = info?["name"] ?? peerID.displayName
                 self.availablePeerWithName = (peerID, name)
                 self.connectedPeerName = name
             }
