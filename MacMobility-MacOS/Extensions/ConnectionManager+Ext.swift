@@ -34,9 +34,6 @@ extension ConnectionManager {
         }
         if let string = String(data: data, encoding: .utf8) {
             if string == "Connected - send data." {
-                self.send(runningApps: self.runningApps)
-                self.send(workspaces: self.workspaces)
-                self.send(shortcuts: self.shortcuts)
                 let diff = self.shortcuts.difference(from: [])
                 self.send(shortcutsDiff: handleDiff(diff))
             } else {

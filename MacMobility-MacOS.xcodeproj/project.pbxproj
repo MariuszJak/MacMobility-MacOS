@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C00CB20B2DD91A680082128F /* ResolutionSelectorCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */; };
 		C03581082DB6501E009E22F5 /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581072DB6501E009E22F5 /* IconPickerView.swift */; };
 		C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */; };
 		C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */; };
@@ -28,6 +29,8 @@
 		C065EC082DC0DE8900000B8C /* ShortcutSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EC072DC0DE8900000B8C /* ShortcutSection.swift */; };
 		C071D7102DB17C6E00ADD746 /* automations.json in Resources */ = {isa = PBXBuildFile; fileRef = C071D70F2DB17C6E00ADD746 /* automations.json */; };
 		C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071D7172DB43A3100ADD746 /* WelcomeView.swift */; };
+		C08BBAA22DD67D31007F561B /* TCPServerStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */; };
+		C08BBAA42DD67D71007F561B /* ScreenViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA32DD67D71007F561B /* ScreenViewManager.swift */; };
 		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
 		C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */; };
 		C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775332B5C319E00F4FFE6 /* Assets.xcassets */; };
@@ -130,6 +133,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResolutionSelectorCard.swift; sourceTree = "<group>"; };
 		C03581072DB6501E009E22F5 /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
 		C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerViewModel.swift; sourceTree = "<group>"; };
 		C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Ext.swift"; sourceTree = "<group>"; };
@@ -152,6 +156,10 @@
 		C071D70F2DB17C6E00ADD746 /* automations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = automations.json; sourceTree = "<group>"; };
 		C071D7172DB43A3100ADD746 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "MacMobility-MacOSDebug.entitlements"; sourceTree = "<group>"; };
+		C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPServerStreamer.swift; sourceTree = "<group>"; };
+		C08BBAA32DD67D71007F561B /* ScreenViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenViewManager.swift; sourceTree = "<group>"; };
+		C08BBAA52DD67D8E007F561B /* CGVirtualDisplayPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CGVirtualDisplayPrivate.h; sourceTree = "<group>"; };
+		C08BBAA62DD67DC0007F561B /* MacMobility-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MacMobility-Bridging-Header.h"; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -278,6 +286,7 @@
 				C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */,
 				C065EBFD2DC0DE1500000B8C /* InstallAutomationsView.swift */,
 				C065EBFF2DC0DE2400000B8C /* AutomationInstallView.swift */,
+				C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -299,6 +308,15 @@
 				C071D70F2DB17C6E00ADD746 /* automations.json */,
 			);
 			path = Automations;
+			sourceTree = "<group>";
+		};
+		C08BBAA02DD67D1F007F561B /* VirtualDisplay */ = {
+			isa = PBXGroup;
+			children = (
+				C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */,
+				C08BBAA32DD67D71007F561B /* ScreenViewManager.swift */,
+			);
+			path = VirtualDisplay;
 			sourceTree = "<group>";
 		};
 		C091AD242BA4D93000C8DC8D /* Managers */ = {
@@ -351,6 +369,9 @@
 		C097752E2B5C319D00F4FFE6 /* MacMobility-MacOS */ = {
 			isa = PBXGroup;
 			children = (
+				C08BBAA62DD67DC0007F561B /* MacMobility-Bridging-Header.h */,
+				C08BBAA52DD67D8E007F561B /* CGVirtualDisplayPrivate.h */,
+				C08BBAA02DD67D1F007F561B /* VirtualDisplay */,
 				C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */,
 				C09775382B5C319E00F4FFE6 /* MacMobility_MacOS.entitlements */,
 				C0C9B78E2DCD31D80068BCAB /* Video */,
@@ -720,6 +741,7 @@
 				C0D0941F2DBE35A100C8EAA4 /* MacroRecorderView.swift in Sources */,
 				C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */,
 				C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */,
+				C00CB20B2DD91A680082128F /* ResolutionSelectorCard.swift in Sources */,
 				C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */,
 				C03581082DB6501E009E22F5 /* IconPickerView.swift in Sources */,
 				C0EAF93F2D90213100044947 /* MacOSMainPopoverViewModel.swift in Sources */,
@@ -747,6 +769,7 @@
 				C05DA73A2DAC104A00BD4FBA /* UpdateScreenView.swift in Sources */,
 				C0D094212DBE35B900C8EAA4 /* KeyRecorder.swift in Sources */,
 				C0EAF93D2D8CC68E00044947 /* NewMultiSelectionUtilityViewModel.swift in Sources */,
+				C08BBAA22DD67D31007F561B /* TCPServerStreamer.swift in Sources */,
 				C064BA652D876F7C0091E2BE /* NSColor+Ext.swift in Sources */,
 				C0D21D6F2D7A266100FEF931 /* AddNewScreenView.swift in Sources */,
 				C0F67ED82D973E840090D568 /* ClientError.swift in Sources */,
@@ -758,6 +781,7 @@
 				C0F67EDE2D973EB20090D568 /* DBSDataProvider.swift in Sources */,
 				C0F67EE92D973F2B0090D568 /* LicenseValidationUseCase.swift in Sources */,
 				C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */,
+				C08BBAA42DD67D71007F561B /* ScreenViewManager.swift in Sources */,
 				C0EAFC1A2D903E7400044947 /* TrialManager.swift in Sources */,
 				C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */,
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
@@ -945,10 +969,11 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.23;
+				MARKETING_VERSION = 1.0.24;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MacMobility-MacOS/MacMobility-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -980,13 +1005,14 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.23;
+				MARKETING_VERSION = 1.0.24;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "MacMobility-MacOS Developer ID Application Prov";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MacMobility-MacOS/MacMobility-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

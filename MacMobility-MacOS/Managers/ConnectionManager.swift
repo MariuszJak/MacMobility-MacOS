@@ -45,6 +45,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var showsLocalError: Bool = false
     @Published var localError: String?
     @Published var dynamicUrls: (Browsers, [String]) = (.chrome, [])
+    private let tcpServer = TCPServerStreamer()
     let keyRecorder = KeyRecorder()
     private var cancellables = Set<AnyCancellable>()
     public var currentIndex = 0
@@ -103,6 +104,11 @@ class ConnectionManager: NSObject, ObservableObject {
     public var cursorPosition: CGPoint = .zero
     private var uuidCode: String?
     
+    var iosDevice: iOSDevice? {
+        guard let connectedPeerName else { return nil }
+        return connectedPeerName.contains("iPad") ? .ipad : .iphone
+    }
+    
     override init() {
         session = MCSession(peer: myPeerId, securityIdentity: nil, encryptionPreference: .none)
         serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
@@ -120,6 +126,31 @@ class ConnectionManager: NSObject, ObservableObject {
         
         startAdvertising()
         startBrowsing()
+    }
+    
+    func startTCPServer(
+        completion: @escaping(Bool, CGDirectDisplayID?) -> Void,
+        streamConnection: @escaping (Bool) -> Void
+    ) async {
+        guard let iosDevice else { return }
+        
+        await tcpServer.startServer(device: iosDevice) { [weak self] success, displayId in
+            if success, let ipAddress = self?.getLocalIPAddress() {
+                self?.sendStartStream(action: "START", ipAddress: ipAddress)
+            }
+            completion(success, displayId)
+        } streamConnection: { connected in
+            DispatchQueue.main.async {
+                streamConnection(connected)
+            }
+        }
+    }
+    
+    func stopTCPServer(completion: @escaping(Bool) -> Void) {
+        tcpServer.stopServer { [weak self] in
+            self?.sendStartStream(action: "STOP", ipAddress: "")
+            completion(true)
+        }
     }
     
     func generateUUID() -> String {
@@ -217,6 +248,7 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         guard availablePeer == peerID else { return }
         availablePeer = nil
+        
     }
 }
 
@@ -224,6 +256,11 @@ extension ConnectionManager: MCSessionDelegate {
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         DispatchQueue.main.async {
             self.pairingStatus = state == .connected ? .paired : .notPaired
+            if state == .notConnected {
+                self.stopTCPServer { _ in
+//                    self.streamConnectionState = .notConnected
+                }
+            }
             self.toggleAdvertising()
         }
     }

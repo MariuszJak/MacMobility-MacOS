@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
-    let connectionManager: ConnectionManager
+    @Published var connectionManager: ConnectionManager
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []
     @Published var installedApps: [ShortcutObject] = []

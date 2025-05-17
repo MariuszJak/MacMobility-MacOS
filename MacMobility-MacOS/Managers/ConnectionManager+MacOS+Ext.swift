@@ -38,6 +38,12 @@ struct ShortcutsResponseDiff: Codable {
     let shortcutsDiff: [ChangeType: [SDiff]]
 }
 
+struct StartStream: Codable {
+    let title: String
+    let action: String
+    let ipAddress: String
+}
+
 extension ConnectionManager: ConnectionSenable {
     var mouseLocation: NSPoint { NSEvent.mouseLocation }
 
@@ -115,6 +121,15 @@ extension ConnectionManager: ConnectionSenable {
         send(data)
     }
     
+    func sendStartStream(action: String, ipAddress: String) {
+        let payload = StartStream(title: "MacMobilityStream", action: action, ipAddress: ipAddress)
+        guard !session.connectedPeers.isEmpty,
+              let data = try? JSONEncoder().encode(payload) else {
+            return
+        }
+        send(data)
+    }
+    
     func send(alert: AlertMessage) {
         let payload = AlertMessageResponse(alertTitle: "alertTitle", message: alert)
         guard !session.connectedPeers.isEmpty,
@@ -122,6 +137,45 @@ extension ConnectionManager: ConnectionSenable {
             return
         }
         send(data)
+    }
+    
+    func getLocalIPAddress() -> String? {
+        var address: String?
+
+        // Get list of all interfaces
+        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        if getifaddrs(&ifaddr) == 0 {
+            var ptr = ifaddr
+            while ptr != nil {
+                defer { ptr = ptr?.pointee.ifa_next }
+
+                let interface = ptr!.pointee
+                let addrFamily = interface.ifa_addr.pointee.sa_family
+
+                // Check for IPv4
+                if addrFamily == UInt8(AF_INET) {
+                    let name = String(cString: interface.ifa_name)
+                    // Skip internal interfaces like lo0
+                    if name == "en0" || name.hasPrefix("en") {
+                        var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                        let result = getnameinfo(interface.ifa_addr,
+                                                 socklen_t(interface.ifa_addr.pointee.sa_len),
+                                                 &hostname,
+                                                 socklen_t(hostname.count),
+                                                 nil,
+                                                 0,
+                                                 NI_NUMERICHOST)
+                        if result == 0 {
+                            address = String(cString: hostname)
+                            break
+                        }
+                    }
+                }
+            }
+            freeifaddrs(ifaddr)
+        }
+
+        return address
     }
 }
 
