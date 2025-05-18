@@ -219,7 +219,7 @@ struct ShortcutsView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         if streamConnectionState == .connected, let displayID, let iosDevice = viewModel.connectionManager.iosDevice {
-                            ResolutionSelectorCard(displayID: displayID, iosDevice: iosDevice)
+                            ResolutionSelectorCard(displayID: displayID, iosDevice: iosDevice, compressionRate: $viewModel.connectionManager.compressionRate)
                         }
                         ForEach(1..<viewModel.pages+1, id: \.self) { page in
                             HStack {

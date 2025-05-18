@@ -7,27 +7,14 @@
 
 import Foundation
 
-enum iOSDevice {
+struct iOSDevice {
+    let type: iOSDeviceType
+    var resolution: CGSize
+}
+
+enum iOSDeviceType {
     case ipad
     case iphone
-    
-    var resolutions: CGSize {
-        switch self {
-        case .ipad:
-            return .init(width: 1194, height: 834)
-        case .iphone:
-            return .init(width: 1266, height: 585)
-        }
-    }
-    
-    var compression: Double {
-        switch self {
-        case .ipad:
-            return 0.7
-        case .iphone:
-            return 0.01
-        }
-    }
 }
 
 class ScreenViewManager {
@@ -54,7 +41,7 @@ class ScreenViewManager {
         let settings = CGVirtualDisplaySettings()
         settings.hiDPI = 1
         settings.modes = [
-            CGVirtualDisplayMode(width: UInt(device.resolutions.width), height: UInt(device.resolutions.height), refreshRate: 60),
+            CGVirtualDisplayMode(width: UInt(device.resolution.width), height: UInt(device.resolution.height), refreshRate: 60),
         ]
         display.apply(settings)
         return display.displayID

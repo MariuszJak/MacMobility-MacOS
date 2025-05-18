@@ -32,6 +32,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var inProgressWindow: NSWindow?
     @Published var availablePeer: MCPeerID?
     @Published var connectedPeerName: String?
+    @Published var connectedPeerResolution: String?
     @Published var receivedInvite: Bool = false
     @Published var receivedInviteFrom: MCPeerID?
     @Published var invitationHandler: ((Bool, MCSession?) -> Void)?
@@ -45,6 +46,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var showsLocalError: Bool = false
     @Published var localError: String?
     @Published var dynamicUrls: (Browsers, [String]) = (.chrome, [])
+    @Published var compressionRate: CGFloat? = 0.4
     private let tcpServer = TCPServerStreamer()
     let keyRecorder = KeyRecorder()
     private var cancellables = Set<AnyCancellable>()
@@ -106,7 +108,11 @@ class ConnectionManager: NSObject, ObservableObject {
     
     var iosDevice: iOSDevice? {
         guard let connectedPeerName else { return nil }
-        return connectedPeerName.contains("iPad") ? .ipad : .iphone
+        let test = connectedPeerResolution?.split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .compactMap { CGFloat(Double($0) ?? 0) }
+        let resolution: CGSize = .init(width: test?[0] ?? 0.0, height: test?[1] ?? 0.0)
+        return connectedPeerName.contains("iPad") ? .init(type: .ipad, resolution: resolution) : .init(type: .iphone, resolution: resolution)
     }
     
     override init() {
@@ -134,7 +140,12 @@ class ConnectionManager: NSObject, ObservableObject {
     ) async {
         guard let iosDevice else { return }
         
-        await tcpServer.startServer(device: iosDevice) { [weak self] success, displayId in
+        await tcpServer.startServer(
+            compressionRate: .init(
+                get: { self.compressionRate },
+                set: { newValue in self.compressionRate = newValue ?? 0.4 }),
+            device: iosDevice
+        ) { [weak self] success, displayId in
             if success, let ipAddress = self?.getLocalIPAddress() {
                 self?.sendStartStream(action: "START", ipAddress: ipAddress)
             }
@@ -241,6 +252,7 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
             if self.availablePeer == nil {
                 self.availablePeer = peerID
                 self.connectedPeerName = peerID.displayName
+                self.connectedPeerResolution = info?["screenResolution"]
             }
         }
     }

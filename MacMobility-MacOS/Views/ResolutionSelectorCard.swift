@@ -12,7 +12,27 @@ struct ResolutionSelectorCard: View {
     let displayID: CGDirectDisplayID
     let iosDevice: iOSDevice
     @State private var resolutions: [DisplayMode] = []
+    @State private var compressionRates: [CGFloat] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
+    let descriptions: [CGFloat: String] = [
+        0.1: "90% (Low quality & fast performance)",
+        0.2: "80%",
+        0.3: "70%",
+        0.4: "60% (Good quality & reliable performance)",
+        0.5: "50%",
+        0.6: "40%",
+        0.7: "30% (High quality & low performance)",
+        0.8: "20%",
+        0.9: "10%",
+        1.0: "0%"
+    ]
     @State private var selectedMode: DisplayMode?
+    @Binding var compressionRate: CGFloat?
+    
+    init(displayID: CGDirectDisplayID, iosDevice: iOSDevice, compressionRate: Binding<CGFloat?>) {
+        self._compressionRate = compressionRate
+        self.iosDevice = iosDevice
+        self.displayID = displayID
+    }
     
     var body: some View {
         HStack(spacing: 16) {
@@ -23,20 +43,13 @@ struct ResolutionSelectorCard: View {
                 .foregroundColor(.accentColor)
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("Change Resolution")
-                    .font(.headline)
-                
-                Picker("Resolution", selection: $selectedMode) {
-                    ForEach(resolutions) { mode in
-                        Text(mode.description).tag(Optional(mode))
+                Picker("Compression", selection: $compressionRate) {
+                    ForEach(compressionRates, id: \.self) { compressionRate in
+                        Text(descriptions[compressionRate] ?? "-").tag(Optional(compressionRate))
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
-                .onChange(of: selectedMode) { _, newMode in
-                    if let mode = newMode {
-                        setDisplayResolution(displayID: displayID, to: mode.cgMode)
-                    }
-                }
+                Text("Resolution: \(selectedMode?.description ?? "")")
                 
                 Button("Open Display Settings") {
                     openDisplayArrangementSettings()
@@ -57,7 +70,7 @@ struct ResolutionSelectorCard: View {
         )
         .padding()
         .onAppear {
-            if let initialMode = getDisplayModeForResolution(iosDevice.resolutions) {
+            if let initialMode = getDisplayModeForResolution(iosDevice.resolution) {
                 setDisplayResolution(displayID: displayID, to: initialMode.cgMode)
             }
             let all = getSupportedResolutions(for: displayID)
