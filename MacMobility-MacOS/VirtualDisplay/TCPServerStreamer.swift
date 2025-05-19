@@ -11,7 +11,7 @@ import ScreenCaptureKit
 import CoreImage
 
 //@MainActor
-class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate {
+class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamOutput {
     @Binding var compressionRate: CGFloat?
     private var listener: NWListener?
     private var connection: NWConnection?
@@ -271,9 +271,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate {
         let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
         return bitmapRep.representation(using: .jpeg, properties: [.compressionFactor: compressionRate ?? 0.5])
     }
-}
-
-extension TCPServerStreamer: SCStreamOutput {
+    
     func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {
         guard let pixelBuffer = sampleBuffer.imageBuffer else { return }
         if let jpegData = self.compressToJPEG(from: pixelBuffer) {
