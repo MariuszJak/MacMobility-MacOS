@@ -121,7 +121,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func openPermissionsWindow() {
         if nil == permissionsWindow {
             permissionsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 300),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 450),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

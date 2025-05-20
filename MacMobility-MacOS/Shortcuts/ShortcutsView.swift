@@ -29,7 +29,6 @@ enum StreamConnectionState {
 
 struct ShortcutsView: View {
     @ObservedObject private var viewModel: ShortcutsViewModel
-    @State private var streamConnectionState: StreamConnectionState = .notConnected
     @State private var newWindow: NSWindow?
     @State private var newUtilityWindow: NSWindow?
     @State private var shortcutsToInstallWindow: NSWindow?
@@ -40,7 +39,7 @@ struct ShortcutsView: View {
     @State private var shouldShowCompanionRequestPopup: Bool = false
     @State private var selectedTab = 0
     @State private var tab: Tab = .apps
-    @State private var displayID: CGDirectDisplayID?
+    
     @State private var resolutions: [DisplayMode] = []
     @State private var selectedMode: DisplayMode?
 
@@ -50,7 +49,7 @@ struct ShortcutsView: View {
     init(viewModel: ShortcutsViewModel) {
         self.viewModel = viewModel
     }
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -135,35 +134,26 @@ struct ShortcutsView: View {
                 }
                 .padding(.all, 3.0)
                 
-                switch streamConnectionState {
+                switch viewModel.streamConnectionState {
                 case .connected, .notConnected:
                     BlueButton(
-                        title: streamConnectionState.label,
+                        title: viewModel.streamConnectionState.label,
                         font: .callout,
                         padding: 8.0,
                         cornerRadius: 6.0,
                         backgroundColor: .clear
                     ) {
-                        switch streamConnectionState {
+                        switch viewModel.streamConnectionState {
                         case .notConnected:
-                            Task {
-                                streamConnectionState = .connecting
-                                await viewModel.connectionManager.startTCPServer { success, displayId in
-                                    if let displayId {
-                                        displayID = displayId
-                                    }
-                                } streamConnection: { connected in
-                                    streamConnectionState = .connected
-                                }
-                            }
+                            viewModel.extendScreen()
                         case .connecting:
                             break
                         case .disconnecting:
                             break
                         case .connected:
-                            streamConnectionState = .disconnecting
+                            viewModel.streamConnectionState = .disconnecting
                             viewModel.connectionManager.stopTCPServer { _ in
-                               streamConnectionState = .notConnected
+                                viewModel.streamConnectionState = .notConnected
                             }
                         }
                     }
@@ -178,13 +168,13 @@ struct ShortcutsView: View {
                         backgroundColor: .red
                     ) {
                         viewModel.connectionManager.stopTCPServer { _ in
-                            streamConnectionState = .notConnected
+                            viewModel.streamConnectionState = .notConnected
                         }
                     }
                     .padding(.all, 3.0)
                 case .disconnecting:
                     BlueButton(
-                        title: streamConnectionState.label,
+                        title: viewModel.streamConnectionState.label,
                         font: .callout,
                         padding: 8.0,
                         cornerRadius: 6.0,
@@ -218,7 +208,7 @@ struct ShortcutsView: View {
             VStack(alignment: .leading) {
                 ScrollViewReader { proxy in
                     ScrollView {
-                        if streamConnectionState == .connected, let displayID, let iosDevice = viewModel.connectionManager.iosDevice {
+                        if viewModel.streamConnectionState == .connected, let displayID = viewModel.displayID, let iosDevice = viewModel.connectionManager.iosDevice {
                             ResolutionSelectorCard(displayID: displayID, iosDevice: iosDevice, compressionRate: $viewModel.connectionManager.compressionRate)
                         }
                         ForEach(1..<viewModel.pages+1, id: \.self) { page in
@@ -295,7 +285,7 @@ struct ShortcutsView: View {
                             viewModel.connectionManager.stopTCPServer { success in
                                 print("Disconnected from server: \(success)")
                             }
-                            streamConnectionState = .notConnected
+                            viewModel.streamConnectionState = .notConnected
                         }
                     }
                 }

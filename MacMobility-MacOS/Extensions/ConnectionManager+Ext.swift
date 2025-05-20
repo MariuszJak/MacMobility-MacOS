@@ -54,6 +54,14 @@ extension ConnectionManager {
             switch shortcutItem.utilityType {
             case .commandline:
                 if let script = shortcutItem.scriptCode {
+                    if script.contains("macbook://extend-display") {
+                        NotificationCenter.default.post(
+                            name: .extendScreen,
+                            object: nil,
+                            userInfo: nil
+                        )
+                        return
+                    }
                     if script.contains("raycast://") {
                         if let url = URL(string: script) {
                             NSWorkspace.shared.open(url)
@@ -181,6 +189,14 @@ extension ConnectionManager {
                     switch tool.utilityType {
                     case .commandline:
                         if let script = tool.scriptCode {
+                            if script.contains("macbook://extend-display") {
+                                NotificationCenter.default.post(
+                                    name: .extendScreen,
+                                    object: nil,
+                                    userInfo: nil
+                                )
+                                return
+                            }
                             if script.contains("raycast://") {
                                 if let url = URL(string: script) {
                                     NSWorkspace.shared.open(url)

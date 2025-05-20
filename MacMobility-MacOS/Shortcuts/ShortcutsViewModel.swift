@@ -23,6 +23,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var availablePeerName: String = ""
     @Published var sections: [ShortcutSection] = []
     @Published var allSectionsExpanded = true
+    @Published var streamConnectionState: StreamConnectionState = .notConnected
+    @Published var displayID: CGDirectDisplayID?
     @Published var utilities: [ShortcutObject] = [] {
         didSet {
             sections = utilitiesWithSections()
@@ -53,6 +55,26 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchInstalledApps()
         registerListener()
         startMonitoring()
+        
+        connectionManager
+            .$streamConnectionState
+            .receive(on: DispatchQueue.main)
+            .sink { value in
+                self.streamConnectionState = value
+            }
+            .store(in: &cancellables)
+        
+        connectionManager
+            .$displayID
+            .receive(on: DispatchQueue.main)
+            .sink { value in
+                self.displayID = value
+            }
+            .store(in: &cancellables)
+    }
+    
+    func extendScreen() {
+        connectionManager.extendScreen()
     }
     
     func allCategories() -> [String] {

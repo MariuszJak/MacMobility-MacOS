@@ -10,6 +10,7 @@ import SwiftUI
 extension ShortcutObject {
     static func from(script: AutomationScript, at index: Int? = nil) -> ShortcutObject {
         var utilityType: UtilityObject.UtilityType?
+        var imageData = script.imageData
         switch script.type {
         case .automator, .none:
             utilityType = .automation
@@ -22,6 +23,7 @@ extension ShortcutObject {
         }
         if script.script.contains("raycast://") {
             color = .raycast
+            imageData = NSImage(named: "raycastIcon")?.toData
         }
         if script.name == "MOV to MP4" || script.name == "MP4 to MOV" {
             color = "test"
@@ -36,7 +38,7 @@ extension ShortcutObject {
             color: color,
             faviconLink: nil,
             browser: nil,
-            imageData: script.imageData,
+            imageData: imageData,
             scriptCode: script.script,
             utilityType: utilityType,
             objects: nil,

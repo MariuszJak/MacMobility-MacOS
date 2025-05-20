@@ -52,6 +52,8 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var localError: String?
     @Published var dynamicUrls: (Browsers, [String]) = (.chrome, [])
     @Published var compressionRate: CGFloat? = 0.4
+    @Published var streamConnectionState: StreamConnectionState = .notConnected
+    @Published var displayID: CGDirectDisplayID?
     private let tcpServer = TCPServerStreamer()
     let keyRecorder = KeyRecorder()
     private var cancellables = Set<AnyCancellable>()
@@ -140,6 +142,30 @@ class ConnectionManager: NSObject, ObservableObject {
         
         startAdvertising()
         startBrowsing()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleData(_:)),
+            name: .extendScreen,
+            object: nil
+        )
+    }
+    
+    @objc private func handleData(_ notification: Notification) {
+        extendScreen()
+    }
+    
+    func extendScreen() {
+        Task {
+            streamConnectionState = .connecting
+            await startTCPServer { success, displayId in
+                if let displayId {
+                    self.displayID = displayId
+                }
+            } streamConnection: { connected in
+                self.streamConnectionState = .connected
+            }
+        }
     }
     
     func startTCPServer(
@@ -157,7 +183,9 @@ class ConnectionManager: NSObject, ObservableObject {
             if success, let ipAddress = self?.getLocalIPAddress() {
                 self?.sendStartStream(action: "START", ipAddress: ipAddress)
             }
-            completion(success, displayId)
+            DispatchQueue.main.async {
+                completion(success, displayId)
+            }
         } streamConnection: { connected in
             DispatchQueue.main.async {
                 streamConnection(connected)
@@ -298,4 +326,8 @@ extension ConnectionManager: MCSessionDelegate {
     public func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         log.error("Receiving resources is not supported")
     }
+}
+
+extension Notification.Name {
+    static let extendScreen = Notification.Name("extendScreen")
 }
