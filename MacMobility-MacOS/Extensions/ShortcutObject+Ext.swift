@@ -23,7 +23,9 @@ extension ShortcutObject {
         }
         if script.script.contains("raycast://") {
             color = .raycast
-            imageData = NSImage(named: "raycastIcon")?.toData
+            if imageData == nil {
+                imageData = NSImage(named: "raycastIcon")?.toData
+            }
         }
         if script.name == "MOV to MP4" || script.name == "MP4 to MOV" {
             color = "test"

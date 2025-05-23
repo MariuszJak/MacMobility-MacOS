@@ -9,19 +9,45 @@ import Foundation
 import Network
 import ScreenCaptureKit
 import CoreImage
+import SwiftUI
+import CoreGraphics
+
+struct DisplayMode: Identifiable, Equatable, Hashable {
+    let id = UUID()
+    let cgMode: CGDisplayMode
+    let width: Int
+    let height: Int
+    let refreshRate: Double
+    let isScaled: Bool
+
+    var description: String {
+        "\(width)x\(height)\(isScaled ? " (Scaled)" : "")\(refreshRate > 0 ? " @ \(Int(refreshRate))Hz" : "")"
+    }
+}
+
+import Foundation
+import ScreenCaptureKit
+import AVFoundation
+import VideoToolbox
+import AppKit
 
 //@MainActor
 class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamOutput {
+    @Published var currentFrame: NSImage?
+    private var stream: SCStream?
+    private let streamQueue = DispatchQueue(label: "ScreenCaptureQueue")
+    private var compressionSession: VTCompressionSession?
+    
     @Binding var compressionRate: CGFloat?
     private var listener: NWListener?
     private var connection: NWConnection?
-    private var stream: SCStream?
     private let queue = DispatchQueue(label: "ScreenStreamQueue")
     private let ciContext = CIContext()
     private var isConnected = false
     private let screenViewManager = ScreenViewManager()
     private var iosDevice: iOSDevice?
     var displayId: CGDirectDisplayID?
+    let framerate = 60.0
     
     override init() {
         self._compressionRate = .constant(0.1)
@@ -43,15 +69,23 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
             config.width = Int(device.resolution.width)
             config.height = Int(device.resolution.height)
             config.pixelFormat = kCVPixelFormatType_32BGRA
-            config.minimumFrameInterval = CMTime(value: 1, timescale: 60)
+            
+            config.minimumFrameInterval = CMTime(value: 1, timescale: Int32(framerate))
+            
+            // Optimize the queue size for better throughput
+            config.queueDepth = 5
+            
+            // Show cursor in the stream
+            config.showsCursor = true
 
             let filter = SCContentFilter(display: display, excludingWindows: [])
             stream = SCStream(filter: filter, configuration: config, delegate: self)
             try stream?.addStreamOutput(self, type: .screen, sampleHandlerQueue: queue)
 
             try await stream?.startCapture()
-
+            setupCompressionSession(width: Int(display.width), height: Int(display.height))
             try await startTCPListener(streamConnection: streamConnection)
+            
             completion(true, displayId)
         } catch {
             completion(false, nil)
@@ -77,41 +111,274 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
     private func startTCPListener(
         streamConnection: @escaping (Bool) -> Void
     ) async throws {
-        listener = try NWListener(using: .tcp, on: 8888)
+        // Configure TCP parameters for better streaming performance
+        let tcpOptions = NWProtocolTCP.Options()
+        tcpOptions.enableFastOpen = true // Use TCP Fast Open for faster connection establishment
+        tcpOptions.enableKeepalive = true // Keep connection alive
+        tcpOptions.keepaliveIdle = 60 // Seconds of idle time before sending keepalive probe
+        
+        let parameters = NWParameters(tls: nil, tcp: tcpOptions)
+        
+        // Set service quality for real-time streaming
+        parameters.serviceClass = .interactiveVideo
+        
+        listener = try NWListener(using: parameters, on: 8888)
 
         listener?.newConnectionHandler = { [weak self] newConn in
             guard let self = self else { return }
             
             print("Accepted new connection from \(newConn.endpoint)")
             self.connection = newConn
-            newConn.start(queue: .global())
+            
+            // Set high priority for video streaming data
+            newConn.betterPathUpdateHandler = { hasBetterPath in
+                if hasBetterPath {
+                    print("Better network path available - optimizing connection")
+                }
+            }
+            
+            newConn.start(queue: self.queue)
             self.isConnected = true
             self.continueReceiving(on: newConn)
             streamConnection(true)
         }
-        listener?.start(queue: .global())
+        
+        listener?.start(queue: self.queue)
         print("Server listening on port 8888")
     }
     
+    private func setupCompressionSession(width: Int, height: Int) {
+        // Request hardware acceleration for encoding
+        let encoderSpecification: [String: Any] = [
+            kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder as String: true,
+            kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder as String: true
+        ]
+        
+        // Create pixel buffer attributes optimized for performance
+        let pixelBufferAttributes: [String: Any] = [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:]
+        ]
+        
+        VTCompressionSessionCreate(
+            allocator: nil,
+            width: Int32(width),
+            height: Int32(height),
+            codecType: kCMVideoCodecType_H264,
+            encoderSpecification: encoderSpecification as CFDictionary,
+            imageBufferAttributes: pixelBufferAttributes as CFDictionary,
+            compressedDataAllocator: nil,
+            outputCallback: Self.compressionOutputCallback,
+            refcon: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()),
+            compressionSessionOut: &compressionSession
+        )
+        
+        guard let compressionSession = compressionSession else { return }
+        
+        // Optimize for real-time streaming
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_RealTime, value: kCFBooleanTrue)
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_AllowFrameReordering, value: kCFBooleanFalse)
+        
+        // Set profile to High for better quality/compression tradeoff
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_ProfileLevel, value: kVTProfileLevel_H264_High_AutoLevel)
+        
+        // Set bitrate - adjust based on screen resolution and desired quality
+        let targetBitRate = Double(width) * Double(height) * 2 // Approx 2 bits per pixel
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_AverageBitRate, value: targetBitRate as CFNumber)
+        
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_ExpectedFrameRate, value: framerate as CFNumber)
+        
+        // More consistent quality with bitrate limits
+        let dataRateLimit = width * height * 4 // 4 bits per pixel max
+        let limits: [String: Any] = [
+            kVTCompressionPropertyKey_DataRateLimits as String: [dataRateLimit / 8, 1] // bytes per second, 1 second window
+        ]
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_DataRateLimits, value: limits as CFDictionary)
+        
+        // Set keyframe interval (30 frames = approx every 1 second at 30fps)
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_MaxKeyFrameInterval, value: framerate as CFNumber)
+        
+        // Optimize for lower latency by using a smaller max frame delay
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_MaxFrameDelayCount, value: 1 as CFNumber)
+                
+        // Prepare the session for encoding
+        VTCompressionSessionPrepareToEncodeFrames(compressionSession)
+    }
+    
+    static let compressionOutputCallback: VTCompressionOutputCallback = { (
+        outputCallbackRefCon,
+        sourceFrameRefCon,
+        status,
+        infoFlags,
+        sampleBuffer
+    ) in
+        guard status == noErr,
+              let sampleBuffer = sampleBuffer,
+              let refCon = outputCallbackRefCon else { return }
+
+        let mySelf = Unmanaged<TCPServerStreamer>.fromOpaque(refCon).takeUnretainedValue()
+        
+        // Check if we have an active connection before processing
+        guard mySelf.isConnected, mySelf.connection != nil else { return }
+
+        // Process the frame right away to avoid Sendable issues
+        // Check if it's a keyframe
+        var isKeyFrame = false
+        if let attachments = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, createIfNecessary: false) {
+            if CFArrayGetCount(attachments) > 0 {
+                let dict = unsafeBitCast(CFArrayGetValueAtIndex(attachments, 0), to: CFDictionary.self)
+                let notSync = CFDictionaryContainsKey(dict, Unmanaged.passUnretained(kCMSampleAttachmentKey_NotSync).toOpaque())
+                isKeyFrame = !notSync
+            }
+        }
+
+        // Send SPS & PPS if it's a keyframe
+        if isKeyFrame,
+           let formatDesc = CMSampleBufferGetFormatDescription(sampleBuffer) {
+
+            var spsPointer: UnsafePointer<UInt8>?
+            var spsSize: Int = 0
+            var ppsPointer: UnsafePointer<UInt8>?
+            var ppsSize: Int = 0
+            var parameterSetCount: Int = 0
+            
+            // Get parameter set count
+            CMVideoFormatDescriptionGetH264ParameterSetAtIndex(
+                formatDesc, parameterSetIndex: 0,
+                parameterSetPointerOut: nil, parameterSetSizeOut: nil,
+                parameterSetCountOut: &parameterSetCount, nalUnitHeaderLengthOut: nil
+            )
+            
+            guard parameterSetCount >= 2 else {
+                print("Error: Expected at least 2 parameter sets, found \(parameterSetCount)")
+                return
+            }
+
+            // Get SPS
+            let spsStatus = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(
+                formatDesc, parameterSetIndex: 0,
+                parameterSetPointerOut: &spsPointer, parameterSetSizeOut: &spsSize,
+                parameterSetCountOut: nil, nalUnitHeaderLengthOut: nil
+            )
+            
+            // Get PPS
+            let ppsStatus = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(
+                formatDesc, parameterSetIndex: 1,
+                parameterSetPointerOut: &ppsPointer, parameterSetSizeOut: &ppsSize,
+                parameterSetCountOut: nil, nalUnitHeaderLengthOut: nil
+            )
+            
+            // Check for errors
+            guard spsStatus == noErr, ppsStatus == noErr else {
+                print("Error retrieving SPS/PPS: SPS status \(spsStatus), PPS status \(ppsStatus)")
+                return
+            }
+
+            if let spsPointer = spsPointer, let ppsPointer = ppsPointer {
+                let nalStartCode: [UInt8] = [0x00, 0x00, 0x00, 0x01]
+                let sps = Data(nalStartCode) + Data(bytes: spsPointer, count: spsSize)
+                let pps = Data(nalStartCode) + Data(bytes: ppsPointer, count: ppsSize)
+                
+                // Send SPS followed by PPS as a single packet if possible
+                let combinedPacket = sps + pps
+//                DispatchQueue.global(qos: .userInitiated).async {
+//                    mySelf.send(data: combinedPacket)
+//                }
+                DispatchQueue.main.async {
+                    mySelf.send(data: combinedPacket)
+                }
+            }
+        }
+
+        // Send actual encoded frame
+        guard let dataBuffer = CMSampleBufferGetDataBuffer(sampleBuffer) else { return }
+
+        var length = 0
+        var totalLength = 0
+        var dataPointer: UnsafeMutablePointer<Int8>?
+
+        let result = CMBlockBufferGetDataPointer(
+            dataBuffer,
+            atOffset: 0,
+            lengthAtOffsetOut: &length,
+            totalLengthOut: &totalLength,
+            dataPointerOut: &dataPointer
+        )
+
+        if result == kCMBlockBufferNoErr, let dataPointer = dataPointer {
+            var currentOffset = 0
+            let nalStartCode: [UInt8] = [0x00, 0x00, 0x00, 0x01]
+            var outData = Data(capacity: totalLength + 128) // Pre-allocate buffer with extra space for NAL markers
+
+            while currentOffset < totalLength {
+                // Read 4-byte big-endian NAL unit length
+                var nalUnitLength: UInt32 = 0
+                memcpy(&nalUnitLength, dataPointer + currentOffset, 4)
+                nalUnitLength = CFSwapInt32BigToHost(nalUnitLength)
+
+                // Safety check
+                guard currentOffset + 4 + Int(nalUnitLength) <= totalLength else {
+                    print("Invalid NAL unit length: \(nalUnitLength), currentOffset: \(currentOffset), totalLength: \(totalLength)")
+                    return
+                }
+
+                // Add NAL unit start code (0x00 0x00 0x00 0x01)
+                outData.append(contentsOf: nalStartCode)
+                
+                // Add NAL unit data (excluding length prefix)
+                outData.append(Data(bytes: dataPointer + currentOffset + 4, count: Int(nalUnitLength)))
+
+                currentOffset += 4 + Int(nalUnitLength)
+            }
+
+            let finalData = outData
+            DispatchQueue.main.async {
+                mySelf.send(data: finalData)
+            }
+//            DispatchQueue.global(qos: .userInitiated).async {
+//                mySelf.send(data: finalData)
+//            }
+        }
+    }
+    
     private func continueReceiving(on conn: NWConnection) {
-        conn.receive(minimumIncompleteLength: 4, maximumLength: 4) { [weak self] lengthData, _, _, _ in
-            guard let self = self,
+        // Use higher maximum length to allow for larger control packets
+        conn.receive(minimumIncompleteLength: 4, maximumLength: 4) { [weak self] lengthData, _, _, error in
+            guard let self = self, error == nil,
                   let lengthData = lengthData,
                   lengthData.count == 4 else {
-                print("Failed to receive packet length")
+                print("Failed to receive packet length or connection error")
                 return
             }
             
+            // Extract the packet length, endian-aware
             let length = lengthData.withUnsafeBytes { $0.load(as: UInt32.self).bigEndian }
             
-            conn.receive(minimumIncompleteLength: Int(length), maximumLength: Int(length)) { data, _, _, _ in
-                guard let data = data else {
+            // Validate packet size to avoid excessive memory allocation
+            guard length > 0, length < 1024 * 1024 else { // 1MB max packet size
+                print("Invalid packet length: \(length)")
+                self.continueReceiving(on: conn)
+                return
+            }
+            
+            // Receive the packet content
+            conn.receive(minimumIncompleteLength: Int(length), maximumLength: Int(length)) { [weak self] data, _, _, error in
+                guard let self = self, error == nil,
+                      let data = data, !data.isEmpty else {
                     print("Failed to receive full packet")
+                    self?.continueReceiving(on: conn)
                     return
                 }
                 
-                self.handleIncomingPacket(data)
-                self.continueReceiving(on: conn)
+                // Process the data on a background queue to avoid blocking network operations
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.handleIncomingPacket(data)
+                    
+                    // Continue receiving on the same queue as the connection
+                    DispatchQueue.main.async {
+                        self.continueReceiving(on: conn)
+                    }
+                }
             }
         }
     }
@@ -250,48 +517,58 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
         )
         scrollEvent?.post(tap: .cghidEventTap)
     }
+    
+    func send(data: Data) {
+        guard let connection = connection else { return }
 
-    private func sendImageData(_ data: Data) {
-        guard isConnected, let connection = connection else { return }
-
+        // Prepare frame size data (4 bytes, big endian)
         var length = UInt32(data.count).bigEndian
         let lengthData = Data(bytes: &length, count: 4)
 
-        connection.send(content: lengthData + data, completion: .contentProcessed({ error in
-            if error != nil {
-                self.isConnected = false
+        // Combine header and frame data to send as a single packet
+        // This reduces syscall overhead and packet fragmentation
+        let combinedData = lengthData + data
+        
+        // Use contentProcessed completion to maintain backpressure
+        // This ensures we don't overwhelm the network or receiver
+        connection.send(content: combinedData, completion: .contentProcessed({ error in
+            if let error = error {
+                print("Error sending data: \(error)")
             }
         }))
     }
-
-    private func compressToJPEG(from buffer: CVPixelBuffer) -> Data? {
-        let ciImage = CIImage(cvPixelBuffer: buffer)
-        guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-
-        let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
-        return bitmapRep.representation(using: .jpeg, properties: [.compressionFactor: compressionRate ?? 0.5])
-    }
-    
-    func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {
-        guard let pixelBuffer = sampleBuffer.imageBuffer else { return }
-        if let jpegData = self.compressToJPEG(from: pixelBuffer) {
-            self.sendImageData(jpegData)
-        }
-    }
 }
 
-import SwiftUI
-import CoreGraphics
-
-struct DisplayMode: Identifiable, Equatable, Hashable {
-    let id = UUID()
-    let cgMode: CGDisplayMode
-    let width: Int
-    let height: Int
-    let refreshRate: Double
-    let isScaled: Bool
-
-    var description: String {
-        "\(width)x\(height)\(isScaled ? " (Scaled)" : "")\(refreshRate > 0 ? " @ \(Int(refreshRate))Hz" : "")"
+extension TCPServerStreamer {
+    // Mark as nonisolated to satisfy the protocol requirement in Swift 6
+    nonisolated func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of outputType: SCStreamOutputType) {
+        // Only process screen content to avoid unnecessary work
+        guard outputType == .screen,
+              let pixelBuffer = sampleBuffer.imageBuffer,
+              CMSampleBufferIsValid(sampleBuffer) else {
+            return
+        }
+        
+        // Access main-actor isolated properties in an async context
+        Task { @MainActor in
+            guard let compressionSession = self.compressionSession, self.isConnected else { return }
+            
+            // Compress using H.264
+            let pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+            let duration = CMSampleBufferGetDuration(sampleBuffer)
+            
+            // Use better frame properties for more control
+            let frameProperties: [String: Any] = [
+                kVTEncodeFrameOptionKey_ForceKeyFrame as String: false
+            ]
+            
+            VTCompressionSessionEncodeFrame(compressionSession,
+                                          imageBuffer: pixelBuffer,
+                                          presentationTimeStamp: pts,
+                                          duration: duration,
+                                          frameProperties: frameProperties as CFDictionary,
+                                          sourceFrameRefcon: nil,
+                                          infoFlagsOut: nil)
+        }
     }
 }
