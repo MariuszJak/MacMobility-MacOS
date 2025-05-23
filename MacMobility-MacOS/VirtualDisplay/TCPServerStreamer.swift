@@ -33,7 +33,8 @@ import AppKit
 
 //@MainActor
 class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamOutput {
-    @Published var currentFrame: NSImage?
+    private var lastFrameTime: CFTimeInterval = 0
+    private let minimumFrameInterval: CFTimeInterval = 1.0 / 60.0
     private var stream: SCStream?
     private let streamQueue = DispatchQueue(label: "ScreenCaptureQueue")
     private var compressionSession: VTCompressionSession?
@@ -48,7 +49,8 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
     private var iosDevice: iOSDevice?
     var displayId: CGDirectDisplayID?
     let framerate = 60.0
-    
+    private var lastFrameChecksum: Int?
+
     override init() {
         self._compressionRate = .constant(0.1)
     }
@@ -73,7 +75,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
             config.minimumFrameInterval = CMTime(value: 1, timescale: Int32(framerate))
             
             // Optimize the queue size for better throughput
-            config.queueDepth = 5
+            config.queueDepth = 3  // Reduced for lower latency
             
             // Show cursor in the stream
             config.showsCursor = true
@@ -95,6 +97,26 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
     func scDisplay(for displayID: CGDirectDisplayID) async throws -> SCDisplay? {
         let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
         return content.displays.first(where: { $0.displayID == displayID })
+    }
+
+    func pixelBufferChecksum(_ buffer: CVPixelBuffer) -> Int {
+        CVPixelBufferLockBaseAddress(buffer, .readOnly)
+        defer { CVPixelBufferUnlockBaseAddress(buffer, .readOnly) }
+        
+        let width = CVPixelBufferGetWidth(buffer)
+        let height = CVPixelBufferGetHeight(buffer)
+        let bytesPerRow = CVPixelBufferGetBytesPerRow(buffer)
+        let baseAddress = CVPixelBufferGetBaseAddress(buffer)!
+        
+        // Sample every 10th pixel in both dimensions
+        var hash = 0
+        for y in stride(from: 0, to: height, by: 10) {
+            let row = baseAddress.advanced(by: y * bytesPerRow)
+            for x in stride(from: 0, to: width * 4, by: 40) { // * 4 for BGRA
+                hash = hash &+ Int(row.load(fromByteOffset: x, as: UInt32.self))
+            }
+        }
+        return hash
     }
 
     func stopServer(completion: @escaping() -> Void) {
@@ -120,7 +142,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
         let parameters = NWParameters(tls: nil, tcp: tcpOptions)
         
         // Set service quality for real-time streaming
-        parameters.serviceClass = .interactiveVideo
+        parameters.serviceClass = .signaling
         
         listener = try NWListener(using: parameters, on: 8888)
 
@@ -183,13 +205,13 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
         VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_ProfileLevel, value: kVTProfileLevel_H264_High_AutoLevel)
         
         // Set bitrate - adjust based on screen resolution and desired quality
-        let targetBitRate = Double(width) * Double(height) * 2 // Approx 2 bits per pixel
+        let targetBitRate = Double(width) * Double(height) // Approx 2 bits per pixel
         VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_AverageBitRate, value: targetBitRate as CFNumber)
         
         VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_ExpectedFrameRate, value: framerate as CFNumber)
         
         // More consistent quality with bitrate limits
-        let dataRateLimit = width * height * 4 // 4 bits per pixel max
+        let dataRateLimit = width * height // 4 bits per pixel max
         let limits: [String: Any] = [
             kVTCompressionPropertyKey_DataRateLimits as String: [dataRateLimit / 8, 1] // bytes per second, 1 second window
         ]
@@ -198,8 +220,22 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
         // Set keyframe interval (30 frames = approx every 1 second at 30fps)
         VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_MaxKeyFrameInterval, value: framerate as CFNumber)
         
+//        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration, value: 0.1 as CFNumber)
+        
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_MaxH264SliceBytes, value: 1024 * 100 as CFNumber)
+        
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality, value: kCFBooleanTrue)
+        
         // Optimize for lower latency by using a smaller max frame delay
         VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_MaxFrameDelayCount, value: 1 as CFNumber)
+        
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_AllowTemporalCompression, value: kCFBooleanTrue)
+
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_H264EntropyMode, value: kVTH264EntropyMode_CABAC)
+
+    
+        // Increase quality for static content
+        VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_Quality, value: 0.8 as CFNumber)
                 
         // Prepare the session for encoding
         VTCompressionSessionPrepareToEncodeFrames(compressionSession)
@@ -281,10 +317,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
                 
                 // Send SPS followed by PPS as a single packet if possible
                 let combinedPacket = sps + pps
-//                DispatchQueue.global(qos: .userInitiated).async {
-//                    mySelf.send(data: combinedPacket)
-//                }
-                DispatchQueue.main.async {
+                DispatchQueue.global(qos: .userInitiated).async {
                     mySelf.send(data: combinedPacket)
                 }
             }
@@ -332,12 +365,9 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
             }
 
             let finalData = outData
-            DispatchQueue.main.async {
+            DispatchQueue.global(qos: .userInitiated).async {
                 mySelf.send(data: finalData)
             }
-//            DispatchQueue.global(qos: .userInitiated).async {
-//                mySelf.send(data: finalData)
-//            }
         }
     }
     
@@ -521,17 +551,12 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
     func send(data: Data) {
         guard let connection = connection else { return }
 
-        // Prepare frame size data (4 bytes, big endian)
+        var combinedData = Data(capacity: data.count + 4)
         var length = UInt32(data.count).bigEndian
-        let lengthData = Data(bytes: &length, count: 4)
-
-        // Combine header and frame data to send as a single packet
-        // This reduces syscall overhead and packet fragmentation
-        let combinedData = lengthData + data
-        
-        // Use contentProcessed completion to maintain backpressure
-        // This ensures we don't overwhelm the network or receiver
-        connection.send(content: combinedData, completion: .contentProcessed({ error in
+        combinedData.append(UnsafeBufferPointer(start: &length, count: 1))
+        combinedData.append(data)
+         
+        connection.send(content: combinedData, completion: .contentProcessed({ [weak self] error in
             if let error = error {
                 print("Error sending data: \(error)")
             }
@@ -542,11 +567,23 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
 extension TCPServerStreamer {
     // Mark as nonisolated to satisfy the protocol requirement in Swift 6
     nonisolated func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of outputType: SCStreamOutputType) {
+
+        let currentTime = CACurrentMediaTime()
+        let elapsed = currentTime - lastFrameTime
+
+        // Drop frame if we're getting them too quickly
+        guard elapsed >= minimumFrameInterval else { return }
+
         // Only process screen content to avoid unnecessary work
         guard outputType == .screen,
               let pixelBuffer = sampleBuffer.imageBuffer,
               CMSampleBufferIsValid(sampleBuffer) else {
             return
+        }
+
+        let checksum = self.pixelBufferChecksum(pixelBuffer)
+        if let last = self.lastFrameChecksum, last == checksum {
+            return // Skip unchanged frame
         }
         
         // Access main-actor isolated properties in an async context
