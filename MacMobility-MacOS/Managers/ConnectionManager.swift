@@ -51,7 +51,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var showsLocalError: Bool = false
     @Published var localError: String?
     @Published var dynamicUrls: (Browsers, [String]) = (.chrome, [])
-    @Published var compressionRate: CGFloat? = 0.4
+    @Published var bitrate: CGFloat? = 1
     @Published var streamConnectionState: StreamConnectionState = .notConnected
     @Published var displayID: CGDirectDisplayID?
     private let tcpServer = TCPServerStreamer()
@@ -161,9 +161,15 @@ class ConnectionManager: NSObject, ObservableObject {
             await startTCPServer { success, displayId in
                 if let displayId {
                     self.displayID = displayId
+                } else {
+                    self.streamConnectionState = .notConnected
                 }
             } streamConnection: { connected in
-                self.streamConnectionState = .connected
+                if connected {
+                    self.streamConnectionState = .connected
+                } else {
+                    self.streamConnectionState = .notConnected
+                }
             }
         }
     }
@@ -172,12 +178,15 @@ class ConnectionManager: NSObject, ObservableObject {
         completion: @escaping(Bool, CGDirectDisplayID?) -> Void,
         streamConnection: @escaping (Bool) -> Void
     ) async {
-        guard let iosDevice else { return }
+        guard let iosDevice else {
+            completion(false, nil)
+            return
+        }
         
         await tcpServer.startServer(
-            compressionRate: .init(
-                get: { self.compressionRate },
-                set: { newValue in self.compressionRate = newValue ?? 0.4 }),
+            bitrate: .init(
+                get: { self.bitrate },
+                set: { newValue in self.bitrate = newValue ?? 1.0 }),
             device: iosDevice
         ) { [weak self] success, displayId in
             if success, let ipAddress = self?.getLocalIPAddress() {

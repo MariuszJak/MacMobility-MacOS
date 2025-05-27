@@ -12,24 +12,21 @@ struct ResolutionSelectorCard: View {
     let displayID: CGDirectDisplayID
     let iosDevice: iOSDevice
     @State private var resolutions: [DisplayMode] = []
-    @State private var compressionRates: [CGFloat] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
+    @State private var bitrates: [CGFloat] = [1, 2, 3, 4, 5, 6, 7]
     let descriptions: [CGFloat: String] = [
-        0.1: "90% (Low quality & fast performance)",
-        0.2: "80%",
-        0.3: "70%",
-        0.4: "60% (Good quality & reliable performance)",
-        0.5: "50%",
-        0.6: "40%",
-        0.7: "30% (High quality & low performance)",
-        0.8: "20%",
-        0.9: "10%",
-        1.0: "0%"
+        1: "1 bits per pixel",
+        2: "2 bits per pixel",
+        3: "3 bits per pixel",
+        4: "4 bits per pixel",
+        5: "5 bits per pixel",
+        6: "6 bits per pixel",
+        7: "7 bits per pixel"
     ]
     @State private var selectedMode: DisplayMode?
-    @Binding var compressionRate: CGFloat?
+    @Binding var bitrate: CGFloat?
     
-    init(displayID: CGDirectDisplayID, iosDevice: iOSDevice, compressionRate: Binding<CGFloat?>) {
-        self._compressionRate = compressionRate
+    init(displayID: CGDirectDisplayID, iosDevice: iOSDevice, bitrate: Binding<CGFloat?>) {
+        self._bitrate = bitrate
         self.iosDevice = iosDevice
         self.displayID = displayID
     }
@@ -43,12 +40,12 @@ struct ResolutionSelectorCard: View {
                 .foregroundColor(.accentColor)
             
             VStack(alignment: .leading, spacing: 8) {
-                Picker("Compression", selection: $compressionRate) {
-                    ForEach(compressionRates, id: \.self) { compressionRate in
-                        Text(descriptions[compressionRate] ?? "-").tag(Optional(compressionRate))
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
+//                Picker("Bitrate", selection: $bitrate) {
+//                    ForEach(bitrates, id: \.self) { bitrate in
+//                        Text(descriptions[bitrate] ?? "-").tag(Optional(bitrate))
+//                    }
+//                }
+//                .pickerStyle(MenuPickerStyle())
                 Text("Resolution: \(selectedMode?.description ?? "")")
                 
                 Button("Open Display Settings") {
