@@ -196,7 +196,7 @@ struct MacOSMainPopoverView: View {
     private func openLicenseWindow() {
         if nil == licenseWindow {
             licenseWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 280),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 380),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false

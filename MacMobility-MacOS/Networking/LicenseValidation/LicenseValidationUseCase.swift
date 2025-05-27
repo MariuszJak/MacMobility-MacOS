@@ -8,16 +8,16 @@
 import Foundation
 
 protocol LicenseValidationUseCaseProtocol {
-    func validateLicense(_ licenseKey: String) async -> Result<ValidateKeyResponse, ClientError>
+    func validateLicense(_ licenseKey: String, email: String) async -> Result<ValidateKeyResponse, ClientError>
 }
 
 struct LicenseValidationUseCase: LicenseValidationUseCaseProtocol {
     @Inject private var client: LicenseValidationAPIProtocol
     
-    func validateLicense(_ licenseKey: String) async -> Result<ValidateKeyResponse, ClientError> {
+    func validateLicense(_ licenseKey: String, email: String) async -> Result<ValidateKeyResponse, ClientError> {
         do {
             let result = try await client
-                .validateLicense(licenseKey)
+                .validateLicense(licenseKey, email: email)
                 .execute()
             switch result {
             case .success(let data):

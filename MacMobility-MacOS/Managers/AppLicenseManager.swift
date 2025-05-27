@@ -20,6 +20,7 @@ public struct ValidateKeyResponse: Codable {
 
 public struct ValidateKeyBody: Codable {
     let key: String
+    let email: String
 }
 
 public class AppLicenseManager: ObservableObject {
@@ -46,9 +47,9 @@ public class AppLicenseManager: ObservableObject {
     }
     
     @MainActor
-    public func validate(key: String, completion: @escaping (Bool) -> Void) async {
+    public func validate(key: String, email: String, completion: @escaping (Bool) -> Void) async {
         if LicenseKeyGenerator().validateKey(key) {
-            let result = await useCase.validateLicense(key)
+            let result = await useCase.validateLicense(key, email: email)
             switch result {
             case .success(let body):
                 if body.success {
