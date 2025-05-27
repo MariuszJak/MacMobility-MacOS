@@ -18,7 +18,7 @@ public class DBSDataProvider: DBSDataProviderRepresentable {
     public init(configuration: URLSessionConfiguration = .default) {
         self.configuration = configuration
         #if DEBUG
-        self.appConfig = .init(serviceURL: "http://192.168.68.124:3000")
+        self.appConfig = .init(serviceURL: "http://192.168.68.109:3000")
         #elseif RELEASE
         self.appConfig = .init(serviceURL: "https://www.coderblocks.eu")
         #endif
