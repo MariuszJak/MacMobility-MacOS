@@ -21,16 +21,21 @@ struct MacMobility_MacOSApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var permissionsWindow: NSWindow?
     private var welcomeWindow: NSWindow?
+    private var shortcutsWindow: NSWindow?
     private let connectionManager = ConnectionManager()
     var statusItem: NSStatusItem?
     var popOver = NSPopover()
     var menuView: MacOSMainPopoverView?
     var eventMonitor: Any?
     var cancellables = Set<AnyCancellable>()
+    lazy var shortcutsViewModel: ShortcutsViewModel = .init(connectionManager: connectionManager)
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         register()
-        menuView = MacOSMainPopoverView(connectionManager: connectionManager)
+        menuView = MacOSMainPopoverView(connectionManager: connectionManager) {
+            self.openShortcutsWindow()
+        }
+        
         popOver.behavior = .transient
         popOver.animates = true
         popOver.contentViewController = NSViewController()
@@ -49,8 +54,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.standard.store(Lifecycle(openCount: lifecycle.openCount + 1), for: .lifecycle)
         }
         if lifecycle.openCount == 1 {
-            openPermissionsWindow()
+            openShortcutsWindow()
             UserDefaults.standard.store(Lifecycle(openCount: lifecycle.openCount + 1), for: .lifecycle)
+        }
+        if lifecycle.openCount > 1 {
+            openShortcutsWindow()
         }
         
         if let menuButton = statusItem?.button {
@@ -84,6 +92,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         connectionManager.showsLocalError = false
     }
     
+    func openShortcutsWindow() {
+        shortcutsWindow?.close()
+        shortcutsWindow = nil
+        if nil == shortcutsWindow {
+            shortcutsWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 1300, height: 700),
+                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            shortcutsWindow?.center()
+            shortcutsWindow?.setFrameAutosaveName("Shortcuts")
+            shortcutsWindow?.isReleasedWhenClosed = false
+            shortcutsWindow?.titlebarAppearsTransparent = true
+            shortcutsWindow?.styleMask.insert(.fullSizeContentView)
+            shortcutsWindow?.title = "Editor"
+            let hv = NSHostingController(rootView: ShortcutsView(viewModel: shortcutsViewModel))
+            shortcutsWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = shortcutsWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        shortcutsWindow?.makeKeyAndOrderFront(nil)
+    }
+    
     func openWelcomeWindow() {
         if nil == welcomeWindow {
             welcomeWindow = NSWindow(
@@ -110,6 +142,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.connectionManager.initialSetup = setupMode
                 self.connectionManager.automatedActions = automatedActions
                 self.welcomeWindow?.close()
+                self.openShortcutsWindow()
             }), connectionManager: connectionManager))
             welcomeWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = welcomeWindow?.contentView?.bounds ?? .zero

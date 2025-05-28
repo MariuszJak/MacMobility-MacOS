@@ -25,10 +25,12 @@ struct MacOSMainPopoverView: View {
     @State private var aboutWindow: NSWindow?
     @State var isAccessibilityGranted: Bool = false
     private var spacing = 6.0
+    private let shorctuctsAction: () -> Void
     
-    init(connectionManager: ConnectionManager) {
+    init(connectionManager: ConnectionManager, shorctuctsAction: @escaping () -> Void) {
         self._connectionManager = .init(wrappedValue: connectionManager)
         self.isAccessibilityGranted = AXIsProcessTrusted()
+        self.shorctuctsAction = shorctuctsAction
     }
     
     var body: some View {
@@ -104,7 +106,7 @@ struct MacOSMainPopoverView: View {
                     shortcutsWindowButtonView
                     Text("(Demo)")
                         .onTapGesture {
-                            openShortcutsWindow()
+                            shorctuctsAction()
                         }
                 }
                 pairiningView
@@ -112,28 +114,6 @@ struct MacOSMainPopoverView: View {
             Divider()
             quitView
         }
-    }
-    
-    private func openShortcutsWindow() {
-        if nil == shortcutsWindow {
-            shortcutsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 1300, height: 700),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
-            shortcutsWindow?.center()
-            shortcutsWindow?.setFrameAutosaveName("Shortcuts")
-            shortcutsWindow?.isReleasedWhenClosed = false
-            shortcutsWindow?.titlebarAppearsTransparent = true
-            shortcutsWindow?.styleMask.insert(.fullSizeContentView)
-            shortcutsWindow?.title = "Editor"
-            let hv = NSHostingController(rootView: ShortcutsView(viewModel: .init(connectionManager: connectionManager)))
-            shortcutsWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = shortcutsWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-        }
-        shortcutsWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openUpdatesWindow() {
@@ -325,7 +305,7 @@ struct MacOSMainPopoverView: View {
     
     private var shortcutsWindowButtonView: some View {
         Button {
-            openShortcutsWindow()
+            shorctuctsAction()
         } label: {
             HStack {
                 Image(systemName: "macwindow.on.rectangle")
