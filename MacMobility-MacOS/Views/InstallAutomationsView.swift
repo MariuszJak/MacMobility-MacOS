@@ -24,14 +24,15 @@ struct InstallAutomationsView: View {
                         Button("Open") {
                             action()
                         }
+                        .padding(.bottom, 28.0)
                     }
                 }
                 .padding(.trailing, 21.0)
                 VStack(alignment: .leading) {
-                    Spacer()
                     Text(automationItem.title)
                         .font(.system(size: 21, weight: .bold))
                         .padding(.bottom, 4.0)
+                        .padding(.top, 16.0)
                     Text(automationItem.description)
                         .font(.system(size: 14))
                         .foregroundStyle(Color.gray)

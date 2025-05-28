@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct AutomationsList: Codable {
     let automations: [AutomationItem]
@@ -39,10 +40,36 @@ struct AutomationItem: Identifiable, Codable {
 
 class ExploreAutomationsViewModel: ObservableObject, JSONLoadable {
     @Published var automations: [AutomationItem] = []
+    @Published var searchText: String = ""
+    private var tmp: [AutomationItem] = []
+    private var cancellables = Set<AnyCancellable>()
+    
+    init() {
+        bind()
+    }
     
     func loadJSONFromDirectory() {
         let test: AutomationsList = loadJSON("automations")
         self.automations = test.automations
+    }
+    
+    func bind() {
+        $searchText
+            .receive(on: RunLoop.main)
+            .sink { [weak self] text in
+                guard let self else { return }
+                if text.isEmpty, !tmp.isEmpty {
+                    self.automations = self.tmp
+                    self.tmp.removeAll()
+                } else {
+                    if tmp.isEmpty {
+                        self.tmp = automations
+                    } else {
+                        self.automations = self.tmp.filter { $0.title.lowercased().contains(text.lowercased()) }
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -52,9 +79,15 @@ struct ExploreAutomationsView: View {
     
     var body: some View {
         VStack {
-            Text("Install Automations")
-                .font(.system(size: 21, weight: .bold))
-                .padding(.bottom, 18.0)
+            HStack {
+                Spacer()
+                Text("Install Automations")
+                    .font(.system(size: 21, weight: .bold))
+                    .padding(.bottom, 18.0)
+                Spacer()
+                AnimatedSearchBar(searchText: $viewModel.searchText)
+                    .padding(.all, 3.0)
+            }
             Divider()
                 .padding(.bottom, 14.0)
             ScrollView {

@@ -821,7 +821,6 @@ struct ShortcutsView: View {
             automationsToInstallWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: ExploreAutomationsView(openDetailsPage: { item in
                 openAutomationItemWindow(item)
-                automationsToInstallWindow?.close()
             }))
             automationsToInstallWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = automationsToInstallWindow?.contentView?.bounds ?? .zero
