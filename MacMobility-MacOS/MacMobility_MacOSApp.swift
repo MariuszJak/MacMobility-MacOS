@@ -35,7 +35,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menuView = MacOSMainPopoverView(connectionManager: connectionManager) {
             self.openShortcutsWindow()
         }
-        openShortcutsWindow()
+        
         popOver.behavior = .transient
         popOver.animates = true
         popOver.contentViewController = NSViewController()
@@ -54,8 +54,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.standard.store(Lifecycle(openCount: lifecycle.openCount + 1), for: .lifecycle)
         }
         if lifecycle.openCount == 1 {
-            openPermissionsWindow()
+            openShortcutsWindow()
             UserDefaults.standard.store(Lifecycle(openCount: lifecycle.openCount + 1), for: .lifecycle)
+        }
+        if lifecycle.openCount > 1 {
+            openShortcutsWindow()
         }
         
         if let menuButton = statusItem?.button {
@@ -139,6 +142,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.connectionManager.initialSetup = setupMode
                 self.connectionManager.automatedActions = automatedActions
                 self.welcomeWindow?.close()
+                self.openShortcutsWindow()
             }), connectionManager: connectionManager))
             welcomeWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = welcomeWindow?.contentView?.bounds ?? .zero

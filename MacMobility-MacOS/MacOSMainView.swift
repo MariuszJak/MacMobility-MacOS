@@ -116,28 +116,6 @@ struct MacOSMainPopoverView: View {
         }
     }
     
-//    func openShortcutsWindow() {
-//        if nil == shortcutsWindow {
-//            shortcutsWindow = NSWindow(
-//                contentRect: NSRect(x: 0, y: 0, width: 1300, height: 700),
-//                styleMask: [.titled, .closable, .resizable, .miniaturizable],
-//                backing: .buffered,
-//                defer: false
-//            )
-//            shortcutsWindow?.center()
-//            shortcutsWindow?.setFrameAutosaveName("Shortcuts")
-//            shortcutsWindow?.isReleasedWhenClosed = false
-//            shortcutsWindow?.titlebarAppearsTransparent = true
-//            shortcutsWindow?.styleMask.insert(.fullSizeContentView)
-//            shortcutsWindow?.title = "Editor"
-//            let hv = NSHostingController(rootView: ShortcutsView(viewModel: shortcutsViewModel))
-//            shortcutsWindow?.contentView?.addSubview(hv.view)
-//            hv.view.frame = shortcutsWindow?.contentView?.bounds ?? .zero
-//            hv.view.autoresizingMask = [.width, .height]
-//        }
-//        shortcutsWindow?.makeKeyAndOrderFront(nil)
-//    }
-    
     private func openUpdatesWindow() {
         guard let updateData = viewModel.updateData else {
             return
