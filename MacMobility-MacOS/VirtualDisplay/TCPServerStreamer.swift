@@ -370,7 +370,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
 
         if isKeyPressed {
             toggleShift.toggle()
-            let shift = toggleShift ? CGPoint(x: 0.2, y: 0) : CGPoint(x: -0.2, y: 0)
+            let shift = toggleShift ? CGPoint(x: 0.0, y: 0) : CGPoint(x: 0.0, y: 0)
             if let shifted = shiftedPixelBuffer(from: buffer, shift: shift) {
                 forceKeyframe(true)
                 return shifted
@@ -382,30 +382,30 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
     
     func shiftedPixelBuffer(from buffer: CVPixelBuffer, shift: CGPoint) -> CVPixelBuffer? {
         let ciImage = CIImage(cvPixelBuffer: buffer)
-        let transform = CGAffineTransform(translationX: shift.x, y: shift.y)
-        let shiftedImage = ciImage.transformed(by: transform)
-
+        
         let width = CVPixelBufferGetWidth(buffer)
         let height = CVPixelBufferGetHeight(buffer)
-        var outputBuffer: CVPixelBuffer?
 
+        let overlayColor = CIColor.randomCIColor(alpha: 0.0001)
+        let dot = CIImage(color: overlayColor).cropped(to: CGRect(x: CGFloat(CVPixelBufferGetWidth(buffer)) * 0.5, y: CGFloat(CVPixelBufferGetHeight(buffer)) * 0.5, width: 500, height: 500))
+        
+        let composited = dot.composited(over: ciImage)
+        
+        var newBuffer: CVPixelBuffer?
         let attrs = [
-            kCVPixelBufferCGImageCompatibilityKey: true,
-            kCVPixelBufferCGBitmapContextCompatibilityKey: true
+            kCVPixelBufferPixelFormatTypeKey: Int(kCVPixelFormatType_32BGRA),
+            kCVPixelBufferWidthKey: width,
+            kCVPixelBufferHeightKey: height,
+            kCVPixelBufferIOSurfacePropertiesKey: [:]
         ] as CFDictionary
-
-        CVPixelBufferCreate(
-            nil, width, height,
-            kCVPixelFormatType_32BGRA,
-            attrs,
-            &outputBuffer
-        )
-
-        if let outputBuffer = outputBuffer {
-            ciContext.render(shiftedImage, to: outputBuffer)
-            return outputBuffer
+        
+        CVPixelBufferCreate(nil, width, height, kCVPixelFormatType_32BGRA, attrs, &newBuffer)
+        
+        if let newBuffer = newBuffer {
+            ciContext.render(composited, to: newBuffer)
+            return newBuffer
         }
-
+        
         return nil
     }
     
@@ -631,7 +631,12 @@ extension TCPServerStreamer {
             ]
             
             let processedBuffer = processCapturedBuffer(pixelBuffer) { force in
-                VTSessionSetProperty(compressionSession, key: kVTEncodeFrameOptionKey_ForceKeyFrame, value: force ? kCFBooleanTrue : kCFBooleanFalse)
+                VTSessionSetProperty(compressionSession, key: kVTEncodeFrameOptionKey_ForceKeyFrame, value: kCFBooleanTrue)
+                if force {
+                    VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_MaxKeyFrameInterval, value: 2.0 as CFNumber)
+                } else {
+                    VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_ExpectedFrameRate, value: self.framerate as CFNumber)
+                }
             }
             
             VTCompressionSessionEncodeFrame(compressionSession,
@@ -642,5 +647,16 @@ extension TCPServerStreamer {
                                             sourceFrameRefcon: nil,
                                             infoFlagsOut: nil)
         }
+    }
+}
+
+extension CIColor {
+    static func randomCIColor(alpha: CGFloat = 1.0) -> CIColor {
+        return CIColor(
+            red: CGFloat.random(in: 0...1),
+            green: CGFloat.random(in: 0...1),
+            blue: CGFloat.random(in: 0...1),
+            alpha: alpha
+        )
     }
 }
