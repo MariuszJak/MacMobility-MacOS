@@ -156,7 +156,7 @@ class ConnectionManager: NSObject, ObservableObject {
     }
     
     func extendScreen() {
-        Task {
+        Task { @MainActor in
             streamConnectionState = .connecting
             await startTCPServer { success, displayId in
                 if let displayId {
