@@ -59,11 +59,11 @@ struct ShortcutsView: View {
                     .frame(height: 14.0)
                 
                 BlueButton(
-                    title: "Automations",
+                    title: "Store",
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-                    leadingImage: "sparkle",
+                    leadingImage: "storefront.circle",
                     backgroundColor: .accentColor
                 ) {
                     openInstallAutomationsWindow()

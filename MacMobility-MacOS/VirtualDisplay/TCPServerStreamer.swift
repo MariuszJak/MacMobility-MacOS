@@ -53,6 +53,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
     private var toggleShift = false
     var displayId: CGDirectDisplayID?
     let framerate = 60.0
+    var forceKeyframe: Bool = false
     private var lastFrameChecksum: Int?
 
     override init() {
@@ -464,6 +465,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
         case "click":
             if let dx = json["dx"] as? CGFloat, let dy = json["dy"] as? CGFloat, let displayId {
                 performClick(onDisplayId: displayId, atLocalPoint: .init(x: dx, y: dy), double: false)
+                toggleForceKeyframe()
             }
         case "doubleClick":
             if let dx = json["dx"] as? CGFloat, let dy = json["dy"] as? CGFloat, let displayId {
@@ -491,6 +493,16 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
             }
         default:
             break
+        }
+    }
+    
+    private func toggleForceKeyframe() {
+        guard !forceKeyframe else {
+            return
+        }
+        forceKeyframe = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.forceKeyframe = false
         }
     }
 
@@ -626,16 +638,17 @@ extension TCPServerStreamer {
             let pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
             let duration = CMSampleBufferGetDuration(sampleBuffer)
             
-            let frameProperties: [String: Any] = [
-                kVTEncodeFrameOptionKey_ForceKeyFrame as String: false
-            ]
+            var frameProperties: [String: Any] = [:]
             
             let processedBuffer = processCapturedBuffer(pixelBuffer) { force in
-                VTSessionSetProperty(compressionSession, key: kVTEncodeFrameOptionKey_ForceKeyFrame, value: kCFBooleanTrue)
                 if force {
-                    VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_MaxKeyFrameInterval, value: 2.0 as CFNumber)
+                    self.toggleForceKeyframe()
                 } else {
-                    VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_ExpectedFrameRate, value: self.framerate as CFNumber)
+                    if self.forceKeyframe {
+                        frameProperties[kVTEncodeFrameOptionKey_ForceKeyFrame as String] = true
+                    } else {
+                        frameProperties[kVTEncodeFrameOptionKey_ForceKeyFrame as String] = false
+                    }
                 }
             }
             

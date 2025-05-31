@@ -230,7 +230,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         guard let name = path.appNameFromPath() else {
             return nil
         }
-        if let automation = automations?.automations.first(where: { $0.title.lowercased() == name.lowercased() }) {
+        if let automation = automations?.automations.first(where: { $0.title.replacingOccurrences(of: " (Raycast)", with: "").lowercased() == name.lowercased() }) {
             return automation
         }
         return nil
