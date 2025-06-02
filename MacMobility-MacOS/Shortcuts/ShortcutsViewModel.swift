@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import UniformTypeIdentifiers
 
 public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
     @Published var connectionManager: ConnectionManager
@@ -346,6 +347,27 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
         UserDefaults.standard.store(pages, for: .pages)
+    }
+    
+    func exportPageAsAutomations(number: Int) {
+        let pageContent = configuredShortcuts.filter { $0.page == number }
+        let scripts: [AutomationScript] = pageContent.map { .init(id: UUID(), name: $0.title, description: "",
+                                                                  script: $0.scriptCode ?? "", imageData: $0.imageData, imageName: nil,
+                                                                  type: $0.utilityType?.toAutomationType(), isAdvanced: false, showsTitle: true, category: $0.category) }
+        let list: AutomationsList = .init(automations: [.init(id: UUID(), title: "CHANGE_TITLE", description: "CHANGE_DESCRIPTION", imageData: nil, imageName: nil, scripts: scripts)])
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "automations.json"
+        panel.allowedContentTypes = [.json]
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                do {
+                    let data = try JSONEncoder().encode(list)
+                    try data.write(to: url)
+                } catch {
+                    print("Failed to save JSON: \(error)")
+                }
+            }
+        }
     }
     
     func removeWebItem(id: String) {

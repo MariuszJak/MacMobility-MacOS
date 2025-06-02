@@ -26,6 +26,7 @@ struct AutomationScript: Identifiable, Codable, Equatable {
     var imageName: String?
     var type: AutomationType?
     var isAdvanced: Bool?
+    var showsTitle: Bool?
     var category: String?
 }
 
@@ -81,7 +82,7 @@ struct ExploreAutomationsView: View {
         VStack {
             HStack {
                 Spacer()
-                Text("Install Automations")
+                Text("Store")
                     .font(.system(size: 21, weight: .bold))
                     .padding(.bottom, 18.0)
                 Spacer()

@@ -10,12 +10,14 @@ import SwiftUI
 struct AutomationInstallView: View {
     var automationItem: AutomationItem
     var selectedScriptsAction: ([AutomationScript]) -> Void
+    var close: () -> Void
     
     @State private var selectedScriptIDs: Set<UUID>
     
-    init(automationItem: AutomationItem, selectedScriptsAction: @escaping ([AutomationScript]) -> Void) {
+    init(automationItem: AutomationItem, selectedScriptsAction: @escaping ([AutomationScript]) -> Void, close: @escaping () -> Void) {
         self.automationItem = automationItem
         self.selectedScriptsAction = selectedScriptsAction
+        self.close = close
         _selectedScriptIDs = State(initialValue: Set(automationItem.scripts.map { $0.id }))
     }
     
@@ -42,6 +44,11 @@ struct AutomationInstallView: View {
             }
             .padding(.top)
             
+            Text(automationItem.description)
+                .font(.subheadline)
+                .foregroundStyle(Color.gray)
+                .padding(.bottom, 12.0)
+            
             Divider()
             
             // Scripts section
@@ -53,7 +60,7 @@ struct AutomationInstallView: View {
                     ForEach(automationItem.scripts) { script in
                         HStack(alignment: .top) {
                             VStack(alignment: .leading) {
-                                HStack {
+                                HStack(alignment: .top) {
                                     Toggle("", isOn: Binding(
                                         get: {
                                             selectedScriptIDs.contains(script.id)
@@ -66,10 +73,9 @@ struct AutomationInstallView: View {
                                             }
                                         }
                                     ))
-                                    .toggleStyle(.switch)
+//                                    .toggleStyle(.switch)
                                     Text(script.name)
                                         .font(.system(size: 14))
-                                        .padding(.bottom, 8.0)
                                 }
                                 Text(script.description)
                                     .font(.system(size: 12))
@@ -91,6 +97,9 @@ struct AutomationInstallView: View {
                     selectedScriptsAction(selectedScripts)
                 }
                 .keyboardShortcut(.defaultAction)
+                Button("Close") {
+                    close()
+                }
                 Spacer()
             }
             .padding(.bottom)

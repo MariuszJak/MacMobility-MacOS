@@ -7,6 +7,21 @@
 
 import SwiftUI
 
+extension UtilityObject.UtilityType {
+    func toAutomationType() -> AutomationType {
+        switch self {
+        case .commandline:
+            return .bash
+        case .multiselection:
+            return .bash
+        case .automation:
+            return .automator
+        case .macro:
+            return .bash
+        }
+    }
+}
+
 extension ShortcutObject {
     static func from(script: AutomationScript, at index: Int? = nil) -> ShortcutObject {
         var utilityType: UtilityObject.UtilityType?
@@ -44,7 +59,7 @@ extension ShortcutObject {
             scriptCode: script.script,
             utilityType: utilityType,
             objects: nil,
-            showTitleOnIcon: color != nil,
+            showTitleOnIcon: script.showsTitle ?? (color != nil),
             category: script.category
         )
     }

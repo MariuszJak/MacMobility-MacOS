@@ -217,6 +217,15 @@ struct ShortcutsView: View {
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundStyle(Color.white)
                                 Spacer()
+                                #if DEBUG
+                                Button {
+                                    viewModel.exportPageAsAutomations(number: page)
+                                } label: {
+                                    Text("Export")
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(Color.red)
+                                }
+                                #endif
                                 Button {
                                     viewModel.removePage(with: page)
                                 } label: {
@@ -620,8 +629,8 @@ struct ShortcutsView: View {
                                     .onDrag {
                                         NSItemProvider(object: app.id as NSString)
                                     }
+                                    Spacer()
                                     if let automation = viewModel.appHasAutomation(path: app.path ?? "") {
-                                        Spacer()
                                         Button("Automation") {
                                             openAutomationItemWindow(automation)
                                         }
@@ -629,7 +638,6 @@ struct ShortcutsView: View {
                                         .tint(.blue)
                                     }
                                     if viewModel.isAppAddedByUser(path: app.path ?? "") {
-                                        Spacer()
                                         Button("Remove") {
                                             viewModel.removeAppInstalledByUser(path: app.path ?? "")
                                         }
@@ -804,8 +812,8 @@ struct ShortcutsView: View {
     private func openInstallAutomationsWindow() {
         if nil == automationsToInstallWindow {
             automationsToInstallWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 500, height: 700),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 1100, height: 700),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
@@ -867,8 +875,8 @@ struct ShortcutsView: View {
         automationItemWindow = nil
         if nil == automationItemWindow {
             automationItemWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 500, height: 700),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 700),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
@@ -886,6 +894,8 @@ struct ShortcutsView: View {
                 viewModel.addAutomations(from: scripts)
                 automationItemWindow?.close()
                 tab = .utilities
+            }, close: {
+                automationItemWindow?.close()
             }))
             automationItemWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = automationItemWindow?.contentView?.bounds ?? .zero

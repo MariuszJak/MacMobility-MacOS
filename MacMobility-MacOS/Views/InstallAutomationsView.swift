@@ -40,6 +40,7 @@ struct InstallAutomationsView: View {
                     
                     Spacer()
                 }
+                Spacer()
             }
             .padding(.all, 8.0)
             .background(
