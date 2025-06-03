@@ -37,7 +37,7 @@ class NewMultiSelectionUtilityViewModel: ObservableObject {
     }
     
     func objectAt(index: Int) -> ShortcutObject? {
-        configuredShortcuts.first(where: { $0.index == index })
+        configuredShortcuts.first(where: { $0.indexes?.contains(index) ?? false })
     }
     
     func object(for id: String) -> ShortcutObject? {

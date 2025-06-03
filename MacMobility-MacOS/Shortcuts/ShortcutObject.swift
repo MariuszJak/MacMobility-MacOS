@@ -26,6 +26,7 @@ extension Array where Element: Equatable {
 
 public struct ShortcutObject: Identifiable, Codable, Equatable {
     public var index: Int?
+    public let indexes: [Int]?
     public var page: Int
     public let id: String
     public let title: String
@@ -40,11 +41,14 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
     public var objects: [ShortcutObject]?
     public var showTitleOnIcon: Bool?
     public var category: String?
+    public let size: CGSize?
     
     public init(
         type: ShortcutType,
         page: Int,
         index: Int? = nil,
+        indexes: [Int]? = nil,
+        size: CGSize =  .init(width: 1, height: 1),
         path: String? = nil,
         id: String,
         title: String,
@@ -61,9 +65,11 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         self.page = page
         self.type = type
         self.index = index
+        self.indexes = indexes ?? [index ?? 0]
         self.path = path
         self.id = id
         self.title = title
+        self.size = size
         self.color = color
         self.scriptCode = scriptCode
         self.utilityType = utilityType

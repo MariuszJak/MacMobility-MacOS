@@ -92,6 +92,8 @@ struct NewMultiSelectionUtilityView: View {
                                                 type: object.type,
                                                 page: 1,
                                                 index: index,
+                                                indexes: neighboringIndexes(for: index, size: object.size ?? .init(width: 1, height: 1)),
+                                                size: object.size ?? .init(width: 1, height: 1),
                                                 path: object.path,
                                                 id: object.id,
                                                 title: object.title,
@@ -152,6 +154,39 @@ struct NewMultiSelectionUtilityView: View {
             }
         }
         .padding()
+    }
+    
+    func neighboringIndexes(for index: Int, size: CGSize, inGridWithColumns columns: Int = 7, rows: Int = 3) -> [Int]? {
+        let totalSquares = columns * rows
+        let objectWidth = Int(size.width)
+        let objectHeight = Int(size.height)
+
+        let startRow = index / columns
+        let startCol = index % columns
+
+        // Check if the object would go out of bounds
+        if startCol + objectWidth > columns || startRow + objectHeight > rows {
+            return nil
+        }
+
+        var result: [Int] = []
+
+        for dy in 0..<objectHeight {
+            for dx in 0..<objectWidth {
+                let newRow = startRow + dy
+                let newCol = startCol + dx
+                let newIndex = newRow * columns + newCol
+
+                // Additional safety check
+                if newIndex < totalSquares {
+                    result.append(newIndex)
+                } else {
+                    return nil
+                }
+            }
+        }
+
+        return result
     }
     
     @ViewBuilder

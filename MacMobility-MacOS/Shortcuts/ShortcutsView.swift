@@ -42,6 +42,8 @@ struct ShortcutsView: View {
     
     @State private var resolutions: [DisplayMode] = []
     @State private var selectedMode: DisplayMode?
+    
+    let testSize = 20.0
 
     @Namespace private var animation
     let cornerRadius = 17.0
@@ -204,7 +206,7 @@ struct ShortcutsView: View {
         }
         .padding(.top, 21.0)
         .frame(minWidth: 1300.0)
-        HStack {
+        HStack(alignment: .top) {
             VStack(alignment: .leading) {
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -235,13 +237,35 @@ struct ShortcutsView: View {
                                 }
                             }
                             .padding()
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 10) {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 70), alignment: .leading)], spacing: 10) {
                                 ForEach(0..<21) { index in
                                     VStack {
-                                        ZStack {
-                                            itemViews(for: index, page: page)
-                                                .frame(width: 70, height: 70)
-                                                .clipped()
+                                        ZStack(alignment: .topLeading) {
+                                            itemViews(for: index, page: page, size:
+                                                    .init(
+                                                        width: 70 * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)
+                                                        + testSize * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1),
+                                                        height: 70 * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
+                                                        + testSize * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
+                                                    ))
+                                            .frame(width: 70 * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)
+                                                   + testSize * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1),
+                                                   height: 70 * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
+                                                   + testSize * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1))
+                                            .if((viewModel.objectAt(index: index, page: page)?.size?.width ?? 0) > 1) {
+                                                $0.padding(.leading, (70 * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)
+                                                                      + testSize * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)) * 0.5)
+                                            }
+                                            .if((viewModel.objectAt(index: index, page: page)?.size?.height ?? 0) > 1) {
+                                                $0.padding(.top, (70 * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
+                                                                  + testSize * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)) * 0.5)
+                                            }
+                                            .clipped()
+                                            .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
+                                                view.onDrag {
+                                                    NSItemProvider(object: id as NSString)
+                                                }
+                                            }
                                             if let id = viewModel.objectAt(index: index, page: page)?.id {
                                                 VStack {
                                                     HStack {
@@ -252,18 +276,31 @@ struct ShortcutsView: View {
                                                     }
                                                     Spacer()
                                                 }
+                                                .if((viewModel.objectAt(index: index, page: page)?.size?.width ?? 0) > 1) {
+                                                    $0.padding(.leading, (70 * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)
+                                                                          + testSize * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)) * 0.5)
+                                                }
+                                                .if((viewModel.objectAt(index: index, page: page)?.size?.height ?? 0) > 1) {
+                                                    $0.padding(.top, (70 * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
+                                                                      + testSize * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)) * 0.5)
+                                                }
                                             }
-                                            
+
                                         }
                                     }
-                                    .frame(width: 70, height: 70)
-                                    .background(
-                                        PlusButtonView()
-                                    )
-                                    .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
-                                        view.onDrag {
-                                            NSItemProvider(object: id as NSString)
-                                        }
+                                    .if(viewModel.shouldDisplayPlusAt(index: index, page: page) == nil) {
+                                        $0
+                                            .frame(width: 70, height: 70)
+                                            .background(
+                                                PlusButtonView()
+                                            )
+                                    }
+                                    .if(viewModel.shouldDisplayPlusAt(index: index, page: page) != nil) {
+                                        $0
+                                            .frame(width: 70, height: 70)
+                                            .background(
+                                                EmptyView()
+                                            )
                                     }
                                     .onDrop(of: [.text], isTargeted: nil) { providers in
                                         providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
@@ -353,6 +390,8 @@ struct ShortcutsView: View {
                         type: object.type,
                         page: page,
                         index: index,
+                        indexes: neighboringIndexes(for: index, size: object.size  ?? .init(width: 1, height: 1)),
+                        size: object.size ?? .init(width: 1, height: 1),
                         path: object.path,
                         id: object.id,
                         title: object.title,
@@ -368,6 +407,39 @@ struct ShortcutsView: View {
                     )
             )
         }
+    }
+    
+    func neighboringIndexes(for index: Int, size: CGSize, inGridWithColumns columns: Int = 7, rows: Int = 3) -> [Int]? {
+        let totalSquares = columns * rows
+        let objectWidth = Int(size.width)
+        let objectHeight = Int(size.height)
+
+        let startRow = index / columns
+        let startCol = index % columns
+
+        // Check if the object would go out of bounds
+        if startCol + objectWidth > columns || startRow + objectHeight > rows {
+            return nil
+        }
+
+        var result: [Int] = []
+
+        for dy in 0..<objectHeight {
+            for dx in 0..<objectWidth {
+                let newRow = startRow + dy
+                let newCol = startCol + dx
+                let newIndex = newRow * columns + newCol
+
+                // Additional safety check
+                if newIndex < totalSquares {
+                    result.append(newIndex)
+                } else {
+                    return nil
+                }
+            }
+        }
+
+        return result
     }
     
     @ViewBuilder
@@ -421,20 +493,20 @@ struct ShortcutsView: View {
     }
     
     @ViewBuilder
-    private func itemViews(for index: Int, page: Int) -> some View {
+    private func itemViews(for index: Int, page: Int, size: CGSize) -> some View {
         if let object = viewModel.objectAt(index: index, page: page) {
             if let path = object.path, object.type == .app {
                 Image(nsImage: NSWorkspace.shared.icon(forFile: path))
                     .resizable()
-                    .scaledToFill()
-                    .frame(width: 85, height: 85)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: size.width, height: size.height)
             } else if object.type == .shortcut {
                 if let data = object.imageData, let image = NSImage(data: data) {
                     Image(nsImage: image)
                         .resizable()
                         .scaledToFill()
                         .cornerRadius(cornerRadius)
-                        .frame(width: 70, height: 70)
+                        .frame(width: size.width, height: size.height)
                         .onTapGesture {
                             openEditUtilityWindow(item: object)
                         }
@@ -452,7 +524,7 @@ struct ShortcutsView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .cornerRadius(cornerRadius)
-                        .frame(width: 70, height: 70)
+                        .frame(width: size.width, height: size.height)
                         .clipShape(
                             RoundedRectangle(cornerRadius: cornerRadius)
                         )
@@ -472,7 +544,7 @@ struct ShortcutsView: View {
                 } else if let path = object.browser?.icon {
                     Image(path)
                         .resizable()
-                        .frame(width: 80, height: 80)
+                        .frame(width: size.width, height: size.height)
                         .cornerRadius(cornerRadius)
                         .onTapGesture {
                             openCreateNewWebpageWindow(item: object)
@@ -494,7 +566,7 @@ struct ShortcutsView: View {
                         .resizable()
                         .scaledToFill()
                         .cornerRadius(cornerRadius)
-                        .frame(width: 70, height: 70)
+                        .frame(width: size.width, height: size.height)
                         .onTapGesture {
                             openEditUtilityWindow(item: object)
                         }
@@ -505,7 +577,7 @@ struct ShortcutsView: View {
                             .font(.system(size: 11))
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
-                            .frame(maxWidth: 80)
+                            .frame(maxWidth: 80 * (object.size?.width ?? 1))
                             .outlinedText()
                             .onTapGesture {
                                 openEditUtilityWindow(item: object)

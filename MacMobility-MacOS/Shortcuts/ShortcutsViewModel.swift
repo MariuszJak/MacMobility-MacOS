@@ -213,13 +213,13 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         var websitesSO: [ShortcutObject] = []
         let name = urls.extractWebsiteNames().joined(separator: ", ")
         urls.enumerated().forEach { (index, url) in
-            let so: ShortcutObject = .init(type: .webpage, page: 1, index: index, path: url, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: browser, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
+            let so: ShortcutObject = .init(type: .webpage, page: 1, index: index, indexes: [index], path: url, id: UUID().uuidString, title: "", color: nil, faviconLink: nil, browser: browser, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false)
             if !webpages.contains(where: { $0.browser == so.browser && $0.path == so.path }) {
                 saveWebpage(with: so)
             }
             websitesSO.append(so)
         }
-        let ma: ShortcutObject = .init(type: .utility, page: 1, index: 0, path: nil, id: UUID().uuidString, title: name, color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData, scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: true, category: "Multiselection")
+        let ma: ShortcutObject = .init(type: .utility, page: 1, index: 0, indexes: [0], path: nil, id: UUID().uuidString, title: name, color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData, scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: true, category: "Multiselection")
         saveUtility(with: ma)
     }
     
@@ -279,7 +279,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     if website.url.containsValidDomain {
                         let updatedURL = website.url.applyHTTPS()
                         let so: ShortcutObject = .init(
-                            type: .webpage, page: 1, index: i, path: updatedURL, id: UUID().uuidString,
+                            type: .webpage, page: 1, index: i, indexes: [i], path: updatedURL, id: UUID().uuidString,
                             title: "", color: nil, faviconLink: nil, browser: browser ?? .safari, imageData: website.nsImage?.toData,
                             scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false
                         )
@@ -291,10 +291,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
                 if let createMultiactions, createMultiactions {
                     websitesSO.enumerated().forEach { (index, _) in
-                        websitesSO[index].index = index
+//                        websitesSO[index].index = index
                     }
                     let ma: ShortcutObject = .init(
-                        type: .utility, page: 1, index: i, path: nil, id: UUID().uuidString,
+                        type: .utility, page: 1, index: i, indexes: [i], path: nil, id: UUID().uuidString,
                         title: "", color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData,
                         scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: false,
                         category: "Multiselection"
@@ -307,7 +307,11 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func objectAt(index: Int, page: Int) -> ShortcutObject? {
-        configuredShortcuts.filter { $0.page == page }.first(where: { $0.index == index })
+        configuredShortcuts.filter { $0.page == page }.first(where: { $0.indexes?.first == index })
+    }
+    
+    func shouldDisplayPlusAt(index: Int, page: Int) -> ShortcutObject? {
+        configuredShortcuts.filter { $0.page == page }.first(where: { $0.indexes?.contains(index) ?? false })
     }
     
     func object(for id: String) -> ShortcutObject? {
@@ -404,6 +408,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         type: oldObject.type,
                         page: configuredShortcuts[index].page,
                         index: configuredShortcuts[index].index,
+                        indexes: configuredShortcuts[index].indexes,
+                        size: configuredShortcuts[index].size ?? .init(width: 1, height: 1),
                         path: oldObject.path,
                         id: oldObject.id,
                         title: oldObject.title,
@@ -471,6 +477,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     type: webpageItem.type,
                     page: configuredShortcuts[configuredIndex].page,
                     index: configuredShortcuts[configuredIndex].index,
+                    indexes: configuredShortcuts[configuredIndex].indexes,
+                    size: configuredShortcuts[configuredIndex].size ?? .init(width: 1, height: 1),
                     path: webpageItem.path,
                     id: webpageItem.id,
                     title: webpageItem.title,
@@ -500,6 +508,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     type: utilityItem.type,
                     page: configuredShortcuts[configuredIndex].page,
                     index: configuredShortcuts[configuredIndex].index,
+                    indexes: configuredShortcuts[configuredIndex].indexes,
+                    size: configuredShortcuts[configuredIndex].size ?? .init(width: 1, height: 1),
                     path: utilityItem.path,
                     id: utilityItem.id,
                     title: utilityItem.title,

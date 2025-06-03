@@ -49,6 +49,7 @@ extension ShortcutObject {
             type: .utility,
             page: 1,
             index: index,
+            indexes: [index ?? 0],
             path: nil,
             id: script.id.uuidString,
             title: script.name,
