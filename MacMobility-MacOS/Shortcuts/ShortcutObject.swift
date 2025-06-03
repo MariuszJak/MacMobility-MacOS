@@ -48,7 +48,7 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         page: Int,
         index: Int? = nil,
         indexes: [Int]? = nil,
-        size: CGSize =  .init(width: 1, height: 1),
+        size: CGSize? = .init(width: 1, height: 1),
         path: String? = nil,
         id: String,
         title: String,
