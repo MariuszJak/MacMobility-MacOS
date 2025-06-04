@@ -50,6 +50,8 @@ extension ConnectionManager {
             openShortcut(name: shortcutItem.title)
         case .webpage:
             openWebPage(for: shortcutItem)
+        case .control:
+            break
         case .utility:
             switch shortcutItem.utilityType {
             case .commandline:
@@ -185,6 +187,8 @@ extension ConnectionManager {
                     openShortcut(name: tool.title)
                 case .webpage:
                     openWebPage(for: tool)
+                case .control:
+                    break
                 case .utility:
                     switch tool.utilityType {
                     case .commandline:

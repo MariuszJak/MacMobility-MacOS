@@ -43,7 +43,7 @@ struct ShortcutsView: View {
     @State private var resolutions: [DisplayMode] = []
     @State private var selectedMode: DisplayMode?
     
-    let testSize = 20.0
+    let testSize = 7.0
 
     @Namespace private var animation
     let cornerRadius = 17.0
@@ -253,12 +253,10 @@ struct ShortcutsView: View {
                                                    height: 70 * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
                                                    + testSize * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1))
                                             .if((viewModel.objectAt(index: index, page: page)?.size?.width ?? 0) > 1) {
-                                                $0.padding(.leading, (70 * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)
-                                                                      + testSize * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)) * 0.5)
+                                                $0.padding(.leading, ((70 + testSize) * ((viewModel.objectAt(index: index, page: page)?.size?.width ?? 1) - 1) + testSize))
                                             }
                                             .if((viewModel.objectAt(index: index, page: page)?.size?.height ?? 0) > 1) {
-                                                $0.padding(.top, (70 * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
-                                                                  + testSize * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)) * 0.5)
+                                                $0.padding(.top, (70 + testSize) * ((viewModel.objectAt(index: index, page: page)?.size?.height ?? 1) - 1))
                                             }
                                             .clipped()
                                             .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
@@ -277,12 +275,10 @@ struct ShortcutsView: View {
                                                     Spacer()
                                                 }
                                                 .if((viewModel.objectAt(index: index, page: page)?.size?.width ?? 0) > 1) {
-                                                    $0.padding(.leading, (70 * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)
-                                                                          + testSize * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1)) * 0.5)
+                                                    $0.padding(.leading, ((70 + testSize) * ((viewModel.objectAt(index: index, page: page)?.size?.width ?? 1) - 1) + testSize))
                                                 }
                                                 .if((viewModel.objectAt(index: index, page: page)?.size?.height ?? 0) > 1) {
-                                                    $0.padding(.top, (70 * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
-                                                                      + testSize * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)) * 0.5)
+                                                    $0.padding(.top, (70 + testSize) * ((viewModel.objectAt(index: index, page: page)?.size?.height ?? 1) - 1))
                                                 }
                                             }
 
@@ -304,7 +300,8 @@ struct ShortcutsView: View {
                                     }
                                     .onDrop(of: [.text], isTargeted: nil) { providers in
                                         providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                                            if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
+                                            if let droppedString = droppedItem as? String,
+                                               let object = viewModel.object(for: droppedString, index: index, page: page) {
                                                 handleOnDrop(index: index, page: page, object: object)
                                             }
                                         }
@@ -584,6 +581,12 @@ struct ShortcutsView: View {
                             }
                     }
                 }
+            } else if object.type == .control {
+                BrightnessVolumeContainerView()
+                    .frame(width: size.width, height: size.height)
+//                HTMLCPUView()
+//                    .cornerRadius(cornerRadius)
+//                    .frame(width: size.width, height: size.height)
             }
         }
     }

@@ -12,7 +12,149 @@ public enum ShortcutType: String, Codable {
     case app
     case webpage
     case utility
+    case control
 }
+
+import SwiftUI
+import WebKit
+
+struct HTMLCPUView: NSViewRepresentable {
+    func makeNSView(context: Context) -> WKWebView {
+        let webView = WKWebView()
+
+        // Load local HTML string
+        webView.loadHTMLString(htmlContent, baseURL: nil)
+        return webView
+    }
+
+    func updateNSView(_ nsView: WKWebView, context: Context) {
+        // No dynamic updates needed
+    }
+
+    private var htmlContent: String {
+        """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+          <title>CPU Usage Monitor</title>
+          <style>
+            body {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              background: #f3f4f6;
+              margin: 0;
+              font-family: 'Segoe UI', sans-serif;
+            }
+            #cpu-box {
+              width: 300px;
+              height: 300px;
+              background: white;
+              border-radius: 20px;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+              padding: 20px;
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              text-align: center;
+            }
+            #cpu-box h2 {
+              margin: 0 0 10px;
+              font-size: 24px;
+              color: #111827;
+            }
+            #cpu-box p {
+              font-size: 20px;
+              margin: 5px 0;
+              color: #4b5563;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="cpu-box">
+            <h2>CPU Usage</h2>
+            <p id="user">User: -- %</p>
+            <p id="sys">System: -- %</p>
+            <p id="idle">Idle: -- %</p>
+          </div>
+
+          <script>
+            async function fetchCpuUsage() {
+              const user = (Math.random() * 20).toFixed(2);
+              const sys = (Math.random() * 10).toFixed(2);
+              const idle = (100 - user - sys).toFixed(2);
+
+              document.getElementById('user').textContent = `User: ${user} %`;
+              document.getElementById('sys').textContent = `System: ${sys} %`;
+              document.getElementById('idle').textContent = `Idle: ${idle} %`;
+            }
+
+            fetchCpuUsage();
+            setInterval(fetchCpuUsage, 2000);
+          </script>
+        </body>
+        </html>
+        """
+    }
+}
+
+struct BrightnessVolumeContainerView: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.gray)
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                .shadow(color: .white.opacity(0.05), radius: 4, x: 0, y: -2)
+            BrightnessVolumeBarView()
+                .padding()
+        }
+    }
+}
+
+struct BrightnessVolumeBarView: View {
+    @State private var progress: Double = 0.5 // Initial value
+
+    var body: some View {
+        ZStack(alignment: .trailing) {
+            // Background bar
+            RoundedRectangle(cornerRadius: 20)
+//                .fill(.ultraThinMaterial)
+                .frame(height: 30)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                )
+                .shadow(radius: 6)
+
+            // Progress bar
+            GeometryReader { geometry in
+                HStack(spacing: 0) {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color.white.opacity(0.8))
+                        .frame(width: geometry.size.width * progress)
+                    Spacer(minLength: 0)
+                }
+                .frame(height: 30)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .contentShape(Rectangle())
+//                .gesture(
+//                    DragGesture(minimumDistance: 0)
+//                        .onChanged { value in
+//                            let newProgress = min(max(0, value.location.x / geometry.size.width), 1)
+//                            progress = newProgress
+//                        }
+//                )
+            }
+            .frame(height: 30)
+        }
+    }
+}
+
 
 extension Array where Element: Equatable {
     mutating func appendUnique(contentsOf newElements: [Element]) {

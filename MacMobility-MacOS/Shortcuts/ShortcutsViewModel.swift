@@ -44,7 +44,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var browser: Browsers?
     
     init(connectionManager: ConnectionManager) {
-//        UserDefaults.standard.clearAll()
+//        UserDefaults.standard.clear(key: .utilities)
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
@@ -56,6 +56,28 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchInstalledApps()
         registerListener()
         startMonitoring()
+        
+        let test: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 1, height: 2), path: "", id: "horizontal-scroll", title: "1 x 2", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        
+        let test2: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 1, height: 3), path: "", id: "horizontal-scroll2", title: "1 x 3", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        
+        let test3: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 2, height: 1), path: "", id: "horizontal-scroll3", title: "2 x 1", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        
+        let test4: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 1), path: "", id: "horizontal-scroll4", title: "3 x 1", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        
+        let test5: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 2), path: "", id: "horizontal-scroll5", title: "3 x 2", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        
+        let test6: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 3), path: "", id: "horizontal-scroll6", title: "3 x 3", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        
+        let test7: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 2, height: 2), path: "", id: "horizontal-scroll7", title: "2 x 2", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        
+        self.saveUtility(with: test)
+        self.saveUtility(with: test2)
+        self.saveUtility(with: test3)
+        self.saveUtility(with: test4)
+        self.saveUtility(with: test5)
+        self.saveUtility(with: test6)
+        self.saveUtility(with: test7)
         
         connectionManager
             .$streamConnectionState
@@ -314,11 +336,23 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         configuredShortcuts.filter { $0.page == page }.first(where: { $0.indexes?.contains(index) ?? false })
     }
     
-    func object(for id: String) -> ShortcutObject? {
+    func object(for id: String, index: Int, page: Int) -> ShortcutObject? {
+        var item: ShortcutObject?
         if searchText.isEmpty {
-            shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id } ?? utilities.first { $0.id == id }
+            item = shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id } ?? utilities.first { $0.id == id }
         } else {
-            tmpAllItems.first { $0.id == id }
+            item = tmpAllItems.first { $0.id == id }
+        }
+        if item?.type == .control {
+            guard let allIndexes = neighboringIndexes(for: index, size: item?.size) else {
+                return nil
+            }
+            let configuredIndexes = configuredShortcuts.filter { $0.page == page && $0.id != id }.compactMap { $0.indexes }.flatMap { $0 }
+            let intersects = Set(allIndexes).intersection(Set(configuredIndexes))
+            return intersects.isEmpty ? item : nil
+        } else {
+            let configuredIndexes = configuredShortcuts.filter { $0.page == page && $0.type == .control }.compactMap { $0.indexes }.flatMap { $0 }
+            return configuredIndexes.contains(index) ? nil : item
         }
     }
     
@@ -399,17 +433,17 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func addConfiguredShortcut(object: ShortcutObject) {
-        if let index = configuredShortcuts.firstIndex(where: { $0.index == object.index && $0.page == object.page }) {
+        if let index = configuredShortcuts.firstIndex(where: { !Set($0.indexes ?? []).intersection(Set(object.indexes ?? [])).isEmpty && $0.page == object.page }) {
             let oldObject = configuredShortcuts[index]
             configuredShortcuts[index] = object
             configuredShortcuts.enumerated().forEach { (index, shortcut) in
-                if (object.index != shortcut.index && shortcut.id == object.id) {
+                if (object.indexes != shortcut.indexes && shortcut.id == object.id) {
                     configuredShortcuts[index] = .init(
                         type: oldObject.type,
                         page: configuredShortcuts[index].page,
                         index: configuredShortcuts[index].index,
-                        indexes: configuredShortcuts[index].indexes,
-                        size: configuredShortcuts[index].size ?? .init(width: 1, height: 1),
+                        indexes: neighboringIndexes(for: configuredShortcuts[index].indexes?.first, size: oldObject.size),
+                        size: oldObject.size ?? .init(width: 1, height: 1),
                         path: oldObject.path,
                         id: oldObject.id,
                         title: oldObject.title,
@@ -431,6 +465,42 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+    }
+    
+    func neighboringIndexes(for index: Int?, size: CGSize?, inGridWithColumns columns: Int = 7, rows: Int = 3) -> [Int]? {
+        guard let index, let size else {
+            return nil
+        }
+        let totalSquares = columns * rows
+        let objectWidth = Int(size.width)
+        let objectHeight = Int(size.height)
+
+        let startRow = index / columns
+        let startCol = index % columns
+
+        // Check if the object would go out of bounds
+        if startCol + objectWidth > columns || startRow + objectHeight > rows {
+            return nil
+        }
+
+        var result: [Int] = []
+
+        for dy in 0..<objectHeight {
+            for dx in 0..<objectWidth {
+                let newRow = startRow + dy
+                let newCol = startCol + dx
+                let newIndex = newRow * columns + newCol
+
+                // Additional safety check
+                if newIndex < totalSquares {
+                    result.append(newIndex)
+                } else {
+                    return nil
+                }
+            }
+        }
+
+        return result
     }
     
     func searchWebpages() {
