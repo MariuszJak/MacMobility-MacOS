@@ -11,6 +11,7 @@ import os
 import Foundation
 import Combine
 import AppKit
+import IOKit.pwr_mgt
 
 enum PairingStatus: Equatable {
     case notPaired
@@ -62,6 +63,8 @@ class ConnectionManager: NSObject, ObservableObject {
     public var myPeerId: MCPeerID = {
         return MCPeerID(displayName: Host.current().name ?? "")
     }()
+    private var keepAliveActivity: NSObjectProtocol?
+    private var assertionID: IOPMAssertionID = 0
     
     public let serviceAdvertiser: MCNearbyServiceAdvertiser
     public let serviceBrowser: MCNearbyServiceBrowser
@@ -246,10 +249,14 @@ class ConnectionManager: NSObject, ObservableObject {
         switch pairingStatus {
         case .notPaired:
             startAdvertising()
+            stopKeepAliveActivity()
+            allowSleep()
         case .pairining:
             break
         case .paired:
             stopAdvertising()
+            startKeepAliveActivity()
+            preventSleep()
         }
     }
     
@@ -267,6 +274,39 @@ class ConnectionManager: NSObject, ObservableObject {
         session.disconnect()
         pairingStatus = .notPaired
         toggleAdvertising()
+    }
+    
+    func preventSleep() {
+        let reasonForActivity = "TCP + Multipeer streaming requires continuous processing" as CFString
+        let result = IOPMAssertionCreateWithName(
+            kIOPMAssertionTypeNoIdleSleep as CFString,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            reasonForActivity,
+            &assertionID
+        )
+        
+        if result == kIOReturnSuccess {
+            print("Sleep prevention assertion created.")
+        }
+    }
+
+    func allowSleep() {
+        IOPMAssertionRelease(assertionID)
+        print("Sleep prevention assertion released.")
+    }
+
+    func startKeepAliveActivity() {
+        keepAliveActivity = ProcessInfo.processInfo.beginActivity(
+            options: [.userInitiated, .latencyCritical, .idleSystemSleepDisabled, .suddenTerminationDisabled, .automaticTerminationDisabled],
+            reason: "Screen streaming and multipeer connection"
+        )
+    }
+
+    func stopKeepAliveActivity() {
+        if let activity = keepAliveActivity {
+            ProcessInfo.processInfo.endActivity(activity)
+            keepAliveActivity = nil
+        }
     }
 }
 
@@ -307,7 +347,6 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         guard availablePeer == peerID else { return }
         availablePeer = nil
-        
     }
 }
 

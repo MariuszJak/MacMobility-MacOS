@@ -44,7 +44,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
     @Binding var bitrate: CGFloat?
     private var listener: NWListener?
     private var connection: NWConnection?
-    private let queue = DispatchQueue(label: "ScreenStreamQueue")
+    private let queue = DispatchQueue(label: "ScreenStreamQueue", qos: .userInitiated)
     private let ciContext = CIContext()
     private var isConnected = false
     private let screenViewManager = ScreenViewManager()
