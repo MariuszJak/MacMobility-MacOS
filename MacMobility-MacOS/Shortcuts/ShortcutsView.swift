@@ -582,11 +582,10 @@ struct ShortcutsView: View {
                     }
                 }
             } else if object.type == .control {
-                BrightnessVolumeContainerView()
+//                BrightnessVolumeContainerView()
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(.blue)
                     .frame(width: size.width, height: size.height)
-//                HTMLCPUView()
-//                    .cornerRadius(cornerRadius)
-//                    .frame(width: size.width, height: size.height)
             }
         }
     }
