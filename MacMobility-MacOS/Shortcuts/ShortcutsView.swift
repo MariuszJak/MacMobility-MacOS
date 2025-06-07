@@ -212,10 +212,8 @@ struct ShortcutsView: View {
                             ResolutionSelectorCard(displayID: displayID, iosDevice: iosDevice, bitrate: $viewModel.connectionManager.bitrate)
                         }
                         ForEach(1..<viewModel.pages+1, id: \.self) { page in
-                            HStack {
-                                Text("Page: \(page)")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundStyle(Color.white)
+                            HStack(alignment: .bottom) {
+                                pageNumberView(page: page)
                                 Spacer()
                                 #if DEBUG
                                 Button {
@@ -344,6 +342,81 @@ struct ShortcutsView: View {
         }
         .frame(minWidth: 1300.0)
         .padding(.top, 21.0)
+    }
+    
+    @ViewBuilder
+    private func pageNumberView(page: Int) -> some View {
+        HStack {
+            VStack(alignment: .trailing) {
+                Text("Page \(page)")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(Color.white)
+                if viewModel.getAssigned(to: page) != nil {
+                    Text("Assigned to: ")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundStyle(Color.gray)
+                }
+            }
+            if let assignedApp = viewModel.getAssigned(to: page) {
+                if let data = viewModel.getIcon(fromAppPath: assignedApp.appPath),
+                   let image = NSImage(data: data) {
+                    VStack {
+                        ZStack {
+                            Image(nsImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .cornerRadius(cornerRadius)
+                                .frame(width: 70, height: 70)
+                                .padding(.bottom, 4.0)
+                            VStack {
+                                HStack {
+                                    Spacer()
+                                    RedXButton {
+                                        viewModel.unassign(app: assignedApp.appPath, from: page)
+                                    }
+                                }
+                                Spacer()
+                            }
+                        }
+                    }
+                    .frame(width: 70, height: 70)
+                    .onDrop(of: [.text], isTargeted: nil) { providers in
+                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                            if let droppedString = droppedItem as? String,
+                               let object = viewModel.app(for: droppedString),
+                               let path = object.path {
+                                DispatchQueue.main.async {
+                                    viewModel.replace(app: path, to: page)
+                                }
+                            }
+                        }
+                        return true
+                    }
+                }
+            } else {
+                Button("Assign") {
+                    if let path = selectApp() {
+                        viewModel.assign(app: path, to: page)
+                    }
+                }
+                .onDrop(of: [.text], isTargeted: nil) { providers in
+                    providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                        if let droppedString = droppedItem as? String,
+                           let object = viewModel.app(for: droppedString),
+                           let path = object.path {
+                            DispatchQueue.main.async {
+                                viewModel.assign(app: path, to: page)
+                            }
+                        }
+                    }
+                    return true
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedBackgroundView()
+        )
     }
     
     private func handleOnDrop(index: Int, page: Int, object: ShortcutObject) {

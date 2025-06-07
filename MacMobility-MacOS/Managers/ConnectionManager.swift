@@ -33,6 +33,7 @@ struct DeviceName: Codable {
 }
 
 class ConnectionManager: NSObject, ObservableObject {
+    @ObservedObject var observer = FocusedAppObserver()
     @Published var screenIndex = 0
     @Published var inProgressWindow: NSWindow?
     @Published var availablePeer: MCPeerID?
@@ -55,6 +56,11 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var bitrate: CGFloat? = 1
     @Published var streamConnectionState: StreamConnectionState = .notConnected
     @Published var displayID: CGDirectDisplayID?
+    public var assignedAppsToPages: [AssignedAppsToPages] = [] {
+        didSet {
+            self.send(assignedAppsToPages: assignedAppsToPages)
+        }
+    }
     private let tcpServer = TCPServerStreamer()
     let keyRecorder = KeyRecorder()
     private var cancellables = Set<AnyCancellable>()
@@ -145,6 +151,17 @@ class ConnectionManager: NSObject, ObservableObject {
         
         startAdvertising()
         startBrowsing()
+        
+        observer
+            .$focusedAppName
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] activeApp in
+                guard let self, let activeApp else { return }
+                if let pageToFocus = assignedAppsToPages.first(where: { $0.appPath.contains(activeApp) }) {
+                    send(assignedApp: pageToFocus)
+                }
+            }
+            .store(in: &cancellables)
         
         NotificationCenter.default.addObserver(
             self,

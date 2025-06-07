@@ -108,6 +108,7 @@ extension UserDefaults {
         case userApps
         case lifecycle
         case browser
+        case assignedAppsToPages
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {
@@ -116,5 +117,43 @@ extension UserDefaults {
 
     func object(forKey defaultName: Const) -> Any? {
         object(forKey: defaultName.rawValue)
+    }
+}
+
+import SwiftUI
+import AppKit
+import Combine
+
+class FocusedAppObserver: ObservableObject {
+    @Published var focusedAppName: String? = nil
+    private var cancellable: AnyCancellable?
+
+    init() {
+        // Observe changes in the frontmost app
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(appDidActivate),
+            name: NSWorkspace.didActivateApplicationNotification,
+            object: nil
+        )
+        
+        // Initial state
+        updateFrontmostApp()
+    }
+
+    deinit {
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
+    }
+
+    @objc private func appDidActivate(notification: Notification) {
+        updateFrontmostApp()
+    }
+
+    private func updateFrontmostApp() {
+        if let app = NSWorkspace.shared.frontmostApplication {
+            self.focusedAppName = app.localizedName
+        } else {
+            self.focusedAppName = nil // Possibly no app focused
+        }
     }
 }

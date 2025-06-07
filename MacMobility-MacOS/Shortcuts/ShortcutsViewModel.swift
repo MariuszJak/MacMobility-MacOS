@@ -9,6 +9,11 @@ import SwiftUI
 import Combine
 import UniformTypeIdentifiers
 
+struct AssignedAppsToPages: Codable {
+    var page: Int
+    let appPath: String
+}
+
 public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
     @Published var connectionManager: ConnectionManager
     @Published var configuredShortcuts: [ShortcutObject] = []
@@ -43,8 +48,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var createMultiactions: Bool?
     private var browser: Browsers?
     
+    
     init(connectionManager: ConnectionManager) {
-//        UserDefaults.standard.clearAll()
+//        UserDefaults.standard.clear(key: .assignedAppsToPages)
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
@@ -52,6 +58,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         self.pages = UserDefaults.standard.get(key: .pages) ?? 1
         self.appsAddedByUser = UserDefaults.standard.get(key: .userApps) ?? []
         self.automations = loadJSON("automations")
+        connectionManager.assignedAppsToPages = UserDefaults.standard.get(key: .assignedAppsToPages) ?? []
         fetchShortcuts()
         fetchInstalledApps()
         registerListener()
@@ -72,6 +79,41 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 self.displayID = value
             }
             .store(in: &cancellables)
+    }
+    
+    func replace(app path: String, to page: Int) {
+        guard let index = connectionManager.assignedAppsToPages.firstIndex(where: { $0.page == page }) else {
+            connectionManager.localError = "No app assigned to \(page), can't replace."
+            connectionManager.showsLocalError = true
+            return
+        }
+        connectionManager.assignedAppsToPages[index] = .init(page: page, appPath: path)
+        if let alreadyAssignedSomwhereIndex = connectionManager.assignedAppsToPages.firstIndex(where: { $0.appPath == path && $0.page != page }) {
+            connectionManager.assignedAppsToPages.remove(at: alreadyAssignedSomwhereIndex)
+        }
+        UserDefaults.standard.store(connectionManager.assignedAppsToPages, for: .assignedAppsToPages)
+        self.pages = pages
+    }
+    
+    func assign(app path: String, to page: Int) {
+        if let assignedApp = connectionManager.assignedAppsToPages.first(where: { $0.appPath == path }) {
+            connectionManager.localError = "App already assigned to page \(assignedApp.page)"
+            connectionManager.showsLocalError = true
+            return
+        }
+        connectionManager.assignedAppsToPages.append(.init(page: page, appPath: path))
+        UserDefaults.standard.store(connectionManager.assignedAppsToPages, for: .assignedAppsToPages)
+        self.pages = pages
+    }
+    
+    func unassign(app path: String, from page: Int) {
+        connectionManager.assignedAppsToPages = connectionManager.assignedAppsToPages.filter { $0.appPath != path && $0.page != page }
+        UserDefaults.standard.store(connectionManager.assignedAppsToPages, for: .assignedAppsToPages)
+        self.pages = pages
+    }
+    
+    func getAssigned(to page: Int) -> AssignedAppsToPages? {
+        connectionManager.assignedAppsToPages.first(where: { $0.page == page })
     }
     
     func extendScreen() {
@@ -318,6 +360,14 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
     }
     
+    func app(for id: String) -> ShortcutObject? {
+        if searchText.isEmpty {
+            installedApps.first { $0.id == id }
+        } else {
+            tmpAllItems.filter { $0.type == .app }.first { $0.id == id }
+        }
+    }
+    
     func allObjects() -> [ShortcutObject] {
         shortcuts + installedApps + webpages + utilities
     }
@@ -335,10 +385,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func removePage(with number: Int) {
+        connectionManager.assignedAppsToPages.removeAll { $0.page == number }
         configuredShortcuts.removeAll { $0.page == number }
         configuredShortcuts.enumerated().forEach { (index, object) in
             if configuredShortcuts[index].page > number {
                 configuredShortcuts[index].page -= 1
+            }
+        }
+        connectionManager.assignedAppsToPages.enumerated().forEach { (index, object) in
+            if connectionManager.assignedAppsToPages[index].page > number {
+                connectionManager.assignedAppsToPages[index].page -= 1
             }
         }
         if pages > 1 {
@@ -347,6 +403,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
         UserDefaults.standard.store(pages, for: .pages)
+        UserDefaults.standard.store(connectionManager.assignedAppsToPages, for: .assignedAppsToPages)
     }
     
     func exportPageAsAutomations(number: Int) {

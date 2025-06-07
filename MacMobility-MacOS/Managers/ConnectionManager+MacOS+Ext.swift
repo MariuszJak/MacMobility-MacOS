@@ -38,6 +38,16 @@ struct ShortcutsResponseDiff: Codable {
     let shortcutsDiff: [ChangeType: [SDiff]]
 }
 
+struct PagesResponse: Codable {
+    let title: String
+    let assignedAppsToPages: [AssignedAppsToPages]
+}
+
+struct FocusResponse: Codable {
+    let title: String
+    let pageToFocus: AssignedAppsToPages
+}
+
 struct StartStream: Codable {
     let title: String
     let action: String
@@ -114,6 +124,24 @@ extension ConnectionManager: ConnectionSenable {
     
     func send(shortcutsDiff: [ChangeType: [SDiff]]) {
         let payload = ShortcutsResponseDiff(shortcutTitle: "shortcutTitleDiff", shortcutsDiff: shortcutsDiff)
+        guard !session.connectedPeers.isEmpty,
+              let data = try? JSONEncoder().encode(payload) else {
+            return
+        }
+        send(data)
+    }
+    
+    func send(assignedAppsToPages: [AssignedAppsToPages]) {
+        let payload = PagesResponse(title: "AssignedApps", assignedAppsToPages: assignedAppsToPages)
+        guard !session.connectedPeers.isEmpty,
+              let data = try? JSONEncoder().encode(payload) else {
+            return
+        }
+        send(data)
+    }
+    
+    func send(assignedApp: AssignedAppsToPages) {
+        let payload = FocusResponse(title: "FocusResponse", pageToFocus: assignedApp)
         guard !session.connectedPeers.isEmpty,
               let data = try? JSONEncoder().encode(payload) else {
             return
