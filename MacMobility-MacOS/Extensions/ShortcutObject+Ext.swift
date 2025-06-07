@@ -18,6 +18,8 @@ extension UtilityObject.UtilityType {
             return .automator
         case .macro:
             return .bash
+        case .html:
+            return .bash
         }
     }
 }

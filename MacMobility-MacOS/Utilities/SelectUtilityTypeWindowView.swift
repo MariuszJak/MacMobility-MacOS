@@ -14,6 +14,7 @@ public struct UtilityObject: Identifiable {
         case multiselection
         case automation
         case macro
+        case html
     }
     let type: UtilityType
     let title: String
@@ -36,7 +37,8 @@ class SelectUtilityTypeWindowViewModel: ObservableObject {
         .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device."),
         .init(type: .macro, title: "Macros", description: "This tool allows creation of macros that can be triggered remotely from companion device."),
         .init(type: .commandline, title: "File Converter", description: "This tool allows conversion of files between different formats. You can define a file format input and output."),
-        .init(type: .commandline, title: "Raycast", description: "This tool allows triggering Raycast commands remotely from companion device using deeplinks.")
+        .init(type: .commandline, title: "Raycast", description: "This tool allows triggering Raycast commands remotely from companion device using deeplinks."),
+        .init(type: .html, title: "HTML", description: "This tool allows creating small html based widgets that refresh periodically.")
     ]
     
     init(connectionManager: ConnectionManager, delegate: UtilitiesWindowDelegate?) {
@@ -160,7 +162,7 @@ struct SelectUtilityTypeWindowView: View {
             } else {
                 newWindow = NSWindow(
                     contentRect: NSRect(x: 0, y: 0, width: 520, height: type == .commandline ? 800 : 470),
-                    styleMask: type == .commandline || type == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+                    styleMask: type == .commandline || type == .automation || type == .html ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                     backing: .buffered,
                     defer: false
                 )
@@ -201,6 +203,13 @@ struct SelectUtilityTypeWindowView: View {
                     hv.view.frame = newWindow?.contentView?.bounds ?? .zero
                     hv.view.autoresizingMask = [.width, .height]
                 }
+            case .html:
+                let hv = NSHostingController(rootView: HTMLUtilityView(categories: categories, item: item, delegate: viewModel.delegate) {
+                    newWindow?.close()
+                })
+                newWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .multiselection:
                 let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel.delegate) {
                     newWindow?.close()

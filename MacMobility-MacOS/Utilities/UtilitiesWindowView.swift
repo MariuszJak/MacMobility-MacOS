@@ -234,7 +234,7 @@ struct UtilitiesWindowView: View {
             } else {
                 editUtilitiesWindow = NSWindow(
                     contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
-                    styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+                    styleMask: item.utilityType == .commandline || item.utilityType == .automation || item.utilityType == .html ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                     backing: .buffered,
                     defer: false
                 )
@@ -274,6 +274,13 @@ struct UtilitiesWindowView: View {
                     hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                     hv.view.autoresizingMask = [.width, .height]
                 }
+            case .html:
+                let hv = NSHostingController(rootView: HTMLUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .multiselection:
                 let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
@@ -346,6 +353,13 @@ struct UtilitiesWindowView: View {
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             }
+        case .html:
+            let hv = NSHostingController(rootView: HTMLUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                editUtilitiesWindow?.close()
+            })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         case .multiselection:
             let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                 editUtilitiesWindow?.close()

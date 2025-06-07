@@ -372,8 +372,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         shortcuts + installedApps + webpages + utilities
     }
     
-    func removeShortcut(id: String) {
-        configuredShortcuts.removeAll { $0.id == id }
+    func removeShortcut(id: String, page: Int) {
+//        configuredShortcuts.removeAll { $0.id == id }
+        configuredShortcuts.removeAll(where: { $0.page == page && $0.id == id })
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
     }
@@ -451,7 +452,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
     }
     
-    func addConfiguredShortcut(object: ShortcutObject) {
+    func addConfiguredShortcut(object: ShortcutObject, page: Int = 0) {
         if let index = configuredShortcuts.firstIndex(where: { $0.index == object.index && $0.page == object.page }) {
             let oldObject = configuredShortcuts[index]
             configuredShortcuts[index] = object
@@ -477,7 +478,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
             }
         } else {
-            configuredShortcuts = configuredShortcuts.filter { $0.id != object.id }
+//            configuredShortcuts = configuredShortcuts.filter { $0.id != object.id }
+            configuredShortcuts.removeAll(where: { $0.page == page && $0.id == object.id })
             configuredShortcuts.append(object)
         }
         connectionManager.shortcuts = configuredShortcuts
@@ -552,7 +554,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         removeFromSections(with: utilityItem.id)
         if let index = utilities.firstIndex(where: { $0.id == utilityItem.id }) {
             utilities[index] = utilityItem
-            if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == utilityItem.id }) {
+            let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == utilityItem.id })
+            configuredIndexes.forEach { configuredIndex in
                 configuredShortcuts[configuredIndex] = .init(
                     type: utilityItem.type,
                     page: configuredShortcuts[configuredIndex].page,
@@ -570,8 +573,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     showTitleOnIcon: utilityItem.showTitleOnIcon ?? true,
                     category: utilityItem.category
                 )
-                UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
+            UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
         } else {
             utilities.insert(utilityItem, at: 0)
         }
@@ -762,5 +765,17 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
 //        print(String(format: "%.8f MB", countMB))
         
         return pngData
+    }
+}
+
+extension Array {
+    func allIndexes(where predicate: (Element) -> Bool) -> [Int] {
+        var indexes: [Int] = []
+        for (index, element) in self.enumerated() {
+            if predicate(element) {
+                indexes.append(index)
+            }
+        }
+        return indexes
     }
 }

@@ -50,6 +50,8 @@ extension ConnectionManager {
             openShortcut(name: shortcutItem.title)
         case .webpage:
             openWebPage(for: shortcutItem)
+        case .html:
+            break
         case .utility:
             switch shortcutItem.utilityType {
             case .commandline:
@@ -81,6 +83,8 @@ extension ConnectionManager {
                         }
                     }
                 }
+            case .html:
+                break
             case .multiselection:
                 runMultiselection(for: shortcutItem)
             case .automation:
@@ -185,6 +189,8 @@ extension ConnectionManager {
                     openShortcut(name: tool.title)
                 case .webpage:
                     openWebPage(for: tool)
+                case .html:
+                    break
                 case .utility:
                     switch tool.utilityType {
                     case .commandline:
@@ -216,6 +222,8 @@ extension ConnectionManager {
                                 }
                             }
                         }
+                    case .html:
+                        break
                     case .multiselection:
                         if let objects = tool.objects {
                             objects.forEach { item in

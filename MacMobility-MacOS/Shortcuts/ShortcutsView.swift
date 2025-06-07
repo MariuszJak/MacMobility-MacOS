@@ -245,13 +245,12 @@ struct ShortcutsView: View {
                                                     HStack {
                                                         Spacer()
                                                         RedXButton {
-                                                            viewModel.removeShortcut(id: id)
+                                                            viewModel.removeShortcut(id: id, page: page)
                                                         }
                                                     }
                                                     Spacer()
                                                 }
                                             }
-                                            
                                         }
                                     }
                                     .frame(width: 70, height: 70)
@@ -438,7 +437,7 @@ struct ShortcutsView: View {
                         objects: object.objects,
                         showTitleOnIcon: object.showTitleOnIcon ?? true,
                         category: object.category
-                    )
+                    ), page: page
             )
         }
     }
@@ -562,6 +561,30 @@ struct ShortcutsView: View {
                     }
                 }
             } else if object.type == .utility {
+                if let data = object.imageData, let image = NSImage(data: data) {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .cornerRadius(cornerRadius)
+                        .frame(width: 70, height: 70)
+                        .onTapGesture {
+                            openEditUtilityWindow(item: object)
+                        }
+                }
+                if !object.title.isEmpty {
+                    if object.showTitleOnIcon ?? true {
+                        Text(object.title)
+                            .font(.system(size: 11))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .frame(maxWidth: 80)
+                            .outlinedText()
+                            .onTapGesture {
+                                openEditUtilityWindow(item: object)
+                            }
+                    }
+                }
+            } else if object.type == .html {
                 if let data = object.imageData, let image = NSImage(data: data) {
                     Image(nsImage: image)
                         .resizable()
@@ -992,7 +1015,7 @@ struct ShortcutsView: View {
             } else {
                 editUtilitiesWindow = NSWindow(
                     contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
-                    styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+                    styleMask: item.utilityType == .commandline || item.utilityType == .automation || item.utilityType == .html ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                     backing: .buffered,
                     defer: false
                 )
@@ -1032,6 +1055,13 @@ struct ShortcutsView: View {
                     hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                     hv.view.autoresizingMask = [.width, .height]
                 }
+            case .html:
+                let hv = NSHostingController(rootView: HTMLUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .multiselection:
                 let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
