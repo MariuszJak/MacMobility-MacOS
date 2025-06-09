@@ -193,9 +193,11 @@ struct UtilitiesWindowView: View {
     }
     
     private func openCreateNewUtilityWindow(item: ShortcutObject? = nil) {
+        newWindow?.close()
+        newWindow = nil
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 800, height: 400),
+                contentRect: NSRect(x: 0, y: 0, width: 1150, height: 500),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -203,26 +205,31 @@ struct UtilitiesWindowView: View {
             newWindow?.center()
             newWindow?.setFrameAutosaveName("NewUtility")
             newWindow?.isReleasedWhenClosed = false
-            newWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
+            newWindow?.titlebarAppearsTransparent = true
+            newWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
+                return
+            }
+            
+            newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: SelectUtilityTypeWindowView(
                 connectionManager: viewModel.connectionManager,
                 categories: viewModel.allCategories(),
                 delegate: viewModel,
                 closeAction: {
                     newWindow?.close()
                 }))
+            newWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         }
-        newWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
-            connectionManager: viewModel.connectionManager,
-            categories: viewModel.allCategories(),
-            delegate: viewModel,
-            closeAction: {
-                newWindow?.close()
-            }))
         newWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openEditUtilityWindow(item: ShortcutObject) {
         editUtilitiesWindow?.close()
+        editUtilitiesWindow = nil
         if nil == editUtilitiesWindow {
             if item.color == .convert {
                 editUtilitiesWindow = NSWindow(
@@ -308,82 +315,5 @@ struct UtilitiesWindowView: View {
             editUtilitiesWindow?.makeKeyAndOrderFront(nil)
             return
         }
-        editUtilitiesWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
-        if item.color == .convert {
-            editUtilitiesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 520, height: 300),
-                styleMask: [.titled, .closable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
-        } else {
-            editUtilitiesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
-                styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
-        }
-        editUtilitiesWindow?.center()
-        editUtilitiesWindow?.setFrameAutosaveName("Utilities")
-        editUtilitiesWindow?.isReleasedWhenClosed = false
-        editUtilitiesWindow?.titlebarAppearsTransparent = true
-        editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
-        switch item.utilityType {
-        case .commandline:
-            if item.color == .convert {
-                let hv = NSHostingController(rootView: ConverterView(item: item, delegate: viewModel){
-                    editUtilitiesWindow?.close()
-                })
-                editUtilitiesWindow?.contentView?.addSubview(hv.view)
-                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-                hv.view.autoresizingMask = [.width, .height]
-            } else if item.color == .raycast {
-                let hv = NSHostingController(rootView: RaycastUtilityView(item: item, delegate: viewModel){
-                    editUtilitiesWindow?.close()
-                })
-                editUtilitiesWindow?.contentView?.addSubview(hv.view)
-                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-                hv.view.autoresizingMask = [.width, .height]
-            } else {
-                let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
-                    editUtilitiesWindow?.close()
-                })
-                editUtilitiesWindow?.contentView?.addSubview(hv.view)
-                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-                hv.view.autoresizingMask = [.width, .height]
-            }
-        case .html:
-            let hv = NSHostingController(rootView: HTMLUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
-                editUtilitiesWindow?.close()
-            })
-            editUtilitiesWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-        case .multiselection:
-            let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
-                editUtilitiesWindow?.close()
-            })
-            editUtilitiesWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-        case .automation:
-            let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
-                editUtilitiesWindow?.close()
-            })
-            editUtilitiesWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-        case .macro:
-            let hv = NSHostingController(rootView: MacroRecorderView(item: item, delegate: viewModel){
-                editUtilitiesWindow?.close()
-            })
-            editUtilitiesWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]            
-        case .none:
-            break
-        }
-        editUtilitiesWindow?.makeKeyAndOrderFront(nil)
     }
 }

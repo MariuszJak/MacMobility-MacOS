@@ -32,12 +32,17 @@ class IconPickerViewModel: ObservableObject {
         self.registerListeners()
     }
     
+    deinit {
+        cancellables.forEach { $0.cancel() }
+    }
+    
     func registerListeners() {
         guard shouldAutofetchImage else { return }
         $searchText
             .receive(on: RunLoop.main)
             .removeDuplicates()
-            .sink { text in
+            .sink { [weak self] text in
+                guard let self else { return }
                 if let text, !text.isEmpty, text.containsValidDomain {
                     self.isFetchingIcon = true
                     self.fetchHighResIcon(from: text) { image in
@@ -83,7 +88,8 @@ class IconPickerViewModel: ObservableObject {
     }
     
     func assignImage(_ image: NSImage, userSelected: Bool = false) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             let resized = image.resizedImage(newSize: self.resizeSize)
             self.selectedImage = resized
             self.completion(resized)
@@ -101,8 +107,8 @@ class IconPickerViewModel: ObservableObject {
         }
 
         guard let url = components.url, let host = url.host, let faviconURL = URL(string: "\(url.scheme!)://\(host)/favicon.ico") else { return }
-        let task = URLSession.shared.dataTask(with: faviconURL) { data, response, error in
-            guard let data = data, error == nil else {
+        let task = URLSession.shared.dataTask(with: faviconURL) { [weak self] data, response, error in
+            guard let self, let data = data, error == nil else {
                 print("Failed to fetch favicon: \(error?.localizedDescription ?? "Unknown error")")
                 completion(false)
                 return
@@ -181,8 +187,9 @@ class IconPickerViewModel: ObservableObject {
             return
         }
         
-        URLSession.shared.dataTask(with: pageURL) { data, _, _ in
-            guard let data = data,
+        URLSession.shared.dataTask(with: pageURL) { [weak self] data, _, _ in
+            guard let self,
+                  let data = data,
                   let html = String(data: data, encoding: .utf8) else {
                 completion(nil)
                 return

@@ -34,7 +34,7 @@ class SelectUtilityTypeWindowViewModel: ObservableObject {
     @Published var utilities: [UtilityObject] = [
         .init(type: .commandline, title: "Commandline tool", description: "This tool allows creation of shortcuts for triggering Bash scripts remotely from companion device."),
         .init(type: .multiselection, title: "Multiselection tool", description: "This tool allows creation of multiactions that can be triggered remotely from companion device."),
-        .init(type: .automation, title: "Automation tool", description: "This tool allows creation of automation workflows that can be triggered remotely from companion device."),
+        .init(type: .automation, title: "Automation tool", description: "This tool allows creation of workflows that can be triggered remotely from companion device."),
         .init(type: .macro, title: "Macros", description: "This tool allows creation of macros that can be triggered remotely from companion device."),
         .init(type: .commandline, title: "File Converter", description: "This tool allows conversion of files between different formats. You can define a file format input and output."),
         .init(type: .commandline, title: "Raycast", description: "This tool allows triggering Raycast commands remotely from companion device using deeplinks."),
@@ -136,6 +136,9 @@ struct SelectUtilityTypeWindowView: View {
                     }
                 }
             }
+            .background(
+                RoundedBackgroundView()
+            )
         }
         .onAppear {
             for window in NSApplication.shared.windows {

@@ -99,8 +99,11 @@ struct ExploreAutomationsView: View {
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding()
             }
+            .background(
+                RoundedBackgroundView()
+            )
         }
         .onAppear {
             viewModel.loadJSONFromDirectory()

@@ -12,6 +12,7 @@
 		C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */; };
 		C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */; };
 		C035810E2DB65091009E22F5 /* VisualEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810D2DB65091009E22F5 /* VisualEffect.swift */; };
+		C035E5722DF7821E00D6F3B3 /* DependenciesInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */; };
 		C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA7372DAC103300BD4FBA /* AboutView.swift */; };
 		C05DA73A2DAC104A00BD4FBA /* UpdateScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */; };
 		C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */; };
@@ -138,6 +139,7 @@
 		C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerViewModel.swift; sourceTree = "<group>"; };
 		C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Ext.swift"; sourceTree = "<group>"; };
 		C035810D2DB65091009E22F5 /* VisualEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffect.swift; sourceTree = "<group>"; };
+		C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependenciesInstallView.swift; sourceTree = "<group>"; };
 		C05DA7372DAC103300BD4FBA /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateScreenView.swift; sourceTree = "<group>"; };
 		C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatesManager.swift; sourceTree = "<group>"; };
@@ -287,6 +289,7 @@
 				C065EBFD2DC0DE1500000B8C /* InstallAutomationsView.swift */,
 				C065EBFF2DC0DE2400000B8C /* AutomationInstallView.swift */,
 				C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */,
+				C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -717,6 +720,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C064B8C42D86EB090091E2BE /* ShortcutsView.swift in Sources */,
+				C035E5722DF7821E00D6F3B3 /* DependenciesInstallView.swift in Sources */,
 				C065EC062DC0DE7400000B8C /* ShortcutObject.swift in Sources */,
 				C0EAFC182D9030D000044947 /* LicenseKeyGenerator.swift in Sources */,
 				C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */,

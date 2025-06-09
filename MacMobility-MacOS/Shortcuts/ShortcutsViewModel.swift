@@ -31,11 +31,15 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var allSectionsExpanded = true
     @Published var streamConnectionState: StreamConnectionState = .notConnected
     @Published var displayID: CGDirectDisplayID?
+    @Published var showDependenciesView: Bool = false
+    @Published var dependenciesObjects: [DependencyObject] = []
+    @Published var idOfObjectToReplaceDependencies: String = ""
     @Published var utilities: [ShortcutObject] = [] {
         didSet {
             sections = utilitiesWithSections()
         }
     }
+    var dependencyUpdate: ([String]) -> Void = { _ in }
     var close: () -> Void = {}
     private var timer: Timer?
     public var testColor = "#6DDADE"
@@ -79,6 +83,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 self.displayID = value
             }
             .store(in: &cancellables)
+        
+        dependencyUpdate = { updates in
+            self.updateDependenciesOfObject(with: self.idOfObjectToReplaceDependencies, replacements: updates)
+        }
     }
     
     func replace(app path: String, to page: Int) {
@@ -150,8 +158,11 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
             }
         }
+        sections.forEach { section in
+            section.items.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+        }
         
-        return sections
+        return sections.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
     
     func removeFromSections(with removeId: String?) {
@@ -478,12 +489,83 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
             }
         } else {
-//            configuredShortcuts = configuredShortcuts.filter { $0.id != object.id }
+            if object.scriptCode?.contains("DEPENDENCY_") ?? false {
+                dependenciesObjects = extractDependencies(from: object.scriptCode ?? "")
+                if dependenciesObjects.contains(where: { $0.type == .tool }) {
+                    if let toolLocation = dependenciesObjects.first?.tool {
+                        if !isCLIToolInstalled(at: toolLocation) {
+                            showDependenciesView = true
+                        }
+                    }
+                    if dependenciesObjects.contains(where: { $0.type == .text }) && !showDependenciesView {
+                        dependenciesObjects.removeAll(where: { $0.type == .tool })
+                        idOfObjectToReplaceDependencies = object.id
+                        showDependenciesView = true
+                    }
+                } else {
+                    showDependenciesView = true
+                    idOfObjectToReplaceDependencies = object.id
+                }
+            }
             configuredShortcuts.removeAll(where: { $0.page == page && $0.id == object.id })
             configuredShortcuts.append(object)
         }
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+    }
+    
+    func extractDependencies(from text: String) -> [DependencyObject] {
+        var dependencies: [DependencyObject] = []
+        
+        let pattern = #"\[DEPENDENCY_(\d+):\s*\{([^}]*)\}\]"#
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+
+        let matches = regex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+        
+        for match in matches {
+            guard match.numberOfRanges == 3 else { continue }
+            let bodyRange = Range(match.range(at: 2), in: text)!
+            let body = String(text[bodyRange])
+            
+            let jsonFormatted = "{\(body)}"
+            do {
+                if let jsonData = jsonFormatted.data(using: .utf8) {
+                    let object = try JSONDecoder().decode(DependencyObject.self, from: jsonData)
+                    dependencies.append(object)
+                }
+            } catch {
+                print(error)
+            }
+        }
+        
+        return dependencies
+    }
+    
+    func updateDependenciesOfObject(with id: String, replacements: [String]) {
+        guard var object = configuredShortcuts.first(where: { $0.id == id }) else { return }
+        replacements.enumerated().forEach { index, replacement in
+            if !replacement.isEmpty {
+                let split = replacement.split(separator: "&+$").map { String($0) }
+                if let script = replaceDependency(in: object.scriptCode, id: split[safe: 0], with: split[safe: 1]) {
+                    object.scriptCode = script
+                }
+            }
+        }
+        saveUtility(with: object)
+    }
+    
+    func replaceDependency(in text: String?, id: String?, with replacement: String?) -> String? {
+        guard let text, let id, let replacement else { return nil }
+        let pattern = #"\[\#(id):\s*\{[^}]*\}\]"#
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+
+        let range = NSRange(text.startIndex..., in: text)
+        return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: replacement)
+    }
+    
+    func isCLIToolInstalled(at path: String) -> Bool {
+        let fileManager = FileManager.default
+        return fileManager.isExecutableFile(atPath: path)
     }
     
     func searchWebpages() {

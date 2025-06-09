@@ -339,6 +339,9 @@ struct ShortcutsView: View {
             .transition(.scale)
             .zIndex(1)
         }
+        .sheet(isPresented: $viewModel.showDependenciesView) {
+            DependenciesInstallView(dependencies: viewModel.dependenciesObjects, dependencyUpdate: viewModel.dependencyUpdate)
+        }
         .frame(minWidth: 1300.0)
         .padding(.top, 21.0)
     }
@@ -936,9 +939,11 @@ struct ShortcutsView: View {
     }
     
     private func openCreateNewUtilityWindow() {
+        newUtilityWindow?.close()
+        newUtilityWindow = nil
         if nil == newUtilityWindow {
             newUtilityWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
+                contentRect: NSRect(x: 0, y: 0, width: 1150, height: 500),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -946,23 +951,25 @@ struct ShortcutsView: View {
             newUtilityWindow?.center()
             newUtilityWindow?.setFrameAutosaveName("NewUtility")
             newUtilityWindow?.isReleasedWhenClosed = false
-            newUtilityWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
+            newUtilityWindow?.titlebarAppearsTransparent = true
+            newUtilityWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newUtilityWindow) else {
+                return
+            }
+            
+            newUtilityWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: SelectUtilityTypeWindowView(
                 connectionManager: viewModel.connectionManager,
                 categories: viewModel.allCategories(),
                 delegate: viewModel,
                 closeAction: {
-                    tab = .utilities
                     newUtilityWindow?.close()
                 }))
+            newUtilityWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newUtilityWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         }
-        newUtilityWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
-            connectionManager: viewModel.connectionManager,
-            categories: viewModel.allCategories(),
-            delegate: viewModel,
-            closeAction: {
-                tab = .utilities
-                newUtilityWindow?.close()
-            }))
         newUtilityWindow?.makeKeyAndOrderFront(nil)
     }
     
