@@ -115,9 +115,10 @@ extension ConnectionManager {
                     return
                 }
                 if let script = shortcutItem.scriptCode {
-                    execute(script) { error in
+                    execute(script) { [weak self] error in
+                        guard let self else { return }
                         if error.description.lowercased().contains("error") {
-                            self.localError = error.description
+                            self.localError = self.extractAppleScriptErrorMessage(from: error.description)
                             self.showsLocalError = true
                         }
                     }
@@ -133,6 +134,29 @@ extension ConnectionManager {
                 break
             }
         }
+    }
+    
+    func extractAppleScriptErrorMessage(from errorString: String) -> String? {
+        var errorDict: [String: String] = [:]
+
+        // Regex pattern to extract key-value pairs
+        let pattern = #"([A-Za-z0-9]+)\s*=\s*"(.*?)";"#
+
+        let regex = try? NSRegularExpression(pattern: pattern, options: [])
+        let range = NSRange(errorString.startIndex..., in: errorString)
+
+        regex?.enumerateMatches(in: errorString, options: [], range: range) { match, _, _ in
+            if let match = match,
+               let keyRange = Range(match.range(at: 1), in: errorString),
+               let valueRange = Range(match.range(at: 2), in: errorString) {
+                let key = errorString[keyRange]
+                let value = errorString[valueRange]
+                errorDict[String(key)] = String(value)
+            }
+        }
+
+        // Prioritize full message > brief message
+        return errorDict["NSAppleScriptErrorMessage"] ?? errorDict["NSAppleScriptErrorBriefMessage"]
     }
     
     func getURLs(from browser: Browsers) -> [String] {
@@ -235,7 +259,7 @@ extension ConnectionManager {
                             execute(script) { error in
                                 if error.description.lowercased().contains("error") {
                                     DispatchQueue.main.async {
-                                        self.localError = error.description
+                                        self.localError = self.extractAppleScriptErrorMessage(from: error.description)
                                         self.showsLocalError = true
                                     }
                                 }
