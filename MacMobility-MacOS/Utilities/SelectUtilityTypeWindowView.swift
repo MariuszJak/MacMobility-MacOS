@@ -149,6 +149,8 @@ struct SelectUtilityTypeWindowView: View {
     }
     
     private func openCreateNewUtilityWindow(type: UtilityObject.UtilityType, title: String, item: ShortcutObject? = nil) {
+        newWindow?.close()
+        newWindow = nil
         if nil == newWindow {
             if title == "File Converter" {
                 newWindow = NSWindow(

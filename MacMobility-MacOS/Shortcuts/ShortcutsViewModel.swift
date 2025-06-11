@@ -55,6 +55,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clear(key: .assignedAppsToPages)
+//        UserDefaults.standard.clearAll()
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
