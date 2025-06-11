@@ -15,7 +15,7 @@ class IconPickerViewModel: ObservableObject {
     @Published var isFetchingIcon: Bool = false
     private let shouldAutofetchImage: Bool
     var userSelectedIconAction: (() -> Void)?
-    var completion: (NSImage) -> Void
+    var completion: ((NSImage) -> Void)?
     private var cancellables = Set<AnyCancellable>()
     let resizeSize: CGSize = .init(width: 150, height: 150)
     
@@ -45,19 +45,22 @@ class IconPickerViewModel: ObservableObject {
                 guard let self else { return }
                 if let text, !text.isEmpty, text.containsValidDomain {
                     self.isFetchingIcon = true
-                    self.fetchHighResIcon(from: text) { image in
+                    self.fetchHighResIcon(from: text) { [weak self] image in
+                        guard let self else { return }
                         if let image {
                             self.assignImage(image)
                             print("Assigned from 1")
                             self.isFetchingIcon = false
                         } else {
-                            self.fetchFaviconFromHTML(for: text) { image in
+                            self.fetchFaviconFromHTML(for: text) { [weak self] image in
+                                guard let self else { return }
                                 if let image {
                                     self.assignImage(image)
                                     print("Assigned from 2")
                                     self.isFetchingIcon = false
                                 } else {
-                                    self.fetchFavicon(for: text) { _ in
+                                    self.fetchFavicon(for: text) { [weak self] _ in
+                                        guard let self else { return }
                                         DispatchQueue.main.async {
                                             self.isFetchingIcon = false
                                         }
@@ -92,7 +95,7 @@ class IconPickerViewModel: ObservableObject {
             guard let self else { return }
             let resized = image.resizedImage(newSize: self.resizeSize)
             self.selectedImage = resized
-            self.completion(resized)
+            self.completion?(resized)
             if userSelected {
                 self.userSelectedIconAction?()
             }
