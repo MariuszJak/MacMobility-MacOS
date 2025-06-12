@@ -469,7 +469,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             let oldObject = configuredShortcuts[index]
             configuredShortcuts[index] = object
             configuredShortcuts.enumerated().forEach { (index, shortcut) in
-                if (object.index != shortcut.index && shortcut.id == object.id) {
+                if (object.index != shortcut.index && shortcut.id == object.id && shortcut.page == object.page) {
                     configuredShortcuts[index] = .init(
                         type: oldObject.type,
                         page: configuredShortcuts[index].page,
