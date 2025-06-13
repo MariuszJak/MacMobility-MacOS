@@ -316,16 +316,20 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 ? option.scripts
                 : option.scripts.filter { !($0.isAdvanced ?? false) }
                 var i: Int = 0
+                
                 filtered.enumerated().forEach { (index, script) in
-                    i += 1
                     if script.script.contains("URLs"), let browser {
                         if script.script.contains(browser.name.uppercased()) {
-                            let so: ShortcutObject = .from(script: script, at: index)
+                            let so: ShortcutObject = .from(script: script, at: i)
                             addConfiguredShortcut(object: so)
+                            i += 1
                         }
                     } else {
-                        let so: ShortcutObject = .from(script: script, at: index)
-                        addConfiguredShortcut(object: so)
+                        if !script.script.contains("URLs") {
+                            let so: ShortcutObject = .from(script: script, at: i)
+                            addConfiguredShortcut(object: so)
+                            i += 1
+                        }
                     }
                 }
                 var websitesSO: [ShortcutObject] = []
