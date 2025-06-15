@@ -109,6 +109,7 @@ extension UserDefaults {
         case lifecycle
         case browser
         case assignedAppsToPages
+        case quickActionItems
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {

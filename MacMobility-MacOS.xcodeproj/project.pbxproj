@@ -33,6 +33,7 @@
 		C08BBAA22DD67D31007F561B /* TCPServerStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */; };
 		C08BBAA42DD67D71007F561B /* ScreenViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA32DD67D71007F561B /* ScreenViewManager.swift */; };
 		C09084DA2DFED7CD00DFE172 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */; };
+		C09084DC2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */; };
 		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
 		C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */; };
 		C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775332B5C319E00F4FFE6 /* Assets.xcassets */; };
@@ -164,6 +165,7 @@
 		C08BBAA52DD67D8E007F561B /* CGVirtualDisplayPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CGVirtualDisplayPrivate.h; sourceTree = "<group>"; };
 		C08BBAA62DD67DC0007F561B /* MacMobility-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MacMobility-Bridging-Header.h"; sourceTree = "<group>"; };
 		C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
+		C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewSetup.swift; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -293,6 +295,7 @@
 				C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */,
 				C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */,
 				C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */,
+				C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -786,6 +789,7 @@
 				C065EC042DC0DE5100000B8C /* ShortcutObject+Ext.swift in Sources */,
 				C0F67EE22D973EF90090D568 /* URL+Ext.swift in Sources */,
 				C035810E2DB65091009E22F5 /* VisualEffect.swift in Sources */,
+				C09084DC2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift in Sources */,
 				C0F67EDE2D973EB20090D568 /* DBSDataProvider.swift in Sources */,
 				C0F67EE92D973F2B0090D568 /* LicenseValidationUseCase.swift in Sources */,
 				C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */,

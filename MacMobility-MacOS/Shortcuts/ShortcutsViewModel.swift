@@ -21,6 +21,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var installedApps: [ShortcutObject] = []
     @Published var appsAddedByUser: [ShortcutObject] = []
     @Published var webpages: [ShortcutObject] = []
+    @Published var quickActionItems: [ShortcutObject] = []
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     @Published var pages = 1
@@ -54,7 +55,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     
     init(connectionManager: ConnectionManager) {
-//        UserDefaults.standard.clear(key: .assignedAppsToPages)
+//        UserDefaults.standard.clear(key: .quickActionItems)
 //        UserDefaults.standard.clearAll()
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
@@ -62,6 +63,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         self.utilities = UserDefaults.standard.get(key: .utilities) ?? []
         self.pages = UserDefaults.standard.get(key: .pages) ?? 1
         self.appsAddedByUser = UserDefaults.standard.get(key: .userApps) ?? []
+        self.quickActionItems = UserDefaults.standard.get(key: .quickActionItems) ?? (0..<10).map { .empty(for: $0) }
         self.automations = loadJSON("automations")
         connectionManager.assignedAppsToPages = UserDefaults.standard.get(key: .assignedAppsToPages) ?? []
         fetchShortcuts()
@@ -88,6 +90,11 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         dependencyUpdate = { updates in
             self.updateDependenciesOfObject(with: self.idOfObjectToReplaceDependencies, replacements: updates)
         }
+    }
+    
+    func saveQuickActionItems(_ items: [ShortcutObject]) {
+        self.quickActionItems = items
+        UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
     }
     
     func replace(app path: String, to page: Int) {
@@ -385,7 +392,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func allObjects() -> [ShortcutObject] {
-        shortcuts + installedApps + webpages + utilities
+        shortcuts + installedApps + webpages + utilities + appsAddedByUser
     }
     
     func removeShortcut(id: String, page: Int) {
@@ -864,5 +871,11 @@ extension Array {
             }
         }
         return indexes
+    }
+}
+
+extension ShortcutObject {
+    static func empty(for index: Int) -> ShortcutObject {
+        .init(type: .app, page: 0, index: index, id: "EMPTY \(index)", title: "EMPTY")
     }
 }

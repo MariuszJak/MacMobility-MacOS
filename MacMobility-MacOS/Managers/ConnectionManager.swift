@@ -56,6 +56,7 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var bitrate: CGFloat? = 1
     @Published var streamConnectionState: StreamConnectionState = .notConnected
     @Published var displayID: CGDirectDisplayID?
+    @Published var listenerAdded: Bool = false
     public var assignedAppsToPages: [AssignedAppsToPages] = [] {
         didSet {
             self.send(assignedAppsToPages: assignedAppsToPages)

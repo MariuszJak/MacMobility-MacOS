@@ -36,6 +36,7 @@ struct ShortcutsView: View {
     @State private var automationItemWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
     @State private var companionAppWindow: NSWindow?
+    @State private var quickActionSetupWindow: NSWindow?
     @State private var circularWindow: NSWindow?
     @State private var shouldShowCompanionRequestPopup: Bool = false
     @State private var selectedTab = 0
@@ -184,6 +185,16 @@ struct ShortcutsView: View {
                     }
                     .padding(.all, 3.0)
                 }
+                BlueButton(
+                    title: "Quick Action Menu",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    backgroundColor: .clear
+                ) {
+                    openQuickActionWindow()
+                }
+                .padding(.all, 3.0)
                 Spacer()
                 AnimatedSearchBar(searchText: $viewModel.searchText)
                     .padding(.all, 3.0)
@@ -349,6 +360,7 @@ struct ShortcutsView: View {
     }
     
     func setupKeyboardListener() {
+        guard !viewModel.connectionManager.listenerAdded else { return }
         NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
             if event.modifierFlags.contains([.control, .option]) && event.keyCode == 49 {
                 openCircularWindow()
@@ -366,6 +378,7 @@ struct ShortcutsView: View {
                 circularWindow = nil
             }
         }
+        viewModel.connectionManager.listenerAdded = true
     }
     
     @ViewBuilder
@@ -966,9 +979,10 @@ struct ShortcutsView: View {
             circularWindow?.level = .floating
             let hostingController = NSHostingController(
                 rootView: QuickActionsView(
-                    viewModel: .init(items: viewModel.configuredShortcuts), action: { item in
+                    viewModel: .init(items: viewModel.quickActionItems), action: { item in
                         viewModel.connectionManager.runShortuct(for: item)
                         circularWindow?.close()
+                        circularWindow = nil
                     }
                 )
             )
@@ -1043,6 +1057,43 @@ struct ShortcutsView: View {
             hv.view.autoresizingMask = [.width, .height]
         }
         newUtilityWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openQuickActionWindow() {
+        quickActionSetupWindow?.close()
+        quickActionSetupWindow = nil
+        if nil == quickActionSetupWindow {
+            quickActionSetupWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            quickActionSetupWindow?.center()
+            quickActionSetupWindow?.setFrameAutosaveName("QuickActionSetupWindow")
+            quickActionSetupWindow?.isReleasedWhenClosed = false
+            quickActionSetupWindow?.titlebarAppearsTransparent = true
+            quickActionSetupWindow?.styleMask.insert(.fullSizeContentView)
+            quickActionSetupWindow?.level = .floating
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: quickActionSetupWindow) else {
+                return
+            }
+            
+            quickActionSetupWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: QuicActionMenuSetupView(
+                setupViewModel: .init(
+                    items: viewModel.quickActionItems,
+                    allItems: viewModel.allObjects()),
+                action: { items in
+                    viewModel.saveQuickActionItems(items)
+                    quickActionSetupWindow?.close()
+                })
+            )
+            quickActionSetupWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = quickActionSetupWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        quickActionSetupWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openAutomationItemWindow(_ item: AutomationItem) {
