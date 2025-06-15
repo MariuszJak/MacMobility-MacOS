@@ -34,16 +34,14 @@ struct QuickActionsView: View {
             ForEach(Array(viewModel.items.enumerated()), id: \.offset) { (index, item) in
                 let angle = Angle.degrees(Double(index) / Double(buttonCount) * 360)
                 ZStack {
-                    VStack {
-                        if index == item.index, item.id != "EMPTY \(index)" {
-                            itemView(object: item)
-                                .onTapGesture {
-                                    action(item)
-                                }
-                        } else {
-                            RoundedBackgroundView(size: frame)
-                                .frame(width: frame.width, height: frame.height)
-                        }
+                    if index == item.index, item.id != "EMPTY \(index)" {
+                        itemView(object: item)
+                            .onTapGesture {
+                                action(item)
+                            }
+                    } else {
+                        RoundedBackgroundView(size: frame)
+                            .frame(width: frame.width, height: frame.height)
                     }
                 }
                 .offset(x: cos(angle.radians) * radius,

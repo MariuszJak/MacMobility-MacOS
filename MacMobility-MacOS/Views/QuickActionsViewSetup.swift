@@ -10,9 +10,9 @@ import SwiftUI
 
 struct QuicActionMenuSetupView: View {
     let setupViewModel: QuickActionsViewSetupModel
-    let action: ([ShortcutObject]) -> Void
+    let action: ([ShortcutObject]?) -> Void
     
-    init(setupViewModel: QuickActionsViewSetupModel, action: @escaping ([ShortcutObject]) -> Void) {
+    init(setupViewModel: QuickActionsViewSetupModel, action: @escaping ([ShortcutObject]?) -> Void) {
         self.setupViewModel = setupViewModel
         self.action = action
     }
@@ -28,7 +28,7 @@ struct QuicActionMenuSetupView: View {
         .padding()
         HStack {
             BlueButton(title: "Cancel", font: .callout, padding: 12.0, backgroundColor: .gray) {
-                action(setupViewModel.items)
+                action(nil)
             }
             .padding(.trailing, 6.0)
             BlueButton(title: "Save", font: .callout, padding: 12.0) {
@@ -53,19 +53,39 @@ class QuickActionsViewSetupModel: ObservableObject {
         (allItems + items).first { $0.id == id }
     }
     
-    func addItem(_ item: ShortcutObject, at index: Int) {
-        var tmp = item
-        tmp.index = index
-        items[index] = tmp
+    func add(_ object: ShortcutObject, at newIndex: Int = 0) {
+        if let oldIndex = items.firstIndex(where: { $0.id == object.id && items[newIndex].title != "EMPTY" }) {
+            let oldObject = items[newIndex]
+            var tmp = object
+            tmp.index = newIndex
+            items[newIndex] = tmp
+            
+            var tmp2 = oldObject
+            tmp2.index = oldIndex
+            items[oldIndex] = tmp2
+        } else {
+            items.enumerated().forEach { (i, item) in
+                if item.id == object.id {
+                    items[i] = .empty(for: i)
+                }
+            }
+            var tmp = object
+            tmp.index = newIndex
+            items[newIndex] = tmp
+        }
+    }
+    
+    func remove(at index: Int) {
+        items[index] = .empty(for: index)
     }
 }
 
 struct QuickActionsViewSetup: View {
     @ObservedObject private var viewModel: QuickActionsViewSetupModel
     
-    let cornerRadius = 20.0
+    let cornerRadius = 30.0
     let radius: CGFloat = 100
-    let frame = CGSize(width: 40, height: 40)
+    let frame = CGSize(width: 50, height: 50)
     
     init(viewModel: QuickActionsViewSetupModel) {
         self.viewModel = viewModel
@@ -75,27 +95,37 @@ struct QuickActionsViewSetup: View {
         ZStack {
             ForEach(Array(viewModel.items.enumerated()), id: \.offset) { (index, item) in
                 let angle = Angle.degrees(Double(index) / Double(viewModel.buttonCount) * 360)
-                ZStack {
-                    VStack {
-                        if index == item.index, item.id != "EMPTY \(index)" {
+                VStack {
+                    if index == item.index, item.id != "EMPTY \(index)" {
+                        ZStack {
                             itemView(object: item)
                                 .onDrag {
                                     NSItemProvider(object: item.id as NSString)
                                 }
-                        } else {
-                            PlusButtonView(size: frame)
-                        }
-                    }
-                    .onDrop(of: [.text], isTargeted: nil) { providers in
-                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                            if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
-                                DispatchQueue.main.async {
-                                    viewModel.addItem(object, at: index)
+                            VStack {
+                                HStack {
+                                    Spacer()
+                                    RedXButton {
+                                        viewModel.remove(at: index)
+                                    }
                                 }
+                                Spacer()
                             }
                         }
-                        return true
+                        .frame(width: frame.width, height: frame.height)
+                    } else {
+                        PlusButtonView(size: frame)
                     }
+                }
+                .onDrop(of: [.text], isTargeted: nil) { providers in
+                    providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                        if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
+                            DispatchQueue.main.async {
+                                viewModel.add(object, at: index)
+                            }
+                        }
+                    }
+                    return true
                 }
                 .offset(x: cos(angle.radians) * radius,
                         y: sin(angle.radians) * radius)

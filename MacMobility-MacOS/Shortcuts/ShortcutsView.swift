@@ -1085,7 +1085,9 @@ struct ShortcutsView: View {
                     items: viewModel.quickActionItems,
                     allItems: viewModel.allObjects()),
                 action: { items in
-                    viewModel.saveQuickActionItems(items)
+                    if let items {
+                        viewModel.saveQuickActionItems(items)
+                    }
                     quickActionSetupWindow?.close()
                 })
             )
