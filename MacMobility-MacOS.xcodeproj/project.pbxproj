@@ -34,6 +34,8 @@
 		C08BBAA42DD67D71007F561B /* ScreenViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA32DD67D71007F561B /* ScreenViewManager.swift */; };
 		C09084DA2DFED7CD00DFE172 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */; };
 		C09084DC2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */; };
+		C09084DE2E00309500DFE172 /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084DD2E00309500DFE172 /* HotKeyManager.swift */; };
+		C09084E22E003C0100DFE172 /* QAM_video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C09084E12E003C0100DFE172 /* QAM_video.mp4 */; };
 		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
 		C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */; };
 		C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775332B5C319E00F4FFE6 /* Assets.xcassets */; };
@@ -166,6 +168,8 @@
 		C08BBAA62DD67DC0007F561B /* MacMobility-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MacMobility-Bridging-Header.h"; sourceTree = "<group>"; };
 		C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
 		C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewSetup.swift; sourceTree = "<group>"; };
+		C09084DD2E00309500DFE172 /* HotKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyManager.swift; sourceTree = "<group>"; };
+		C09084E12E003C0100DFE172 /* QAM_video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = QAM_video.mp4; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -343,6 +347,7 @@
 				C0EAFC192D903E7400044947 /* TrialManager.swift */,
 				C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */,
 				C0D094202DBE35B900C8EAA4 /* KeyRecorder.swift */,
+				C09084DD2E00309500DFE172 /* HotKeyManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -434,6 +439,7 @@
 		C0C9B78E2DCD31D80068BCAB /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				C09084E12E003C0100DFE172 /* QAM_video.mp4 */,
 				C0C9B7932DCD35AD0068BCAB /* ipad-connect.mp4 */,
 				C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */,
 			);
@@ -679,6 +685,7 @@
 				C09775372B5C319E00F4FFE6 /* Preview Assets.xcassets in Resources */,
 				C0F67F062D982E990090D568 /* ANC ON.shortcut in Resources */,
 				C0F67F072D982E990090D568 /* Live Photo to GIF.shortcut in Resources */,
+				C09084E22E003C0100DFE172 /* QAM_video.mp4 in Resources */,
 				C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */,
 				C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */,
 				C0C9B7942DCD35AD0068BCAB /* ipad-connect.mp4 in Resources */,
@@ -731,6 +738,7 @@
 				C0EAFC182D9030D000044947 /* LicenseKeyGenerator.swift in Sources */,
 				C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */,
 				C0F67EE72D973F1D0090D568 /* LicenseValidationAPIProtocol.swift in Sources */,
+				C09084DE2E00309500DFE172 /* HotKeyManager.swift in Sources */,
 				C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */,
 				C065EBFC2DC0DDF300000B8C /* ExploreAutomationsView.swift in Sources */,
 				C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */,

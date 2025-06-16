@@ -74,16 +74,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         connectionManager
             .$streamConnectionState
             .receive(on: DispatchQueue.main)
-            .sink { value in
-                self.streamConnectionState = value
+            .sink { [weak self] value in
+                self?.streamConnectionState = value
             }
             .store(in: &cancellables)
         
         connectionManager
             .$displayID
             .receive(on: DispatchQueue.main)
-            .sink { value in
-                self.displayID = value
+            .sink { [weak self] value in
+                self?.displayID = value
             }
             .store(in: &cancellables)
         

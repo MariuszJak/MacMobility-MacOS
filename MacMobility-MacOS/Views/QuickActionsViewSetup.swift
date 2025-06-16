@@ -10,9 +10,9 @@ import SwiftUI
 
 struct QuicActionMenuSetupView: View {
     let setupViewModel: QuickActionsViewSetupModel
-    let action: ([ShortcutObject]?) -> Void
+    let action: ([ShortcutObject]?, Bool) -> Void
     
-    init(setupViewModel: QuickActionsViewSetupModel, action: @escaping ([ShortcutObject]?) -> Void) {
+    init(setupViewModel: QuickActionsViewSetupModel, action: @escaping ([ShortcutObject]?, Bool) -> Void) {
         self.setupViewModel = setupViewModel
         self.action = action
     }
@@ -21,6 +21,8 @@ struct QuicActionMenuSetupView: View {
         VStack(alignment: .center) {
             Text("Quick Action Menu")
                 .font(.system(size: 18.0, weight: .bold))
+            Text("To open Quick Action Menu, press Control + Option + Space.")
+                .font(.system(size: 14.0, weight: .medium))
         }
         VStack {
             QuickActionsViewSetup(viewModel: setupViewModel)
@@ -28,11 +30,14 @@ struct QuicActionMenuSetupView: View {
         .padding()
         HStack {
             BlueButton(title: "Cancel", font: .callout, padding: 12.0, backgroundColor: .gray) {
-                action(nil)
+                action(nil, true)
             }
             .padding(.trailing, 6.0)
-            BlueButton(title: "Save", font: .callout, padding: 12.0) {
-                action(setupViewModel.items)
+            BlueButton(title: "Update", font: .callout, padding: 12.0) {
+                action(setupViewModel.items, false)
+            }
+            BlueButton(title: "Update & Close", font: .callout, padding: 12.0) {
+                action(setupViewModel.items, true)
             }
         }
         .padding(.trailing, 6.0)

@@ -18,6 +18,8 @@ class QuickActionsViewModel: ObservableObject {
 
 struct QuickActionsView: View {
     @ObservedObject private var viewModel: QuickActionsViewModel
+    @State private var hoveredIndex: Int? = nil
+    @State private var isVisible: Bool = false
     let buttonCount = 10
     let cornerRadius = 20.0
     let radius: CGFloat = 100
@@ -36,8 +38,13 @@ struct QuickActionsView: View {
                 ZStack {
                     if index == item.index, item.id != "EMPTY \(index)" {
                         itemView(object: item)
+                            .scaleEffect(index == hoveredIndex ? 1.3 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
                             .onTapGesture {
                                 action(item)
+                            }
+                            .onHover { hovering in
+                                hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
                             }
                     } else {
                         RoundedBackgroundView(size: frame)
@@ -49,14 +56,16 @@ struct QuickActionsView: View {
             }
         }
         .frame(width: 2 * radius + 80, height: 2 * radius + 80)
-        .background(
-            VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow)
-                .clipShape(Circle())
-                .opacity(0.9)
-        )
+        .background(.ultraThinMaterial)
+        .clipShape(Circle())
+        .scaleEffect(isVisible ? 1.0 : 0.6)
+        .opacity(isVisible ? 1.0 : 0.0)
         .onAppear {
             for window in NSApplication.shared.windows {
                 window.appearance = NSAppearance(named: .darkAqua)
+            }
+            withAnimation(.easeInOut) {
+                isVisible = true
             }
         }
     }
@@ -152,8 +161,6 @@ struct QuickActionsView: View {
         }
     }
 }
-
-import SwiftUI
 
 struct VisualEffectBlur: NSViewRepresentable {
     var material: NSVisualEffectView.Material

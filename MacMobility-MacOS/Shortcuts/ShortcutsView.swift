@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 enum StreamConnectionState {
     case notConnected
@@ -28,6 +29,7 @@ enum StreamConnectionState {
 }
 
 struct ShortcutsView: View {
+    @StateObject private var responder = HotKeyResponder.shared
     @ObservedObject private var viewModel: ShortcutsViewModel
     @State private var newWindow: NSWindow?
     @State private var newUtilityWindow: NSWindow?
@@ -44,6 +46,7 @@ struct ShortcutsView: View {
     
     @State private var resolutions: [DisplayMode] = []
     @State private var selectedMode: DisplayMode?
+    @State private var cancellables = Set<AnyCancellable>()
 
     @Namespace private var animation
     let cornerRadius = 17.0
@@ -361,11 +364,17 @@ struct ShortcutsView: View {
     
     func setupKeyboardListener() {
         guard !viewModel.connectionManager.listenerAdded else { return }
-        NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
-            if event.modifierFlags.contains([.control, .option]) && event.keyCode == 49 {
-                openCircularWindow()
+        HotKeyManager.shared.registerHotKey()
+        
+        responder
+            .$showWindow
+            .receive(on: DispatchQueue.main)
+            .sink { value in
+                if value {
+                    openCircularWindow()
+                }
             }
-        }
+            .store(in: &cancellables)
         
         NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { event in
             guard let window = circularWindow else { return }
@@ -1084,11 +1093,13 @@ struct ShortcutsView: View {
                 setupViewModel: .init(
                     items: viewModel.quickActionItems,
                     allItems: viewModel.allObjects()),
-                action: { items in
+                action: { items, shouldClose in
                     if let items {
                         viewModel.saveQuickActionItems(items)
                     }
-                    quickActionSetupWindow?.close()
+                    if shouldClose {
+                        quickActionSetupWindow?.close()
+                    }
                 })
             )
             quickActionSetupWindow?.contentView?.addSubview(hv.view)

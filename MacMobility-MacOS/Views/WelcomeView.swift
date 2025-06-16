@@ -19,7 +19,7 @@ struct WebsiteTest {
 
 class WelcomeViewModel: ObservableObject {
     @Published var currentPage = 0
-    let pageLimit = 7
+    let pageLimit = 8
     let closeAction: (SetupMode?, [AutomationOption]?, [WebsiteTest], Bool, Browsers) -> Void
     private(set) var createMultiactions: Bool = true
     private(set) var setupMode: SetupMode?
@@ -126,6 +126,8 @@ struct WelcomeView: View {
                             viewModel.updateBrowser(browser)
                         }
                 case 7:
+                    QuickActionVideoTutorialView()
+                case 8:
                     FinalScreenView {
                         viewModel.close()
                     }
@@ -300,6 +302,47 @@ struct OnboardingVideoComparisonView: View {
         .onAppear {
             leftPlayer.play()
             rightPlayer.play()
+        }
+    }
+
+    private func setupLoopingVideo(player: AVQueuePlayer, resource: String) {
+        guard let url = Bundle.main.url(forResource: resource, withExtension: "mp4") else { return }
+        let item = AVPlayerItem(url: url)
+        player.insert(item, after: nil)
+        player.actionAtItemEnd = .none
+
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { _ in
+            player.seek(to: .zero)
+            player.play()
+        }
+    }
+}
+
+struct QuickActionVideoTutorialView: View {
+    private let player = AVQueuePlayer()
+
+    init() {
+        setupLoopingVideo(player: player, resource: "QAM_video")
+    }
+
+    var body: some View {
+        VStack(spacing: 32) {
+            Text("Quick Action Menu")
+                .font(.title)
+                .fontWeight(.bold)
+
+            Text("You can access up to 10 action without companion app. Just setup your Quick Action Menu circle, and access it via control + option + space key shortcut.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            VideoPreviewView(player: player, title: "Access actions quickly", description: "To access, press control + option + space key.")
+                .frame(width: 360.0, height: 240.0)
+        }
+        .padding()
+        .onAppear {
+            player.play()
         }
     }
 

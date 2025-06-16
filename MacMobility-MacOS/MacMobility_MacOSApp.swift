@@ -18,10 +18,15 @@ struct MacMobility_MacOSApp: App {
     }
 }
 
+struct QAMTutorial: Codable {
+    let wasSeen: Bool
+}
+
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var permissionsWindow: NSWindow?
     private var welcomeWindow: NSWindow?
     private var shortcutsWindow: NSWindow?
+    private var qamTutorialWindow: NSWindow?
     private let connectionManager = ConnectionManager()
     var statusItem: NSStatusItem?
     var popOver = NSPopover()
@@ -47,10 +52,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         .store(in: &cancellables)
-//        UserDefaults.standard.clearAll()
+//        UserDefaults.standard.clear(key: .lifecycle)
+//        UserDefaults.standard.clear(key: .quickActionTutorialSeen)
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
         if lifecycle.openCount == 0 {
             openWelcomeWindow()
+            UserDefaults.standard.store(QAMTutorial(wasSeen: true), for: .quickActionTutorialSeen)
             UserDefaults.standard.store(Lifecycle(openCount: lifecycle.openCount + 1), for: .lifecycle)
         }
         if lifecycle.openCount == 1 {
@@ -59,6 +66,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if lifecycle.openCount > 1 {
             openShortcutsWindow()
+        }
+        let qamTutorial: QAMTutorial? = UserDefaults.standard.get(key: .quickActionTutorialSeen)
+        if qamTutorial == nil {
+            openQAMTutorialWindow()
+            UserDefaults.standard.store(QAMTutorial(wasSeen: true), for: .quickActionTutorialSeen)
+        } else if let qamTutorial, !qamTutorial.wasSeen {
+            openQAMTutorialWindow()
+            UserDefaults.standard.store(QAMTutorial(wasSeen: true), for: .quickActionTutorialSeen)
         }
         
         if let menuButton = statusItem?.button {
@@ -114,6 +129,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             hv.view.autoresizingMask = [.width, .height]
         }
         shortcutsWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    func openQAMTutorialWindow() {
+        qamTutorialWindow?.close()
+        shortcutsWindow = nil
+        if nil == qamTutorialWindow {
+            qamTutorialWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            qamTutorialWindow?.center()
+            qamTutorialWindow?.setFrameAutosaveName("QamTutorialWindow")
+            qamTutorialWindow?.isReleasedWhenClosed = false
+            qamTutorialWindow?.titlebarAppearsTransparent = true
+            qamTutorialWindow?.styleMask.insert(.fullSizeContentView)
+            let hv = NSHostingController(rootView: QuickActionVideoTutorialView())
+            qamTutorialWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = qamTutorialWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        qamTutorialWindow?.makeKeyAndOrderFront(nil)
     }
     
     func openWelcomeWindow() {

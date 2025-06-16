@@ -110,6 +110,7 @@ extension UserDefaults {
         case browser
         case assignedAppsToPages
         case quickActionItems
+        case quickActionTutorialSeen
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {
