@@ -637,6 +637,27 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
+            let qamIndexes = quickActionItems.allIndexes(where: { $0.id == webpageItem.id })
+            qamIndexes.forEach { index in
+                quickActionItems[index] = .init(
+                    type: webpageItem.type,
+                    page: quickActionItems[index].page,
+                    index: quickActionItems[index].index,
+                    path: webpageItem.path,
+                    id: webpageItem.id,
+                    title: webpageItem.title,
+                    color: webpageItem.color,
+                    faviconLink: webpageItem.faviconLink,
+                    browser: webpageItem.browser,
+                    imageData: webpageItem.imageData,
+                    scriptCode: webpageItem.scriptCode,
+                    utilityType: webpageItem.utilityType,
+                    objects: webpageItem.objects,
+                    showTitleOnIcon: webpageItem.showTitleOnIcon ?? true,
+                    category: webpageItem.category
+                )
+            }
+            UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
         } else {
             webpages.insert(webpageItem, at: 0)
         }
@@ -669,6 +690,27 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 )
             }
             UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+            let qamIndexes = quickActionItems.allIndexes(where: { $0.id == utilityItem.id })
+            qamIndexes.forEach { index in
+                quickActionItems[index] = .init(
+                    type: utilityItem.type,
+                    page: quickActionItems[index].page,
+                    index: quickActionItems[index].index,
+                    path: utilityItem.path,
+                    id: utilityItem.id,
+                    title: utilityItem.title,
+                    color: utilityItem.color,
+                    faviconLink: utilityItem.faviconLink,
+                    browser: utilityItem.browser,
+                    imageData: utilityItem.imageData,
+                    scriptCode: utilityItem.scriptCode,
+                    utilityType: utilityItem.utilityType,
+                    objects: utilityItem.objects,
+                    showTitleOnIcon: utilityItem.showTitleOnIcon ?? true,
+                    category: utilityItem.category
+                )
+            }
+            UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
         } else {
             utilities.insert(utilityItem, at: 0)
         }
