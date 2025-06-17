@@ -81,6 +81,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             menuButton.action = #selector(menuAction)
         }
         NSApp.setActivationPolicy(.accessory)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(openShortcuts),
+            name: .openShortcuts,
+            object: nil
+        )
+    }
+    
+    @objc func openShortcuts() {
+        openShortcutsWindow()
     }
     
     func showGlobalAlert(title: String, message: String) {

@@ -988,10 +988,16 @@ struct ShortcutsView: View {
             circularWindow?.level = .floating
             let hostingController = NSHostingController(
                 rootView: QuickActionsView(
-                    viewModel: .init(items: viewModel.quickActionItems), action: { item in
+                    viewModel: .init(
+                        items: viewModel.quickActionItems,
+                        allItems: viewModel.allObjects()
+                    ),
+                    action: { item in
                         viewModel.connectionManager.runShortuct(for: item)
                         circularWindow?.close()
                         circularWindow = nil
+                    }, update: { items in
+                        viewModel.saveQuickActionItems(items)
                     }
                 )
             )

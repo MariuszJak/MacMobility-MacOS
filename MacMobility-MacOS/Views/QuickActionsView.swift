@@ -10,9 +10,37 @@ import SwiftUI
 
 class QuickActionsViewModel: ObservableObject {
     @Published var items: [ShortcutObject] = []
+    private let allItems: [ShortcutObject]
     
-    init(items: [ShortcutObject]) {
+    init(items: [ShortcutObject], allItems: [ShortcutObject]) {
         self.items = items
+        self.allItems = allItems
+    }
+    
+    func object(for id: String) -> ShortcutObject? {
+        (allItems + items).first { $0.id == id }
+    }
+    
+    func add(_ object: ShortcutObject, at newIndex: Int = 0) {
+        if let oldIndex = items.firstIndex(where: { $0.id == object.id && items[newIndex].title != "EMPTY" }) {
+            let oldObject = items[newIndex]
+            var tmp = object
+            tmp.index = newIndex
+            items[newIndex] = tmp
+            
+            var tmp2 = oldObject
+            tmp2.index = oldIndex
+            items[oldIndex] = tmp2
+        } else {
+            items.enumerated().forEach { (i, item) in
+                if item.id == object.id || item.title == object.title {
+                    items[i] = .empty(for: i)
+                }
+            }
+            var tmp = object
+            tmp.index = newIndex
+            items[newIndex] = tmp
+        }
     }
 }
 
@@ -24,11 +52,17 @@ struct QuickActionsView: View {
     let cornerRadius = 20.0
     let radius: CGFloat = 100
     let action: (ShortcutObject) -> Void
+    let update: ([ShortcutObject]) -> Void
     let frame = CGSize(width: 40, height: 40)
     
-    init(viewModel: QuickActionsViewModel, action: @escaping (ShortcutObject) -> Void) {
+    init(
+        viewModel: QuickActionsViewModel,
+        action: @escaping (ShortcutObject) -> Void,
+        update: @escaping ([ShortcutObject]) -> Void
+    ) {
         self.viewModel = viewModel
         self.action = action
+        self.update = update
     }
 
     var body: some View {
@@ -46,14 +80,46 @@ struct QuickActionsView: View {
                             .onHover { hovering in
                                 hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
                             }
+                            
                     } else {
-                        RoundedBackgroundView(size: frame)
+                        PlusButtonView(size: frame)
                             .frame(width: frame.width, height: frame.height)
+                            .onTapGesture {
+                                NotificationCenter.default.post(
+                                    name: .openShortcuts,
+                                    object: nil,
+                                    userInfo: nil
+                                )
+                            }
                     }
+                }
+                .onDrop(of: [.text], isTargeted: nil) { providers in
+                    providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                        if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
+                            DispatchQueue.main.async {
+                                viewModel.add(object, at: index)
+                                update(viewModel.items)
+                            }
+                        }
+                    }
+                    return true
                 }
                 .offset(x: cos(angle.radians) * radius,
                         y: sin(angle.radians) * radius)
             }
+            Image(systemName: "gear")
+                .resizable()
+                .frame(width: 20, height: 20)
+                .padding(40)
+                .background(Circle().stroke(Color.primary.opacity(0.3), lineWidth: 1))
+                .contentShape(Circle())
+                .onTapGesture {
+                    NotificationCenter.default.post(
+                        name: .openShortcuts,
+                        object: nil,
+                        userInfo: nil
+                    )
+                }
         }
         .frame(width: 2 * radius + 80, height: 2 * radius + 80)
         .background(.ultraThinMaterial)
