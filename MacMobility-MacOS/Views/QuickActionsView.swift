@@ -33,7 +33,7 @@ class QuickActionsViewModel: ObservableObject {
             items[oldIndex] = tmp2
         } else {
             items.enumerated().forEach { (i, item) in
-                if item.id == object.id || item.title == object.title {
+                if item.id == object.id {
                     items[i] = .empty(for: i)
                 }
             }
@@ -42,12 +42,17 @@ class QuickActionsViewModel: ObservableObject {
             items[newIndex] = tmp
         }
     }
+    
+    func remove(at index: Int) {
+        items[index] = .empty(for: index)
+    }
 }
 
 struct QuickActionsView: View {
     @ObservedObject private var viewModel: QuickActionsViewModel
     @State private var hoveredIndex: Int? = nil
     @State private var isVisible: Bool = false
+    @State private var isEditing: Bool = false
     let buttonCount = 10
     let cornerRadius = 20.0
     let radius: CGFloat = 100
@@ -71,26 +76,47 @@ struct QuickActionsView: View {
                 let angle = Angle.degrees(Double(index) / Double(buttonCount) * 360)
                 ZStack {
                     if index == item.index, item.id != "EMPTY \(index)" {
-                        itemView(object: item)
-                            .scaleEffect(index == hoveredIndex ? 1.3 : 1.0)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
-                            .onTapGesture {
-                                action(item)
+                        ZStack {
+                            itemView(object: item)
+                                .if(!isEditing) {
+                                    $0.scaleEffect(index == hoveredIndex ? 1.3 : 1.0)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
+                                    .onTapGesture {
+                                        action(item)
+                                    }
+                                    .onHover { hovering in
+                                        hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
+                                    }
+                                }
+                            if isEditing {
+                                VStack {
+                                    HStack {
+                                        Spacer()
+                                        RedXButton {
+                                            viewModel.remove(at: index)
+                                            update(viewModel.items)
+                                        }
+                                    }
+                                    Spacer()
+                                }
                             }
-                            .onHover { hovering in
-                                hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
-                            }
-                            
+                        }
+                        .frame(width: 60, height: 60)
                     } else {
-                        PlusButtonView(size: frame)
-                            .frame(width: frame.width, height: frame.height)
-                            .onTapGesture {
-                                NotificationCenter.default.post(
-                                    name: .openShortcuts,
-                                    object: nil,
-                                    userInfo: nil
-                                )
-                            }
+                        if isEditing {
+                            PlusButtonView(size: frame)
+                                .frame(width: frame.width, height: frame.height)
+                                .onTapGesture {
+                                    NotificationCenter.default.post(
+                                        name: .openShortcuts,
+                                        object: nil,
+                                        userInfo: nil
+                                    )
+                                }
+                        } else {
+                            RoundedBackgroundView(size: frame)
+                                .frame(width: frame.width, height: frame.height)
+                        }
                     }
                 }
                 .onDrop(of: [.text], isTargeted: nil) { providers in
@@ -107,19 +133,27 @@ struct QuickActionsView: View {
                 .offset(x: cos(angle.radians) * radius,
                         y: sin(angle.radians) * radius)
             }
-            Image(systemName: "gear")
-                .resizable()
-                .frame(width: 20, height: 20)
-                .padding(40)
-                .background(Circle().stroke(Color.primary.opacity(0.3), lineWidth: 1))
-                .contentShape(Circle())
-                .onTapGesture {
-                    NotificationCenter.default.post(
-                        name: .openShortcuts,
-                        object: nil,
-                        userInfo: nil
-                    )
+            VStack {
+                Button(isEditing ? "Save" : "Edit") {
+                    isEditing.toggle()
+                    if isEditing {
+                        NotificationCenter.default.post(
+                            name: .openShortcuts,
+                            object: nil,
+                            userInfo: nil
+                        )
+                    } else {
+                        NotificationCenter.default.post(
+                            name: .closeShortcuts,
+                            object: nil,
+                            userInfo: nil
+                        )
+                    }
                 }
+            }
+            .padding(40)
+            .background(Circle().stroke(Color.primary.opacity(0.3), lineWidth: 1))
+            .contentShape(Circle())
         }
         .frame(width: 2 * radius + 80, height: 2 * radius + 80)
         .background(.ultraThinMaterial)

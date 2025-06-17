@@ -397,4 +397,5 @@ extension ConnectionManager: MCSessionDelegate {
 extension Notification.Name {
     static let extendScreen = Notification.Name("extendScreen")
     static let openShortcuts = Notification.Name("openShortcuts")
+    static let closeShortcuts = Notification.Name("closeShortcuts")
 }

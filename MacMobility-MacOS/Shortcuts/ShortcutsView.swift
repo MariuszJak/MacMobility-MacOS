@@ -385,6 +385,11 @@ struct ShortcutsView: View {
             if !windowFrame.contains(mouseLocation) {
                 circularWindow?.close()
                 circularWindow = nil
+                NotificationCenter.default.post(
+                    name: .closeShortcuts,
+                    object: nil,
+                    userInfo: nil
+                )
             }
         }
         viewModel.connectionManager.listenerAdded = true
