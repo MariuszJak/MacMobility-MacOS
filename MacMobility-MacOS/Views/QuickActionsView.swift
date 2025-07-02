@@ -55,10 +55,14 @@ struct QuickActionsView: View {
     @State private var isEditing: Bool = false
     let buttonCount = 10
     let cornerRadius = 20.0
-    let radius: CGFloat = 100
+    let radius: CGFloat = 120
     let action: (ShortcutObject) -> Void
     let update: ([ShortcutObject]) -> Void
     let frame = CGSize(width: 40, height: 40)
+    let thickness: CGFloat = 60
+    
+    let sliceCount = 10
+    let sliceAngle = 360.0 / 10.0
     
     init(
         viewModel: QuickActionsViewModel,
@@ -69,70 +73,79 @@ struct QuickActionsView: View {
         self.action = action
         self.update = update
     }
-
+    
     var body: some View {
         ZStack {
-            ForEach(Array(viewModel.items.enumerated()), id: \.offset) { (index, item) in
-                let angle = Angle.degrees(Double(index) / Double(buttonCount) * 360)
-                ZStack {
-                    if index == item.index, item.id != "EMPTY \(index)" {
-                        ZStack {
-                            itemView(object: item)
-                                .if(!isEditing) {
-                                    $0.scaleEffect(index == hoveredIndex ? 1.3 : 1.0)
-                                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
-                                    .onTapGesture {
-                                        action(item)
+            ZStack {
+                ForEach(Array(viewModel.items.enumerated()), id: \.offset) { (index, item) in
+                    let angle = Angle.degrees(Double(index) / Double(buttonCount) * 360)
+                    CircleSlice(index: index, sliceAngle: sliceAngle, thickness: 60)
+                        .scaleEffect(index == hoveredIndex ? 1.05 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
+                    ZStack {
+                        if index == item.index, item.id != "EMPTY \(index)" {
+                            ZStack {
+                                itemView(object: item)
+                                    .if(!isEditing) {
+                                        $0.scaleEffect(index == hoveredIndex ? 1.3 : 1.0)
+                                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
+                                            .onTapGesture {
+                                                action(item)
+                                            }
+                                            .onHover { hovering in
+                                                hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
+                                            }
                                     }
-                                    .onHover { hovering in
-                                        hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
-                                    }
-                                }
-                            if isEditing {
-                                VStack {
-                                    HStack {
-                                        Spacer()
-                                        RedXButton {
-                                            viewModel.remove(at: index)
-                                            update(viewModel.items)
+                                    .shadow(color: .black.opacity(0.6), radius: 4.0)
+                                if isEditing {
+                                    VStack {
+                                        HStack {
+                                            Spacer()
+                                            RedXButton {
+                                                viewModel.remove(at: index)
+                                                update(viewModel.items)
+                                            }
                                         }
+                                        Spacer()
                                     }
-                                    Spacer()
                                 }
                             }
-                        }
-                        .frame(width: 60, height: 60)
-                    } else {
-                        if isEditing {
-                            PlusButtonView(size: frame)
-                                .frame(width: frame.width, height: frame.height)
-                                .onTapGesture {
-                                    NotificationCenter.default.post(
-                                        name: .openShortcuts,
-                                        object: nil,
-                                        userInfo: nil
-                                    )
-                                }
+                            .frame(width: 60.0, height: 60.0)
+                            
                         } else {
-                            RoundedBackgroundView(size: frame)
-                                .frame(width: frame.width, height: frame.height)
-                        }
-                    }
-                }
-                .onDrop(of: [.text], isTargeted: nil) { providers in
-                    providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                        if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
-                            DispatchQueue.main.async {
-                                viewModel.add(object, at: index)
-                                update(viewModel.items)
+                            if isEditing {
+                                PlusButtonView(size: frame)
+                                    .frame(width: frame.width, height: frame.height)
+                                    .onTapGesture {
+                                        NotificationCenter.default.post(
+                                            name: .openShortcuts,
+                                            object: nil,
+                                            userInfo: nil
+                                        )
+                                    }
+                            } else {
+                                RoundedBackgroundView(size: frame)
+                                    .frame(width: frame.width, height: frame.height)
                             }
                         }
                     }
-                    return true
+                    .onDrop(of: [.text], isTargeted: nil) { providers in
+                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                            if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
+                                DispatchQueue.main.async {
+                                    viewModel.add(object, at: index)
+                                    update(viewModel.items)
+                                }
+                            }
+                        }
+                        return true
+                    }
+                    .offset(x: cos(angle.radians) * (radius * (index == hoveredIndex ? 1.05 : 1.0)),
+                            y: sin(angle.radians) * (radius * (index == hoveredIndex ? 1.05 : 1.0)))
+                    .zIndex(1000)
                 }
-                .offset(x: cos(angle.radians) * radius,
-                        y: sin(angle.radians) * radius)
             }
+            .frame(width: 300, height: 300)
             VStack {
                 Button(isEditing ? "Save" : "Edit") {
                     isEditing.toggle()
@@ -151,15 +164,10 @@ struct QuickActionsView: View {
                     }
                 }
             }
-            .padding(40)
-            .background(Circle().stroke(Color.primary.opacity(0.3), lineWidth: 1))
-            .contentShape(Circle())
         }
-        .frame(width: 2 * radius + 80, height: 2 * radius + 80)
-        .background(.ultraThinMaterial)
-        .clipShape(Circle())
         .scaleEffect(isVisible ? 1.0 : 0.6)
         .opacity(isVisible ? 1.0 : 0.0)
+        .frame(width: 400, height: 400)
         .onAppear {
             for window in NSApplication.shared.windows {
                 window.appearance = NSAppearance(named: .darkAqua)
@@ -262,6 +270,34 @@ struct QuickActionsView: View {
     }
 }
 
+struct CircleSlice: View {
+    let index: Int
+    let sliceAngle: Double
+    let thickness: CGFloat
+
+    // Precomputed angles
+    var startAngle: Angle { .degrees(-20) }
+    var rotation: Angle { .degrees(Double(index) * sliceAngle) }
+
+    var body: some View {
+        let sliceShape = CircleSliceShape(
+            startAngle: startAngle,
+            sliceAngle: .degrees(sliceAngle),
+            thickness: thickness
+        )
+
+        return sliceShape
+            .fill(Color.black.opacity(0.5))
+            .rotationEffect(rotation)
+            .overlay {
+                sliceShape
+                    .stroke(Color.black.opacity(0.2), lineWidth: 0.5)
+                    .rotationEffect(rotation)
+            }
+            .contentShape(sliceShape)
+    }
+}
+
 struct VisualEffectBlur: NSViewRepresentable {
     var material: NSVisualEffectView.Material
     var blendingMode: NSVisualEffectView.BlendingMode
@@ -276,4 +312,37 @@ struct VisualEffectBlur: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
+}
+
+struct CircleSliceShape: Shape {
+    var startAngle: Angle = .degrees(-15)
+    var sliceAngle: Angle = .degrees(36) // 1/10th of a circle
+    var thickness: CGFloat = 50          // Thickness of the slice
+
+    func path(in rect: CGRect) -> Path {
+        let radius = min(rect.width, rect.height) / 2
+        let innerRadius = radius - thickness
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+
+        let endAngle = startAngle + sliceAngle
+
+        var path = Path()
+        
+        // Outer arc
+        path.addArc(center: center,
+                    radius: radius,
+                    startAngle: startAngle,
+                    endAngle: endAngle,
+                    clockwise: false)
+
+        // Line to inner arc
+        path.addArc(center: center,
+                    radius: innerRadius,
+                    startAngle: endAngle,
+                    endAngle: startAngle,
+                    clockwise: true)
+
+        path.closeSubpath()
+        return path
+    }
 }

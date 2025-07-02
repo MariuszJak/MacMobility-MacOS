@@ -293,11 +293,11 @@
 				C03581072DB6501E009E22F5 /* IconPickerView.swift */,
 				C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */,
 				C035810D2DB65091009E22F5 /* VisualEffect.swift */,
-				C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */,
 				C065EBFD2DC0DE1500000B8C /* InstallAutomationsView.swift */,
 				C065EBFF2DC0DE2400000B8C /* AutomationInstallView.swift */,
 				C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */,
 				C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */,
+				C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */,
 				C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */,
 				C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */,
 			);
