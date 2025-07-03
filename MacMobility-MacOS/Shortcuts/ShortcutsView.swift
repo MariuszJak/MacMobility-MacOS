@@ -977,7 +977,7 @@ struct ShortcutsView: View {
         circularWindow = nil
         if nil == circularWindow {
             circularWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 400),
+                contentRect: NSRect(x: 0, y: 0, width: 380, height: 380),
                 styleMask: [.borderless],
                 backing: .buffered,
                 defer: false
@@ -1007,7 +1007,7 @@ struct ShortcutsView: View {
                 )
             )
             circularWindow?.contentView = hostingController.view
-            positionWindowAtMouse(window: circularWindow, size: 400)
+            positionWindowAtMouse(window: circularWindow, size: 380)
             circularWindow?.makeKeyAndOrderFront(nil)
             return
         }
