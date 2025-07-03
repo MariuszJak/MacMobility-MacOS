@@ -28,31 +28,72 @@ class QuickActionsViewModel: ObservableObject {
             tmp.index = newIndex
             items[newIndex] = tmp
             
+            if items[newIndex].objects == nil {
+                items[newIndex].objects = (0..<5).map { .empty(for: $0) }
+            }
+            
             var tmp2 = oldObject
             tmp2.index = oldIndex
             items[oldIndex] = tmp2
+            
+            if items[oldIndex].objects == nil {
+                items[oldIndex].objects = (0..<5).map { .empty(for: $0) }
+            }
         } else {
+            var objects: [ShortcutObject]?
+            if let oldIndex = items.firstIndex(where: { $0.id == object.id }) {
+                objects = items[oldIndex].objects
+            }
             items.enumerated().forEach { (i, item) in
                 if item.id == object.id {
                     items[i] = .empty(for: i)
+                    items[i].objects = (0..<5).map { .empty(for: $0) }
                 }
             }
             var tmp = object
             tmp.index = newIndex
             items[newIndex] = tmp
+            if items[newIndex].objects == nil {
+                items[newIndex].objects = objects ?? (0..<5).map { .empty(for: $0) }
+            }
         }
     }
     
-    func remove(at index: Int) {
+    func addSubitem(to itemId: String, item: ShortcutObject, at subIndex: Int) -> ShortcutObject? {
+        if let index = items.firstIndex(where: { $0.id == itemId }), items[index].title != "EMPTY" {
+            if items[index].objects == nil {
+                items[index].objects = (0..<5).map { .empty(for: $0) }
+            }
+            items[index].objects?[subIndex] = item
+            return items[index]
+        } else {
+            return nil
+        }
+    }
+    
+    func removeSubitem(from itemId: String, at subIndex: Int) -> ShortcutObject? {
+        if let index = items.firstIndex(where: { $0.id == itemId }) {
+            items[index].objects?[subIndex] = .empty(for: subIndex)
+            return items[index]
+        }
+        return nil
+    }
+    
+    func remove(at index: Int) -> ShortcutObject {
         items[index] = .empty(for: index)
+        items[index].objects = (0..<5).map { .empty(for: $0) }
+        return items[index]
     }
 }
 
 struct QuickActionsView: View {
     @ObservedObject private var viewModel: QuickActionsViewModel
     @State private var hoveredIndex: Int? = nil
+    @State private var hoveredSubIndex: Int? = nil
     @State private var isVisible: Bool = false
+    @State private var subMenuIsVisible: Bool = false
     @State private var isEditing: Bool = false
+    @State private var showPopup = false
     let buttonCount = 10
     let cornerRadius = 20.0
     let radius: CGFloat = 120
@@ -60,9 +101,11 @@ struct QuickActionsView: View {
     let update: ([ShortcutObject]) -> Void
     let frame = CGSize(width: 40, height: 40)
     let thickness: CGFloat = 60
-    
+    let elegantGray = Color(red: 0.3, green: 0.3, blue: 0.33)
     let sliceCount = 10
     let sliceAngle = 360.0 / 10.0
+    @State var submenuDegrees = 0.0
+    @State var subitem: ShortcutObject?
     
     init(
         viewModel: QuickActionsViewModel,
@@ -92,9 +135,33 @@ struct QuickActionsView: View {
                                             .onTapGesture {
                                                 action(item)
                                             }
+                                            .contextMenu {
+                                                Button("Edit") {
+                                                    isEditing = true
+                                                    NotificationCenter.default.post(
+                                                        name: .openShortcuts,
+                                                        object: nil,
+                                                        userInfo: nil
+                                                    )
+                                                }
+                                            }
                                             .onHover { hovering in
                                                 hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                                    submenuDegrees = angle.degrees - 92
+                                                    if hovering {
+                                                        showPopup = true
+                                                    }
+                                                    subitem = item
+                                                }
                                             }
+                                    }
+                                    .if(isEditing) {
+                                        $0.onHover { hovering in
+                                            showPopup = true
+                                            submenuDegrees = angle.degrees - 92
+                                            subitem = item
+                                        }
                                     }
                                     .shadow(color: .black.opacity(0.6), radius: 4.0)
                                 if isEditing {
@@ -102,7 +169,7 @@ struct QuickActionsView: View {
                                         HStack {
                                             Spacer()
                                             RedXButton {
-                                                viewModel.remove(at: index)
+                                                subitem = viewModel.remove(at: index)
                                                 update(viewModel.items)
                                             }
                                         }
@@ -111,22 +178,29 @@ struct QuickActionsView: View {
                                 }
                             }
                             .frame(width: 60.0, height: 60.0)
-                            
                         } else {
-                            if isEditing {
-                                PlusButtonView(size: frame)
-                                    .frame(width: frame.width, height: frame.height)
-                                    .onTapGesture {
-                                        NotificationCenter.default.post(
-                                            name: .openShortcuts,
-                                            object: nil,
-                                            userInfo: nil
-                                        )
+                            PlusButtonView(size: frame)
+                                .frame(width: frame.width, height: frame.height)
+                                .onTapGesture {
+                                    isEditing = true
+                                    showPopup = true
+                                    submenuDegrees = angle.degrees - 92
+                                    subitem = item
+                                    NotificationCenter.default.post(
+                                        name: .openShortcuts,
+                                        object: nil,
+                                        userInfo: nil
+                                    )
+                                }
+                                .onHover { _ in
+                                    if !isEditing {
+                                        showPopup = false
+                                    } else {
+                                        submenuDegrees = angle.degrees - 92
+                                        subitem = item
+                                        showPopup = true
                                     }
-                            } else {
-                                RoundedBackgroundView(size: frame)
-                                    .frame(width: frame.width, height: frame.height)
-                            }
+                                }
                         }
                     }
                     .onDrop(of: [.text], isTargeted: nil) { providers in
@@ -146,28 +220,127 @@ struct QuickActionsView: View {
                 }
             }
             .frame(width: 300, height: 300)
+            if showPopup {
+                ZStack {
+                    if let subitem, let objects = subitem.objects, objects.contains(where: { $0.title != "EMPTY" || isEditing }) {
+                        ForEach(Array(objects.enumerated()), id: \.offset) { (index, item) in
+                            CircleSliceShape(
+                                startAngle: .degrees(submenuDegrees),
+                                sliceAngle: .degrees(sliceAngle),
+                                thickness: 55
+                            )
+                            .stroke(Color.black.opacity(0.5), lineWidth: 0.7)
+                            .fill(Color.cyan)
+                            .rotationEffect(.degrees(Double(index) * sliceAngle))
+                            ZStack {
+                                if let object = objects[safe: index], object.id != "EMPTY \(index)" {
+                                    ZStack {
+                                        itemView(object: object)
+                                            .if(!isEditing) {
+                                                $0.scaleEffect(index == hoveredSubIndex ? 1.3 : 1.0)
+                                                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredSubIndex)
+                                                    .onTapGesture {
+                                                        action(object)
+                                                    }
+                                                    .contextMenu {
+                                                        Button("Edit") {
+                                                           isEditing = true
+                                                            NotificationCenter.default.post(
+                                                                name: .openShortcuts,
+                                                                object: nil,
+                                                                userInfo: nil
+                                                            )
+                                                        }
+                                                    }
+                                                    .onHover { hovering in
+                                                        hoveredSubIndex = hovering ? index : (hoveredSubIndex == index ? nil : hoveredSubIndex)
+                                                    }
+                                            }
+                                            .shadow(color: .black.opacity(0.6), radius: 4.0)
+                                        if isEditing {
+                                            VStack {
+                                                HStack {
+                                                    Spacer()
+                                                    RedXButton {
+                                                        if let updatedItem = viewModel.removeSubitem(from: subitem.id, at: index) {
+                                                            self.subitem = updatedItem
+                                                        }
+                                                        update(viewModel.items)
+                                                    }
+                                                }
+                                                Spacer()
+                                            }
+                                        }
+                                    }
+                                    .frame(width: 60.0, height: 60.0)
+                                } else {
+                                    PlusButtonView(size: frame)
+                                        .frame(width: frame.width, height: frame.height)
+                                        .onTapGesture {
+                                            isEditing = true
+                                            NotificationCenter.default.post(
+                                                name: .openShortcuts,
+                                                object: nil,
+                                                userInfo: nil
+                                            )
+                                        }
+                                        .opacity(subitem.title == "EMPTY" ? 0.3 : 1.0)
+                                }
+                            }
+                            .onDrop(of: [.text], isTargeted: nil) { providers in
+                                providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                                    if let droppedString = droppedItem as? String,
+                                       let object = viewModel.object(for: droppedString) {
+                                        DispatchQueue.main.async {
+                                            if let updatedItem = viewModel.addSubitem(to: subitem.id, item: object, at: index) {
+                                                self.subitem = updatedItem
+                                            }
+                                            update(viewModel.items)
+                                           
+                                        }
+                                    }
+                                }
+                                return true
+                            }
+                            .offset(x: cos(Angle.degrees((submenuDegrees + 20) + (35.0 * Double(index))).radians) * 185,
+                                    y: sin(Angle.degrees((submenuDegrees + 20) + (35.0 * Double(index))).radians) * 185)
+                        }
+                    }
+                    
+                }
+                .frame(width: 420, height: 420)
+                .scaleEffect(subMenuIsVisible ? 1.0 : 0.6)
+                .opacity(subMenuIsVisible ? 1.0 : 0.0)
+                .onAppear {
+                    subMenuIsVisible = true
+                }
+            }
             VStack {
-                Button(isEditing ? "Save" : "Edit") {
-                    isEditing.toggle()
+                ZStack {
+                    Circle()
+                        .fill(elegantGray)
+                        .frame(width: 150, height: 150)
+                        .onHover { _ in
+                            if !isEditing {
+                                showPopup = false
+                            }
+                        }
                     if isEditing {
-                        NotificationCenter.default.post(
-                            name: .openShortcuts,
-                            object: nil,
-                            userInfo: nil
-                        )
-                    } else {
-                        NotificationCenter.default.post(
-                            name: .closeShortcuts,
-                            object: nil,
-                            userInfo: nil
-                        )
+                        Button("Save") {
+                            isEditing = false
+                            NotificationCenter.default.post(
+                                name: .closeShortcuts,
+                                object: nil,
+                                userInfo: nil
+                            )
+                        }
                     }
                 }
             }
         }
         .scaleEffect(isVisible ? 1.0 : 0.6)
         .opacity(isVisible ? 1.0 : 0.0)
-        .frame(width: 400, height: 400)
+        .frame(width: 420, height: 420)
         .onAppear {
             for window in NSApplication.shared.windows {
                 window.appearance = NSAppearance(named: .darkAqua)
@@ -274,8 +447,8 @@ struct CircleSlice: View {
     let index: Int
     let sliceAngle: Double
     let thickness: CGFloat
+    let elegantGray = Color(red: 0.3, green: 0.3, blue: 0.33)
 
-    // Precomputed angles
     var startAngle: Angle { .degrees(-20) }
     var rotation: Angle { .degrees(Double(index) * sliceAngle) }
 
@@ -287,7 +460,10 @@ struct CircleSlice: View {
         )
 
         return sliceShape
-            .fill(Color.black.opacity(0.5))
+            .fill(LinearGradient(
+                gradient: Gradient(colors: [.blue, .cyan]),
+                startPoint: .top,
+                endPoint: .bottom))
             .rotationEffect(rotation)
             .overlay {
                 sliceShape
@@ -316,8 +492,8 @@ struct VisualEffectBlur: NSViewRepresentable {
 
 struct CircleSliceShape: Shape {
     var startAngle: Angle = .degrees(-15)
-    var sliceAngle: Angle = .degrees(36) // 1/10th of a circle
-    var thickness: CGFloat = 50          // Thickness of the slice
+    var sliceAngle: Angle = .degrees(36)
+    var thickness: CGFloat = 50
 
     func path(in rect: CGRect) -> Path {
         let radius = min(rect.width, rect.height) / 2

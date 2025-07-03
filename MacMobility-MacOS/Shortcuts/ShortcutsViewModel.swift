@@ -71,6 +71,12 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         registerListener()
         startMonitoring()
         
+        quickActionItems.enumerated().forEach { (index, item) in
+            if item.objects == nil {
+                quickActionItems[index].objects = (0..<5).map { .empty(for: $0) }
+            }
+        }
+        
         connectionManager
             .$streamConnectionState
             .receive(on: DispatchQueue.main)
