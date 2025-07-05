@@ -138,11 +138,11 @@ struct QuickActionsViewSetup: View {
             }
         }
         .frame(width: 2 * radius + 80, height: 2 * radius + 80)
-        .background(
-            VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow)
-                .clipShape(Circle())
-                .opacity(0.9)
-        )
+//        .background(
+//            VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow)
+//                .clipShape(Circle())
+//                .opacity(0.9)
+//        )
         .onAppear {
             for window in NSApplication.shared.windows {
                 window.appearance = NSAppearance(named: .darkAqua)

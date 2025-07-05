@@ -8,84 +8,6 @@
 import Foundation
 import SwiftUI
 
-class QuickActionsViewModel: ObservableObject {
-    @Published var items: [ShortcutObject] = []
-    private let allItems: [ShortcutObject]
-    
-    init(items: [ShortcutObject], allItems: [ShortcutObject]) {
-        self.items = items
-        self.allItems = allItems
-    }
-    
-    func object(for id: String) -> ShortcutObject? {
-        (allItems + items).first { $0.id == id }
-    }
-    
-    func add(_ object: ShortcutObject, at newIndex: Int = 0) {
-        if let oldIndex = items.firstIndex(where: { $0.id == object.id && items[newIndex].title != "EMPTY" }) {
-            let oldObject = items[newIndex]
-            var tmp = object
-            tmp.index = newIndex
-            items[newIndex] = tmp
-            
-            if items[newIndex].objects == nil {
-                items[newIndex].objects = (0..<5).map { .empty(for: $0) }
-            }
-            
-            var tmp2 = oldObject
-            tmp2.index = oldIndex
-            items[oldIndex] = tmp2
-            
-            if items[oldIndex].objects == nil {
-                items[oldIndex].objects = (0..<5).map { .empty(for: $0) }
-            }
-        } else {
-            var objects: [ShortcutObject]?
-            if let oldIndex = items.firstIndex(where: { $0.id == object.id }) {
-                objects = items[oldIndex].objects
-            }
-            items.enumerated().forEach { (i, item) in
-                if item.id == object.id {
-                    items[i] = .empty(for: i)
-                    items[i].objects = (0..<5).map { .empty(for: $0) }
-                }
-            }
-            var tmp = object
-            tmp.index = newIndex
-            items[newIndex] = tmp
-            if items[newIndex].objects == nil {
-                items[newIndex].objects = objects ?? (0..<5).map { .empty(for: $0) }
-            }
-        }
-    }
-    
-    func addSubitem(to itemId: String, item: ShortcutObject, at subIndex: Int) -> ShortcutObject? {
-        if let index = items.firstIndex(where: { $0.id == itemId }), items[index].title != "EMPTY" {
-            if items[index].objects == nil {
-                items[index].objects = (0..<5).map { .empty(for: $0) }
-            }
-            items[index].objects?[subIndex] = item
-            return items[index]
-        } else {
-            return nil
-        }
-    }
-    
-    func removeSubitem(from itemId: String, at subIndex: Int) -> ShortcutObject? {
-        if let index = items.firstIndex(where: { $0.id == itemId }) {
-            items[index].objects?[subIndex] = .empty(for: subIndex)
-            return items[index]
-        }
-        return nil
-    }
-    
-    func remove(at index: Int) -> ShortcutObject {
-        items[index] = .empty(for: index)
-        items[index].objects = (0..<5).map { .empty(for: $0) }
-        return items[index]
-    }
-}
-
 struct QuickActionsView: View {
     @ObservedObject private var viewModel: QuickActionsViewModel
     @State private var hoveredIndex: Int? = nil
@@ -127,7 +49,7 @@ struct QuickActionsView: View {
         }
         .scaleEffect(isVisible ? 1.0 : 0.6)
         .opacity(isVisible ? 1.0 : 0.0)
-        .frame(width: 420, height: 420)
+        .frame(width: 460, height: 460)
         .onAppear {
             for window in NSApplication.shared.windows {
                 window.appearance = NSAppearance(named: .darkAqua)
@@ -145,8 +67,10 @@ struct QuickActionsView: View {
                     .fill(elegantGray)
                     .frame(width: 150, height: 150)
                     .onHover { _ in
-                        if !isEditing {
-                            showPopup = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            if !self.isEditing {
+                                self.showPopup = false
+                            }
                         }
                     }
                 if isEditing {
@@ -158,6 +82,31 @@ struct QuickActionsView: View {
                             userInfo: nil
                         )
                     }
+                } else {
+                    VStack {
+                        HStack {
+                            Button("<") {
+                                viewModel.prevPage()
+                            }
+                            Text("Page: \(viewModel.currentPage)")
+                            Button(">") {
+                                viewModel.nextPage()
+                            }
+                        }
+                        Divider()
+                            .frame(width: 30)
+                        HStack {
+                            Button("+") {
+                                viewModel.addPage()
+                                update(viewModel.items)
+                            }
+                            Button("-") {
+                                viewModel.removePage(with: viewModel.currentPage)
+                                update(viewModel.items)
+                            }
+                        }
+                        
+                    }
                 }
             }
         }
@@ -165,13 +114,14 @@ struct QuickActionsView: View {
     
     private func circleMainView() -> some View {
         ZStack {
-            ForEach(Array(viewModel.items.enumerated()), id: \.offset) { (index, item) in
+            ForEach(Array(viewModel.items.filter { $0.page == viewModel.currentPage }.enumerated()), id: \.offset) { (index, item) in
                 let angle = Angle.degrees(Double(index) / Double(buttonCount) * 360)
+                CircleSliceBackground(index: index, sliceAngle: sliceAngle, thickness: 60)
                 CircleSlice(index: index, sliceAngle: sliceAngle, thickness: 60)
                     .scaleEffect(index == hoveredIndex ? 1.05 : 1.0)
                     .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
                 ZStack {
-                    if index == item.index, item.id != "EMPTY \(index)" {
+                    if index + ((viewModel.currentPage - 1) * 10) == item.index, item.title != "EMPTY" {
                         mainView(item: item, index: index, angle: angle)
                     } else {
                         plusView(angle: angle, item: item)
@@ -203,16 +153,34 @@ struct QuickActionsView: View {
                     CircleSliceShape(
                         startAngle: .degrees(submenuDegrees),
                         sliceAngle: .degrees(sliceAngle),
-                        thickness: 55
+                        thickness: 60
+                    )
+                    .fill(.cyan)
+                    .rotationEffect(.degrees(Double(index) * sliceAngle))
+                    CircleSliceShape(
+                        startAngle: .degrees(submenuDegrees),
+                        sliceAngle: .degrees(sliceAngle),
+                        thickness: 60
                     )
                     .stroke(Color.black.opacity(0.5), lineWidth: 0.7)
-                    .fill(Color.cyan)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(red: 44/255, green: 44/255, blue: 46/255),   // Graphite Gray
+                                Color(red: 58/255, green: 58/255, blue: 60/255)    // Steel Gray
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                     .rotationEffect(.degrees(Double(index) * sliceAngle))
+                    .scaleEffect(index == hoveredSubIndex ? 1.05 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredSubIndex)
                     ZStack {
                         if let object = objects[safe: index], object.id != "EMPTY \(index)" {
                             submenuMainView(object: object, subitem: subitem, index: index)
                         } else {
-                            PlusButtonView(size: frame)
+                            PlusButtonView(size: frame, cornerRadius: 10)
                                 .frame(width: frame.width, height: frame.height)
                                 .onTapGesture {
                                     isEditing = true
@@ -244,7 +212,7 @@ struct QuickActionsView: View {
                 }
             }
         }
-        .frame(width: 420, height: 420)
+        .frame(width: 430, height: 430)
         .scaleEffect(subMenuIsVisible ? 1.0 : 0.6)
         .opacity(subMenuIsVisible ? 1.0 : 0.0)
         .onAppear {
@@ -253,7 +221,7 @@ struct QuickActionsView: View {
     }
     
     private func plusView(angle: Angle, item: ShortcutObject) -> some View {
-        PlusButtonView(size: frame)
+        PlusButtonView(size: frame, cornerRadius: 10)
             .frame(width: frame.width, height: frame.height)
             .onTapGesture {
                 isEditing = true
@@ -462,85 +430,5 @@ struct QuickActionsView: View {
                 }
             }
         }
-    }
-}
-
-struct CircleSlice: View {
-    let index: Int
-    let sliceAngle: Double
-    let thickness: CGFloat
-    let elegantGray = Color(red: 0.3, green: 0.3, blue: 0.33)
-
-    var startAngle: Angle { .degrees(-20) }
-    var rotation: Angle { .degrees(Double(index) * sliceAngle) }
-
-    var body: some View {
-        let sliceShape = CircleSliceShape(
-            startAngle: startAngle,
-            sliceAngle: .degrees(sliceAngle),
-            thickness: thickness
-        )
-
-        return sliceShape
-            .fill(LinearGradient(
-                gradient: Gradient(colors: [.blue, .cyan]),
-                startPoint: .top,
-                endPoint: .bottom))
-            .rotationEffect(rotation)
-            .overlay {
-                sliceShape
-                    .stroke(Color.black.opacity(0.2), lineWidth: 0.5)
-                    .rotationEffect(rotation)
-            }
-            .contentShape(sliceShape)
-    }
-}
-
-struct VisualEffectBlur: NSViewRepresentable {
-    var material: NSVisualEffectView.Material
-    var blendingMode: NSVisualEffectView.BlendingMode
-
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = material
-        view.blendingMode = blendingMode
-        view.state = .active
-        view.isEmphasized = true
-        return view
-    }
-
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
-}
-
-struct CircleSliceShape: Shape {
-    var startAngle: Angle = .degrees(-15)
-    var sliceAngle: Angle = .degrees(36)
-    var thickness: CGFloat = 50
-
-    func path(in rect: CGRect) -> Path {
-        let radius = min(rect.width, rect.height) / 2
-        let innerRadius = radius - thickness
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-
-        let endAngle = startAngle + sliceAngle
-
-        var path = Path()
-        
-        // Outer arc
-        path.addArc(center: center,
-                    radius: radius,
-                    startAngle: startAngle,
-                    endAngle: endAngle,
-                    clockwise: false)
-
-        // Line to inner arc
-        path.addArc(center: center,
-                    radius: innerRadius,
-                    startAngle: endAngle,
-                    endAngle: startAngle,
-                    clockwise: true)
-
-        path.closeSubpath()
-        return path
     }
 }

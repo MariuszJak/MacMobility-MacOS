@@ -56,6 +56,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clear(key: .quickActionItems)
+//        UserDefaults.standard.clear(key: .subitemPages)
 //        UserDefaults.standard.clearAll()
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
@@ -63,7 +64,10 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         self.utilities = UserDefaults.standard.get(key: .utilities) ?? []
         self.pages = UserDefaults.standard.get(key: .pages) ?? 1
         self.appsAddedByUser = UserDefaults.standard.get(key: .userApps) ?? []
-        self.quickActionItems = UserDefaults.standard.get(key: .quickActionItems) ?? (0..<10).map { .empty(for: $0) }
+        self.quickActionItems = UserDefaults.standard.get(key: .quickActionItems) ?? (0..<10).map { .empty(for: $0, page: 1) }
+        if self.quickActionItems.isEmpty {
+            self.quickActionItems = (0..<10).map { .empty(for: $0, page: 1) }
+        }
         self.automations = loadJSON("automations")
         connectionManager.assignedAppsToPages = UserDefaults.standard.get(key: .assignedAppsToPages) ?? []
         fetchShortcuts()
@@ -923,7 +927,7 @@ extension Array {
 }
 
 extension ShortcutObject {
-    static func empty(for index: Int) -> ShortcutObject {
-        .init(type: .app, page: 0, index: index, id: "EMPTY \(index)", title: "EMPTY")
+    static func empty(for index: Int, page: Int = 1) -> ShortcutObject {
+        .init(type: .app, page: page, index: index, id: "EMPTY \(index)", title: "EMPTY")
     }
 }

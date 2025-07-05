@@ -51,6 +51,9 @@
 		C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09775652B5C31EE00F4FFE6 /* AppleScriptCommandable.swift */; };
 		C09775692B5C329300F4FFE6 /* scriptnext.scpt in Resources */ = {isa = PBXBuildFile; fileRef = C09775682B5C329300F4FFE6 /* scriptnext.scpt */; };
 		C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */; };
+		C0B1605A2E185BF100C70CBD /* QuickActionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */; };
+		C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */; };
+		C0B160602E185C4D00C70CBD /* CircleSliceShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */; };
 		C0C9B78B2DCAACA40068BCAB /* NewAutomationUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */; };
 		C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */; };
 		C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */; };
@@ -189,6 +192,9 @@
 		C09775682B5C329300F4FFE6 /* scriptnext.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scriptnext.scpt; sourceTree = "<group>"; };
 		C097756A2B5C32AA00F4FFE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionSenable.swift; sourceTree = "<group>"; };
+		C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewModel.swift; sourceTree = "<group>"; };
+		C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSlice.swift; sourceTree = "<group>"; };
+		C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSliceShape.swift; sourceTree = "<group>"; };
 		C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAutomationUtilityView.swift; sourceTree = "<group>"; };
 		C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConverterView.swift; sourceTree = "<group>"; };
 		C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mac-connect.mp4"; sourceTree = "<group>"; };
@@ -287,6 +293,7 @@
 		C05DA7362DAC102900BD4FBA /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C0B1605B2E185C0A00C70CBD /* QuickActionMenu */,
 				C05DA7372DAC103300BD4FBA /* AboutView.swift */,
 				C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */,
 				C071D7172DB43A3100ADD746 /* WelcomeView.swift */,
@@ -298,8 +305,6 @@
 				C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */,
 				C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */,
 				C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */,
-				C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */,
-				C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -434,6 +439,26 @@
 				C097754D2B5C319E00F4FFE6 /* MacMobility_MacOSUITestsLaunchTests.swift */,
 			);
 			path = "MacMobility-MacOSUITests";
+			sourceTree = "<group>";
+		};
+		C0B1605B2E185C0A00C70CBD /* QuickActionMenu */ = {
+			isa = PBXGroup;
+			children = (
+				C0B1605C2E185C1800C70CBD /* Subviews */,
+				C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */,
+				C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */,
+				C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */,
+			);
+			path = QuickActionMenu;
+			sourceTree = "<group>";
+		};
+		C0B1605C2E185C1800C70CBD /* Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */,
+				C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */,
+			);
+			path = Subviews;
 			sourceTree = "<group>";
 		};
 		C0C9B78E2DCD31D80068BCAB /* Video */ = {
@@ -773,6 +798,7 @@
 				C065EBFE2DC0DE1500000B8C /* InstallAutomationsView.swift in Sources */,
 				C0F67EDC2D973EA50090D568 /* EmptyResponse.swift in Sources */,
 				C09084DA2DFED7CD00DFE172 /* QuickActionsView.swift in Sources */,
+				C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */,
 				C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */,
 				C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */,
 				C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */,
@@ -780,8 +806,10 @@
 				C0EAF9F92D902AB100044947 /* Resolver.swift in Sources */,
 				C0F67EDA2D973E930090D568 /* Request.swift in Sources */,
 				C0F67EE42D973F070090D568 /* DBSDataProviderRepresentable.swift in Sources */,
+				C0B1605A2E185BF100C70CBD /* QuickActionsViewModel.swift in Sources */,
 				C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */,
 				C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */,
+				C0B160602E185C4D00C70CBD /* CircleSliceShape.swift in Sources */,
 				C09775632B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift in Sources */,
 				C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */,
 				C09775662B5C31EE00F4FFE6 /* MacOSMainView.swift in Sources */,

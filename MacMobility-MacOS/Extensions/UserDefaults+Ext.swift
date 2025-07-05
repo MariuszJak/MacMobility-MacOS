@@ -101,6 +101,8 @@ extension UserDefaults {
         case workspaceItems
         case shortcuts
         case pages
+        case subitemPages
+        case subitemCurrentPage
         case utilities
         case license
         case licenseKey
