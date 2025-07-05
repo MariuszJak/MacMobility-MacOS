@@ -23,7 +23,9 @@ struct QAMTutorial: Codable {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    private var responder = HotKeyResponder.shared
     private var permissionsWindow: NSWindow?
+    private var circularWindow: NSWindow?
     private var welcomeWindow: NSWindow?
     private var shortcutsWindow: NSWindow?
     private var tabShortcutsWindow: NSWindow?
@@ -96,6 +98,85 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: .closeShortcuts,
             object: nil
         )
+        setupKeyboardListener()
+    }
+    
+    func setupKeyboardListener() {
+        guard !connectionManager.listenerAdded else { return }
+        HotKeyManager.shared.registerHotKey()
+        
+        responder
+            .$showWindow
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                if value {
+                    self?.openCircularWindow()
+                }
+            }
+            .store(in: &cancellables)
+        
+        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
+            guard let self else { return }
+            guard let window = circularWindow else { return }
+
+            let mouseLocation = NSEvent.mouseLocation
+            let windowFrame = window.frame
+
+            if !windowFrame.contains(mouseLocation) {
+                circularWindow?.close()
+                circularWindow = nil
+                NotificationCenter.default.post(
+                    name: .closeShortcuts,
+                    object: nil,
+                    userInfo: nil
+                )
+            }
+        }
+        connectionManager.listenerAdded = true
+    }
+    
+    func openCircularWindow() {
+        circularWindow?.close()
+        circularWindow = nil
+        if nil == circularWindow {
+            circularWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 380, height: 380),
+                styleMask: [.borderless],
+                backing: .buffered,
+                defer: false
+            )
+            circularWindow?.center()
+            circularWindow?.isReleasedWhenClosed = false
+            circularWindow?.titleVisibility = .hidden
+            circularWindow?.titlebarAppearsTransparent = true
+            circularWindow?.isOpaque = false
+            circularWindow?.backgroundColor = .clear
+            circularWindow?.hasShadow = false
+            circularWindow?.isMovableByWindowBackground = true
+            circularWindow?.level = .floating
+            let hostingController = NSHostingController(
+                rootView: QuickActionsView(
+                    viewModel: .init(
+                        items: shortcutsViewModel.quickActionItems,
+                        allItems: shortcutsViewModel.allObjects()
+                    ),
+                    action: { [weak self] item in
+                        guard let self else { return }
+                        connectionManager.runShortuct(for: item)
+                        circularWindow?.close()
+                        circularWindow = nil
+                    }, update: { [weak self] items in
+                        guard let self else { return }
+                        shortcutsViewModel.saveQuickActionItems(items)
+                    }
+                )
+            )
+            circularWindow?.contentView = hostingController.view
+            positionWindowAtMouse(window: circularWindow, size: 380)
+            circularWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+        circularWindow?.makeKeyAndOrderFront(nil)
     }
     
     @objc func openShortcuts() {
@@ -118,8 +199,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             tabShortcutsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = tabShortcutsWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
+//            positionWindowAtMouse(window: tabShortcutsWindow, size: 580)
+            positionSubmenu(window: tabShortcutsWindow, size: 580)
+            
         }
         tabShortcutsWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func positionSubmenu(window: NSWindow?, size: CGFloat) {
+        guard let window, let circularWindow else {
+            return
+        }
+        let mouseLocation = NSEvent.mouseLocation
+        var offset = 0.0
+        if mouseLocation.x > 500 {
+            offset = -550.0
+        } else {
+            offset = 450.0
+        }
+        
+        window.setFrameOrigin(.init(x: circularWindow.frame.origin.x + offset, y: circularWindow.frame.origin.y))
+    }
+    
+    private func positionWindowAtMouse(window: NSWindow?, size: CGFloat) {
+        guard let window else {
+            return
+        }
+        let mouseLocation = NSEvent.mouseLocation
+
+        // Flip Y-coordinate relative to that screen
+        let origin = CGPoint(
+            x: mouseLocation.x - (size / 2),
+            y: mouseLocation.y - size / 2
+        )
+
+        window.setFrameOrigin(origin)
     }
     
     @objc func closeShortcuts() {

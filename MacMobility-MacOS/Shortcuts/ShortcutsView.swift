@@ -39,7 +39,6 @@ struct ShortcutsView: View {
     @State private var editUtilitiesWindow: NSWindow?
     @State private var companionAppWindow: NSWindow?
     @State private var quickActionSetupWindow: NSWindow?
-    @State private var circularWindow: NSWindow?
     @State private var shouldShowCompanionRequestPopup: Bool = false
     @State private var selectedTab = 0
     @State private var tab: Tab = .apps
@@ -338,7 +337,6 @@ struct ShortcutsView: View {
             for window in NSApplication.shared.windows {
                 window.appearance = NSAppearance(named: .darkAqua)
             }
-            setupKeyboardListener()
         }
         .sheet(isPresented: $shouldShowCompanionRequestPopup) {
             CompanionRequestPopup(
@@ -360,39 +358,6 @@ struct ShortcutsView: View {
         }
         .frame(minWidth: 1300.0)
         .padding(.top, 21.0)
-    }
-    
-    func setupKeyboardListener() {
-        guard !viewModel.connectionManager.listenerAdded else { return }
-        HotKeyManager.shared.registerHotKey()
-        
-        responder
-            .$showWindow
-            .receive(on: DispatchQueue.main)
-            .sink { value in
-                if value {
-                    openCircularWindow()
-                }
-            }
-            .store(in: &cancellables)
-        
-        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { event in
-            guard let window = circularWindow else { return }
-
-            let mouseLocation = NSEvent.mouseLocation
-            let windowFrame = window.frame
-
-            if !windowFrame.contains(mouseLocation) {
-                circularWindow?.close()
-                circularWindow = nil
-                NotificationCenter.default.post(
-                    name: .closeShortcuts,
-                    object: nil,
-                    userInfo: nil
-                )
-            }
-        }
-        viewModel.connectionManager.listenerAdded = true
     }
     
     @ViewBuilder
@@ -970,48 +935,6 @@ struct ShortcutsView: View {
             return
         }
         shortcutsToInstallWindow?.makeKeyAndOrderFront(nil)
-    }
-    
-    func openCircularWindow() {
-        circularWindow?.close()
-        circularWindow = nil
-        if nil == circularWindow {
-            circularWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 380, height: 380),
-                styleMask: [.borderless],
-                backing: .buffered,
-                defer: false
-            )
-            circularWindow?.center()
-            circularWindow?.isReleasedWhenClosed = false
-            circularWindow?.titleVisibility = .hidden
-            circularWindow?.titlebarAppearsTransparent = true
-            circularWindow?.isOpaque = false
-            circularWindow?.backgroundColor = .clear
-            circularWindow?.hasShadow = false
-            circularWindow?.isMovableByWindowBackground = true
-            circularWindow?.level = .floating
-            let hostingController = NSHostingController(
-                rootView: QuickActionsView(
-                    viewModel: .init(
-                        items: viewModel.quickActionItems,
-                        allItems: viewModel.allObjects()
-                    ),
-                    action: { item in
-                        viewModel.connectionManager.runShortuct(for: item)
-                        circularWindow?.close()
-                        circularWindow = nil
-                    }, update: { items in
-                        viewModel.saveQuickActionItems(items)
-                    }
-                )
-            )
-            circularWindow?.contentView = hostingController.view
-            positionWindowAtMouse(window: circularWindow, size: 380)
-            circularWindow?.makeKeyAndOrderFront(nil)
-            return
-        }
-        circularWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openInstallAutomationsWindow() {
