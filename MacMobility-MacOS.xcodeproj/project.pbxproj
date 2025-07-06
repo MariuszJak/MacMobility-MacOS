@@ -54,6 +54,7 @@
 		C0B1605A2E185BF100C70CBD /* QuickActionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */; };
 		C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */; };
 		C0B160602E185C4D00C70CBD /* CircleSliceShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */; };
+		C0B160622E1AF2D700C70CBD /* SliceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B160612E1AF2D700C70CBD /* SliceButton.swift */; };
 		C0C9B78B2DCAACA40068BCAB /* NewAutomationUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */; };
 		C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */; };
 		C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */; };
@@ -195,6 +196,7 @@
 		C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewModel.swift; sourceTree = "<group>"; };
 		C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSlice.swift; sourceTree = "<group>"; };
 		C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSliceShape.swift; sourceTree = "<group>"; };
+		C0B160612E1AF2D700C70CBD /* SliceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceButton.swift; sourceTree = "<group>"; };
 		C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAutomationUtilityView.swift; sourceTree = "<group>"; };
 		C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConverterView.swift; sourceTree = "<group>"; };
 		C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mac-connect.mp4"; sourceTree = "<group>"; };
@@ -457,6 +459,7 @@
 			children = (
 				C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */,
 				C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */,
+				C0B160612E1AF2D700C70CBD /* SliceButton.swift */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -793,6 +796,7 @@
 				C0F67EE02D973ECA0090D568 /* String+Ext.swift in Sources */,
 				C0D21D652D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift in Sources */,
 				C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */,
+				C0B160622E1AF2D700C70CBD /* SliceButton.swift in Sources */,
 				C0EAF9432D90246100044947 /* ValidateLicenseView.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
 				C065EBFE2DC0DE1500000B8C /* InstallAutomationsView.swift in Sources */,

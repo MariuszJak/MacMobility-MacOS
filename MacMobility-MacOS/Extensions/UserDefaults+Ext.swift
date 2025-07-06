@@ -111,6 +111,7 @@ extension UserDefaults {
         case lifecycle
         case browser
         case assignedAppsToPages
+        case assignedAppsToSubpages
         case quickActionItems
         case quickActionTutorialSeen
     }

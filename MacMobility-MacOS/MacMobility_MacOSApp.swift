@@ -168,6 +168,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }, update: { [weak self] items in
                         guard let self else { return }
                         shortcutsViewModel.saveQuickActionItems(items)
+                    }, close: { [weak self] in
+                        self?.circularWindow?.close()
+                        self?.circularWindow = nil
                     }
                 )
             )
@@ -199,9 +202,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             tabShortcutsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = tabShortcutsWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
-//            positionWindowAtMouse(window: tabShortcutsWindow, size: 580)
             positionSubmenu(window: tabShortcutsWindow, size: 580)
-            
         }
         tabShortcutsWindow?.makeKeyAndOrderFront(nil)
     }

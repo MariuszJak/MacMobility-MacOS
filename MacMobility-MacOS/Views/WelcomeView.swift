@@ -965,6 +965,39 @@ struct PlusButtonView: View {
     }
 }
 
+struct RoundedTextButtonView: View {
+    var text: String
+    var size: CGSize
+    var cornerRadius: CGFloat
+    
+    init(text: String, size: CGSize = .init(width: 70, height: 70), cornerRadius: CGFloat = 20) {
+        self.text = text
+        self.size = size
+        self.cornerRadius = cornerRadius
+    }
+    
+    var body: some View {
+        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
+
+        return ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(backgroundColor)
+
+            Text(text)
+                .foregroundColor(accentColor)
+                .multilineTextAlignment(.center)
+                .font(.system(size: 8.0, weight: .bold))
+        }
+        .frame(width: size.width, height: size.height)
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(accentColor, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
+    }
+}
+
 struct RoundedBackgroundView: View {
     var size: CGSize
     
@@ -980,9 +1013,31 @@ struct RoundedBackgroundView: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(backgroundColor)
         }
-//        .frame(width: size.width, height: size.height)
         .overlay(
             RoundedRectangle(cornerRadius: 20)
+                .stroke(accentColor, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
+    }
+}
+
+struct CircleBackgroundView: View {
+    var size: CGSize
+    
+    init(size: CGSize = .init(width: 70, height: 70)) {
+        self.size = size
+    }
+    
+    var body: some View {
+        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
+
+        return ZStack {
+           Circle()
+                .fill(backgroundColor)
+        }
+        .overlay(
+            Circle()
                 .stroke(accentColor, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)

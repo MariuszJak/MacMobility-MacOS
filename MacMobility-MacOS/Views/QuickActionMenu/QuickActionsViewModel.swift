@@ -9,6 +9,9 @@ import Foundation
 import SwiftUI
 
 class QuickActionsViewModel: ObservableObject {
+    private var cachedIcons: [String: Data] = [:]
+    @ObservedObject var observer = FocusedAppObserver()
+    @Published var assignedAppsToPages: [AssignedAppsToPages] = []
     @Published var items: [ShortcutObject] = []
     @Published var sections: [Int: [ShortcutObject]] = [:]
     @Published var pages: Int = 1
@@ -18,13 +21,23 @@ class QuickActionsViewModel: ObservableObject {
     init(items: [ShortcutObject], allItems: [ShortcutObject]) {
         self.items = items
         self.allItems = allItems
+        self.assignedAppsToPages = UserDefaults.standard.get(key: .assignedAppsToSubpages) ?? []
         self.currentPage = UserDefaults.standard.get(key: .subitemCurrentPage) ?? 1
         self.pages = UserDefaults.standard.get(key: .subitemPages) ?? 1
         self.sections = [pages: items]
+        
+        if let activeApp = self.observer.focusedAppName,
+           let pageToFocus = assignedAppsToPages.first(where: { $0.appPath.contains(activeApp) }) {
+            currentPage = pageToFocus.page
+        }
     }
     
     func object(for id: String) -> ShortcutObject? {
         (allItems + items).first { $0.id == id }
+    }
+    
+    func object(path: String) -> ShortcutObject? {
+        (allItems + items).first { $0.path == path }
     }
     
     func prevPage() {
@@ -45,18 +58,27 @@ class QuickActionsViewModel: ObservableObject {
         pages = pages + 1
         currentPage = pages
         (0..<10).forEach { index in
-            items.append(.empty(for: index, page: currentPage))
+            var item: ShortcutObject = .empty(for: index, page: currentPage)
+            item.objects = (0..<5).map { .empty(for: $0) }
+            items.append(item)
         }
         UserDefaults.standard.store(pages, for: .subitemPages)
         UserDefaults.standard.store(currentPage, for: .subitemCurrentPage)
     }
     
     func removePage(with number: Int) {
+        guard pages > 1 else { return }
         items.removeAll { $0.page == number }
+        assignedAppsToPages.removeAll(where: { $0.page == number })
         items.enumerated().forEach { (index, object) in
             if items[index].page > number {
                 items[index].page -= 1
                 items[index].index = index
+            }
+        }
+        assignedAppsToPages.enumerated().forEach { (index, _) in
+            if assignedAppsToPages[index].page > number {
+                assignedAppsToPages[index].page -= 1
             }
         }
         if pages > 1 {
@@ -65,6 +87,7 @@ class QuickActionsViewModel: ObservableObject {
         currentPage = pages
         UserDefaults.standard.store(pages, for: .subitemPages)
         UserDefaults.standard.store(currentPage, for: .subitemCurrentPage)
+        UserDefaults.standard.store(assignedAppsToPages, for: .assignedAppsToSubpages)
     }
     
     func add(_ object: ShortcutObject, at newIndex: Int = 0) {
@@ -135,5 +158,84 @@ class QuickActionsViewModel: ObservableObject {
         items[offset] = .empty(for: offset, page: currentPage)
         items[offset].objects = (0..<5).map { .empty(for: $0) }
         return items[offset]
+    }
+    
+    func replace(app path: String, to page: Int) {
+        guard let index = assignedAppsToPages.firstIndex(where: { $0.page == page }) else {
+//            connectionManager.localError = "No app assigned to \(page), can't replace."
+//            connectionManager.showsLocalError = true
+            return
+        }
+        assignedAppsToPages[index] = .init(page: page, appPath: path)
+        if let alreadyAssignedSomwhereIndex = assignedAppsToPages.firstIndex(where: { $0.appPath == path && $0.page != page }) {
+            assignedAppsToPages.remove(at: alreadyAssignedSomwhereIndex)
+        }
+        UserDefaults.standard.store(assignedAppsToPages, for: .assignedAppsToSubpages)
+        self.pages = pages
+    }
+    
+    func getAssigned(to page: Int) -> AssignedAppsToPages? {
+        assignedAppsToPages.first(where: { $0.page == page })
+    }
+    
+    func assign(app path: String, to page: Int) {
+        if let assignedApp = assignedAppsToPages.first(where: { $0.appPath == path }) {
+//            connectionManager.localError = "App already assigned to page \(assignedApp.page)"
+//            connectionManager.showsLocalError = true
+            return
+        }
+        assignedAppsToPages.append(.init(page: page, appPath: path))
+        UserDefaults.standard.store(assignedAppsToPages, for: .assignedAppsToSubpages)
+        self.pages = pages
+    }
+    
+    func unassign(app path: String, from page: Int) {
+        assignedAppsToPages = assignedAppsToPages.filter { $0.appPath != path && $0.page != page }
+        UserDefaults.standard.store(assignedAppsToPages, for: .assignedAppsToSubpages)
+        self.pages = pages
+    }
+    
+    func getIcon(fromAppPath appPath: String?) -> Data? {
+        guard let appPath else {
+            return nil
+        }
+        let bundleURL = URL(fileURLWithPath: appPath)
+        
+        guard let bundle = Bundle(url: bundleURL) else {
+            return nil
+        }
+        
+        guard let iconFile = bundle.infoDictionary?["CFBundleIconFile"] as? String else {
+            let icon = NSWorkspace.shared.icon(forFile: appPath)
+            let resizedIcon = icon.resizedImage(newSize: .init(width: 96.0, height: 96.0))
+            let fallbackIcon = try? resizedIcon.imageData(for: .png(scale: 0.2, excludeGPSData: false))
+            return fallbackIcon
+        }
+        
+        let iconName = (iconFile as NSString).deletingPathExtension
+        let iconExtension = (iconFile as NSString).pathExtension.isEmpty ? "icns" : (iconFile as NSString).pathExtension
+        
+        guard let iconPath = bundle.path(forResource: iconName, ofType: iconExtension) else {
+            return nil
+        }
+        let pngProps: [NSBitmapImageRep.PropertyKey: Any] = [
+            .compressionFactor: 0.0
+        ]
+        guard let icon = NSImage(contentsOfFile: iconPath) else {
+            return nil
+        }
+        let resized = icon.resizedImage(newSize: .init(width: 96.0, height: 96.0))
+        guard let tiffData = resized.tiffRepresentation,
+           let bitmap = NSBitmapImageRep(data: tiffData),
+           let pngData = bitmap.representation(using: .png, properties: pngProps) else {
+            return nil
+        }
+//        cachedIcons[appPath] = pngData
+        
+//        let sizeInMB = Double(pngData.count) / (1024.0 * 1024.0)
+//        countMB += sizeInMB
+//        print(String(format: "%.8f MB", countMB))
+        
+        return pngData
     }
 }

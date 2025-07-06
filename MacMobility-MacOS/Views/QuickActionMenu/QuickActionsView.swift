@@ -16,31 +16,80 @@ struct QuickActionsView: View {
     @State private var subMenuIsVisible: Bool = false
     @State private var isEditing: Bool = false
     @State private var showPopup = false
-    let buttonCount = 10
-    let cornerRadius = 20.0
-    let radius: CGFloat = 120
-    let action: (ShortcutObject) -> Void
-    let update: ([ShortcutObject]) -> Void
-    let frame = CGSize(width: 40, height: 40)
-    let thickness: CGFloat = 60
-    let elegantGray = Color(red: 0.3, green: 0.3, blue: 0.33)
-    let sliceCount = 10
-    let sliceAngle = 360.0 / 10.0
-    @State var submenuDegrees = 0.0
-    @State var subitem: ShortcutObject?
+    @State private var submenuDegrees = 0.0
+    @State private var subitem: ShortcutObject?
+    private let buttonCount = 10
+    private let cornerRadius = 20.0
+    private let radius: CGFloat = 120
+    private let action: (ShortcutObject) -> Void
+    private let update: ([ShortcutObject]) -> Void
+    private let close: () -> Void
+    private let frame = CGSize(width: 40, height: 40)
+    private let thickness: CGFloat = 60
+    private let elegantGray = Color(red: 58/255, green: 58/255, blue: 60/255)
+    private let sliceCount = 10
+    private let sliceAngle = 360.0 / 10.0
+    
+    private let innerCircleColors: [Color] = [
+        Color(red: 64/255, green: 156/255, blue: 255/255),
+        Color(red: 82/255, green: 183/255, blue: 136/255),
+        Color(red: 235/255, green: 87/255, blue: 87/255),
+        Color(red: 64/255, green: 156/255, blue: 255/255),
+        Color(red: 58/255, green: 58/255, blue: 60/255),
+        Color(red: 58/255, green: 58/255, blue: 60/255)
+    ]
+    
+    private var innerCircleActions: [() -> Void] {
+        [
+            {
+                viewModel.nextPage()
+                showPopup = false
+            },
+            {
+                viewModel.addPage()
+                update(viewModel.items)
+            },
+            {
+                viewModel.removePage(with: viewModel.currentPage)
+                update(viewModel.items)
+            },
+            {
+                viewModel.prevPage()
+                showPopup = false
+            },
+            {},
+            {}
+        ]
+    }
+    
+    private var innerCirlceContents: [() -> AnyView] = [
+        { AnyView(Text(">").allowsHitTesting(false)) },
+        { AnyView(Text("+").allowsHitTesting(false)) },
+        { AnyView(Text("-").allowsHitTesting(false)) },
+        { AnyView(Text("<").allowsHitTesting(false)) },
+        { AnyView(Text("")) },
+        { AnyView(Text("")) },
+    ]
     
     init(
         viewModel: QuickActionsViewModel,
         action: @escaping (ShortcutObject) -> Void,
-        update: @escaping ([ShortcutObject]) -> Void
+        update: @escaping ([ShortcutObject]) -> Void,
+        close: @escaping () -> Void
     ) {
         self.viewModel = viewModel
         self.action = action
         self.update = update
+        self.close = close
     }
     
     var body: some View {
         ZStack {
+            Color.white.opacity(0.001)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    close()
+                }
             circleMainView()
             if showPopup {
                 submenuPopup()
@@ -60,54 +109,193 @@ struct QuickActionsView: View {
         }
     }
     
-    private func innerCircleMenu() -> some View {
+    @ViewBuilder
+    private func pageNumberView(page: Int) -> some View {
         VStack {
-            ZStack {
-                Circle()
-                    .fill(elegantGray)
-                    .frame(width: 150, height: 150)
-                    .onHover { _ in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            if !self.isEditing {
-                                self.showPopup = false
+            if let assignedApp = viewModel.getAssigned(to: page),
+               let app = viewModel.object(path: assignedApp.appPath) {
+                if let data = viewModel.getIcon(fromAppPath: assignedApp.appPath),
+                   let image = NSImage(data: data) {
+                    VStack {
+                        ZStack {
+                            Image(nsImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .cornerRadius(cornerRadius)
+                                .frame(width: 60, height: 60)
+                                .padding(.bottom, 4.0)
+                                .if(!isEditing) {
+                                    $0.onTapGesture {
+                                        action(app)
+                                    }
+                                    .contextMenu {
+                                        Button("Edit") {
+                                            isEditing = true
+                                            NotificationCenter.default.post(
+                                                name: .openShortcuts,
+                                                object: nil,
+                                                userInfo: nil
+                                            )
+                                        }
+                                    }
+                                }
+                                .padding(.bottom, 12.0)
+                            if isEditing {
+                                VStack {
+                                    HStack {
+                                        Spacer()
+                                        RedXButton {
+                                            viewModel.unassign(app: assignedApp.appPath, from: page)
+                                        }
+                                    }
+                                    Spacer()
+                                }
                             }
                         }
                     }
-                if isEditing {
-                    Button("Save") {
-                        isEditing = false
+                    .frame(width: 60, height: 60)
+                    .onDrop(of: [.text], isTargeted: nil) { providers in
+                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                            if let droppedString = droppedItem as? String,
+                               let object = viewModel.object(for: droppedString),
+                               let path = object.path {
+                                DispatchQueue.main.async {
+                                    viewModel.replace(app: path, to: page)
+                                }
+                            }
+                        }
+                        return true
+                    }
+                }
+            } else {
+                if !isEditing {
+                    Button("Assign") {
+                        isEditing = true
                         NotificationCenter.default.post(
-                            name: .closeShortcuts,
+                            name: .openShortcuts,
                             object: nil,
                             userInfo: nil
                         )
                     }
+                    .padding(.bottom, 4.0)
                 } else {
-                    VStack {
-                        HStack {
-                            Button("<") {
-                                viewModel.prevPage()
+                    RoundedTextButtonView(text: "Page \(page)\nDrop Here", size: .init(width: 60.0, height: 60.0), cornerRadius: 10)
+                        .onDrop(of: [.text], isTargeted: nil) { providers in
+                            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                                if let droppedString = droppedItem as? String,
+                                   let object = viewModel.object(for: droppedString),
+                                   let path = object.path {
+                                    DispatchQueue.main.async {
+                                        viewModel.assign(app: path, to: page)
+                                    }
+                                }
                             }
-                            Text("Page: \(viewModel.currentPage)")
-                            Button(">") {
-                                viewModel.nextPage()
-                            }
+                            return true
                         }
-                        Divider()
-                            .frame(width: 30)
-                        HStack {
-                            Button("+") {
-                                viewModel.addPage()
-                                update(viewModel.items)
-                            }
-                            Button("-") {
-                                viewModel.removePage(with: viewModel.currentPage)
-                                update(viewModel.items)
-                            }
-                        }
-                        
-                    }
                 }
+            }
+        }
+    }
+    
+    func selectApp() -> String? {
+        let openPanel = NSOpenPanel()
+        openPanel.title = "Select an Application"
+        openPanel.allowedContentTypes = [.application]
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canChooseFiles = true
+        
+        if openPanel.runModal() == .OK {
+            return openPanel.url?.path
+        }
+        
+        return nil
+    }
+    
+    private func innerCircleMenu() -> some View {
+        VStack {
+            ZStack {
+                ZStack {
+                    ForEach(0..<6) { index in
+                        switch index {
+                        case 0:
+                            SliceButton<AnyView>(
+                                index: index,
+                                totalSlices: 6,
+                                thickness: 15,
+                                color: viewModel.currentPage == viewModel.pages ? elegantGray : innerCircleColors[index],
+                                action: innerCircleActions[index],
+                                content: viewModel.currentPage == viewModel.pages ? {AnyView(EmptyView())} : innerCirlceContents[index]
+                            )
+                        case 2:
+                            SliceButton<AnyView>(
+                                index: index,
+                                totalSlices: 6,
+                                thickness: 15,
+                                color: viewModel.pages == 1 ? elegantGray : innerCircleColors[index],
+                                action: innerCircleActions[index],
+                                content: viewModel.pages == 1 ? {AnyView(EmptyView())} : innerCirlceContents[index]
+                            )
+                        case 3:
+                            SliceButton<AnyView>(
+                                index: index,
+                                totalSlices: 6,
+                                thickness: 15,
+                                color: viewModel.currentPage == 1 ? elegantGray : innerCircleColors[index],
+                                action: innerCircleActions[index],
+                                content: viewModel.currentPage == 1 ? {AnyView(EmptyView())} : innerCirlceContents[index]
+                            )
+                        default:
+                            SliceButton<AnyView>(
+                                index: index,
+                                totalSlices: 6,
+                                thickness: 15,
+                                color: innerCircleColors[index],
+                                action: innerCircleActions[index],
+                                content: innerCirlceContents[index]
+                            )
+                        }
+                    }
+                }.frame(width: 150, height: 150)
+                Circle()
+                    .fill(elegantGray)
+                    .frame(width: 120, height: 120)
+                VStack {
+                    if !isEditing {
+                        VStack(alignment: .trailing) {
+                            Text("Page \(viewModel.currentPage)")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(Color.white)
+                        }
+                        .padding(.all, 8.0)
+                        .background(
+                            RoundedBackgroundView()
+                        )
+                        Spacer()
+                    }
+                    if isEditing {
+                        VStack(spacing: 2.0) {
+                            pageNumberView(page: viewModel.currentPage)
+                            Button("Save") {
+                                isEditing = false
+                                NotificationCenter.default.post(
+                                    name: .closeShortcuts,
+                                    object: nil,
+                                    userInfo: nil
+                                )
+                            }
+                            .padding(.top, 4.0)
+                        }
+                    } else {
+                        VStack {
+                            HStack {
+                                pageNumberView(page: viewModel.currentPage)
+                            }
+                        }
+                    }
+                    Spacer()
+                }
+                .frame(height: 120)
             }
         }
     }
@@ -361,7 +549,7 @@ struct QuickActionsView: View {
                     .font(.system(size: 12))
                     .multilineTextAlignment(.center)
                     .padding(.all, 3)
-                    .outlinedText()
+                    .outlinedText(strokeColor: .black.opacity(0.3))
             }
         } else if object.type == .webpage {
             if let data = object.imageData, let image = NSImage(data: data) {
@@ -378,7 +566,7 @@ struct QuickActionsView: View {
                         .font(.system(size: 12))
                         .multilineTextAlignment(.center)
                         .padding(.all, 3)
-                        .outlinedText()
+                        .outlinedText(strokeColor: .black.opacity(0.3))
                 }
             } else if let path = object.browser?.icon {
                 Image(path)
@@ -390,7 +578,7 @@ struct QuickActionsView: View {
                         .font(.system(size: 12))
                         .multilineTextAlignment(.center)
                         .padding(.all, 3)
-                        .outlinedText()
+                        .outlinedText(strokeColor: .black.opacity(0.3))
                 }
             }
         } else if object.type == .utility {
@@ -408,7 +596,7 @@ struct QuickActionsView: View {
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .frame(maxWidth: 80)
-                        .outlinedText()
+                        .outlinedText(strokeColor: .black.opacity(0.3))
                 }
             }
         } else if object.type == .html {
@@ -426,7 +614,7 @@ struct QuickActionsView: View {
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .frame(maxWidth: 80)
-                        .outlinedText()
+                        .outlinedText(strokeColor: .black.opacity(0.3))
                 }
             }
         }

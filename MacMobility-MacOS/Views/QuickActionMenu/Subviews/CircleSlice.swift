@@ -68,3 +68,30 @@ struct CircleSliceBackground: View {
             .contentShape(sliceShape)
     }
 }
+
+struct CircleSliceButton: View {
+    let index: Int
+    let sliceAngle: Double
+    let thickness: CGFloat
+    let background: Color
+    var startAngle: Angle { .degrees(-20) }
+    var rotation: Angle { .degrees(Double(index) * sliceAngle) }
+
+    var body: some View {
+        let sliceShape = CircleSliceShape(
+            startAngle: startAngle,
+            sliceAngle: .degrees(sliceAngle),
+            thickness: thickness
+        )
+
+        return sliceShape
+            .fill(background)
+            .rotationEffect(rotation)
+            .overlay {
+                sliceShape
+                    .stroke(Color.black.opacity(0.2), lineWidth: 0.5)
+                    .rotationEffect(rotation)
+            }
+            .contentShape(sliceShape)
+    }
+}
