@@ -169,7 +169,7 @@ struct QuickActionsView: View {
                 }
             } else {
                 if !isEditing {
-                    Button("Assign") {
+                    Button("Edit") {
                         isEditing = true
                         NotificationCenter.default.post(
                             name: .openShortcuts,
@@ -179,7 +179,7 @@ struct QuickActionsView: View {
                     }
                     .padding(.bottom, 4.0)
                 } else {
-                    RoundedTextButtonView(text: "Page \(page)\nDrop Here", size: .init(width: 60.0, height: 60.0), cornerRadius: 10)
+                    RoundedTextButtonView(text: "Page \(page)\nDrop App Here", size: .init(width: 60.0, height: 60.0), cornerRadius: 10)
                         .onDrop(of: [.text], isTargeted: nil) { providers in
                             providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
                                 if let droppedString = droppedItem as? String,
@@ -278,6 +278,7 @@ struct QuickActionsView: View {
                             pageNumberView(page: viewModel.currentPage)
                             Button("Save") {
                                 isEditing = false
+                                showPopup = false
                                 NotificationCenter.default.post(
                                     name: .closeShortcuts,
                                     object: nil,
