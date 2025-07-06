@@ -425,6 +425,7 @@ struct QuickActionsView: View {
             .onHover { _ in
                 if !isEditing {
                     showPopup = false
+                    lastHoveredIndex = nil
                 } else {
                     submenuDegrees = angle.degrees - 92
                     subitem = item
@@ -475,6 +476,8 @@ struct QuickActionsView: View {
         .frame(width: 60.0, height: 60.0)
     }
     
+    @State private var lastHoveredIndex: Int?
+    
     private func mainView(item: ShortcutObject, index: Int, angle: Angle) -> some View {
         ZStack {
             itemView(object: item)
@@ -496,12 +499,18 @@ struct QuickActionsView: View {
                         }
                         .onHover { hovering in
                             hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                submenuDegrees = angle.degrees - 92
-                                if hovering {
-                                    showPopup = true
+                            if lastHoveredIndex == hoveredIndex {
+                                showPopup = false
+                                lastHoveredIndex = nil
+                            } else {
+                                lastHoveredIndex = index
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    submenuDegrees = angle.degrees - 92
+                                    if hovering {
+                                        showPopup = true
+                                    }
+                                    subitem = item
                                 }
-                                subitem = item
                             }
                         }
                 }
