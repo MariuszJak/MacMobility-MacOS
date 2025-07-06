@@ -30,6 +30,11 @@ class QuickActionsViewModel: ObservableObject {
            let pageToFocus = assignedAppsToPages.first(where: { $0.appPath.contains(activeApp) }) {
             currentPage = pageToFocus.page
         }
+        self.items.enumerated().forEach { (index, _) in
+            if self.items[index].page < 1 {
+                self.items[index].page = 1
+            }
+        }
     }
     
     func object(for id: String) -> ShortcutObject? {
