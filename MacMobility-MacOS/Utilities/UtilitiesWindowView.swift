@@ -115,11 +115,6 @@ struct UtilitiesWindowView: View {
                 }
             }
         }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray.opacity(0.4), lineWidth: 1)
@@ -206,6 +201,7 @@ struct UtilitiesWindowView: View {
             newWindow?.setFrameAutosaveName("NewUtility")
             newWindow?.isReleasedWhenClosed = false
             newWindow?.titlebarAppearsTransparent = true
+            newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
@@ -250,6 +246,7 @@ struct UtilitiesWindowView: View {
             editUtilitiesWindow?.setFrameAutosaveName("Utilities")
             editUtilitiesWindow?.isReleasedWhenClosed = false
             editUtilitiesWindow?.titlebarAppearsTransparent = true
+            editUtilitiesWindow?.appearance = NSAppearance(named: .darkAqua)
             editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {

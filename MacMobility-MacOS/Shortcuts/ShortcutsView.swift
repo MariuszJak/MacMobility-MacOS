@@ -187,16 +187,6 @@ struct ShortcutsView: View {
                     }
                     .padding(.all, 3.0)
                 }
-                BlueButton(
-                    title: "Quick Action Menu",
-                    font: .callout,
-                    padding: 8.0,
-                    cornerRadius: 6.0,
-                    backgroundColor: .clear
-                ) {
-                    openQuickActionWindow()
-                }
-                .padding(.all, 3.0)
                 Spacer()
                 AnimatedSearchBar(searchText: $viewModel.searchText)
                     .padding(.all, 3.0)
@@ -331,11 +321,6 @@ struct ShortcutsView: View {
                     }
                 }
                 .frame(maxWidth: 500.0, maxHeight: .infinity)
-            }
-        }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
             }
         }
         .sheet(isPresented: $shouldShowCompanionRequestPopup) {
@@ -845,6 +830,7 @@ struct ShortcutsView: View {
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
             newWindow?.titlebarAppearsTransparent = true
+            newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
@@ -885,6 +871,7 @@ struct ShortcutsView: View {
             companionAppWindow?.setFrameAutosaveName("Webpages")
             companionAppWindow?.isReleasedWhenClosed = false
             companionAppWindow?.titlebarAppearsTransparent = true
+            companionAppWindow?.appearance = NSAppearance(named: .darkAqua)
             companionAppWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: companionAppWindow) else {
@@ -918,6 +905,7 @@ struct ShortcutsView: View {
             shortcutsToInstallWindow?.setFrameAutosaveName("ShortcutsToInstallWindow")
             shortcutsToInstallWindow?.isReleasedWhenClosed = false
             shortcutsToInstallWindow?.titlebarAppearsTransparent = true
+            shortcutsToInstallWindow?.appearance = NSAppearance(named: .darkAqua)
             shortcutsToInstallWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: shortcutsToInstallWindow) else {
@@ -949,6 +937,7 @@ struct ShortcutsView: View {
             automationsToInstallWindow?.setFrameAutosaveName("AutomationsToInstallWindow")
             automationsToInstallWindow?.isReleasedWhenClosed = false
             automationsToInstallWindow?.titlebarAppearsTransparent = true
+            automationsToInstallWindow?.appearance = NSAppearance(named: .darkAqua)
             automationsToInstallWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: automationsToInstallWindow) else {
@@ -981,6 +970,7 @@ struct ShortcutsView: View {
             newUtilityWindow?.setFrameAutosaveName("NewUtility")
             newUtilityWindow?.isReleasedWhenClosed = false
             newUtilityWindow?.titlebarAppearsTransparent = true
+            newUtilityWindow?.appearance = NSAppearance(named: .darkAqua)
             newUtilityWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newUtilityWindow) else {
@@ -1016,6 +1006,7 @@ struct ShortcutsView: View {
             quickActionSetupWindow?.setFrameAutosaveName("QuickActionSetupWindow")
             quickActionSetupWindow?.isReleasedWhenClosed = false
             quickActionSetupWindow?.titlebarAppearsTransparent = true
+            quickActionSetupWindow?.appearance = NSAppearance(named: .darkAqua)
             quickActionSetupWindow?.styleMask.insert(.fullSizeContentView)
             quickActionSetupWindow?.level = .floating
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: quickActionSetupWindow) else {
@@ -1057,6 +1048,7 @@ struct ShortcutsView: View {
             automationItemWindow?.setFrameAutosaveName("AutomationsToInstallWindow")
             automationItemWindow?.isReleasedWhenClosed = false
             automationItemWindow?.titlebarAppearsTransparent = true
+            automationItemWindow?.appearance = NSAppearance(named: .darkAqua)
             automationItemWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: automationItemWindow) else {
@@ -1101,6 +1093,7 @@ struct ShortcutsView: View {
             editUtilitiesWindow?.setFrameAutosaveName("Utilities")
             editUtilitiesWindow?.isReleasedWhenClosed = false
             editUtilitiesWindow?.titlebarAppearsTransparent = true
+            editUtilitiesWindow?.appearance = NSAppearance(named: .darkAqua)
             editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {

@@ -46,6 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         popOver.behavior = .transient
         popOver.animates = true
+        popOver.appearance = NSAppearance(named: .darkAqua)
         popOver.contentViewController = NSViewController()
         popOver.contentViewController?.view = NSHostingView(rootView: menuView)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -196,6 +197,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             tabShortcutsWindow?.setFrameAutosaveName("TabShortcutsWindow")
             tabShortcutsWindow?.isReleasedWhenClosed = false
             tabShortcutsWindow?.titlebarAppearsTransparent = true
+            tabShortcutsWindow?.appearance = NSAppearance(named: .darkAqua)
             tabShortcutsWindow?.styleMask.insert(.fullSizeContentView)
             tabShortcutsWindow?.title = "Quick Actions Drag & Drop"
             let hv = NSHostingController(rootView: StandaloneTabView(viewModel: shortcutsViewModel))
@@ -281,8 +283,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             shortcutsWindow?.setFrameAutosaveName("Shortcuts")
             shortcutsWindow?.isReleasedWhenClosed = false
             shortcutsWindow?.titlebarAppearsTransparent = true
+            shortcutsWindow?.appearance = NSAppearance(named: .darkAqua)
             shortcutsWindow?.styleMask.insert(.fullSizeContentView)
             shortcutsWindow?.title = "Editor"
+            shortcutsWindow?.appearance = NSAppearance(named: .darkAqua)
             let hv = NSHostingController(rootView: ShortcutsView(viewModel: shortcutsViewModel))
             shortcutsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = shortcutsWindow?.contentView?.bounds ?? .zero
@@ -305,6 +309,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             qamTutorialWindow?.setFrameAutosaveName("QamTutorialWindow")
             qamTutorialWindow?.isReleasedWhenClosed = false
             qamTutorialWindow?.titlebarAppearsTransparent = true
+            qamTutorialWindow?.appearance = NSAppearance(named: .darkAqua)
             qamTutorialWindow?.styleMask.insert(.fullSizeContentView)
             let hv = NSHostingController(rootView: QuickActionVideoTutorialView())
             qamTutorialWindow?.contentView?.addSubview(hv.view)
@@ -326,6 +331,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             welcomeWindow?.setFrameAutosaveName("Welcome")
             welcomeWindow?.isReleasedWhenClosed = false
             welcomeWindow?.titlebarAppearsTransparent = true
+            welcomeWindow?.appearance = NSAppearance(named: .darkAqua)
             welcomeWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: welcomeWindow) else {
@@ -361,6 +367,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             permissionsWindow?.setFrameAutosaveName("Permissions")
             permissionsWindow?.isReleasedWhenClosed = false
             permissionsWindow?.titlebarAppearsTransparent = true
+            permissionsWindow?.appearance = NSAppearance(named: .darkAqua)
             permissionsWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: permissionsWindow) else {

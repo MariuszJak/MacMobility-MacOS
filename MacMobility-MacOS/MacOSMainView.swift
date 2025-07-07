@@ -52,9 +52,6 @@ struct MacOSMainPopoverView: View {
                     viewModel.appIsUpToDate = nil
                 }
             }
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
         }
     }
     
@@ -131,6 +128,7 @@ struct MacOSMainPopoverView: View {
             updatesWindow?.setFrameAutosaveName("Updates")
             updatesWindow?.isReleasedWhenClosed = false
             updatesWindow?.titlebarAppearsTransparent = true
+            updatesWindow?.appearance = NSAppearance(named: .darkAqua)
             updatesWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: updatesWindow) else {
@@ -158,6 +156,7 @@ struct MacOSMainPopoverView: View {
             permissionsWindow?.setFrameAutosaveName("Permissions")
             permissionsWindow?.isReleasedWhenClosed = false
             permissionsWindow?.titlebarAppearsTransparent = true
+            permissionsWindow?.appearance = NSAppearance(named: .darkAqua)
             permissionsWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: permissionsWindow) else {
@@ -185,6 +184,7 @@ struct MacOSMainPopoverView: View {
             licenseWindow?.setFrameAutosaveName("License")
             licenseWindow?.isReleasedWhenClosed = false
             licenseWindow?.titlebarAppearsTransparent = true
+            licenseWindow?.appearance = NSAppearance(named: .darkAqua)
             licenseWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: licenseWindow) else {
@@ -212,6 +212,7 @@ struct MacOSMainPopoverView: View {
             aboutWindow?.setFrameAutosaveName("About")
             aboutWindow?.isReleasedWhenClosed = false
             aboutWindow?.titlebarAppearsTransparent = true
+            aboutWindow?.appearance = NSAppearance(named: .darkAqua)
             aboutWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: aboutWindow) else {

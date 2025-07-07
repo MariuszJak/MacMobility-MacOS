@@ -134,9 +134,6 @@ struct ExploreAutomationsView: View {
         }
         .onAppear {
             viewModel.loadJSONFromDirectory()
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
         }
         .padding()
     }

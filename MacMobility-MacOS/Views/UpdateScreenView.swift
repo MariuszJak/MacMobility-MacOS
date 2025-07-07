@@ -62,11 +62,6 @@ struct UpdateScreenView: View {
                 .padding(.bottom, 24.0)
             }
         }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
         .padding(.horizontal, 21.0)
     }
 }

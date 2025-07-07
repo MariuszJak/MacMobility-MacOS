@@ -48,10 +48,5 @@ struct InstallAutomationsView: View {
                     .fill(Color.gray.opacity(0.1))
             )
         }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
     }
 }

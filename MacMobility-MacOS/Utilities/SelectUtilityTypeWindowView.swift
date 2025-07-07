@@ -140,11 +140,6 @@ struct SelectUtilityTypeWindowView: View {
                 RoundedBackgroundView()
             )
         }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
         .padding()
     }
     
@@ -163,6 +158,7 @@ struct SelectUtilityTypeWindowView: View {
                 newWindow?.setFrameAutosaveName("CreateNewUtility")
                 newWindow?.isReleasedWhenClosed = false
                 newWindow?.titlebarAppearsTransparent = true
+                newWindow?.appearance = NSAppearance(named: .darkAqua)
                 newWindow?.styleMask.insert(.fullSizeContentView)
             } else {
                 newWindow = NSWindow(
@@ -175,6 +171,7 @@ struct SelectUtilityTypeWindowView: View {
                 newWindow?.setFrameAutosaveName("CreateNewUtility")
                 newWindow?.isReleasedWhenClosed = false
                 newWindow?.titlebarAppearsTransparent = true
+                newWindow?.appearance = NSAppearance(named: .darkAqua)
                 newWindow?.styleMask.insert(.fullSizeContentView)
             }
             

@@ -114,11 +114,6 @@ public struct ValidateLicenseView: View {
             }
             .disabled(viewModel.isCheckDisabled)
         }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
         .padding()
     }
 }

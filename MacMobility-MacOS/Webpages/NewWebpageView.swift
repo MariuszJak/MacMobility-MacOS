@@ -167,11 +167,6 @@ struct NewWebpageView: View {
             }
             .padding(.trailing, 28.0)
         }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
         .padding()
     }
 }

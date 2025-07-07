@@ -100,9 +100,6 @@ struct QuickActionsView: View {
         .opacity(isVisible ? 1.0 : 0.0)
         .frame(width: 460, height: 460)
         .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
             withAnimation(.easeInOut) {
                 isVisible = true
             }

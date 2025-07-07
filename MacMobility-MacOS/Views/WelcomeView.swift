@@ -183,9 +183,6 @@ struct WelcomeView: View {
             withAnimation(.easeInOut(duration: 5)) {
                 showWelcomeText = true
             }
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
         }
         .padding(.horizontal, 21.0)
     }
