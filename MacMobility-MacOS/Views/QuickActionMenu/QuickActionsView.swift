@@ -351,7 +351,7 @@ struct QuickActionsView: View {
                         sliceAngle: .degrees(sliceAngle),
                         thickness: 60
                     )
-                    .stroke(Color.black.opacity(0.5), lineWidth: 0.7)
+                    .stroke(Color(red: 44/255, green: 44/255, blue: 46/255), lineWidth: 0.7)
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [

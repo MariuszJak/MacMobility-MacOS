@@ -35,7 +35,7 @@ struct CircleSlice: View {
             .rotationEffect(rotation)
             .overlay {
                 sliceShape
-                    .stroke(Color.black.opacity(0.2), lineWidth: 0.5)
+                    .stroke(Color(red: 44/255, green: 44/255, blue: 46/255), lineWidth: 0.5)
                     .rotationEffect(rotation)
             }
             .contentShape(sliceShape)
