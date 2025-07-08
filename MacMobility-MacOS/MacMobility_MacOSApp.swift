@@ -213,15 +213,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let window, let circularWindow else {
             return
         }
-        let mouseLocation = NSEvent.mouseLocation
+        let circularWindowLocation = circularWindow.frame.origin
         var offset = 0.0
-        if mouseLocation.x > 500 {
+        if circularWindowLocation.x > 500 {
             offset = -550.0
         } else {
             offset = 450.0
         }
         
-        window.setFrameOrigin(.init(x: circularWindow.frame.origin.x + offset, y: circularWindow.frame.origin.y))
+        window.setFrameOrigin(.init(x: circularWindowLocation.x + offset, y: circularWindowLocation.y))
     }
     
     private func positionWindowAtMouse(window: NSWindow?, size: CGFloat) {
