@@ -210,18 +210,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func positionSubmenu(window: NSWindow?, size: CGFloat) {
-        guard let window, let circularWindow else {
+        guard let window, let circularWindow, let screenSize = currentScreenSize() else {
             return
         }
         let circularWindowLocation = circularWindow.frame.origin
         var offset = 0.0
-        if circularWindowLocation.x > 500 {
+        
+        if circularWindowLocation.x > screenSize.width * 0.5 {
             offset = -550.0
         } else {
             offset = 450.0
         }
         
         window.setFrameOrigin(.init(x: circularWindowLocation.x + offset, y: circularWindowLocation.y))
+    }
+    
+    private func currentScreenSize() -> CGSize? {
+        let mouseLocation = NSEvent.mouseLocation
+        if let screen = NSScreen.screens.first(where: { $0.frame.contains(mouseLocation) }) {
+            return screen.frame.size
+        }
+        return nil
     }
     
     private func positionWindowAtMouse(window: NSWindow?, size: CGFloat) {
