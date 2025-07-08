@@ -52,7 +52,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var automations: AutomationsList?
     private var createMultiactions: Bool?
     private var browser: Browsers?
-    
+    private var installedAllApps: [ShortcutObject] = []
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clear(key: .quickActionItems)
@@ -801,23 +801,24 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         ]
 
         var apps: [ShortcutObject] = []
-
-        for directory in appDirectories {
-            apps.append(contentsOf: findApps(in: directory))
-        }
-
         DispatchQueue.main.async {
+            for directory in appDirectories {
+                apps.append(contentsOf: self.findApps(in: directory))
+            }
+            
+            self.appsAddedByUser.forEach { userApp in
+                if apps.contains(where: { $0.path != userApp.path }) {
+                    apps.append(userApp)
+                }
+            }
+            
             if self.searchText.isEmpty {
                 self.installedApps = apps.sorted { $0.title.lowercased() < $1.title.lowercased() }
+                self.installedAllApps.removeAll()
             } else {
-                self.installedApps = apps.sorted { $0.title.lowercased() < $1.title.lowercased() }
+                self.installedAllApps = apps.sorted { $0.title.lowercased() < $1.title.lowercased() }
+                self.installedApps = self.installedAllApps
                     .filter { $0.title.lowercased().contains(self.searchText.lowercased()) }
-            }
-        }
-        
-        appsAddedByUser.forEach { userApp in
-            if apps.contains(where: { $0.path != userApp.path }) {
-                apps.append(userApp)
             }
         }
     }
@@ -852,12 +853,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         if let appURLs = try? FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: directory), includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
             for appURL in appURLs where appURL.pathExtension == "app" {
                 let appName = appURL.deletingPathExtension().lastPathComponent
+                let id: String = installedApps.first(where: { shortcut in appURL.path == shortcut.path })?.id
+                ?? installedAllApps.first(where: { shortcut in appURL.path == shortcut.path })?.id
+                ?? configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id
+                ?? UUID().uuidString
                 apps.append(
                     ShortcutObject(
                         type: .app,
                         page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? 1,
                         path: appURL.path,
-                        id: installedApps.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
+                        id: id,
                         title: appName,
                         imageData: cachedIcons[appURL.path] ?? getIcon(fromAppPath: appURL.path)
                     )
