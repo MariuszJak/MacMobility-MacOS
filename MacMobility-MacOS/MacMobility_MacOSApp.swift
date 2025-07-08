@@ -170,6 +170,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         guard let self else { return }
                         shortcutsViewModel.saveQuickActionItems(items)
                     }, close: { [weak self] in
+                        self?.closeShortcuts()
                         self?.circularWindow?.close()
                         self?.circularWindow = nil
                     }
