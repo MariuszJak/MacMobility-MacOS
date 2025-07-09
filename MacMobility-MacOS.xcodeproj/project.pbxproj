@@ -35,7 +35,6 @@
 		C09084DA2DFED7CD00DFE172 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */; };
 		C09084DC2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */; };
 		C09084DE2E00309500DFE172 /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084DD2E00309500DFE172 /* HotKeyManager.swift */; };
-		C09084E22E003C0100DFE172 /* QAM_video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C09084E12E003C0100DFE172 /* QAM_video.mp4 */; };
 		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
 		C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */; };
 		C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775332B5C319E00F4FFE6 /* Assets.xcassets */; };
@@ -55,6 +54,11 @@
 		C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */; };
 		C0B160602E185C4D00C70CBD /* CircleSliceShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */; };
 		C0B160622E1AF2D700C70CBD /* SliceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B160612E1AF2D700C70CBD /* SliceButton.swift */; };
+		C0B160672E1D2B9500C70CBD /* QAM-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160652E1D2B9500C70CBD /* QAM-3.mp4 */; };
+		C0B160682E1D2B9500C70CBD /* QAM-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160642E1D2B9500C70CBD /* QAM-2.mp4 */; };
+		C0B160692E1D2B9500C70CBD /* QAM-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160662E1D2B9500C70CBD /* QAM-4.mp4 */; };
+		C0B1606C2E1D32C100C70CBD /* QAM-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B1606B2E1D32C100C70CBD /* QAM-1.mp4 */; };
+		C0B1606E2E1D3A1C00C70CBD /* StandaloneTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1606D2E1D3A1C00C70CBD /* StandaloneTabView.swift */; };
 		C0C9B78B2DCAACA40068BCAB /* NewAutomationUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */; };
 		C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */; };
 		C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */; };
@@ -173,7 +177,6 @@
 		C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
 		C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewSetup.swift; sourceTree = "<group>"; };
 		C09084DD2E00309500DFE172 /* HotKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyManager.swift; sourceTree = "<group>"; };
-		C09084E12E003C0100DFE172 /* QAM_video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = QAM_video.mp4; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -197,6 +200,11 @@
 		C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSlice.swift; sourceTree = "<group>"; };
 		C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSliceShape.swift; sourceTree = "<group>"; };
 		C0B160612E1AF2D700C70CBD /* SliceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceButton.swift; sourceTree = "<group>"; };
+		C0B160642E1D2B9500C70CBD /* QAM-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-2.mp4"; sourceTree = "<group>"; };
+		C0B160652E1D2B9500C70CBD /* QAM-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-3.mp4"; sourceTree = "<group>"; };
+		C0B160662E1D2B9500C70CBD /* QAM-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-4.mp4"; sourceTree = "<group>"; };
+		C0B1606B2E1D32C100C70CBD /* QAM-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-1.mp4"; sourceTree = "<group>"; };
+		C0B1606D2E1D3A1C00C70CBD /* StandaloneTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandaloneTabView.swift; sourceTree = "<group>"; };
 		C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAutomationUtilityView.swift; sourceTree = "<group>"; };
 		C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConverterView.swift; sourceTree = "<group>"; };
 		C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mac-connect.mp4"; sourceTree = "<group>"; };
@@ -450,6 +458,7 @@
 				C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */,
 				C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */,
 				C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */,
+				C0B1606D2E1D3A1C00C70CBD /* StandaloneTabView.swift */,
 			);
 			path = QuickActionMenu;
 			sourceTree = "<group>";
@@ -467,7 +476,10 @@
 		C0C9B78E2DCD31D80068BCAB /* Video */ = {
 			isa = PBXGroup;
 			children = (
-				C09084E12E003C0100DFE172 /* QAM_video.mp4 */,
+				C0B1606B2E1D32C100C70CBD /* QAM-1.mp4 */,
+				C0B160642E1D2B9500C70CBD /* QAM-2.mp4 */,
+				C0B160652E1D2B9500C70CBD /* QAM-3.mp4 */,
+				C0B160662E1D2B9500C70CBD /* QAM-4.mp4 */,
 				C0C9B7932DCD35AD0068BCAB /* ipad-connect.mp4 */,
 				C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */,
 			);
@@ -713,11 +725,11 @@
 				C09775372B5C319E00F4FFE6 /* Preview Assets.xcassets in Resources */,
 				C0F67F062D982E990090D568 /* ANC ON.shortcut in Resources */,
 				C0F67F072D982E990090D568 /* Live Photo to GIF.shortcut in Resources */,
-				C09084E22E003C0100DFE172 /* QAM_video.mp4 in Resources */,
 				C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */,
 				C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */,
 				C0C9B7942DCD35AD0068BCAB /* ipad-connect.mp4 in Resources */,
 				C0F67F0A2D982E990090D568 /* Weather for Upcoming Events.shortcut in Resources */,
+				C0B1606C2E1D32C100C70CBD /* QAM-1.mp4 in Resources */,
 				C0F67F1B2D9831C90090D568 /* Focus ON.shortcut in Resources */,
 				C0F67F0B2D982E990090D568 /* ANC OFF.shortcut in Resources */,
 				C0F67F0C2D982E990090D568 /* Copy App Link.shortcut in Resources */,
@@ -729,6 +741,9 @@
 				C0F67F102D982E990090D568 /* Days Until....shortcut in Resources */,
 				C0F67F112D982E990090D568 /* EXIF Inspector.shortcut in Resources */,
 				C0F67F122D982E990090D568 /* Convert to JPEG and Copy.shortcut in Resources */,
+				C0B160672E1D2B9500C70CBD /* QAM-3.mp4 in Resources */,
+				C0B160682E1D2B9500C70CBD /* QAM-2.mp4 in Resources */,
+				C0B160692E1D2B9500C70CBD /* QAM-4.mp4 in Resources */,
 				C0F67F132D982E990090D568 /* Show Clipboard.shortcut in Resources */,
 				C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */,
 				C0F67F142D982E990090D568 /* Take Screenshot and Share.shortcut in Resources */,
@@ -767,6 +782,7 @@
 				C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */,
 				C0F67EE72D973F1D0090D568 /* LicenseValidationAPIProtocol.swift in Sources */,
 				C09084DE2E00309500DFE172 /* HotKeyManager.swift in Sources */,
+				C0B1606E2E1D3A1C00C70CBD /* StandaloneTabView.swift in Sources */,
 				C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */,
 				C065EBFC2DC0DDF300000B8C /* ExploreAutomationsView.swift in Sources */,
 				C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */,

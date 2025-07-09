@@ -319,7 +319,7 @@ struct QuickActionVideoTutorialView: View {
     private let player = AVQueuePlayer()
 
     init() {
-        setupLoopingVideo(player: player, resource: "QAM_video")
+        setupLoopingVideo(player: player, resource: "QAM-1")
     }
 
     var body: some View {
@@ -328,14 +328,14 @@ struct QuickActionVideoTutorialView: View {
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text("You can access up to 10 action without companion app. Just setup your Quick Action Menu circle, and access it via control + option + space key shortcut.")
+            Text("You can access up to 10 action without companion app. Access it via control + option + space key shortcut, setup your Quick Action Menu circle and use any of the actions.")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
             VideoPreviewView(player: player, title: "Access actions quickly", description: "To access, press control + option + space key.")
-                .frame(width: 360.0, height: 240.0)
+                .frame(width: 340.0, height: 240.0)
         }
         .padding()
         .onAppear {
@@ -346,6 +346,104 @@ struct QuickActionVideoTutorialView: View {
     private func setupLoopingVideo(player: AVQueuePlayer, resource: String) {
         guard let url = Bundle.main.url(forResource: resource, withExtension: "mp4") else { return }
         let item = AVPlayerItem(url: url)
+        player.insert(item, after: nil)
+        player.actionAtItemEnd = .none
+
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { _ in
+            player.seek(to: .zero)
+            player.play()
+        }
+    }
+}
+
+struct NewQAMVideoTutorialView: View {
+    @State var currentResourceIndex: Int = 0
+    private let isFirstOpen: Bool
+    private let closeHandler: () -> Void
+    private let player = AVQueuePlayer()
+    let resources = [
+        "QAM-1",
+        "QAM-2",
+        "QAM-3",
+        "QAM-4"
+    ]
+    
+    let names = [
+        "Assigning items to Quick Action Menu",
+        "Navigation in Quick Action Menu",
+        "Edit items in Quick Action Menu",
+        "Assign apps to pages in Quick Action Menu"
+    ]
+    
+    let descriptions = [
+        "Assign apps with Edit option. You can assign app to a page, and assign up to 10 apps to a circle. Each option in circle has additional 5 more spaces",
+        "Create new circle page with green `+` button. Navigate with `<` and `>` buttons. Remove page with `-` button.",
+        "Right-click on any item to Edit it.",
+        "Once an app is assigned to a page, it will be automatically shown in the circle if this app is in focus."
+    ]
+
+    init(isFirstOpen: Bool, closeHandler: @escaping () -> Void) {
+        self.isFirstOpen = isFirstOpen
+        self.closeHandler = closeHandler
+        setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
+    }
+
+    var body: some View {
+        VStack(spacing: 32) {
+            Text(names[currentResourceIndex])
+                .font(.title)
+                .fontWeight(.bold)
+            
+            Text(descriptions[currentResourceIndex])
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+
+            VideoPreviewView(player: player, title: "", description: "")
+                .frame(width: 700.0, height: 445.0)
+            
+            HStack {
+                if currentResourceIndex > 0 {
+                    Button("Previous") {
+                        currentResourceIndex -= 1
+                        setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
+                    }
+                }
+                if currentResourceIndex < resources.count - 1 {
+                    Button("Next") {
+                        currentResourceIndex += 1
+                        setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
+                    }
+                } else {
+                    if isFirstOpen {
+                        Button("Open QAM") {
+                            NotificationCenter.default.post(
+                                name: .openQAM,
+                                object: nil,
+                                userInfo: nil
+                            )
+                            closeHandler()
+                        }
+                    } else {
+                        Button("Close") {
+                            closeHandler()
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .onAppear {
+            player.play()
+        }
+    }
+
+    private func setupLoopingVideo(player: AVQueuePlayer, resource: String) {
+        guard let url = Bundle.main.url(forResource: resource, withExtension: "mp4") else { return }
+        let item = AVPlayerItem(url: url)
+        player.removeAllItems()
         player.insert(item, after: nil)
         player.actionAtItemEnd = .none
 
@@ -386,7 +484,7 @@ struct VideoPreviewView: View {
                 .disabled(true)
                 .cornerRadius(12)
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                .frame(height: 200)
+//                .frame(height: 200)
 
             Text(title)
                 .font(.headline)

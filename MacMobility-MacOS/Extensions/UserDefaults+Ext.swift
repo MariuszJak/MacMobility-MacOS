@@ -114,6 +114,7 @@ extension UserDefaults {
         case assignedAppsToSubpages
         case quickActionItems
         case quickActionTutorialSeen
+        case newQuickActionTutorialSeen
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {
