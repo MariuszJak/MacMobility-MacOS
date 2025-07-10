@@ -155,6 +155,7 @@ struct QuickActionsView: View {
                         providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
                             if let droppedString = droppedItem as? String,
                                let object = viewModel.object(for: droppedString),
+                               object.type == .app,
                                let path = object.path {
                                 DispatchQueue.main.async {
                                     viewModel.replace(app: path, to: page)
@@ -181,6 +182,7 @@ struct QuickActionsView: View {
                             providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
                                 if let droppedString = droppedItem as? String,
                                    let object = viewModel.object(for: droppedString),
+                                   object.type == .app,
                                    let path = object.path {
                                     DispatchQueue.main.async {
                                         viewModel.assign(app: path, to: page)
