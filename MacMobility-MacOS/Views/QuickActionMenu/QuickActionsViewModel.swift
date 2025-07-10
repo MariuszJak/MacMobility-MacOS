@@ -59,6 +59,11 @@ class QuickActionsViewModel: ObservableObject {
         UserDefaults.standard.store(currentPage, for: .subitemCurrentPage)
     }
     
+    func set(page number: Int) {
+        currentPage = number
+        UserDefaults.standard.store(currentPage, for: .subitemCurrentPage)
+    }
+    
     func addPage() {
         pages = pages + 1
         currentPage = pages

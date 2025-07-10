@@ -399,4 +399,5 @@ extension Notification.Name {
     static let openShortcuts = Notification.Name("openShortcuts")
     static let closeShortcuts = Notification.Name("closeShortcuts")
     static let openQAM = Notification.Name("openQAM")
+    static let openNewQAMTutorial = Notification.Name("openNewQAMTutorial")
 }

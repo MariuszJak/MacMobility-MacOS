@@ -30,14 +30,16 @@ struct QuickActionsView: View {
     private let sliceCount = 10
     private let sliceAngle = 360.0 / 10.0
     
-    private let innerCircleColors: [Color] = [
-        Color(red: 64/255, green: 156/255, blue: 255/255),
-        Color(red: 82/255, green: 183/255, blue: 136/255),
-        Color(red: 235/255, green: 87/255, blue: 87/255),
-        Color(red: 64/255, green: 156/255, blue: 255/255),
-        Color(red: 58/255, green: 58/255, blue: 60/255),
-        Color(red: 58/255, green: 58/255, blue: 60/255)
-    ]
+    private var innerCircleColors: [Color] {
+        [
+            Color(red: 44/255, green: 44/255, blue: 46/255),
+            Color(red: 44/255, green: 44/255, blue: 46/255),
+            Color(red: 44/255, green: 44/255, blue: 46/255),
+            Color(red: 44/255, green: 44/255, blue: 46/255),
+            isEditing ? Color(red: 58/255, green: 58/255, blue: 60/255) : Color(red: 44/255, green: 44/255, blue: 46/255),
+            Color(red: 58/255, green: 58/255, blue: 60/255)
+        ]
+    }
     
     private var innerCircleActions: [() -> Void] {
         [
@@ -57,19 +59,35 @@ struct QuickActionsView: View {
                 viewModel.prevPage()
                 showPopup = false
             },
-            {},
+            {
+                if !isEditing {
+                    NotificationCenter.default.post(
+                        name: .openNewQAMTutorial,
+                        object: nil,
+                        userInfo: nil
+                    )
+                }
+            },
             {}
         ]
     }
     
-    private var innerCirlceContents: [() -> AnyView] = [
-        { AnyView(Text(">").allowsHitTesting(false)) },
-        { AnyView(Text("+").allowsHitTesting(false)) },
-        { AnyView(Text("-").allowsHitTesting(false)) },
-        { AnyView(Text("<").allowsHitTesting(false)) },
-        { AnyView(Text("")) },
-        { AnyView(Text("")) },
-    ]
+    private var innerCirlceContents: [() -> AnyView] {
+        [
+            { AnyView(Text(">").allowsHitTesting(false)) },
+            { AnyView(Text("+").allowsHitTesting(false)) },
+            { AnyView(Text("-").allowsHitTesting(false)) },
+            { AnyView(Text("<").allowsHitTesting(false)) },
+            {
+                if isEditing {
+                    AnyView(EmptyView())
+                } else {
+                    AnyView(Image(systemName: "info.circle").frame(width: 10, height: 10).allowsHitTesting(false))
+                }
+            },
+            { AnyView(Text("")) },
+        ]
+    }
     
     init(
         viewModel: QuickActionsViewModel,
@@ -106,6 +124,14 @@ struct QuickActionsView: View {
         }
     }
     
+    var circularDotsRotation: Angle {
+        if viewModel.pages == 2 {
+            return .degrees(270)
+        } else {
+            return .degrees(180)
+        }
+    }
+    
     @ViewBuilder
     private func pageNumberView(page: Int) -> some View {
         VStack {
@@ -113,69 +139,93 @@ struct QuickActionsView: View {
                let app = viewModel.object(path: assignedApp.appPath) {
                 if let data = viewModel.getIcon(fromAppPath: assignedApp.appPath),
                    let image = NSImage(data: data) {
-                    VStack {
-                        ZStack {
-                            Image(nsImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .cornerRadius(cornerRadius)
-                                .frame(width: 60, height: 60)
-                                .padding(.bottom, 4.0)
-                                .if(!isEditing) {
-                                    $0.onTapGesture {
-                                        action(app)
-                                    }
-                                    .contextMenu {
-                                        Button("Edit") {
-                                            isEditing = true
-                                            NotificationCenter.default.post(
-                                                name: .openShortcuts,
-                                                object: nil,
-                                                userInfo: nil
-                                            )
+                    ZStack {
+                        VStack {
+                            ZStack {
+                                Image(nsImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .cornerRadius(cornerRadius)
+                                    .frame(width: 60, height: 60)
+                                    .if(!isEditing) {
+                                        $0.onTapGesture {
+                                            action(app)
+                                        }
+                                        .contextMenu {
+                                            Button("Edit") {
+                                                isEditing = true
+                                                NotificationCenter.default.post(
+                                                    name: .openShortcuts,
+                                                    object: nil,
+                                                    userInfo: nil
+                                                )
+                                            }
                                         }
                                     }
-                                }
-                                .padding(.bottom, 12.0)
-                            if isEditing {
-                                VStack {
-                                    HStack {
+                                if isEditing {
+                                    VStack {
+                                        HStack {
+                                            Spacer()
+                                            RedXButton {
+                                                viewModel.unassign(app: assignedApp.appPath, from: page)
+                                            }
+                                        }
                                         Spacer()
-                                        RedXButton {
-                                            viewModel.unassign(app: assignedApp.appPath, from: page)
-                                        }
                                     }
-                                    Spacer()
                                 }
                             }
                         }
-                    }
-                    .frame(width: 60, height: 60)
-                    .onDrop(of: [.text], isTargeted: nil) { providers in
-                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                            if let droppedString = droppedItem as? String,
-                               let object = viewModel.object(for: droppedString),
-                               object.type == .app,
-                               let path = object.path {
-                                DispatchQueue.main.async {
-                                    viewModel.replace(app: path, to: page)
+                        .frame(width: 60, height: 60)
+                        .onDrop(of: [.text], isTargeted: nil) { providers in
+                            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                                if let droppedString = droppedItem as? String,
+                                   let object = viewModel.object(for: droppedString),
+                                   object.type == .app,
+                                   let path = object.path {
+                                    DispatchQueue.main.async {
+                                        viewModel.replace(app: path, to: page)
+                                    }
                                 }
                             }
+                            return true
                         }
-                        return true
+                        if !isEditing {
+                            CircularPageDotsView(
+                                pageCount: viewModel.pages,
+                                currentPage: viewModel.currentPage - 1
+                            ) { index in
+                                viewModel.set(page: index + 1)
+                            }
+                            .rotationEffect(circularDotsRotation)
+                        }
                     }
                 }
             } else {
                 if !isEditing {
-                    Button("Edit") {
-                        isEditing = true
-                        NotificationCenter.default.post(
-                            name: .openShortcuts,
-                            object: nil,
-                            userInfo: nil
-                        )
+                    ZStack {
+                        Image(systemName: "slider.horizontal.2.square")
+                            .resizable()
+                            .frame(width: 35, height: 35)
+                            .onTapGesture {
+                                isEditing = true
+                                NotificationCenter.default.post(
+                                    name: .openShortcuts,
+                                    object: nil,
+                                    userInfo: nil
+                                )
+                            }
+                            .padding(.all, 10.0)
+                            .background(
+                                RoundedBackgroundView(cornerRadius: 10.0)
+                            )
+                        CircularPageDotsView(
+                            pageCount: viewModel.pages,
+                            currentPage: viewModel.currentPage - 1
+                        ) { index in
+                            viewModel.set(page: index + 1)
+                        }
+                        .rotationEffect(circularDotsRotation)
                     }
-                    .padding(.bottom, 4.0)
                 } else {
                     RoundedTextButtonView(text: "Page \(page)\nDrop App Here", size: .init(width: 60.0, height: 60.0), cornerRadius: 10)
                         .onDrop(of: [.text], isTargeted: nil) { providers in
@@ -260,18 +310,21 @@ struct QuickActionsView: View {
                     .fill(elegantGray)
                     .frame(width: 120, height: 120)
                 VStack {
-                    if !isEditing {
-                        VStack(alignment: .trailing) {
-                            Text("Page \(viewModel.currentPage)")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundStyle(Color.white)
-                        }
-                        .padding(.all, 8.0)
-                        .background(
-                            RoundedBackgroundView()
-                        )
-                        Spacer()
-                    }
+//                    if !isEditing {
+//                        VStack {
+//                            VStack(alignment: .trailing) {
+//                                Text("Page \(viewModel.currentPage)")
+//                                    .font(.system(size: 10, weight: .bold))
+//                                    .foregroundStyle(Color.white)
+//                            }
+//                            .padding(.all, 8.0)
+//                            .background(
+//                                RoundedBackgroundView()
+//                            )
+//                        }
+//                        .padding(.top, 8.0)
+//                        Spacer()
+//                    }
                     if isEditing {
                         VStack(spacing: 2.0) {
                             pageNumberView(page: viewModel.currentPage)
@@ -293,7 +346,7 @@ struct QuickActionsView: View {
                             }
                         }
                     }
-                    Spacer()
+//                    Spacer()
                 }
                 .frame(height: 120)
             }
@@ -627,5 +680,33 @@ struct QuickActionsView: View {
                 }
             }
         }
+    }
+}
+
+struct CircularPageDotsView: View {
+    var pageCount: Int
+    var currentPage: Int
+    var radius: CGFloat = 45
+    var action: (Int) -> Void
+
+    var body: some View {
+        ZStack {
+            ForEach(0..<pageCount, id: \.self) { index in
+                let angle = Angle(degrees: Double(index) / Double(pageCount) * 360.0 - 90)
+                let x = cos(angle.radians) * radius
+                let y = sin(angle.radians) * radius
+
+                Circle()
+                    .fill(index == currentPage ? Color.white : Color.gray.opacity(0.6))
+                    .frame(width: index == currentPage ? 14 : 10,
+                           height: index == currentPage ? 14 : 10)
+                    .position(x: radius + x, y: radius + y)
+                    .animation(.interpolatingSpring(stiffness: 300, damping: 20), value: currentPage)
+                    .onTapGesture {
+                        action(index)
+                    }
+            }
+        }
+        .frame(width: radius * 2, height: radius * 2)
     }
 }

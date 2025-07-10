@@ -58,7 +58,7 @@ struct SliceButton<Content: View>: View {
                     .fill(color)
                     .overlay(
                         SliceShape(startAngle: startAngle, endAngle: endAngle, thickness: thickness)
-                            .stroke(color, lineWidth: 1)
+                            .stroke(.black.opacity(0.4), lineWidth: 1)
                     )
                     .contentShape(SliceShape(startAngle: startAngle, endAngle: endAngle, thickness: thickness))
                     .onTapGesture {

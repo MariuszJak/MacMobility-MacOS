@@ -416,6 +416,8 @@ struct NewQAMVideoTutorialView: View {
                         currentResourceIndex += 1
                         setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
                     }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
                 } else {
                     if isFirstOpen {
                         Button("Open QAM") {
@@ -426,10 +428,14 @@ struct NewQAMVideoTutorialView: View {
                             )
                             closeHandler()
                         }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.blue)
                     } else {
                         Button("Close") {
                             closeHandler()
                         }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.blue)
                     }
                 }
             }
@@ -1095,9 +1101,11 @@ struct RoundedTextButtonView: View {
 
 struct RoundedBackgroundView: View {
     var size: CGSize
+    var cornerRadius: CGFloat
     
-    init(size: CGSize = .init(width: 70, height: 70)) {
+    init(size: CGSize = .init(width: 70, height: 70), cornerRadius: CGFloat = 20) {
         self.size = size
+        self.cornerRadius = cornerRadius
     }
     
     var body: some View {
@@ -1105,11 +1113,11 @@ struct RoundedBackgroundView: View {
         let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
 
         return ZStack {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(backgroundColor)
         }
         .overlay(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: cornerRadius)
                 .stroke(accentColor, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)

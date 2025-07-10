@@ -107,7 +107,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: .openQAM,
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(openNewQAMTutorial),
+            name: .openNewQAMTutorial,
+            object: nil
+        )
         setupKeyboardListener()
+    }
+    
+    @objc func openNewQAMTutorial() {
+        openNewQAMTutorialWindow(isFirstOpen: false)
+        circularWindow?.close()
+        circularWindow = nil
     }
     
     func setupKeyboardListener() {
@@ -126,6 +139,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         self?.openNewQAMTutorialWindow(isFirstOpen: true)
                         UserDefaults.standard.store(true, for: .newQuickActionTutorialSeen)
                     }
+//                    self?.openNewQAMTutorialWindow(isFirstOpen: true)
                 }
             }
             .store(in: &cancellables)
