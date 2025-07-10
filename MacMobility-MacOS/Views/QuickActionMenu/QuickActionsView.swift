@@ -142,26 +142,31 @@ struct QuickActionsView: View {
                     ZStack {
                         VStack {
                             ZStack {
-                                Image(nsImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .cornerRadius(cornerRadius)
-                                    .frame(width: 60, height: 60)
-                                    .if(!isEditing) {
-                                        $0.onTapGesture {
-                                            action(app)
-                                        }
-                                        .contextMenu {
-                                            Button("Edit") {
-                                                isEditing = true
-                                                NotificationCenter.default.post(
-                                                    name: .openShortcuts,
-                                                    object: nil,
-                                                    userInfo: nil
-                                                )
-                                            }
+                                ZStack {
+                                    EventView { direction in
+                                        viewModel.handleDirection(direction)
+                                    }
+                                    Image(nsImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .cornerRadius(cornerRadius)
+                                }
+                                .frame(width: 60, height: 60)
+                                .if(!isEditing) {
+                                    $0.onTapGesture {
+                                        action(app)
+                                    }
+                                    .contextMenu {
+                                        Button("Edit") {
+                                            isEditing = true
+                                            NotificationCenter.default.post(
+                                                name: .openShortcuts,
+                                                object: nil,
+                                                userInfo: nil
+                                            )
                                         }
                                     }
+                                }
                                 if isEditing {
                                     VStack {
                                         HStack {
@@ -203,21 +208,26 @@ struct QuickActionsView: View {
             } else {
                 if !isEditing {
                     ZStack {
-                        Image(systemName: "slider.horizontal.2.square")
-                            .resizable()
-                            .frame(width: 35, height: 35)
-                            .onTapGesture {
-                                isEditing = true
-                                NotificationCenter.default.post(
-                                    name: .openShortcuts,
-                                    object: nil,
-                                    userInfo: nil
-                                )
+                        ZStack {
+                            EventView { direction in
+                                viewModel.handleDirection(direction)
                             }
-                            .padding(.all, 10.0)
-                            .background(
-                                RoundedBackgroundView(cornerRadius: 10.0)
+                            Image(systemName: "slider.horizontal.2.square")
+                                .resizable()
+                        }
+                        .frame(width: 35, height: 35)
+                        .onTapGesture {
+                            isEditing = true
+                            NotificationCenter.default.post(
+                                name: .openShortcuts,
+                                object: nil,
+                                userInfo: nil
                             )
+                        }
+                        .padding(.all, 10.0)
+                        .background(
+                            RoundedBackgroundView(cornerRadius: 10.0)
+                        )
                         CircularPageDotsView(
                             pageCount: viewModel.pages,
                             currentPage: viewModel.currentPage - 1
@@ -272,9 +282,9 @@ struct QuickActionsView: View {
                                 index: index,
                                 totalSlices: 6,
                                 thickness: 15,
-                                color: viewModel.currentPage == viewModel.pages ? elegantGray : innerCircleColors[index],
+                                color: viewModel.pages == 1 ? elegantGray : innerCircleColors[index],
                                 action: innerCircleActions[index],
-                                content: viewModel.currentPage == viewModel.pages ? {AnyView(EmptyView())} : innerCirlceContents[index]
+                                content: viewModel.pages == 1 ? {AnyView(EmptyView())} : innerCirlceContents[index]
                             )
                         case 2:
                             SliceButton<AnyView>(
@@ -290,9 +300,9 @@ struct QuickActionsView: View {
                                 index: index,
                                 totalSlices: 6,
                                 thickness: 15,
-                                color: viewModel.currentPage == 1 ? elegantGray : innerCircleColors[index],
+                                color: viewModel.pages == 1 ? elegantGray : innerCircleColors[index],
                                 action: innerCircleActions[index],
-                                content: viewModel.currentPage == 1 ? {AnyView(EmptyView())} : innerCirlceContents[index]
+                                content: viewModel.pages == 1 ? {AnyView(EmptyView())} : innerCirlceContents[index]
                             )
                         default:
                             SliceButton<AnyView>(
@@ -310,21 +320,6 @@ struct QuickActionsView: View {
                     .fill(elegantGray)
                     .frame(width: 120, height: 120)
                 VStack {
-//                    if !isEditing {
-//                        VStack {
-//                            VStack(alignment: .trailing) {
-//                                Text("Page \(viewModel.currentPage)")
-//                                    .font(.system(size: 10, weight: .bold))
-//                                    .foregroundStyle(Color.white)
-//                            }
-//                            .padding(.all, 8.0)
-//                            .background(
-//                                RoundedBackgroundView()
-//                            )
-//                        }
-//                        .padding(.top, 8.0)
-//                        Spacer()
-//                    }
                     if isEditing {
                         VStack(spacing: 2.0) {
                             pageNumberView(page: viewModel.currentPage)
@@ -346,7 +341,6 @@ struct QuickActionsView: View {
                             }
                         }
                     }
-//                    Spacer()
                 }
                 .frame(height: 120)
             }

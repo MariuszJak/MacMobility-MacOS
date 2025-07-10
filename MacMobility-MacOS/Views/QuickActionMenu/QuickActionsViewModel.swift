@@ -17,6 +17,8 @@ class QuickActionsViewModel: ObservableObject {
     @Published var pages: Int = 1
     @Published var currentPage: Int = 1
     private let allItems: [ShortcutObject]
+    private var lastDirectionChange: Date = .distantPast
+    private let throttleInterval: TimeInterval = 0.35
     
     init(items: [ShortcutObject], allItems: [ShortcutObject]) {
         self.items = items
@@ -37,6 +39,21 @@ class QuickActionsViewModel: ObservableObject {
         }
     }
     
+    func handleDirection(_ direction: EventDirection) {
+        let now = Date()
+        guard now.timeIntervalSince(lastDirectionChange) > throttleInterval else {
+            return
+        }
+        lastDirectionChange = now
+        
+        switch direction {
+        case .left:
+            nextPage()
+        case .right:
+            prevPage()
+        }
+    }
+    
     func object(for id: String) -> ShortcutObject? {
         (allItems + items).first { $0.id == id }
     }
@@ -48,6 +65,8 @@ class QuickActionsViewModel: ObservableObject {
     func prevPage() {
         if currentPage > 1 {
             currentPage -= 1
+        } else {
+            currentPage = pages
         }
         UserDefaults.standard.store(currentPage, for: .subitemCurrentPage)
     }
@@ -55,6 +74,8 @@ class QuickActionsViewModel: ObservableObject {
     func nextPage() {
         if currentPage < pages {
             currentPage += 1
+        } else {
+            currentPage = 1
         }
         UserDefaults.standard.store(currentPage, for: .subitemCurrentPage)
     }

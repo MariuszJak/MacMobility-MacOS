@@ -95,3 +95,64 @@ struct CircleSliceButton: View {
             .contentShape(sliceShape)
     }
 }
+
+import SwiftUI
+import AppKit
+
+enum EventDirection {
+    case left
+    case right
+}
+
+struct EventView: NSViewRepresentable {
+    var action: (EventDirection) -> Void
+
+    class Coordinator: NSObject {
+        var parent: EventView
+        var accumulatedScrollDeltaX: CGFloat = 0
+        
+        init(parent: EventView) {
+            self.parent = parent
+        }
+
+        @objc func handleEvent(_ event: NSEvent) {
+            if event.type == .scrollWheel {
+                let maxClampX = 3.0
+                let clampedDeltaX = max(min(event.scrollingDeltaX, maxClampX), -maxClampX)
+                accumulatedScrollDeltaX += clampedDeltaX
+                if abs(accumulatedScrollDeltaX) > 80 {
+                    if accumulatedScrollDeltaX > 0 {
+                        parent.action(.right)
+                    } else {
+                        parent.action(.left)
+                    }
+                    accumulatedScrollDeltaX = 0
+                } else {
+                    if event.scrollingDeltaX == 0 {
+                        accumulatedScrollDeltaX = 0
+                    }
+                }
+            }
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(parent: self)
+    }
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        
+        NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { event in
+            context.coordinator.handleEvent(event)
+            return event
+        }
+        
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        // No updates needed
+    }
+}
+
