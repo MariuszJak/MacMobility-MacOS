@@ -41,7 +41,7 @@ struct QuickActionsView: View {
         ]
     }
     
-    private var innerCircleActions: [() -> Void] {
+    private var innerCircleActions: [(() -> Void)?] {
         [
             {
                 viewModel.nextPage()
@@ -68,7 +68,7 @@ struct QuickActionsView: View {
                     )
                 }
             },
-            {}
+            nil
         ]
     }
     
@@ -152,6 +152,7 @@ struct QuickActionsView: View {
                                         .cornerRadius(cornerRadius)
                                 }
                                 .frame(width: 60, height: 60)
+                                .shadow(color: .black.opacity(0.6), radius: 4.0)
                                 .if(!isEditing) {
                                     $0.onTapGesture {
                                         action(app)
@@ -237,12 +238,17 @@ struct QuickActionsView: View {
                         .rotationEffect(circularDotsRotation)
                     }
                 } else {
-                    RoundedTextButtonView(text: "Page \(page)\nDrop App Here", size: .init(width: 60.0, height: 60.0), cornerRadius: 10)
-                        .onDrop(of: [.text], isTargeted: nil) { providers in
-                            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                                if let droppedString = droppedItem as? String,
-                                   let object = viewModel.object(for: droppedString),
-                                   object.type == .app,
+                    RoundedTextButtonView(
+                        higlightedText: "Page \(page)",
+                        text: "Drop App Here",
+                        size: .init(width: 60.0, height: 60.0),
+                        cornerRadius: 10
+                    )
+                    .onDrop(of: [.text], isTargeted: nil) { providers in
+                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                            if let droppedString = droppedItem as? String,
+                               let object = viewModel.object(for: droppedString),
+                               object.type == .app,
                                    let path = object.path {
                                     DispatchQueue.main.async {
                                         viewModel.assign(app: path, to: page)
@@ -318,12 +324,26 @@ struct QuickActionsView: View {
                 }.frame(width: 150, height: 150)
                 Circle()
                     .fill(elegantGray)
+                    .onHover { _ in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            self.showPopup = false
+                            subitem = nil
+                        }
+                    }
+                    .contentShape(Circle())
                     .frame(width: 120, height: 120)
+                    
                 VStack {
                     if isEditing {
                         VStack(spacing: 2.0) {
                             pageNumberView(page: viewModel.currentPage)
-                            Button("Save") {
+                            BlueButton(
+                                title: "Close",
+                                font: .callout,
+                                padding: 3.0,
+                                cornerRadius: 3.0,
+                                backgroundColor: .accentColor
+                            ) {
                                 isEditing = false
                                 showPopup = false
                                 NotificationCenter.default.post(
@@ -472,7 +492,7 @@ struct QuickActionsView: View {
             .onHover { _ in
                 if !isEditing {
                     showPopup = false
-                    lastHoveredIndex = nil
+//                    lastHoveredIndex = nil
                 } else {
                     submenuDegrees = angle.degrees - 92
                     subitem = item
@@ -523,7 +543,7 @@ struct QuickActionsView: View {
         .frame(width: 60.0, height: 60.0)
     }
     
-    @State private var lastHoveredIndex: Int?
+//    @State private var lastHoveredIndex: Int?
     
     private func mainView(item: ShortcutObject, index: Int, angle: Angle) -> some View {
         ZStack {
@@ -546,18 +566,11 @@ struct QuickActionsView: View {
                         }
                         .onHover { hovering in
                             hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
-                            if lastHoveredIndex == hoveredIndex {
-                                showPopup = false
-                                lastHoveredIndex = nil
-                            } else {
-                                lastHoveredIndex = index
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    submenuDegrees = angle.degrees - 92
-                                    if hovering {
-                                        showPopup = true
-                                    }
-                                    subitem = item
-                                }
+//                            showPopup = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                submenuDegrees = angle.degrees - 92
+                                showPopup = true
+                                subitem = item
                             }
                         }
                 }
@@ -591,13 +604,14 @@ struct QuickActionsView: View {
             Image(nsImage: NSWorkspace.shared.icon(forFile: path))
                 .resizable()
                 .scaledToFill()
+                .cornerRadius(cornerRadius / 4)
                 .frame(width: frame.width, height: frame.height)
         } else if object.type == .shortcut {
             if let data = object.imageData, let image = NSImage(data: data) {
                 Image(nsImage: image)
                     .resizable()
                     .scaledToFill()
-                    .cornerRadius(cornerRadius)
+                    .cornerRadius(cornerRadius / 4)
                     .frame(width: frame.width, height: frame.height)
             }
             if object.showTitleOnIcon ?? true {
@@ -612,10 +626,10 @@ struct QuickActionsView: View {
                 Image(nsImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .cornerRadius(cornerRadius)
+                    .cornerRadius(cornerRadius / 4)
                     .frame(width: frame.width, height: frame.height)
                     .clipShape(
-                        RoundedRectangle(cornerRadius: cornerRadius)
+                        RoundedRectangle(cornerRadius: cornerRadius / 4)
                     )
                 if object.showTitleOnIcon ?? true {
                     Text(object.title)
@@ -628,7 +642,7 @@ struct QuickActionsView: View {
                 Image(path)
                     .resizable()
                     .frame(width: frame.width, height: frame.height)
-                    .cornerRadius(cornerRadius)
+                    .cornerRadius(cornerRadius / 4)
                 if object.showTitleOnIcon ?? true {
                     Text(object.title)
                         .font(.system(size: 12))
@@ -642,7 +656,7 @@ struct QuickActionsView: View {
                 Image(nsImage: image)
                     .resizable()
                     .scaledToFill()
-                    .cornerRadius(cornerRadius)
+                    .cornerRadius(cornerRadius / 4)
                     .frame(width: frame.width, height: frame.height)
             }
             if !object.title.isEmpty {
@@ -660,7 +674,7 @@ struct QuickActionsView: View {
                 Image(nsImage: image)
                     .resizable()
                     .scaledToFill()
-                    .cornerRadius(cornerRadius)
+                    .cornerRadius(cornerRadius / 4)
                     .frame(width: frame.width, height: frame.height)
             }
             if !object.title.isEmpty {

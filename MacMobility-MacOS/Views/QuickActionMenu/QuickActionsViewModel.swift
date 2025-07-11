@@ -18,7 +18,7 @@ class QuickActionsViewModel: ObservableObject {
     @Published var currentPage: Int = 1
     private let allItems: [ShortcutObject]
     private var lastDirectionChange: Date = .distantPast
-    private let throttleInterval: TimeInterval = 0.35
+    private let throttleInterval: TimeInterval = 0.4
     
     init(items: [ShortcutObject], allItems: [ShortcutObject]) {
         self.items = items
@@ -176,9 +176,8 @@ class QuickActionsViewModel: ObservableObject {
     }
     
     func removeSubitem(from itemId: String, at subIndex: Int) -> ShortcutObject? {
-        let offset = subIndex + ((currentPage - 1) * 10)
         if let index = items.firstIndex(where: { $0.id == itemId }) {
-            items[index].objects?[offset] = .empty(for: offset)
+            items[index].objects?[subIndex] = .empty(for: subIndex)
             return items[index]
         }
         return nil

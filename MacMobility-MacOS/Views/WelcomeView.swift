@@ -1068,10 +1068,12 @@ struct PlusButtonView: View {
 
 struct RoundedTextButtonView: View {
     var text: String
+    var higlightedText: String
     var size: CGSize
     var cornerRadius: CGFloat
     
-    init(text: String, size: CGSize = .init(width: 70, height: 70), cornerRadius: CGFloat = 20) {
+    init(higlightedText: String, text: String, size: CGSize = .init(width: 70, height: 70), cornerRadius: CGFloat = 20) {
+        self.higlightedText = higlightedText
         self.text = text
         self.size = size
         self.cornerRadius = cornerRadius
@@ -1079,16 +1081,24 @@ struct RoundedTextButtonView: View {
     
     var body: some View {
         let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
-        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
+        let accentColor = Color.gray
 
         return ZStack {
             RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(backgroundColor)
+            
+            VStack {
+                Text(higlightedText)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 12.0, weight: .bold))
+                    .padding(.bottom, 3.0)
 
-            Text(text)
-                .foregroundColor(accentColor)
-                .multilineTextAlignment(.center)
-                .font(.system(size: 8.0, weight: .bold))
+                Text(text)
+                    .foregroundColor(accentColor)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 9.0, weight: .bold))
+            }
         }
         .frame(width: size.width, height: size.height)
         .overlay(

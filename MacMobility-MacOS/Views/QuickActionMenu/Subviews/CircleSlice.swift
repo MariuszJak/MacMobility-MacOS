@@ -110,6 +110,7 @@ struct EventView: NSViewRepresentable {
     class Coordinator: NSObject {
         var parent: EventView
         var accumulatedScrollDeltaX: CGFloat = 0
+        var testAccumulation: CGFloat = 0
         
         init(parent: EventView) {
             self.parent = parent
@@ -117,9 +118,8 @@ struct EventView: NSViewRepresentable {
 
         @objc func handleEvent(_ event: NSEvent) {
             if event.type == .scrollWheel {
-                let maxClampX = 3.0
-                let clampedDeltaX = max(min(event.scrollingDeltaX, maxClampX), -maxClampX)
-                accumulatedScrollDeltaX += clampedDeltaX
+                let scrollingDeltaX = event.scrollingDeltaX
+                accumulatedScrollDeltaX += scrollingDeltaX
                 if abs(accumulatedScrollDeltaX) > 80 {
                     if accumulatedScrollDeltaX > 0 {
                         parent.action(.right)
@@ -155,4 +155,3 @@ struct EventView: NSViewRepresentable {
         // No updates needed
     }
 }
-

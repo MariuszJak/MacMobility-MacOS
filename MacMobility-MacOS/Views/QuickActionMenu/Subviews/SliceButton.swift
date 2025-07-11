@@ -29,11 +29,12 @@ struct SliceShape: Shape {
 }
 
 struct SliceButton<Content: View>: View {
+    @State var isHovering = false
     var index: Int
     var totalSlices: Int
     var thickness: CGFloat
     var color: Color
-    var action: () -> Void
+    var action: (() -> Void)?
     var content: () -> AnyView
 
     var body: some View {
@@ -55,14 +56,21 @@ struct SliceButton<Content: View>: View {
 
             ZStack {
                 SliceShape(startAngle: startAngle, endAngle: endAngle, thickness: thickness)
-                    .fill(color)
+                    .fill(isHovering ? .cyan : color)
                     .overlay(
                         SliceShape(startAngle: startAngle, endAngle: endAngle, thickness: thickness)
                             .stroke(.black.opacity(0.4), lineWidth: 1)
+                            .if(action != nil) {
+                                $0.onHover { hovering in
+                                    withAnimation {
+                                        isHovering = hovering
+                                    }
+                                }
+                            }
                     )
                     .contentShape(SliceShape(startAngle: startAngle, endAngle: endAngle, thickness: thickness))
                     .onTapGesture {
-                        action()
+                        action?()
                     }
 
                 content()
