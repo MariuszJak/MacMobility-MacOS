@@ -89,7 +89,7 @@ struct MacOSMainPopoverView: View {
             Divider()
             if viewModel.isTrialExpired {
                 Button {
-                    let url = NSURL(string: "https://coderblocks.eu/macmobility/") as? URL
+                    let url = NSURL(string: "https://coderblocks.eu/mobility") as? URL
                     NSWorkspace.shared.open(url!, configuration: NSWorkspace.OpenConfiguration()) { _, error in
                         if let error { print(error) }
                     }
