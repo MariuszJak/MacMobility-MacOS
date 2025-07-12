@@ -213,10 +213,11 @@ struct QuickActionsView: View {
                             EventView { direction in
                                 viewModel.handleDirection(direction)
                             }
-                            Image(systemName: "slider.horizontal.2.square")
+                            Image(systemName: "slider.horizontal.3")
                                 .resizable()
+                                .frame(width: 20, height: 20)
                         }
-                        .frame(width: 35, height: 35)
+                        .frame(width: 30, height: 30)
                         .onTapGesture {
                             isEditing = true
                             NotificationCenter.default.post(

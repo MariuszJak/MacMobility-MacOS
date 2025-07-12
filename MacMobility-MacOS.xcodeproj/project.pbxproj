@@ -54,11 +54,11 @@
 		C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */; };
 		C0B160602E185C4D00C70CBD /* CircleSliceShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */; };
 		C0B160622E1AF2D700C70CBD /* SliceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B160612E1AF2D700C70CBD /* SliceButton.swift */; };
-		C0B160672E1D2B9500C70CBD /* QAM-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160652E1D2B9500C70CBD /* QAM-3.mp4 */; };
-		C0B160682E1D2B9500C70CBD /* QAM-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160642E1D2B9500C70CBD /* QAM-2.mp4 */; };
-		C0B160692E1D2B9500C70CBD /* QAM-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160662E1D2B9500C70CBD /* QAM-4.mp4 */; };
-		C0B1606C2E1D32C100C70CBD /* QAM-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B1606B2E1D32C100C70CBD /* QAM-1.mp4 */; };
 		C0B1606E2E1D3A1C00C70CBD /* StandaloneTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1606D2E1D3A1C00C70CBD /* StandaloneTabView.swift */; };
+		C0B160732E22753D00C70CBD /* QAM-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160712E22753D00C70CBD /* QAM-3.mp4 */; };
+		C0B160752E22753D00C70CBD /* QAM-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160702E22753D00C70CBD /* QAM-2.mp4 */; };
+		C0B160762E22753D00C70CBD /* QAM-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160722E22753D00C70CBD /* QAM-4.mp4 */; };
+		C0B160782E22758A00C70CBD /* QAM-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160772E22758A00C70CBD /* QAM-1.mp4 */; };
 		C0C9B78B2DCAACA40068BCAB /* NewAutomationUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */; };
 		C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */; };
 		C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */; };
@@ -200,11 +200,11 @@
 		C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSlice.swift; sourceTree = "<group>"; };
 		C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSliceShape.swift; sourceTree = "<group>"; };
 		C0B160612E1AF2D700C70CBD /* SliceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceButton.swift; sourceTree = "<group>"; };
-		C0B160642E1D2B9500C70CBD /* QAM-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-2.mp4"; sourceTree = "<group>"; };
-		C0B160652E1D2B9500C70CBD /* QAM-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-3.mp4"; sourceTree = "<group>"; };
-		C0B160662E1D2B9500C70CBD /* QAM-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-4.mp4"; sourceTree = "<group>"; };
-		C0B1606B2E1D32C100C70CBD /* QAM-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-1.mp4"; sourceTree = "<group>"; };
 		C0B1606D2E1D3A1C00C70CBD /* StandaloneTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandaloneTabView.swift; sourceTree = "<group>"; };
+		C0B160702E22753D00C70CBD /* QAM-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-2.mp4"; sourceTree = "<group>"; };
+		C0B160712E22753D00C70CBD /* QAM-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-3.mp4"; sourceTree = "<group>"; };
+		C0B160722E22753D00C70CBD /* QAM-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-4.mp4"; sourceTree = "<group>"; };
+		C0B160772E22758A00C70CBD /* QAM-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-1.mp4"; sourceTree = "<group>"; };
 		C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAutomationUtilityView.swift; sourceTree = "<group>"; };
 		C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConverterView.swift; sourceTree = "<group>"; };
 		C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mac-connect.mp4"; sourceTree = "<group>"; };
@@ -476,10 +476,10 @@
 		C0C9B78E2DCD31D80068BCAB /* Video */ = {
 			isa = PBXGroup;
 			children = (
-				C0B1606B2E1D32C100C70CBD /* QAM-1.mp4 */,
-				C0B160642E1D2B9500C70CBD /* QAM-2.mp4 */,
-				C0B160652E1D2B9500C70CBD /* QAM-3.mp4 */,
-				C0B160662E1D2B9500C70CBD /* QAM-4.mp4 */,
+				C0B160772E22758A00C70CBD /* QAM-1.mp4 */,
+				C0B160702E22753D00C70CBD /* QAM-2.mp4 */,
+				C0B160712E22753D00C70CBD /* QAM-3.mp4 */,
+				C0B160722E22753D00C70CBD /* QAM-4.mp4 */,
 				C0C9B7932DCD35AD0068BCAB /* ipad-connect.mp4 */,
 				C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */,
 			);
@@ -724,12 +724,15 @@
 				C0F67EF32D981CAD0090D568 /* Upcoming Events.shortcut in Resources */,
 				C09775372B5C319E00F4FFE6 /* Preview Assets.xcassets in Resources */,
 				C0F67F062D982E990090D568 /* ANC ON.shortcut in Resources */,
+				C0B160782E22758A00C70CBD /* QAM-1.mp4 in Resources */,
 				C0F67F072D982E990090D568 /* Live Photo to GIF.shortcut in Resources */,
+				C0B160732E22753D00C70CBD /* QAM-3.mp4 in Resources */,
+				C0B160752E22753D00C70CBD /* QAM-2.mp4 in Resources */,
+				C0B160762E22753D00C70CBD /* QAM-4.mp4 in Resources */,
 				C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */,
 				C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */,
 				C0C9B7942DCD35AD0068BCAB /* ipad-connect.mp4 in Resources */,
 				C0F67F0A2D982E990090D568 /* Weather for Upcoming Events.shortcut in Resources */,
-				C0B1606C2E1D32C100C70CBD /* QAM-1.mp4 in Resources */,
 				C0F67F1B2D9831C90090D568 /* Focus ON.shortcut in Resources */,
 				C0F67F0B2D982E990090D568 /* ANC OFF.shortcut in Resources */,
 				C0F67F0C2D982E990090D568 /* Copy App Link.shortcut in Resources */,
@@ -741,9 +744,6 @@
 				C0F67F102D982E990090D568 /* Days Until....shortcut in Resources */,
 				C0F67F112D982E990090D568 /* EXIF Inspector.shortcut in Resources */,
 				C0F67F122D982E990090D568 /* Convert to JPEG and Copy.shortcut in Resources */,
-				C0B160672E1D2B9500C70CBD /* QAM-3.mp4 in Resources */,
-				C0B160682E1D2B9500C70CBD /* QAM-2.mp4 in Resources */,
-				C0B160692E1D2B9500C70CBD /* QAM-4.mp4 in Resources */,
 				C0F67F132D982E990090D568 /* Show Clipboard.shortcut in Resources */,
 				C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */,
 				C0F67F142D982E990090D568 /* Take Screenshot and Share.shortcut in Resources */,

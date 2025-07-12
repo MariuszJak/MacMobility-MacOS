@@ -376,8 +376,8 @@ struct NewQAMVideoTutorialView: View {
     ]
     
     let descriptions = [
-        "Assign apps with Edit option. You can assign app to a page, and assign up to 10 apps to a circle. Each option in circle has additional 5 more spaces",
-        "Create new circle page with green `+` button. Navigate with `<` and `>` buttons. Remove page with `-` button.",
+        "Assign apps with Edit option.\nYou can assign app to a page, and assign up to 10 apps to a circle.\nEach option in circle has additional 5 more spaces",
+        "Create new circle page with `+` button.\nNavigate with `<` and `>` buttons or by swiping on trackpad.\nRemove page with `-` button.",
         "Right-click on any item to Edit it.",
         "Once an app is assigned to a page, it will be automatically shown in the circle if this app is in focus."
     ]
@@ -390,59 +390,68 @@ struct NewQAMVideoTutorialView: View {
 
     var body: some View {
         VStack(spacing: 32) {
-            Text(names[currentResourceIndex])
-                .font(.title)
-                .fontWeight(.bold)
-            
-            Text(descriptions[currentResourceIndex])
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-
+            VStack {
+                Text(names[currentResourceIndex])
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 17.0)
+                
+                Text(descriptions[currentResourceIndex])
+                    .font(.system(size: 14))
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+            .frame(height: 100.0)
+            .padding(.top, 40.0)
 
             VideoPreviewView(player: player, title: "", description: "")
                 .frame(width: 700.0, height: 445.0)
             
-            HStack {
-                if currentResourceIndex > 0 {
-                    Button("Previous") {
-                        currentResourceIndex -= 1
-                        setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
-                    }
-                }
-                if currentResourceIndex < resources.count - 1 {
-                    Button("Next") {
-                        currentResourceIndex += 1
-                        setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.blue)
-                } else {
-                    if isFirstOpen {
-                        Button("Open QAM") {
-                            NotificationCenter.default.post(
-                                name: .openQAM,
-                                object: nil,
-                                userInfo: nil
-                            )
-                            closeHandler()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.blue)
-                    } else {
-                        Button("Close") {
-                            closeHandler()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.blue)
-                    }
-                }
-            }
+            controls()
+                .padding(.bottom, 50.0)
         }
         .padding()
         .onAppear {
             player.play()
+        }
+    }
+    
+    private func controls() -> some View {
+        HStack {
+            if currentResourceIndex > 0 {
+                Button("Previous") {
+                    currentResourceIndex -= 1
+                    setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
+                }
+            }
+            if currentResourceIndex < resources.count - 1 {
+                Button("Next") {
+                    currentResourceIndex += 1
+                    setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
+            } else {
+                if isFirstOpen {
+                    Button("Open QAM") {
+                        NotificationCenter.default.post(
+                            name: .openQAM,
+                            object: nil,
+                            userInfo: nil
+                        )
+                        closeHandler()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                } else {
+                    Button("Close") {
+                        closeHandler()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                }
+            }
         }
     }
 
