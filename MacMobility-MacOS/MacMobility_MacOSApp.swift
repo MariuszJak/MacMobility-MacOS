@@ -57,6 +57,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         .store(in: &cancellables)
+//        UserDefaults.standard.clearAll()
 //        UserDefaults.standard.clear(key: .lifecycle)
 //        UserDefaults.standard.clear(key: .quickActionTutorialSeen)
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
