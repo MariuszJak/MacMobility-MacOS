@@ -12,6 +12,10 @@ import Combine
 import AppKit
 import SwiftUI
 
+struct ServerReconnect: Codable {
+    let reconnect: Bool
+}
+
 protocol ConnectionManagerWorskpaceCapable {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID)
     func openApp(at path: String)
@@ -26,6 +30,16 @@ protocol ConnectionManagerWorskpaceCapable {
 
 extension ConnectionManager {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+        if let serverReconnect = try? JSONDecoder().decode(ServerReconnect.self, from: data) {
+            DispatchQueue.main.async {
+                if serverReconnect.reconnect {
+                    Task {
+                        await self.extendScreen()
+                    }
+                }
+            }
+            return
+        }
         if let shortcutItem = try? JSONDecoder().decode(ShortcutObject.self, from: data) {
             DispatchQueue.main.async {
                 self.runShortuct(for: shortcutItem)

@@ -123,6 +123,7 @@ class QuickActionsViewModel: ObservableObject {
     
     func add(_ object: ShortcutObject, at newIndex: Int = 0) {
         let offset = newIndex + ((currentPage - 1) * 10)
+        // This replaces two apps with each other
         if let oldIndex = items.firstIndex(where: { $0.id == object.id && items[offset].title != "EMPTY" }) {
             let oldObject = items[offset]
             var tmp = object
@@ -142,12 +143,13 @@ class QuickActionsViewModel: ObservableObject {
                 items[oldIndex].objects = (0..<5).map { .empty(for: $0) }
             }
         } else {
+            // This adds new one
             var objects: [ShortcutObject]?
-            if let oldIndex = items.firstIndex(where: { $0.id == object.id }) {
+            if let oldIndex = items.firstIndex(where: { $0.id == object.id && $0.page == currentPage }) {
                 objects = items[oldIndex].objects
             }
             items.enumerated().forEach { (i, item) in
-                if item.id == object.id {
+                if item.id == object.id && item.page == currentPage {
                     items[i] = .empty(for: i, page: currentPage)
                     items[i].objects = (0..<5).map { .empty(for: $0) }
                 }

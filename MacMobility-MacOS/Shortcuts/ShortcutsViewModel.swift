@@ -144,7 +144,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func extendScreen() {
-        connectionManager.extendScreen()
+        Task {
+            await connectionManager.extendScreen()
+        }
     }
     
     func allCategories() -> [String] {

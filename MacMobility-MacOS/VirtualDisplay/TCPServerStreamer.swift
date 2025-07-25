@@ -88,12 +88,15 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
 
             let filter = SCContentFilter(display: display, excludingWindows: [])
             stream = SCStream(filter: filter, configuration: config, delegate: self)
-            try stream?.addStreamOutput(self, type: .screen, sampleHandlerQueue: queue)
+            guard let stream else {
+                completion(false, nil)
+                return
+            }
+            try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: queue)
 
-            try await stream?.startCapture()
+            try await stream.startCapture()
             setupCompressionSession(width: Int(display.width), height: Int(display.height))
             try await startTCPListener(streamConnection: streamConnection)
-            
             completion(true, displayId)
         } catch {
             completion(false, nil)
@@ -141,6 +144,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
         let tcpOptions = NWProtocolTCP.Options()
         tcpOptions.enableKeepalive = true
         tcpOptions.keepaliveIdle = 60
+        tcpOptions.connectionTimeout = 5
         
         let parameters = NWParameters(tls: nil, tcp: tcpOptions)
         parameters.serviceClass = .interactiveVideo
@@ -149,14 +153,7 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
         listener?.newConnectionHandler = { [weak self] newConn in
             guard let self = self else { return }
             
-            print("Accepted new connection from \(newConn.endpoint)")
             self.connection = newConn
-            
-            newConn.betterPathUpdateHandler = { hasBetterPath in
-                if hasBetterPath {
-                    print("Better network path available - optimizing connection")
-                }
-            }
             
             newConn.start(queue: self.queue)
             self.isConnected = true
@@ -165,7 +162,6 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
         }
         
         listener?.start(queue: self.queue)
-        print("Server listening on port 8888")
     }
     
     private func setupCompressionSession(width: Int, height: Int) {
@@ -194,7 +190,9 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
             compressionSessionOut: &compressionSession
         )
         
-        guard let compressionSession = compressionSession else { return }
+        guard let compressionSession = compressionSession else {
+            return
+        }
         
         // Optimize for real-time streaming
         VTSessionSetProperty(compressionSession, key: kVTCompressionPropertyKey_RealTime, value: kCFBooleanTrue)
@@ -416,7 +414,6 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
             guard let self = self, error == nil,
                   let lengthData = lengthData,
                   lengthData.count == 4 else {
-                print("Failed to receive packet length or connection error")
                 return
             }
             
@@ -425,7 +422,6 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
             
             // Validate packet size to avoid excessive memory allocation
             guard length > 0, length < 1024 * 1024 else { // 1MB max packet size
-                print("Invalid packet length: \(length)")
                 self.continueReceiving(on: conn)
                 return
             }
@@ -434,7 +430,6 @@ class TCPServerStreamer: NSObject, ObservableObject, SCStreamDelegate, SCStreamO
             conn.receive(minimumIncompleteLength: Int(length), maximumLength: Int(length)) { [weak self] data, _, _, error in
                 guard let self = self, error == nil,
                       let data = data, !data.isEmpty else {
-                    print("Failed to receive full packet")
                     self?.continueReceiving(on: conn)
                     return
                 }
