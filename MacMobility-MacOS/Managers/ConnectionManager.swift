@@ -331,14 +331,21 @@ struct ConnectionRequest: Codable {
 
 extension ConnectionManager: MCNearbyServiceAdvertiserDelegate {
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-        if let context, let data = String(data: context, encoding: .utf8), isValidUUID(data) {
-            connectedPeerName = availablePeerWithName?.1
-            invitationHandler(true, session)
-            _ = generateUUID()
-        } else if let context, let connectionRequest = try? JSONDecoder().decode(ConnectionRequest.self, from: context) {
-            invitationHandler(connectionRequest.shouldConnect, session)
-        } else {
-            invitationHandler(false, nil)
+        DispatchQueue.main.async {
+            if let context, let data = String(data: context, encoding: .utf8), self.isValidUUID(data) {
+                self.connectedPeerName = self.availablePeerWithName?.1
+                invitationHandler(true, self.session)
+                _ = self.generateUUID()
+            } else if let context, let connectionRequest = try? JSONDecoder().decode(ConnectionRequest.self, from: context) {
+                if let availablePeerWithName = self.availablePeerWithName,
+                   let availablePeer = availablePeerWithName.0,
+                   connectionRequest.shouldConnect {
+                    self.invitePeer(with: availablePeer)
+                    self.pairingStatus = .pairining
+                }
+            } else {
+                invitationHandler(false, nil)
+            }
         }
     }
 }
@@ -349,11 +356,13 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
     }
 
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
-        if self.availablePeer == nil, !peerID.displayName.contains(".local") {
-            let name = info?["name"] ?? peerID.displayName
-            self.availablePeerWithName = (peerID, name)
-            self.connectedPeerName = name
-            self.connectedPeerResolution = info?["screenResolution"]
+        DispatchQueue.main.async {
+            if self.availablePeer == nil, !peerID.displayName.contains(".local") {
+                let name = info?["name"] ?? peerID.displayName
+                self.availablePeerWithName = (peerID, name)
+                self.connectedPeerName = name
+                self.connectedPeerResolution = info?["screenResolution"]
+            }
         }
     }
 
@@ -365,11 +374,13 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
 
 extension ConnectionManager: MCSessionDelegate {
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        self.pairingStatus = state == .connected ? .paired : .notPaired
-        if state == .notConnected {
-            self.stopTCPServer { _ in }
+        DispatchQueue.main.async {
+            self.pairingStatus = state == .connected ? .paired : .notPaired
+            if state == .notConnected {
+                self.stopTCPServer { _ in }
+            }
+            self.toggleAdvertising()
         }
-        self.toggleAdvertising()
     }
 
     public func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
