@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import UniformTypeIdentifiers
+import MultipeerConnectivity
 
 struct AssignedAppsToPages: Codable {
     var page: Int
@@ -16,6 +17,9 @@ struct AssignedAppsToPages: Codable {
 
 public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
     @Published var connectionManager: ConnectionManager
+    @Published var pairingStatus: PairingStatus = .notPaired
+    @Published var availablePeerWithName: (MCPeerID?, String)?
+    @Published var connectedPeerName: String?
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []
     @Published var installedApps: [ShortcutObject] = []
@@ -75,6 +79,21 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchInstalledApps()
         registerListener()
         startMonitoring()
+        
+        connectionManager
+            .$pairingStatus
+            .assign(to: \.pairingStatus, on: self)
+            .store(in: &cancellables)
+        
+        connectionManager
+            .$availablePeerWithName
+            .assign(to: \.availablePeerWithName, on: self)
+            .store(in: &cancellables)
+        
+        connectionManager
+            .$connectedPeerName
+            .assign(to: \.connectedPeerName, on: self)
+            .store(in: &cancellables)
         
         quickActionItems.enumerated().forEach { (index, item) in
             if item.objects == nil {

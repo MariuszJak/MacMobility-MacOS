@@ -161,7 +161,7 @@ struct ShortcutsView: View {
                             }
                         }
                     }
-                    .disabled(viewModel.connectionManager.pairingStatus != .paired)
+                    .disabled(viewModel.pairingStatus != .paired)
                     .padding(.all, 3.0)
                 case .connecting:
                     BlueButton(
@@ -203,7 +203,7 @@ struct ShortcutsView: View {
             }
             .padding([.horizontal, .top], 16)
             .padding(.bottom, 8.0)
-            .animation(.easeInOut, value: viewModel.connectionManager.pairingStatus)
+            .animation(.easeInOut, value: viewModel.pairingStatus)
             Divider()
         }
         .padding(.top, 21.0)
@@ -290,7 +290,7 @@ struct ShortcutsView: View {
                             proxy.scrollTo(page, anchor: .top)
                         }
                     }
-                    .onChange(of: viewModel.connectionManager.pairingStatus) { _, newValue in
+                    .onChange(of: viewModel.pairingStatus) { _, newValue in
                         if newValue == .notPaired {
                             viewModel.connectionManager.stopTCPServer { success in
                                 print("Disconnected from server: \(success)")
@@ -462,9 +462,9 @@ struct ShortcutsView: View {
     @ViewBuilder
     private var pairiningView: some View {
         VStack {
-            switch viewModel.connectionManager.pairingStatus {
+            switch viewModel.pairingStatus {
             case .notPaired:
-                if let availablePeerWithName = viewModel.connectionManager.availablePeerWithName,
+                if let availablePeerWithName = viewModel.availablePeerWithName,
                    let availablePeer = availablePeerWithName.0 {
                     BlueButton(
                         title: "Connect to \(availablePeerWithName.1)",
@@ -475,13 +475,13 @@ struct ShortcutsView: View {
                         backgroundColor: .accentColor
                     ) {
                         viewModel.connectionManager.invitePeer(with: availablePeer)
-                        viewModel.connectionManager.pairingStatus = .pairining
+                        viewModel.pairingStatus = .pairining
                     }
                     .padding(.all, 3.0)
                 }
             case .paired:
                 BlueButton(
-                    title: "Disconnect from \(viewModel.connectionManager.connectedPeerName ?? "")",
+                    title: "Disconnect from \(viewModel.connectedPeerName ?? "")",
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
@@ -489,7 +489,7 @@ struct ShortcutsView: View {
                     backgroundColor: .red
                 ) {
                     viewModel.connectionManager.disconnect()
-                    viewModel.connectionManager.pairingStatus = .notPaired
+                    viewModel.pairingStatus = .notPaired
                 }
                 .padding(.all, 3.0)
             case .pairining:
@@ -506,7 +506,7 @@ struct ShortcutsView: View {
                 .padding(.all, 3.0)
             }
         }
-        .animation(.easeInOut, value: viewModel.connectionManager.pairingStatus)
+        .animation(.easeInOut, value: viewModel.pairingStatus)
     }
     
     @ViewBuilder
