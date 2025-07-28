@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 enum StreamConnectionState {
     case notConnected
@@ -28,6 +29,7 @@ enum StreamConnectionState {
 }
 
 struct ShortcutsView: View {
+    @StateObject private var responder = HotKeyResponder.shared
     @ObservedObject private var viewModel: ShortcutsViewModel
     @State private var newWindow: NSWindow?
     @State private var newUtilityWindow: NSWindow?
@@ -36,12 +38,14 @@ struct ShortcutsView: View {
     @State private var automationItemWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
     @State private var companionAppWindow: NSWindow?
+    @State private var quickActionSetupWindow: NSWindow?
     @State private var shouldShowCompanionRequestPopup: Bool = false
     @State private var selectedTab = 0
     @State private var tab: Tab = .apps
     
     @State private var resolutions: [DisplayMode] = []
     @State private var selectedMode: DisplayMode?
+    @State private var cancellables = Set<AnyCancellable>()
     
     let testSize = 7.0
 
@@ -159,7 +163,7 @@ struct ShortcutsView: View {
                             }
                         }
                     }
-                    .disabled(viewModel.connectionManager.pairingStatus != .paired)
+                    .disabled(viewModel.pairingStatus != .paired)
                     .padding(.all, 3.0)
                 case .connecting:
                     BlueButton(
@@ -201,7 +205,7 @@ struct ShortcutsView: View {
             }
             .padding([.horizontal, .top], 16)
             .padding(.bottom, 8.0)
-            .animation(.easeInOut, value: viewModel.connectionManager.pairingStatus)
+            .animation(.easeInOut, value: viewModel.pairingStatus)
             Divider()
         }
         .padding(.top, 21.0)
@@ -214,10 +218,8 @@ struct ShortcutsView: View {
                             ResolutionSelectorCard(displayID: displayID, iosDevice: iosDevice, bitrate: $viewModel.connectionManager.bitrate)
                         }
                         ForEach(1..<viewModel.pages+1, id: \.self) { page in
-                            HStack {
-                                Text("Page: \(page)")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundStyle(Color.white)
+                            HStack(alignment: .bottom) {
+                                pageNumberView(page: page)
                                 Spacer()
                                 #if DEBUG
                                 Button {
@@ -269,7 +271,7 @@ struct ShortcutsView: View {
                                                     HStack {
                                                         Spacer()
                                                         RedXButton {
-                                                            viewModel.removeShortcut(id: id)
+                                                            viewModel.removeShortcut(id: id, page: page)
                                                         }
                                                     }
                                                     Spacer()
@@ -298,6 +300,11 @@ struct ShortcutsView: View {
                                                 EmptyView()
                                             )
                                     }
+                                    .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
+                                        view.onDrag {
+                                            NSItemProvider(object: id as NSString)
+                                        }
+                                    }
                                     .onDrop(of: [.text], isTargeted: nil) { providers in
                                         providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
                                             if let droppedString = droppedItem as? String,
@@ -323,7 +330,7 @@ struct ShortcutsView: View {
                             proxy.scrollTo(page, anchor: .top)
                         }
                     }
-                    .onChange(of: viewModel.connectionManager.pairingStatus) { _, newValue in
+                    .onChange(of: viewModel.pairingStatus) { _, newValue in
                         if newValue == .notPaired {
                             viewModel.connectionManager.stopTCPServer { success in
                                 print("Disconnected from server: \(success)")
@@ -356,11 +363,6 @@ struct ShortcutsView: View {
                 .frame(maxWidth: 500.0, maxHeight: .infinity)
             }
         }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
         .sheet(isPresented: $shouldShowCompanionRequestPopup) {
             CompanionRequestPopup(
                 deviceName: viewModel.availablePeerName,
@@ -376,8 +378,86 @@ struct ShortcutsView: View {
             .transition(.scale)
             .zIndex(1)
         }
+        .sheet(isPresented: $viewModel.showDependenciesView) {
+            DependenciesInstallView(dependencies: viewModel.dependenciesObjects, dependencyUpdate: viewModel.dependencyUpdate)
+        }
         .frame(minWidth: 1300.0)
         .padding(.top, 21.0)
+    }
+    
+    @ViewBuilder
+    private func pageNumberView(page: Int) -> some View {
+        HStack {
+            VStack(alignment: .trailing) {
+                Text("Page \(page)")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(Color.white)
+                if viewModel.getAssigned(to: page) != nil {
+                    Text("Assigned to: ")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundStyle(Color.gray)
+                }
+            }
+            if let assignedApp = viewModel.getAssigned(to: page) {
+                if let data = viewModel.getIcon(fromAppPath: assignedApp.appPath),
+                   let image = NSImage(data: data) {
+                    VStack {
+                        ZStack {
+                            Image(nsImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .cornerRadius(cornerRadius)
+                                .frame(width: 70, height: 70)
+                                .padding(.bottom, 4.0)
+                            VStack {
+                                HStack {
+                                    Spacer()
+                                    RedXButton {
+                                        viewModel.unassign(app: assignedApp.appPath, from: page)
+                                    }
+                                }
+                                Spacer()
+                            }
+                        }
+                    }
+                    .frame(width: 70, height: 70)
+                    .onDrop(of: [.text], isTargeted: nil) { providers in
+                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                            if let droppedString = droppedItem as? String,
+                               let object = viewModel.app(for: droppedString),
+                               let path = object.path {
+                                DispatchQueue.main.async {
+                                    viewModel.replace(app: path, to: page)
+                                }
+                            }
+                        }
+                        return true
+                    }
+                }
+            } else {
+                Button("Assign") {
+                    if let path = selectApp() {
+                        viewModel.assign(app: path, to: page)
+                    }
+                }
+                .onDrop(of: [.text], isTargeted: nil) { providers in
+                    providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                        if let droppedString = droppedItem as? String,
+                           let object = viewModel.app(for: droppedString),
+                           let path = object.path {
+                            DispatchQueue.main.async {
+                                viewModel.assign(app: path, to: page)
+                            }
+                        }
+                    }
+                    return true
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedBackgroundView()
+        )
     }
     
     private func handleOnDrop(index: Int, page: Int, object: ShortcutObject) {
@@ -401,9 +481,24 @@ struct ShortcutsView: View {
                         objects: object.objects,
                         showTitleOnIcon: object.showTitleOnIcon ?? true,
                         category: object.category
-                    )
+                    ), page: page
             )
         }
+    }
+
+    private func positionWindowAtMouse(window: NSWindow?, size: CGFloat) {
+        guard let window else {
+            return
+        }
+        let mouseLocation = NSEvent.mouseLocation
+
+        // Flip Y-coordinate relative to that screen
+        let origin = CGPoint(
+            x: mouseLocation.x - size / 2,
+            y: mouseLocation.y - size / 2
+        )
+
+        window.setFrameOrigin(origin)
     }
     
     func neighboringIndexes(for index: Int, size: CGSize, inGridWithColumns columns: Int = 7, rows: Int = 3) -> [Int]? {
@@ -442,9 +537,9 @@ struct ShortcutsView: View {
     @ViewBuilder
     private var pairiningView: some View {
         VStack {
-            switch viewModel.connectionManager.pairingStatus {
+            switch viewModel.pairingStatus {
             case .notPaired:
-                if let availablePeerWithName = viewModel.connectionManager.availablePeerWithName,
+                if let availablePeerWithName = viewModel.availablePeerWithName,
                    let availablePeer = availablePeerWithName.0 {
                     BlueButton(
                         title: "Connect to \(availablePeerWithName.1)",
@@ -455,13 +550,13 @@ struct ShortcutsView: View {
                         backgroundColor: .accentColor
                     ) {
                         viewModel.connectionManager.invitePeer(with: availablePeer)
-                        viewModel.connectionManager.pairingStatus = .pairining
+                        viewModel.pairingStatus = .pairining
                     }
                     .padding(.all, 3.0)
                 }
             case .paired:
                 BlueButton(
-                    title: "Disconnect from \(viewModel.connectionManager.connectedPeerName ?? "")",
+                    title: "Disconnect from \(viewModel.connectedPeerName ?? "")",
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
@@ -469,7 +564,7 @@ struct ShortcutsView: View {
                     backgroundColor: .red
                 ) {
                     viewModel.connectionManager.disconnect()
-                    viewModel.connectionManager.pairingStatus = .notPaired
+                    viewModel.pairingStatus = .notPaired
                 }
                 .padding(.all, 3.0)
             case .pairining:
@@ -486,7 +581,7 @@ struct ShortcutsView: View {
                 .padding(.all, 3.0)
             }
         }
-        .animation(.easeInOut, value: viewModel.connectionManager.pairingStatus)
+        .animation(.easeInOut, value: viewModel.pairingStatus)
     }
     
     @ViewBuilder
@@ -581,6 +676,30 @@ struct ShortcutsView: View {
                             }
                     }
                 }
+            } else if object.type == .html {
+                if let data = object.imageData, let image = NSImage(data: data) {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .cornerRadius(cornerRadius)
+                        .frame(width: 70, height: 70)
+                        .onTapGesture {
+                            openEditUtilityWindow(item: object)
+                        }
+                }
+                if !object.title.isEmpty {
+                    if object.showTitleOnIcon ?? true {
+                        Text(object.title)
+                            .font(.system(size: 11))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .frame(maxWidth: 80)
+                            .outlinedText()
+                            .onTapGesture {
+                                openEditUtilityWindow(item: object)
+                            }
+                    }
+                }
             } else if object.type == .control {
 //                BrightnessVolumeContainerView()
                 RoundedRectangle(cornerRadius: cornerRadius)
@@ -589,7 +708,7 @@ struct ShortcutsView: View {
             }
         }
     }
-    
+
     private var shortcutsView: some View {
         VStack(alignment: .leading) {
             if viewModel.shortcuts.isEmpty {
@@ -791,6 +910,7 @@ struct ShortcutsView: View {
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
             newWindow?.titlebarAppearsTransparent = true
+            newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
@@ -831,6 +951,7 @@ struct ShortcutsView: View {
             companionAppWindow?.setFrameAutosaveName("Webpages")
             companionAppWindow?.isReleasedWhenClosed = false
             companionAppWindow?.titlebarAppearsTransparent = true
+            companionAppWindow?.appearance = NSAppearance(named: .darkAqua)
             companionAppWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: companionAppWindow) else {
@@ -864,6 +985,7 @@ struct ShortcutsView: View {
             shortcutsToInstallWindow?.setFrameAutosaveName("ShortcutsToInstallWindow")
             shortcutsToInstallWindow?.isReleasedWhenClosed = false
             shortcutsToInstallWindow?.titlebarAppearsTransparent = true
+            shortcutsToInstallWindow?.appearance = NSAppearance(named: .darkAqua)
             shortcutsToInstallWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: shortcutsToInstallWindow) else {
@@ -895,6 +1017,7 @@ struct ShortcutsView: View {
             automationsToInstallWindow?.setFrameAutosaveName("AutomationsToInstallWindow")
             automationsToInstallWindow?.isReleasedWhenClosed = false
             automationsToInstallWindow?.titlebarAppearsTransparent = true
+            automationsToInstallWindow?.appearance = NSAppearance(named: .darkAqua)
             automationsToInstallWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: automationsToInstallWindow) else {
@@ -914,9 +1037,11 @@ struct ShortcutsView: View {
     }
     
     private func openCreateNewUtilityWindow() {
+        newUtilityWindow?.close()
+        newUtilityWindow = nil
         if nil == newUtilityWindow {
             newUtilityWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
+                contentRect: NSRect(x: 0, y: 0, width: 1150, height: 500),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -924,24 +1049,69 @@ struct ShortcutsView: View {
             newUtilityWindow?.center()
             newUtilityWindow?.setFrameAutosaveName("NewUtility")
             newUtilityWindow?.isReleasedWhenClosed = false
-            newUtilityWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
+            newUtilityWindow?.titlebarAppearsTransparent = true
+            newUtilityWindow?.appearance = NSAppearance(named: .darkAqua)
+            newUtilityWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newUtilityWindow) else {
+                return
+            }
+            
+            newUtilityWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: SelectUtilityTypeWindowView(
                 connectionManager: viewModel.connectionManager,
                 categories: viewModel.allCategories(),
                 delegate: viewModel,
                 closeAction: {
-                    tab = .utilities
                     newUtilityWindow?.close()
                 }))
+            newUtilityWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = newUtilityWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
         }
-        newUtilityWindow?.contentView = NSHostingView(rootView: SelectUtilityTypeWindowView(
-            connectionManager: viewModel.connectionManager,
-            categories: viewModel.allCategories(),
-            delegate: viewModel,
-            closeAction: {
-                tab = .utilities
-                newUtilityWindow?.close()
-            }))
         newUtilityWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func openQuickActionWindow() {
+        quickActionSetupWindow?.close()
+        quickActionSetupWindow = nil
+        if nil == quickActionSetupWindow {
+            quickActionSetupWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            quickActionSetupWindow?.center()
+            quickActionSetupWindow?.setFrameAutosaveName("QuickActionSetupWindow")
+            quickActionSetupWindow?.isReleasedWhenClosed = false
+            quickActionSetupWindow?.titlebarAppearsTransparent = true
+            quickActionSetupWindow?.appearance = NSAppearance(named: .darkAqua)
+            quickActionSetupWindow?.styleMask.insert(.fullSizeContentView)
+            quickActionSetupWindow?.level = .floating
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: quickActionSetupWindow) else {
+                return
+            }
+            
+            quickActionSetupWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: QuicActionMenuSetupView(
+                setupViewModel: .init(
+                    items: viewModel.quickActionItems,
+                    allItems: viewModel.allObjects()),
+                action: { items, shouldClose in
+                    if let items {
+                        viewModel.saveQuickActionItems(items)
+                    }
+                    if shouldClose {
+                        quickActionSetupWindow?.close()
+                    }
+                })
+            )
+            quickActionSetupWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = quickActionSetupWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        quickActionSetupWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openAutomationItemWindow(_ item: AutomationItem) {
@@ -958,6 +1128,7 @@ struct ShortcutsView: View {
             automationItemWindow?.setFrameAutosaveName("AutomationsToInstallWindow")
             automationItemWindow?.isReleasedWhenClosed = false
             automationItemWindow?.titlebarAppearsTransparent = true
+            automationItemWindow?.appearance = NSAppearance(named: .darkAqua)
             automationItemWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: automationItemWindow) else {
@@ -993,7 +1164,7 @@ struct ShortcutsView: View {
             } else {
                 editUtilitiesWindow = NSWindow(
                     contentRect: NSRect(x: 0, y: 0, width: 520, height: 470),
-                    styleMask: item.utilityType == .commandline || item.utilityType == .automation ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
+                    styleMask: item.utilityType == .commandline || item.utilityType == .automation || item.utilityType == .html ? [.titled, .closable, .resizable, .miniaturizable] : [.titled, .closable, .miniaturizable],
                     backing: .buffered,
                     defer: false
                 )
@@ -1002,6 +1173,7 @@ struct ShortcutsView: View {
             editUtilitiesWindow?.setFrameAutosaveName("Utilities")
             editUtilitiesWindow?.isReleasedWhenClosed = false
             editUtilitiesWindow?.titlebarAppearsTransparent = true
+            editUtilitiesWindow?.appearance = NSAppearance(named: .darkAqua)
             editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
@@ -1033,6 +1205,13 @@ struct ShortcutsView: View {
                     hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                     hv.view.autoresizingMask = [.width, .height]
                 }
+            case .html:
+                let hv = NSHostingController(rootView: HTMLUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                    editUtilitiesWindow?.close()
+                })
+                editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                hv.view.autoresizingMask = [.width, .height]
             case .multiselection:
                 let hv = NSHostingController(rootView: NewMultiSelectionUtilityView(item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()

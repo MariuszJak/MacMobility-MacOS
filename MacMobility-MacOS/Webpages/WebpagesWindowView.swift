@@ -73,11 +73,6 @@ struct WebpagesWindowView: View {
                         .fill(Color(NSColor.windowBackgroundColor))
                 )
         )
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
         .padding(.bottom, 16.0)
     }
     
@@ -157,6 +152,7 @@ struct WebpagesWindowView: View {
             newWindow?.setFrameAutosaveName("Webpages")
             newWindow?.isReleasedWhenClosed = false
             newWindow?.titlebarAppearsTransparent = true
+            newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {

@@ -12,6 +12,7 @@
 		C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */; };
 		C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */; };
 		C035810E2DB65091009E22F5 /* VisualEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810D2DB65091009E22F5 /* VisualEffect.swift */; };
+		C035E5722DF7821E00D6F3B3 /* DependenciesInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */; };
 		C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA7372DAC103300BD4FBA /* AboutView.swift */; };
 		C05DA73A2DAC104A00BD4FBA /* UpdateScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */; };
 		C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */; };
@@ -31,6 +32,9 @@
 		C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071D7172DB43A3100ADD746 /* WelcomeView.swift */; };
 		C08BBAA22DD67D31007F561B /* TCPServerStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */; };
 		C08BBAA42DD67D71007F561B /* ScreenViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA32DD67D71007F561B /* ScreenViewManager.swift */; };
+		C09084DA2DFED7CD00DFE172 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */; };
+		C09084DC2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */; };
+		C09084DE2E00309500DFE172 /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09084DD2E00309500DFE172 /* HotKeyManager.swift */; };
 		C091AD2F2BA4E1D000C8DC8D /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = C091AD2E2BA4E1D000C8DC8D /* QRCode */; };
 		C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */; };
 		C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C09775332B5C319E00F4FFE6 /* Assets.xcassets */; };
@@ -46,6 +50,15 @@
 		C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09775652B5C31EE00F4FFE6 /* AppleScriptCommandable.swift */; };
 		C09775692B5C329300F4FFE6 /* scriptnext.scpt in Resources */ = {isa = PBXBuildFile; fileRef = C09775682B5C329300F4FFE6 /* scriptnext.scpt */; };
 		C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */; };
+		C0B1605A2E185BF100C70CBD /* QuickActionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */; };
+		C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */; };
+		C0B160602E185C4D00C70CBD /* CircleSliceShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */; };
+		C0B160622E1AF2D700C70CBD /* SliceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B160612E1AF2D700C70CBD /* SliceButton.swift */; };
+		C0B1606E2E1D3A1C00C70CBD /* StandaloneTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1606D2E1D3A1C00C70CBD /* StandaloneTabView.swift */; };
+		C0B160732E22753D00C70CBD /* QAM-3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160712E22753D00C70CBD /* QAM-3.mp4 */; };
+		C0B160752E22753D00C70CBD /* QAM-2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160702E22753D00C70CBD /* QAM-2.mp4 */; };
+		C0B160762E22753D00C70CBD /* QAM-4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160722E22753D00C70CBD /* QAM-4.mp4 */; };
+		C0B160782E22758A00C70CBD /* QAM-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0B160772E22758A00C70CBD /* QAM-1.mp4 */; };
 		C0C9B78B2DCAACA40068BCAB /* NewAutomationUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */; };
 		C0C9B78D2DCAAD1F0068BCAB /* ConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */; };
 		C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */; };
@@ -138,6 +151,7 @@
 		C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerViewModel.swift; sourceTree = "<group>"; };
 		C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Ext.swift"; sourceTree = "<group>"; };
 		C035810D2DB65091009E22F5 /* VisualEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffect.swift; sourceTree = "<group>"; };
+		C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependenciesInstallView.swift; sourceTree = "<group>"; };
 		C05DA7372DAC103300BD4FBA /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateScreenView.swift; sourceTree = "<group>"; };
 		C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatesManager.swift; sourceTree = "<group>"; };
@@ -160,6 +174,9 @@
 		C08BBAA32DD67D71007F561B /* ScreenViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenViewManager.swift; sourceTree = "<group>"; };
 		C08BBAA52DD67D8E007F561B /* CGVirtualDisplayPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CGVirtualDisplayPrivate.h; sourceTree = "<group>"; };
 		C08BBAA62DD67DC0007F561B /* MacMobility-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MacMobility-Bridging-Header.h"; sourceTree = "<group>"; };
+		C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
+		C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewSetup.swift; sourceTree = "<group>"; };
+		C09084DD2E00309500DFE172 /* HotKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyManager.swift; sourceTree = "<group>"; };
 		C097752C2B5C319D00F4FFE6 /* MacMobility.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacMobility.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C097752F2B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMobility_MacOSApp.swift; sourceTree = "<group>"; };
 		C09775332B5C319E00F4FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -179,6 +196,15 @@
 		C09775682B5C329300F4FFE6 /* scriptnext.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scriptnext.scpt; sourceTree = "<group>"; };
 		C097756A2B5C32AA00F4FFE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionSenable.swift; sourceTree = "<group>"; };
+		C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewModel.swift; sourceTree = "<group>"; };
+		C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSlice.swift; sourceTree = "<group>"; };
+		C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSliceShape.swift; sourceTree = "<group>"; };
+		C0B160612E1AF2D700C70CBD /* SliceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceButton.swift; sourceTree = "<group>"; };
+		C0B1606D2E1D3A1C00C70CBD /* StandaloneTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandaloneTabView.swift; sourceTree = "<group>"; };
+		C0B160702E22753D00C70CBD /* QAM-2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-2.mp4"; sourceTree = "<group>"; };
+		C0B160712E22753D00C70CBD /* QAM-3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-3.mp4"; sourceTree = "<group>"; };
+		C0B160722E22753D00C70CBD /* QAM-4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-4.mp4"; sourceTree = "<group>"; };
+		C0B160772E22758A00C70CBD /* QAM-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QAM-1.mp4"; sourceTree = "<group>"; };
 		C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAutomationUtilityView.swift; sourceTree = "<group>"; };
 		C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConverterView.swift; sourceTree = "<group>"; };
 		C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mac-connect.mp4"; sourceTree = "<group>"; };
@@ -277,16 +303,18 @@
 		C05DA7362DAC102900BD4FBA /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C0B1605B2E185C0A00C70CBD /* QuickActionMenu */,
 				C05DA7372DAC103300BD4FBA /* AboutView.swift */,
 				C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */,
 				C071D7172DB43A3100ADD746 /* WelcomeView.swift */,
 				C03581072DB6501E009E22F5 /* IconPickerView.swift */,
 				C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */,
 				C035810D2DB65091009E22F5 /* VisualEffect.swift */,
-				C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */,
 				C065EBFD2DC0DE1500000B8C /* InstallAutomationsView.swift */,
 				C065EBFF2DC0DE2400000B8C /* AutomationInstallView.swift */,
 				C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */,
+				C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */,
+				C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -334,6 +362,7 @@
 				C0EAFC192D903E7400044947 /* TrialManager.swift */,
 				C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */,
 				C0D094202DBE35B900C8EAA4 /* KeyRecorder.swift */,
+				C09084DD2E00309500DFE172 /* HotKeyManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -422,9 +451,35 @@
 			path = "MacMobility-MacOSUITests";
 			sourceTree = "<group>";
 		};
+		C0B1605B2E185C0A00C70CBD /* QuickActionMenu */ = {
+			isa = PBXGroup;
+			children = (
+				C0B1605C2E185C1800C70CBD /* Subviews */,
+				C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */,
+				C09084DB2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift */,
+				C09084D92DFED7CD00DFE172 /* QuickActionsView.swift */,
+				C0B1606D2E1D3A1C00C70CBD /* StandaloneTabView.swift */,
+			);
+			path = QuickActionMenu;
+			sourceTree = "<group>";
+		};
+		C0B1605C2E185C1800C70CBD /* Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */,
+				C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */,
+				C0B160612E1AF2D700C70CBD /* SliceButton.swift */,
+			);
+			path = Subviews;
+			sourceTree = "<group>";
+		};
 		C0C9B78E2DCD31D80068BCAB /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				C0B160772E22758A00C70CBD /* QAM-1.mp4 */,
+				C0B160702E22753D00C70CBD /* QAM-2.mp4 */,
+				C0B160712E22753D00C70CBD /* QAM-3.mp4 */,
+				C0B160722E22753D00C70CBD /* QAM-4.mp4 */,
 				C0C9B7932DCD35AD0068BCAB /* ipad-connect.mp4 */,
 				C0C9B7902DCD31E90068BCAB /* mac-connect.mp4 */,
 			);
@@ -669,7 +724,11 @@
 				C0F67EF32D981CAD0090D568 /* Upcoming Events.shortcut in Resources */,
 				C09775372B5C319E00F4FFE6 /* Preview Assets.xcassets in Resources */,
 				C0F67F062D982E990090D568 /* ANC ON.shortcut in Resources */,
+				C0B160782E22758A00C70CBD /* QAM-1.mp4 in Resources */,
 				C0F67F072D982E990090D568 /* Live Photo to GIF.shortcut in Resources */,
+				C0B160732E22753D00C70CBD /* QAM-3.mp4 in Resources */,
+				C0B160752E22753D00C70CBD /* QAM-2.mp4 in Resources */,
+				C0B160762E22753D00C70CBD /* QAM-4.mp4 in Resources */,
 				C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */,
 				C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */,
 				C0C9B7942DCD35AD0068BCAB /* ipad-connect.mp4 in Resources */,
@@ -717,10 +776,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				C064B8C42D86EB090091E2BE /* ShortcutsView.swift in Sources */,
+				C035E5722DF7821E00D6F3B3 /* DependenciesInstallView.swift in Sources */,
 				C065EC062DC0DE7400000B8C /* ShortcutObject.swift in Sources */,
 				C0EAFC182D9030D000044947 /* LicenseKeyGenerator.swift in Sources */,
 				C064BA632D876F5E0091E2BE /* Color+Ext.swift in Sources */,
 				C0F67EE72D973F1D0090D568 /* LicenseValidationAPIProtocol.swift in Sources */,
+				C09084DE2E00309500DFE172 /* HotKeyManager.swift in Sources */,
+				C0B1606E2E1D3A1C00C70CBD /* StandaloneTabView.swift in Sources */,
 				C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */,
 				C065EBFC2DC0DDF300000B8C /* ExploreAutomationsView.swift in Sources */,
 				C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */,
@@ -750,10 +812,13 @@
 				C0F67EE02D973ECA0090D568 /* String+Ext.swift in Sources */,
 				C0D21D652D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift in Sources */,
 				C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */,
+				C0B160622E1AF2D700C70CBD /* SliceButton.swift in Sources */,
 				C0EAF9432D90246100044947 /* ValidateLicenseView.swift in Sources */,
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
 				C065EBFE2DC0DE1500000B8C /* InstallAutomationsView.swift in Sources */,
 				C0F67EDC2D973EA50090D568 /* EmptyResponse.swift in Sources */,
+				C09084DA2DFED7CD00DFE172 /* QuickActionsView.swift in Sources */,
+				C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */,
 				C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */,
 				C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */,
 				C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */,
@@ -761,8 +826,10 @@
 				C0EAF9F92D902AB100044947 /* Resolver.swift in Sources */,
 				C0F67EDA2D973E930090D568 /* Request.swift in Sources */,
 				C0F67EE42D973F070090D568 /* DBSDataProviderRepresentable.swift in Sources */,
+				C0B1605A2E185BF100C70CBD /* QuickActionsViewModel.swift in Sources */,
 				C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */,
 				C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */,
+				C0B160602E185C4D00C70CBD /* CircleSliceShape.swift in Sources */,
 				C09775632B5C31E300F4FFE6 /* ConnectionManager+MacOS+Ext.swift in Sources */,
 				C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */,
 				C09775662B5C31EE00F4FFE6 /* MacOSMainView.swift in Sources */,
@@ -778,6 +845,7 @@
 				C065EC042DC0DE5100000B8C /* ShortcutObject+Ext.swift in Sources */,
 				C0F67EE22D973EF90090D568 /* URL+Ext.swift in Sources */,
 				C035810E2DB65091009E22F5 /* VisualEffect.swift in Sources */,
+				C09084DC2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift in Sources */,
 				C0F67EDE2D973EB20090D568 /* DBSDataProvider.swift in Sources */,
 				C0F67EE92D973F2B0090D568 /* LicenseValidationUseCase.swift in Sources */,
 				C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */,
@@ -969,7 +1037,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.31;
+				MARKETING_VERSION = 1.0.38;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1005,7 +1073,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.31;
+				MARKETING_VERSION = 1.0.38;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				PROVISIONING_PROFILE_SPECIFIER = "";

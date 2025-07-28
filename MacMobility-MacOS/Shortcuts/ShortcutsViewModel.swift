@@ -8,14 +8,24 @@
 import SwiftUI
 import Combine
 import UniformTypeIdentifiers
+import MultipeerConnectivity
+
+struct AssignedAppsToPages: Codable {
+    var page: Int
+    let appPath: String
+}
 
 public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
     @Published var connectionManager: ConnectionManager
+    @Published var pairingStatus: PairingStatus = .notPaired
+    @Published var availablePeerWithName: (MCPeerID?, String)?
+    @Published var connectedPeerName: String?
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []
     @Published var installedApps: [ShortcutObject] = []
     @Published var appsAddedByUser: [ShortcutObject] = []
     @Published var webpages: [ShortcutObject] = []
+    @Published var quickActionItems: [ShortcutObject] = []
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     @Published var pages = 1
@@ -26,11 +36,15 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var allSectionsExpanded = true
     @Published var streamConnectionState: StreamConnectionState = .notConnected
     @Published var displayID: CGDirectDisplayID?
+    @Published var showDependenciesView: Bool = false
+    @Published var dependenciesObjects: [DependencyObject] = []
+    @Published var idOfObjectToReplaceDependencies: String = ""
     @Published var utilities: [ShortcutObject] = [] {
         didSet {
             sections = utilitiesWithSections()
         }
     }
+    var dependencyUpdate: ([String]) -> Void = { _ in }
     var close: () -> Void = {}
     private var timer: Timer?
     public var testColor = "#6DDADE"
@@ -42,16 +56,25 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var automations: AutomationsList?
     private var createMultiactions: Bool?
     private var browser: Browsers?
+    private var installedAllApps: [ShortcutObject] = []
     
     init(connectionManager: ConnectionManager) {
-//        UserDefaults.standard.clear(key: .utilities)
+//        UserDefaults.standard.clear(key: .quickActionItems)
+//        UserDefaults.standard.clear(key: .subitemPages)
+//        UserDefaults.standard.clear(key: .assignedAppsToSubpages)
+//        UserDefaults.standard.clearAll()
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
         self.utilities = UserDefaults.standard.get(key: .utilities) ?? []
         self.pages = UserDefaults.standard.get(key: .pages) ?? 1
         self.appsAddedByUser = UserDefaults.standard.get(key: .userApps) ?? []
+        self.quickActionItems = UserDefaults.standard.get(key: .quickActionItems) ?? (0..<10).map { .empty(for: $0, page: 1) }
+        if self.quickActionItems.isEmpty {
+            self.quickActionItems = (0..<10).map { .empty(for: $0, page: 1) }
+        }
         self.automations = loadJSON("automations")
+        connectionManager.assignedAppsToPages = UserDefaults.standard.get(key: .assignedAppsToPages) ?? []
         fetchShortcuts()
         fetchInstalledApps()
         registerListener()
@@ -80,24 +103,91 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         self.saveUtility(with: test7)
         
         connectionManager
+            .$pairingStatus
+            .assign(to: \.pairingStatus, on: self)
+            .store(in: &cancellables)
+        
+        connectionManager
+            .$availablePeerWithName
+            .assign(to: \.availablePeerWithName, on: self)
+            .store(in: &cancellables)
+        
+        connectionManager
+            .$connectedPeerName
+            .assign(to: \.connectedPeerName, on: self)
+            .store(in: &cancellables)
+        
+        quickActionItems.enumerated().forEach { (index, item) in
+            if item.objects == nil {
+                quickActionItems[index].objects = (0..<5).map { .empty(for: $0) }
+            }
+        }
+        
+        connectionManager
             .$streamConnectionState
             .receive(on: DispatchQueue.main)
-            .sink { value in
-                self.streamConnectionState = value
+            .sink { [weak self] value in
+                self?.streamConnectionState = value
             }
             .store(in: &cancellables)
         
         connectionManager
             .$displayID
             .receive(on: DispatchQueue.main)
-            .sink { value in
-                self.displayID = value
+            .sink { [weak self] value in
+                self?.displayID = value
             }
             .store(in: &cancellables)
+        
+        dependencyUpdate = { updates in
+            self.updateDependenciesOfObject(with: self.idOfObjectToReplaceDependencies, replacements: updates)
+        }
+    }
+    
+    func saveQuickActionItems(_ items: [ShortcutObject]) {
+        self.quickActionItems = items
+        UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
+    }
+    
+    func replace(app path: String, to page: Int) {
+        guard let index = connectionManager.assignedAppsToPages.firstIndex(where: { $0.page == page }) else {
+            connectionManager.localError = "No app assigned to \(page), can't replace."
+            connectionManager.showsLocalError = true
+            return
+        }
+        connectionManager.assignedAppsToPages[index] = .init(page: page, appPath: path)
+        if let alreadyAssignedSomwhereIndex = connectionManager.assignedAppsToPages.firstIndex(where: { $0.appPath == path && $0.page != page }) {
+            connectionManager.assignedAppsToPages.remove(at: alreadyAssignedSomwhereIndex)
+        }
+        UserDefaults.standard.store(connectionManager.assignedAppsToPages, for: .assignedAppsToPages)
+        self.pages = pages
+    }
+    
+    func assign(app path: String, to page: Int) {
+        if let assignedApp = connectionManager.assignedAppsToPages.first(where: { $0.appPath == path }) {
+            connectionManager.localError = "App already assigned to page \(assignedApp.page)"
+            connectionManager.showsLocalError = true
+            return
+        }
+        connectionManager.assignedAppsToPages.append(.init(page: page, appPath: path))
+        UserDefaults.standard.store(connectionManager.assignedAppsToPages, for: .assignedAppsToPages)
+        self.pages = pages
+    }
+    
+    func unassign(app path: String, from page: Int) {
+        connectionManager.assignedAppsToPages = connectionManager.assignedAppsToPages.filter { $0.appPath != path && $0.page != page }
+        UserDefaults.standard.store(connectionManager.assignedAppsToPages, for: .assignedAppsToPages)
+        self.pages = pages
+    }
+    
+    func getAssigned(to page: Int) -> AssignedAppsToPages? {
+        connectionManager.assignedAppsToPages.first(where: { $0.page == page })
     }
     
     func extendScreen() {
-        connectionManager.extendScreen()
+        Task {
+            await connectionManager.extendScreen()
+        }
     }
     
     func allCategories() -> [String] {
@@ -130,8 +220,11 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
             }
         }
+        sections.forEach { section in
+            section.items.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+        }
         
-        return sections
+        return sections.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
     
     func removeFromSections(with removeId: String?) {
@@ -284,16 +377,20 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 ? option.scripts
                 : option.scripts.filter { !($0.isAdvanced ?? false) }
                 var i: Int = 0
+                
                 filtered.enumerated().forEach { (index, script) in
-                    i += 1
                     if script.script.contains("URLs"), let browser {
                         if script.script.contains(browser.name.uppercased()) {
-                            let so: ShortcutObject = .from(script: script, at: index)
+                            let so: ShortcutObject = .from(script: script, at: i)
                             addConfiguredShortcut(object: so)
+                            i += 1
                         }
                     } else {
-                        let so: ShortcutObject = .from(script: script, at: index)
-                        addConfiguredShortcut(object: so)
+                        if !script.script.contains("URLs") {
+                            let so: ShortcutObject = .from(script: script, at: i)
+                            addConfiguredShortcut(object: so)
+                            i += 1
+                        }
                     }
                 }
                 var websitesSO: [ShortcutObject] = []
@@ -356,12 +453,21 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
     }
     
-    func allObjects() -> [ShortcutObject] {
-        shortcuts + installedApps + webpages + utilities
+    func app(for id: String) -> ShortcutObject? {
+        if searchText.isEmpty {
+            installedApps.first { $0.id == id }
+        } else {
+            tmpAllItems.filter { $0.type == .app }.first { $0.id == id }
+        }
     }
     
-    func removeShortcut(id: String) {
-        configuredShortcuts.removeAll { $0.id == id }
+    func allObjects() -> [ShortcutObject] {
+        shortcuts + installedApps + webpages + utilities + appsAddedByUser
+    }
+    
+    func removeShortcut(id: String, page: Int) {
+//        configuredShortcuts.removeAll { $0.id == id }
+        configuredShortcuts.removeAll(where: { $0.page == page && $0.id == id })
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
     }
@@ -373,10 +479,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func removePage(with number: Int) {
+        connectionManager.assignedAppsToPages.removeAll { $0.page == number }
         configuredShortcuts.removeAll { $0.page == number }
         configuredShortcuts.enumerated().forEach { (index, object) in
             if configuredShortcuts[index].page > number {
                 configuredShortcuts[index].page -= 1
+            }
+        }
+        connectionManager.assignedAppsToPages.enumerated().forEach { (index, object) in
+            if connectionManager.assignedAppsToPages[index].page > number {
+                connectionManager.assignedAppsToPages[index].page -= 1
             }
         }
         if pages > 1 {
@@ -385,6 +497,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
         UserDefaults.standard.store(pages, for: .pages)
+        UserDefaults.standard.store(connectionManager.assignedAppsToPages, for: .assignedAppsToPages)
     }
     
     func exportPageAsAutomations(number: Int) {
@@ -432,12 +545,12 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
     }
     
-    func addConfiguredShortcut(object: ShortcutObject) {
+    func addConfiguredShortcut(object: ShortcutObject, page: Int = 0) {
         if let index = configuredShortcuts.firstIndex(where: { !Set($0.indexes ?? []).intersection(Set(object.indexes ?? [])).isEmpty && $0.page == object.page }) {
             let oldObject = configuredShortcuts[index]
             configuredShortcuts[index] = object
             configuredShortcuts.enumerated().forEach { (index, shortcut) in
-                if (object.indexes != shortcut.indexes && shortcut.id == object.id) {
+                if (object.indexes != shortcut.indexes && shortcut.id == object.id && shortcut.page == object.page) {
                     configuredShortcuts[index] = .init(
                         type: oldObject.type,
                         page: configuredShortcuts[index].page,
@@ -460,7 +573,25 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
             }
         } else {
-            configuredShortcuts = configuredShortcuts.filter { $0.id != object.id }
+            if object.scriptCode?.contains("DEPENDENCY_") ?? false {
+                dependenciesObjects = extractDependencies(from: object.scriptCode ?? "")
+                if dependenciesObjects.contains(where: { $0.type == .tool }) {
+                    if let toolLocation = dependenciesObjects.first?.tool {
+                        if !isCLIToolInstalled(at: toolLocation) {
+                            showDependenciesView = true
+                        }
+                    }
+                    if dependenciesObjects.contains(where: { $0.type == .text }) && !showDependenciesView {
+                        dependenciesObjects.removeAll(where: { $0.type == .tool })
+                        idOfObjectToReplaceDependencies = object.id
+                        showDependenciesView = true
+                    }
+                } else {
+                    showDependenciesView = true
+                    idOfObjectToReplaceDependencies = object.id
+                }
+            }
+            configuredShortcuts.removeAll(where: { $0.page == page && $0.id == object.id })
             configuredShortcuts.append(object)
         }
         connectionManager.shortcuts = configuredShortcuts
@@ -501,6 +632,60 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
 
         return result
+    }
+    
+    func extractDependencies(from text: String) -> [DependencyObject] {
+        var dependencies: [DependencyObject] = []
+        
+        let pattern = #"\[DEPENDENCY_(\d+):\s*\{([^}]*)\}\]"#
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+
+        let matches = regex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+        
+        for match in matches {
+            guard match.numberOfRanges == 3 else { continue }
+            let bodyRange = Range(match.range(at: 2), in: text)!
+            let body = String(text[bodyRange])
+            
+            let jsonFormatted = "{\(body)}"
+            do {
+                if let jsonData = jsonFormatted.data(using: .utf8) {
+                    let object = try JSONDecoder().decode(DependencyObject.self, from: jsonData)
+                    dependencies.append(object)
+                }
+            } catch {
+                print(error)
+            }
+        }
+        
+        return dependencies
+    }
+    
+    func updateDependenciesOfObject(with id: String, replacements: [String]) {
+        guard var object = configuredShortcuts.first(where: { $0.id == id }) else { return }
+        replacements.enumerated().forEach { index, replacement in
+            if !replacement.isEmpty {
+                let split = replacement.split(separator: "&+$").map { String($0) }
+                if let script = replaceDependency(in: object.scriptCode, id: split[safe: 0], with: split[safe: 1]) {
+                    object.scriptCode = script
+                }
+            }
+        }
+        saveUtility(with: object)
+    }
+    
+    func replaceDependency(in text: String?, id: String?, with replacement: String?) -> String? {
+        guard let text, let id, let replacement else { return nil }
+        let pattern = #"\[\#(id):\s*\{[^}]*\}\]"#
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+
+        let range = NSRange(text.startIndex..., in: text)
+        return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: replacement)
+    }
+    
+    func isCLIToolInstalled(at path: String) -> Bool {
+        let fileManager = FileManager.default
+        return fileManager.isExecutableFile(atPath: path)
     }
     
     func searchWebpages() {
@@ -562,6 +747,27 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 )
                 UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
+            let qamIndexes = quickActionItems.allIndexes(where: { $0.id == webpageItem.id })
+            qamIndexes.forEach { index in
+                quickActionItems[index] = .init(
+                    type: webpageItem.type,
+                    page: quickActionItems[index].page,
+                    index: quickActionItems[index].index,
+                    path: webpageItem.path,
+                    id: webpageItem.id,
+                    title: webpageItem.title,
+                    color: webpageItem.color,
+                    faviconLink: webpageItem.faviconLink,
+                    browser: webpageItem.browser,
+                    imageData: webpageItem.imageData,
+                    scriptCode: webpageItem.scriptCode,
+                    utilityType: webpageItem.utilityType,
+                    objects: webpageItem.objects,
+                    showTitleOnIcon: webpageItem.showTitleOnIcon ?? true,
+                    category: webpageItem.category
+                )
+            }
+            UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
         } else {
             webpages.insert(webpageItem, at: 0)
         }
@@ -573,7 +779,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         removeFromSections(with: utilityItem.id)
         if let index = utilities.firstIndex(where: { $0.id == utilityItem.id }) {
             utilities[index] = utilityItem
-            if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == utilityItem.id }) {
+            let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == utilityItem.id })
+            configuredIndexes.forEach { configuredIndex in
                 configuredShortcuts[configuredIndex] = .init(
                     type: utilityItem.type,
                     page: configuredShortcuts[configuredIndex].page,
@@ -593,8 +800,29 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     showTitleOnIcon: utilityItem.showTitleOnIcon ?? true,
                     category: utilityItem.category
                 )
-                UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
             }
+            UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+            let qamIndexes = quickActionItems.allIndexes(where: { $0.id == utilityItem.id })
+            qamIndexes.forEach { index in
+                quickActionItems[index] = .init(
+                    type: utilityItem.type,
+                    page: quickActionItems[index].page,
+                    index: quickActionItems[index].index,
+                    path: utilityItem.path,
+                    id: utilityItem.id,
+                    title: utilityItem.title,
+                    color: utilityItem.color,
+                    faviconLink: utilityItem.faviconLink,
+                    browser: utilityItem.browser,
+                    imageData: utilityItem.imageData,
+                    scriptCode: utilityItem.scriptCode,
+                    utilityType: utilityItem.utilityType,
+                    objects: utilityItem.objects,
+                    showTitleOnIcon: utilityItem.showTitleOnIcon ?? true,
+                    category: utilityItem.category
+                )
+            }
+            UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
         } else {
             utilities.insert(utilityItem, at: 0)
         }
@@ -674,23 +902,24 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         ]
 
         var apps: [ShortcutObject] = []
-
-        for directory in appDirectories {
-            apps.append(contentsOf: findApps(in: directory))
-        }
-
         DispatchQueue.main.async {
+            for directory in appDirectories {
+                apps.append(contentsOf: self.findApps(in: directory))
+            }
+            
+            self.appsAddedByUser.forEach { userApp in
+                if apps.contains(where: { $0.path != userApp.path }) {
+                    apps.append(userApp)
+                }
+            }
+            
             if self.searchText.isEmpty {
                 self.installedApps = apps.sorted { $0.title.lowercased() < $1.title.lowercased() }
+                self.installedAllApps.removeAll()
             } else {
-                self.installedApps = apps.sorted { $0.title.lowercased() < $1.title.lowercased() }
+                self.installedAllApps = apps.sorted { $0.title.lowercased() < $1.title.lowercased() }
+                self.installedApps = self.installedAllApps
                     .filter { $0.title.lowercased().contains(self.searchText.lowercased()) }
-            }
-        }
-        
-        appsAddedByUser.forEach { userApp in
-            if apps.contains(where: { $0.path != userApp.path }) {
-                apps.append(userApp)
             }
         }
     }
@@ -725,12 +954,16 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         if let appURLs = try? FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: directory), includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
             for appURL in appURLs where appURL.pathExtension == "app" {
                 let appName = appURL.deletingPathExtension().lastPathComponent
+                let id: String = installedApps.first(where: { shortcut in appURL.path == shortcut.path })?.id
+                ?? installedAllApps.first(where: { shortcut in appURL.path == shortcut.path })?.id
+                ?? configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id
+                ?? UUID().uuidString
                 apps.append(
                     ShortcutObject(
                         type: .app,
                         page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? 1,
                         path: appURL.path,
-                        id: installedApps.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id ?? UUID().uuidString,
+                        id: id,
                         title: appName,
                         imageData: cachedIcons[appURL.path] ?? getIcon(fromAppPath: appURL.path)
                     )
@@ -785,5 +1018,23 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
 //        print(String(format: "%.8f MB", countMB))
         
         return pngData
+    }
+}
+
+extension Array {
+    func allIndexes(where predicate: (Element) -> Bool) -> [Int] {
+        var indexes: [Int] = []
+        for (index, element) in self.enumerated() {
+            if predicate(element) {
+                indexes.append(index)
+            }
+        }
+        return indexes
+    }
+}
+
+extension ShortcutObject {
+    static func empty(for index: Int, page: Int = 1) -> ShortcutObject {
+        .init(type: .app, page: page, index: index, id: "EMPTY \(index)", title: "EMPTY")
     }
 }

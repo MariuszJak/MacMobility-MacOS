@@ -11,6 +11,7 @@ import os
 import Foundation
 import Combine
 import AppKit
+import IOKit.pwr_mgt
 
 enum PairingStatus: Equatable {
     case notPaired
@@ -32,6 +33,7 @@ struct DeviceName: Codable {
 }
 
 class ConnectionManager: NSObject, ObservableObject {
+    @ObservedObject var observer = FocusedAppObserver()
     @Published var screenIndex = 0
     @Published var inProgressWindow: NSWindow?
     @Published var availablePeer: MCPeerID?
@@ -54,6 +56,12 @@ class ConnectionManager: NSObject, ObservableObject {
     @Published var bitrate: CGFloat? = 1
     @Published var streamConnectionState: StreamConnectionState = .notConnected
     @Published var displayID: CGDirectDisplayID?
+    @Published var listenerAdded: Bool = false
+    public var assignedAppsToPages: [AssignedAppsToPages] = [] {
+        didSet {
+            self.send(assignedAppsToPages: assignedAppsToPages)
+        }
+    }
     private let tcpServer = TCPServerStreamer()
     let keyRecorder = KeyRecorder()
     private var cancellables = Set<AnyCancellable>()
@@ -62,6 +70,8 @@ class ConnectionManager: NSObject, ObservableObject {
     public var myPeerId: MCPeerID = {
         return MCPeerID(displayName: Host.current().name ?? "")
     }()
+    private var keepAliveActivity: NSObjectProtocol?
+    private var assertionID: IOPMAssertionID = 0
     
     public let serviceAdvertiser: MCNearbyServiceAdvertiser
     public let serviceBrowser: MCNearbyServiceBrowser
@@ -87,18 +97,15 @@ class ConnectionManager: NSObject, ObservableObject {
         for change in diff {
             switch change {
             case let .insert(_, element, associatedWith):
-                if let fromIndex = associatedWith {
+                if let _ = associatedWith {
                 } else {
-                    // This is a new insert
                     insertedItems.append(.init(item: element, from: nil, to: nil))
                 }
 
             case let .remove(_, element, associatedWith):
                 if associatedWith == nil {
-                    // This is a real removal
                     removedItems.append(.init(item: element, from: nil, to: nil))
                 }
-                // If it's part of a move, we already handled it on insert side
             }
         }
         return [ChangeType.insert: insertedItems, ChangeType.remove: removedItems]
@@ -143,6 +150,17 @@ class ConnectionManager: NSObject, ObservableObject {
         startAdvertising()
         startBrowsing()
         
+        observer
+            .$focusedAppName
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] activeApp in
+                guard let self, let activeApp else { return }
+                if let pageToFocus = assignedAppsToPages.first(where: { $0.appPath.contains(activeApp) }) {
+                    send(assignedApp: pageToFocus)
+                }
+            }
+            .store(in: &cancellables)
+        
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleData(_:)),
@@ -152,24 +170,24 @@ class ConnectionManager: NSObject, ObservableObject {
     }
     
     @objc private func handleData(_ notification: Notification) {
-        extendScreen()
+        Task {
+            await extendScreen()
+        }
     }
     
-    func extendScreen() {
-        Task { @MainActor in
-            streamConnectionState = .connecting
-            await startTCPServer { success, displayId in
-                if let displayId {
-                    self.displayID = displayId
-                } else {
-                    self.streamConnectionState = .notConnected
-                }
-            } streamConnection: { connected in
-                if connected {
-                    self.streamConnectionState = .connected
-                } else {
-                    self.streamConnectionState = .notConnected
-                }
+    func extendScreen() async {
+        streamConnectionState = .connecting
+        await startTCPServer { success, displayId in
+            if let displayId {
+                self.displayID = displayId
+            } else {
+                self.streamConnectionState = .notConnected
+            }
+        } streamConnection: { connected in
+            if connected {
+                self.streamConnectionState = .connected
+            } else {
+                self.streamConnectionState = .notConnected
             }
         }
     }
@@ -246,10 +264,14 @@ class ConnectionManager: NSObject, ObservableObject {
         switch pairingStatus {
         case .notPaired:
             startAdvertising()
+            stopKeepAliveActivity()
+            allowSleep()
         case .pairining:
             break
         case .paired:
             stopAdvertising()
+            startKeepAliveActivity()
+            preventSleep()
         }
     }
     
@@ -268,6 +290,39 @@ class ConnectionManager: NSObject, ObservableObject {
         pairingStatus = .notPaired
         toggleAdvertising()
     }
+    
+    func preventSleep() {
+        let reasonForActivity = "TCP + Multipeer streaming requires continuous processing" as CFString
+        let result = IOPMAssertionCreateWithName(
+            kIOPMAssertionTypeNoIdleSleep as CFString,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            reasonForActivity,
+            &assertionID
+        )
+        
+        if result == kIOReturnSuccess {
+            print("Sleep prevention assertion created.")
+        }
+    }
+
+    func allowSleep() {
+        IOPMAssertionRelease(assertionID)
+        print("Sleep prevention assertion released.")
+    }
+
+    func startKeepAliveActivity() {
+        keepAliveActivity = ProcessInfo.processInfo.beginActivity(
+            options: [.userInitiated, .latencyCritical, .idleSystemSleepDisabled, .suddenTerminationDisabled, .automaticTerminationDisabled],
+            reason: "Screen streaming and multipeer connection"
+        )
+    }
+
+    func stopKeepAliveActivity() {
+        if let activity = keepAliveActivity {
+            ProcessInfo.processInfo.endActivity(activity)
+            keepAliveActivity = nil
+        }
+    }
 }
 
 struct ConnectionRequest: Codable {
@@ -276,14 +331,21 @@ struct ConnectionRequest: Codable {
 
 extension ConnectionManager: MCNearbyServiceAdvertiserDelegate {
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-        if let context, let data = String(data: context, encoding: .utf8), isValidUUID(data) {
-            connectedPeerName = availablePeerWithName?.1
-            invitationHandler(true, session)
-            _ = generateUUID()
-        } else if let context, let connectionRequest = try? JSONDecoder().decode(ConnectionRequest.self, from: context) {
-            invitationHandler(connectionRequest.shouldConnect, session)
-        } else {
-            invitationHandler(false, nil)
+        DispatchQueue.main.async {
+            if let context, let data = String(data: context, encoding: .utf8), self.isValidUUID(data) {
+                self.connectedPeerName = self.availablePeerWithName?.1
+                invitationHandler(true, self.session)
+                _ = self.generateUUID()
+            } else if let context, let connectionRequest = try? JSONDecoder().decode(ConnectionRequest.self, from: context) {
+                if let availablePeerWithName = self.availablePeerWithName,
+                   let availablePeer = availablePeerWithName.0,
+                   connectionRequest.shouldConnect {
+                    self.invitePeer(with: availablePeer)
+                    self.pairingStatus = .pairining
+                }
+            } else {
+                invitationHandler(false, nil)
+            }
         }
     }
 }
@@ -307,7 +369,6 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         guard availablePeer == peerID else { return }
         availablePeer = nil
-        
     }
 }
 
@@ -316,9 +377,7 @@ extension ConnectionManager: MCSessionDelegate {
         DispatchQueue.main.async {
             self.pairingStatus = state == .connected ? .paired : .notPaired
             if state == .notConnected {
-                self.stopTCPServer { _ in
-//                    self.streamConnectionState = .notConnected
-                }
+                self.stopTCPServer { _ in }
             }
             self.toggleAdvertising()
         }
@@ -339,4 +398,8 @@ extension ConnectionManager: MCSessionDelegate {
 
 extension Notification.Name {
     static let extendScreen = Notification.Name("extendScreen")
+    static let openShortcuts = Notification.Name("openShortcuts")
+    static let closeShortcuts = Notification.Name("closeShortcuts")
+    static let openQAM = Notification.Name("openQAM")
+    static let openNewQAMTutorial = Notification.Name("openNewQAMTutorial")
 }

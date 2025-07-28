@@ -87,10 +87,5 @@ struct IconPickerView: View {
                 }
             }
         }
-        .onAppear {
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
-            }
-        }
     }
 }

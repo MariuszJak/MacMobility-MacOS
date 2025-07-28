@@ -19,7 +19,7 @@ struct WebsiteTest {
 
 class WelcomeViewModel: ObservableObject {
     @Published var currentPage = 0
-    let pageLimit = 7
+    let pageLimit = 8
     let closeAction: (SetupMode?, [AutomationOption]?, [WebsiteTest], Bool, Browsers) -> Void
     private(set) var createMultiactions: Bool = true
     private(set) var setupMode: SetupMode?
@@ -126,6 +126,8 @@ struct WelcomeView: View {
                             viewModel.updateBrowser(browser)
                         }
                 case 7:
+                    QuickActionVideoTutorialView()
+                case 8:
                     FinalScreenView {
                         viewModel.close()
                     }
@@ -180,9 +182,6 @@ struct WelcomeView: View {
         .onAppear {
             withAnimation(.easeInOut(duration: 5)) {
                 showWelcomeText = true
-            }
-            for window in NSApplication.shared.windows {
-                window.appearance = NSAppearance(named: .darkAqua)
             }
         }
         .padding(.horizontal, 21.0)
@@ -316,6 +315,160 @@ struct OnboardingVideoComparisonView: View {
     }
 }
 
+struct QuickActionVideoTutorialView: View {
+    private let player = AVQueuePlayer()
+
+    init() {
+        setupLoopingVideo(player: player, resource: "QAM-1")
+    }
+
+    var body: some View {
+        VStack(spacing: 32) {
+            Text("Quick Action Menu")
+                .font(.title)
+                .fontWeight(.bold)
+
+            Text("You can access up to 10 action without companion app. Access it via control + option + space key shortcut, setup your Quick Action Menu circle and use any of the actions.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            VideoPreviewView(player: player, title: "Access actions quickly", description: "To access, press control + option + space key.")
+                .frame(width: 340.0, height: 240.0)
+        }
+        .padding()
+        .onAppear {
+            player.play()
+        }
+    }
+
+    private func setupLoopingVideo(player: AVQueuePlayer, resource: String) {
+        guard let url = Bundle.main.url(forResource: resource, withExtension: "mp4") else { return }
+        let item = AVPlayerItem(url: url)
+        player.insert(item, after: nil)
+        player.actionAtItemEnd = .none
+
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { _ in
+            player.seek(to: .zero)
+            player.play()
+        }
+    }
+}
+
+struct NewQAMVideoTutorialView: View {
+    @State var currentResourceIndex: Int = 0
+    private let isFirstOpen: Bool
+    private let closeHandler: () -> Void
+    private let player = AVQueuePlayer()
+    let resources = [
+        "QAM-1",
+        "QAM-2",
+        "QAM-3",
+        "QAM-4"
+    ]
+    
+    let names = [
+        "Assigning items to Quick Action Menu",
+        "Navigation in Quick Action Menu",
+        "Edit items in Quick Action Menu",
+        "Assign apps to pages in Quick Action Menu"
+    ]
+    
+    let descriptions = [
+        "Assign apps with Edit option.\nYou can assign app to a page, and assign up to 10 apps to a circle.\nEach option in circle has additional 5 more spaces",
+        "Create new circle page with `+` button.\nNavigate with `<` and `>` buttons or by swiping on trackpad.\nRemove page with `-` button.",
+        "Right-click on any item to Edit it.",
+        "Once an app is assigned to a page, it will be automatically shown in the circle if this app is in focus."
+    ]
+
+    init(isFirstOpen: Bool, closeHandler: @escaping () -> Void) {
+        self.isFirstOpen = isFirstOpen
+        self.closeHandler = closeHandler
+        setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
+    }
+
+    var body: some View {
+        VStack(spacing: 32) {
+            VStack {
+                Text(names[currentResourceIndex])
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 17.0)
+                
+                Text(descriptions[currentResourceIndex])
+                    .font(.system(size: 14))
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+            .frame(height: 100.0)
+            .padding(.top, 40.0)
+
+            VideoPreviewView(player: player, title: "", description: "")
+                .frame(width: 700.0, height: 445.0)
+            
+            controls()
+                .padding(.bottom, 50.0)
+        }
+        .padding()
+        .onAppear {
+            player.play()
+        }
+    }
+    
+    private func controls() -> some View {
+        HStack {
+            if currentResourceIndex > 0 {
+                Button("Previous") {
+                    currentResourceIndex -= 1
+                    setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
+                }
+            }
+            if currentResourceIndex < resources.count - 1 {
+                Button("Next") {
+                    currentResourceIndex += 1
+                    setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
+            } else {
+                if isFirstOpen {
+                    Button("Open QAM") {
+                        NotificationCenter.default.post(
+                            name: .openQAM,
+                            object: nil,
+                            userInfo: nil
+                        )
+                        closeHandler()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                } else {
+                    Button("Close") {
+                        closeHandler()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                }
+            }
+        }
+    }
+
+    private func setupLoopingVideo(player: AVQueuePlayer, resource: String) {
+        guard let url = Bundle.main.url(forResource: resource, withExtension: "mp4") else { return }
+        let item = AVPlayerItem(url: url)
+        player.removeAllItems()
+        player.insert(item, after: nil)
+        player.actionAtItemEnd = .none
+
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { _ in
+            player.seek(to: .zero)
+            player.play()
+        }
+    }
+}
+
 struct AVPlayerViewNoControls: NSViewRepresentable {
     let player: AVPlayer
 
@@ -346,7 +499,7 @@ struct VideoPreviewView: View {
                 .disabled(true)
                 .cornerRadius(12)
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                .frame(height: 200)
+//                .frame(height: 200)
 
             Text(title)
                 .font(.headline)
@@ -894,6 +1047,104 @@ struct AnimatedSearchBar: View {
 
 struct PlusButtonView: View {
     var size: CGSize
+    var cornerRadius: CGFloat
+    
+    init(size: CGSize = .init(width: 70, height: 70), cornerRadius: CGFloat = 20) {
+        self.size = size
+        self.cornerRadius = cornerRadius
+    }
+    
+    var body: some View {
+        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
+
+        return ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(backgroundColor)
+
+            Image(systemName: "plus")
+                .foregroundColor(accentColor)
+                .font(.system(size: 20, weight: .bold))
+        }
+        .frame(width: size.width, height: size.height)
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(accentColor, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
+    }
+}
+
+struct RoundedTextButtonView: View {
+    var text: String
+    var higlightedText: String
+    var size: CGSize
+    var cornerRadius: CGFloat
+    
+    init(higlightedText: String, text: String, size: CGSize = .init(width: 70, height: 70), cornerRadius: CGFloat = 20) {
+        self.higlightedText = higlightedText
+        self.text = text
+        self.size = size
+        self.cornerRadius = cornerRadius
+    }
+    
+    var body: some View {
+        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+        let accentColor = Color.gray
+
+        return ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(backgroundColor)
+            
+            VStack {
+                Text(higlightedText)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 12.0, weight: .bold))
+                    .padding(.bottom, 3.0)
+
+                Text(text)
+                    .foregroundColor(accentColor)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 9.0, weight: .bold))
+            }
+        }
+        .frame(width: size.width, height: size.height)
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(accentColor, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
+    }
+}
+
+struct RoundedBackgroundView: View {
+    var size: CGSize
+    var cornerRadius: CGFloat
+    
+    init(size: CGSize = .init(width: 70, height: 70), cornerRadius: CGFloat = 20) {
+        self.size = size
+        self.cornerRadius = cornerRadius
+    }
+    
+    var body: some View {
+        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
+
+        return ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(backgroundColor)
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(accentColor, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
+    }
+}
+
+struct CircleBackgroundView: View {
+    var size: CGSize
     
     init(size: CGSize = .init(width: 70, height: 70)) {
         self.size = size
@@ -904,16 +1155,11 @@ struct PlusButtonView: View {
         let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
 
         return ZStack {
-            RoundedRectangle(cornerRadius: 20)
+           Circle()
                 .fill(backgroundColor)
-
-            Image(systemName: "plus")
-                .foregroundColor(accentColor)
-                .font(.system(size: 20, weight: .bold))
         }
-        .frame(width: size.width, height: size.height)
         .overlay(
-            RoundedRectangle(cornerRadius: 20)
+            Circle()
                 .stroke(accentColor, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)

@@ -12,6 +12,7 @@ public enum ShortcutType: String, Codable {
     case app
     case webpage
     case utility
+    case html
     case control
 }
 

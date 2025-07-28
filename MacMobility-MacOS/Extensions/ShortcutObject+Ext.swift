@@ -18,6 +18,8 @@ extension UtilityObject.UtilityType {
             return .automator
         case .macro:
             return .bash
+        case .html:
+            return .bash
         }
     }
 }
@@ -31,6 +33,8 @@ extension ShortcutObject {
             utilityType = .automation
         case .bash:
             utilityType = .commandline
+        case .html:
+            utilityType = .html
         }
         var color: String?
         if script.script.contains("FILE_CONVERTER") {
@@ -46,7 +50,7 @@ extension ShortcutObject {
             color = "test"
         }
         return .init(
-            type: .utility,
+            type: utilityType == .html ? .html : .utility,
             page: 1,
             index: index,
             indexes: [index ?? 0],
