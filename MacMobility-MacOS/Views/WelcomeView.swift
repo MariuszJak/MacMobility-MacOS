@@ -889,6 +889,7 @@ struct BlueButton: View {
                 if let leadingImage {
                     Image(systemName: leadingImage)
                         .resizable()
+                        .scaledToFill()
                         .frame(width: 18, height: 18)
                         .padding(.trailing, 6.0)
                 }
@@ -1046,21 +1047,45 @@ struct AnimatedSearchBar: View {
 }
 
 struct PlusButtonView: View {
+    @Binding var affectedIndexes: NeighboringIndexes
+    @State private var isTargeted: Bool = false
+    @State private var allowDrop: Bool = false
+    let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+    let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
     var size: CGSize
     var cornerRadius: CGFloat
+    var dropAction: ((NSItemProviderReading?) -> Void)?
+    var targetAction: ((Int, Bool) -> Void)?
+    let index: Int
+    let page: Int
     
-    init(size: CGSize = .init(width: 70, height: 70), cornerRadius: CGFloat = 20) {
+    init(
+        size: CGSize = .init(width: 70, height: 70),
+        cornerRadius: CGFloat = 20,
+        index: Int? = nil,
+        page: Int? = nil,
+        affectedIndexes: Binding<NeighboringIndexes> = .constant(.init(page: -1, indexes: [], conflict: false)),
+        dropAction: ((NSItemProviderReading?) -> Void)? = nil,
+        targetAction: ((Int, Bool) -> Void)? = nil
+    ) {
         self.size = size
         self.cornerRadius = cornerRadius
+        self.dropAction = dropAction
+        self.targetAction = targetAction
+        self.index = index ?? -1
+        self.page = page ?? -1
+        self._affectedIndexes = affectedIndexes
     }
     
     var body: some View {
-        let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
-        let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
+        
 
         return ZStack {
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(backgroundColor)
+                .fill(fillColor())
+                .onChange(of: isTargeted) { oldValue, newValue in
+                    targetAction?(index, newValue)
+                }
 
             Image(systemName: "plus")
                 .foregroundColor(accentColor)
@@ -1072,6 +1097,35 @@ struct PlusButtonView: View {
                 .stroke(accentColor, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
+        .onDrop(of: [.text], isTargeted: $isTargeted) { providers in
+            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                dropAction?(droppedItem)
+            }
+            return true
+        }
+        .onDrop(of: [.text], delegate: DropDelegateWrapper(allowDrop: allowDrop))
+    }
+    
+    func fillColor() -> Color {
+        guard affectedIndexes.page == page else {
+            return backgroundColor
+        }
+        return affectedIndexes.indexes.contains(index) ? affectedIndexes.conflict ? .red : .green : backgroundColor
+    }
+}
+
+// Custom drop delegate to validate the drop
+struct DropDelegateWrapper: DropDelegate {
+    var allowDrop: Bool
+
+    func validateDrop(info: DropInfo) -> Bool {
+        // Your custom business logic here
+        return allowDrop
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        // actual drop handling happens here, or in .onDrop
+        return true
     }
 }
 

@@ -65,7 +65,15 @@ extension ConnectionManager {
         case .webpage:
             openWebPage(for: shortcutItem)
         case .control:
-            break
+            if shortcutItem.utilityType == .commandline {
+                if let script = shortcutItem.scriptCode {
+                    if let message = runInlineBashScript(script: script), message.lowercased().contains("error") {
+                        DispatchQueue.main.async {
+                            print(message)
+                        }
+                    }
+                }
+            }
         case .html:
             break
         case .utility:

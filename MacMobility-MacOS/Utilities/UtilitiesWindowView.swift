@@ -164,7 +164,22 @@ struct UtilitiesWindowView: View {
                     Text(item.title)
                 }
                 .onDrag {
-                    NSItemProvider(object: item.id as NSString)
+                    switch item.type {
+                    case .control:
+                        viewModel.draggingData = .init(size: item.size, indexes: item.indexes)
+                        return NSItemProvider(object: item.id as NSString)
+                    default:
+                        return NSItemProvider(object: item.id as NSString)
+                    }
+                } preview: {
+                    if item.type == .control {
+                        RoundedRectangle(cornerRadius: 5.0)
+                            .fill(Color.blue)
+                            .frame(
+                                width: 20 * (item.size?.width ?? 1) + 7.0 * (item.size?.width ?? 1),
+                                height: 20 * (item.size?.height ?? 1) + 7.0 * (item.size?.height ?? 1)
+                            )
+                    }
                 }
                 Spacer()
                 Image(systemName: "gear")

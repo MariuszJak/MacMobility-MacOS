@@ -26,6 +26,20 @@ enum StreamConnectionState {
             return "Close Display"
         }
     }
+    
+    var backgroundColor: Color {
+        switch self {
+        case .notConnected:
+            return .clear
+        case .connected, .connecting, .disconnecting:
+            return .disconnection
+        }
+    }
+}
+
+struct DraggingData {
+    let size: CGSize?
+    var indexes: [Int]?
 }
 
 struct ShortcutsView: View {
@@ -61,85 +75,6 @@ struct ShortcutsView: View {
             HStack {
                 pairiningView
                 
-                Divider()
-                    .frame(height: 14.0)
-                
-                BlueButton(
-                    title: "Store",
-                    font: .callout,
-                    padding: 8.0,
-                    cornerRadius: 6.0,
-                    leadingImage: "storefront.circle",
-                    backgroundColor: .accentColor
-                ) {
-                    openInstallAutomationsWindow()
-                }
-                .padding(.all, 3.0)
-                
-                Divider()
-                    .frame(height: 14.0)
-                
-                BlueButton(
-                    title: "New Page",
-                    font: .callout,
-                    padding: 8.0,
-                    cornerRadius: 6.0,
-                    backgroundColor: .clear
-                ) {
-                    viewModel.addPage()
-                }
-                .padding(.all, 3.0)
-                
-                Divider()
-                    .frame(height: 14.0)
-                
-                BlueButton(
-                    title: "Add App",
-                    font: .callout,
-                    padding: 8.0,
-                    cornerRadius: 6.0,
-                    backgroundColor: .clear
-                ) {
-                    tab = .apps
-                    if let path = selectApp() {
-                        viewModel.addInstalledApp(for: path)
-                    }
-                }
-                .padding(.all, 3.0)
-                
-                BlueButton(
-                    title: "Install Shortcuts",
-                    font: .callout,
-                    padding: 8.0,
-                    cornerRadius: 6.0,
-                    backgroundColor: .clear
-                ) {
-                    openInstallShortcutsWindow()
-                }
-                .padding(.all, 3.0)
-                
-                BlueButton(
-                    title: "Add Link",
-                    font: .callout,
-                    padding: 8.0,
-                    cornerRadius: 6.0,
-                    backgroundColor: .clear
-                ) {
-                    openCreateNewWebpageWindow()
-                }
-                .padding(.all, 3.0)
-                
-                BlueButton(
-                    title: "Add Utility",
-                    font: .callout,
-                    padding: 8.0,
-                    cornerRadius: 6.0,
-                    backgroundColor: .clear
-                ) {
-                    openCreateNewUtilityWindow()
-                }
-                .padding(.all, 3.0)
-                
                 switch viewModel.streamConnectionState {
                 case .connected, .notConnected:
                     BlueButton(
@@ -147,7 +82,8 @@ struct ShortcutsView: View {
                         font: .callout,
                         padding: 8.0,
                         cornerRadius: 6.0,
-                        backgroundColor: .clear
+                        leadingImage: "rectangle.on.rectangle",
+                        backgroundColor: viewModel.streamConnectionState.backgroundColor
                     ) {
                         switch viewModel.streamConnectionState {
                         case .notConnected:
@@ -171,7 +107,8 @@ struct ShortcutsView: View {
                         font: .callout,
                         padding: 8.0,
                         cornerRadius: 6.0,
-                        backgroundColor: .red
+                        leadingImage: "rectangle.on.rectangle",
+                        backgroundColor: .disconnection
                     ) {
                         viewModel.connectionManager.stopTCPServer { _ in
                             viewModel.streamConnectionState = .notConnected
@@ -184,19 +121,64 @@ struct ShortcutsView: View {
                         font: .callout,
                         padding: 8.0,
                         cornerRadius: 6.0,
-                        backgroundColor: .red
+                        leadingImage: "rectangle.on.rectangle",
+                        backgroundColor: .disconnection
                     ) {
                     }
                     .padding(.all, 3.0)
                 }
+                
+                Divider()
+                    .frame(height: 14.0)
+                
+                BlueButton(
+                    title: "Store",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: "storefront.circle",
+                    backgroundColor: .clear
+                ) {
+                    openInstallAutomationsWindow()
+                }
+                .padding(.all, 3.0)
+                
+                Divider()
+                    .frame(height: 14.0)
+                
+                BlueButton(
+                    title: "Add URL",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: "link.badge.plus",
+                    backgroundColor: .clear
+                ) {
+                    openCreateNewWebpageWindow()
+                }
+                .padding(.all, 3.0)
+                
+                BlueButton(
+                    title: "Add Utility",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: "plus.app",
+                    backgroundColor: .clear
+                ) {
+                    openCreateNewUtilityWindow()
+                }
+                .padding(.all, 3.0)
+                
                 Spacer()
                 AnimatedSearchBar(searchText: $viewModel.searchText)
                     .padding(.all, 3.0)
                 BlueButton(
-                    title: "Get Companion App",
+                    title: "",
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
+                    leadingImage: "qrcode",
                     backgroundColor: .clear
                 ) {
                     openCompanionAppWindow()
@@ -254,6 +236,15 @@ struct ShortcutsView: View {
                                                    + testSize * (viewModel.objectAt(index: index, page: page)?.size?.width ?? 1),
                                                    height: 70 * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1)
                                                    + testSize * (viewModel.objectAt(index: index, page: page)?.size?.height ?? 1))
+                                            .onDrop(of: [.text], isTargeted: nil) { providers in
+                                                providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                                                    if let droppedString = droppedItem as? String,
+                                                       let object = viewModel.object(for: droppedString, index: index, page: page) {
+                                                        handleOnDrop(index: index, page: page, object: object)
+                                                    }
+                                                }
+                                                return true
+                                            }
                                             .if((viewModel.objectAt(index: index, page: page)?.size?.width ?? 0) > 1) {
                                                 $0.padding(.leading, ((70 + testSize) * ((viewModel.objectAt(index: index, page: page)?.size?.width ?? 1) - 1) + testSize))
                                             }
@@ -261,10 +252,19 @@ struct ShortcutsView: View {
                                                 $0.padding(.top, (70 + testSize) * ((viewModel.objectAt(index: index, page: page)?.size?.height ?? 1) - 1))
                                             }
                                             .clipped()
-                                            .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
-                                                view.onDrag {
-                                                    NSItemProvider(object: id as NSString)
-                                                }
+                                            .ifLet(viewModel.objectAt(index: index, page: page)) { view, object in
+                                                dragView(view, object: object)
+                                            }
+                                            .if(viewModel.objectAt(index: index, page: page) != nil && viewModel.draggingData.size != nil) {
+                                                $0.overlay(
+                                                    plusView(index: index, page: page)
+                                                        .opacity(0.01)
+                                                )
+                                            }
+                                            .if(viewModel.objectAt(index: index, page: page) != nil && viewModel.draggingData.size == nil) {
+                                                $0.overlay(
+                                                    EmptyView()
+                                                )
                                             }
                                             if let id = viewModel.objectAt(index: index, page: page)?.id {
                                                 VStack {
@@ -290,29 +290,28 @@ struct ShortcutsView: View {
                                         $0
                                             .frame(width: 70, height: 70)
                                             .background(
-                                                PlusButtonView()
+                                                plusView(index: index, page: page)
                                             )
                                     }
                                     .if(viewModel.shouldDisplayPlusAt(index: index, page: page) != nil) {
                                         $0
                                             .frame(width: 70, height: 70)
-                                            .background(
-                                                EmptyView()
-                                            )
+                                            .if(viewModel.draggingData.size == nil) {
+                                                $0.background(
+                                                    EmptyView()
+                                                )
+                                            }
+                                            .if(viewModel.draggingData.size != nil) {
+                                                $0.background(
+                                                    plusView(index: index, page: page)
+                                                        .opacity(0.01)
+                                                )
+                                            }
                                     }
                                     .ifLet(viewModel.objectAt(index: index, page: page)?.id) { view, id in
                                         view.onDrag {
                                             NSItemProvider(object: id as NSString)
                                         }
-                                    }
-                                    .onDrop(of: [.text], isTargeted: nil) { providers in
-                                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                                            if let droppedString = droppedItem as? String,
-                                               let object = viewModel.object(for: droppedString, index: index, page: page) {
-                                                handleOnDrop(index: index, page: page, object: object)
-                                            }
-                                        }
-                                        return true
                                     }
                                 }
                             }
@@ -337,6 +336,19 @@ struct ShortcutsView: View {
                             }
                             viewModel.streamConnectionState = .notConnected
                         }
+                    }
+                    VStack {
+                        BlueButton(
+                            title: "New Page",
+                            font: .callout,
+                            padding: 8.0,
+                            cornerRadius: 6.0,
+                            leadingImage: "plus.rectangle.on.rectangle",
+                            backgroundColor: .clear
+                        ) {
+                            viewModel.addPage()
+                        }
+                        .padding(.bottom, 45.0)
                     }
                 }
             }
@@ -383,6 +395,51 @@ struct ShortcutsView: View {
         }
         .frame(minWidth: 1300.0)
         .padding(.top, 21.0)
+    }
+    
+    @ViewBuilder
+    private func plusView(index: Int, page: Int) -> some View {
+        PlusButtonView(index: index, page: page, affectedIndexes: $viewModel.affectedIndexes, dropAction: { droppedItem in
+            if let droppedString = droppedItem as? String,
+               let object = viewModel.object(for: droppedString, index: index, page: page) {
+                handleOnDrop(index: index, page: page, object: object)
+            } else {
+                DispatchQueue.main.async {
+                    self.viewModel.draggingData = .init(size: nil)
+                    self.viewModel.currentlyTargetedIndex = nil
+                    self.viewModel.affectedIndexes = .init(page: -1, indexes: [], conflict: false)
+                }
+            }
+        }) { currentIndex, isTargeting in
+            if isTargeting {
+                viewModel.currentlyTargetedIndex = .init(page: page, index: currentIndex)
+            } else {
+                viewModel.currentlyTargetedIndex = nil
+                viewModel.affectedIndexes = .init(page: -1, indexes: [], conflict: false)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func dragView<Content: View>(_ view: Content, object: ShortcutObject) -> some View {
+        switch object.type {
+        case .control:
+            view.onDrag {
+                viewModel.draggingData = .init(size: object.size, indexes: object.indexes)
+                return NSItemProvider(object: object.id as NSString)
+            } preview: {
+                RoundedRectangle(cornerRadius: 5.0)
+                    .fill(Color.blue)
+                    .frame(
+                        width: 20 * (object.size?.width ?? 1) + testSize * (object.size?.width ?? 1),
+                        height: 20 * (object.size?.height ?? 1) + testSize * (object.size?.height ?? 1)
+                    )
+            }
+        default:
+            view.onDrag {
+                return NSItemProvider(object: object.id as NSString)
+            }
+        }
     }
     
     @ViewBuilder
@@ -462,6 +519,9 @@ struct ShortcutsView: View {
     
     private func handleOnDrop(index: Int, page: Int, object: ShortcutObject) {
         DispatchQueue.main.async {
+            viewModel.draggingData = .init(size: nil)
+            viewModel.affectedIndexes = .init(page: -1, indexes: [], conflict: false)
+            viewModel.currentlyTargetedIndex = nil
             viewModel.addConfiguredShortcut(object:
                     .init(
                         type: object.type,
@@ -546,7 +606,7 @@ struct ShortcutsView: View {
                         font: .callout,
                         padding: 10.0,
                         cornerRadius: 6.0,
-                        leadingImage: nil,
+                        leadingImage: "app.connected.to.app.below.fill",
                         backgroundColor: .accentColor
                     ) {
                         viewModel.connectionManager.invitePeer(with: availablePeer)
@@ -560,8 +620,8 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-                    leadingImage: nil,
-                    backgroundColor: .red
+                    leadingImage: "app.connected.to.app.below.fill",
+                    backgroundColor: .disconnection
                 ) {
                     viewModel.connectionManager.disconnect()
                     viewModel.pairingStatus = .notPaired
@@ -573,8 +633,8 @@ struct ShortcutsView: View {
                     font: .callout,
                     padding: 8.0,
                     cornerRadius: 6.0,
-                    leadingImage: nil,
-                    backgroundColor: .red
+                    leadingImage: "app.connected.to.app.below.fill",
+                    backgroundColor: .disconnection
                 ) {
                     viewModel.connectionManager.cancel()
                 }
@@ -701,10 +761,14 @@ struct ShortcutsView: View {
                     }
                 }
             } else if object.type == .control {
-//                BrightnessVolumeContainerView()
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(.blue)
-                    .frame(width: size.width, height: size.height)
+                if object.title == "Volume Control" {
+                    BrightnessVolumeContainerView()
+                        .frame(width: size.width, height: size.height)
+                } else {
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(.blue)
+                        .frame(width: size.width, height: size.height)
+                }
             }
         }
     }
@@ -721,13 +785,6 @@ struct ShortcutsView: View {
                                 .font(.system(size: 24, weight: .medium))
                                 .foregroundStyle(Color.white)
                                 .padding(.bottom, 12.0)
-                            Button {
-                                openInstallShortcutsWindow()
-                            } label: {
-                                Text("Add new one!")
-                                    .font(.system(size: 16.0))
-                                    .foregroundStyle(Color.white)
-                            }
                         }
                         Spacer()
                     }
@@ -971,38 +1028,6 @@ struct ShortcutsView: View {
         hv.view.frame = companionAppWindow?.contentView?.bounds ?? .zero
         hv.view.autoresizingMask = [.width, .height]
         companionAppWindow?.makeKeyAndOrderFront(nil)
-    }
-    
-    private func openInstallShortcutsWindow() {
-        if nil == shortcutsToInstallWindow {
-            shortcutsToInstallWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 500, height: 700),
-                styleMask: [.titled, .closable, .resizable, .miniaturizable],
-                backing: .buffered,
-                defer: false
-            )
-            shortcutsToInstallWindow?.center()
-            shortcutsToInstallWindow?.setFrameAutosaveName("ShortcutsToInstallWindow")
-            shortcutsToInstallWindow?.isReleasedWhenClosed = false
-            shortcutsToInstallWindow?.titlebarAppearsTransparent = true
-            shortcutsToInstallWindow?.appearance = NSAppearance(named: .darkAqua)
-            shortcutsToInstallWindow?.styleMask.insert(.fullSizeContentView)
-            
-            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: shortcutsToInstallWindow) else {
-                return
-            }
-            shortcutsToInstallWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: ShortcutInstallView() {
-                shortcutsToInstallWindow?.close()
-                tab = .shortcuts
-            })
-            shortcutsToInstallWindow?.contentView?.addSubview(hv.view)
-            hv.view.frame = shortcutsToInstallWindow?.contentView?.bounds ?? .zero
-            hv.view.autoresizingMask = [.width, .height]
-            shortcutsToInstallWindow?.makeKeyAndOrderFront(nil)
-            return
-        }
-        shortcutsToInstallWindow?.makeKeyAndOrderFront(nil)
     }
     
     private func openInstallAutomationsWindow() {

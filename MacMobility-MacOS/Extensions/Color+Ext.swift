@@ -53,4 +53,8 @@ extension Color {
         let uiColor = NSColor(self)
         return uiColor.toHex(alpha: alpha)
     }
+    
+    static var disconnection: Color {
+        Color(red: 0.85, green: 0.42, blue: 0.35)
+    }
 }

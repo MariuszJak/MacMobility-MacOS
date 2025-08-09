@@ -169,7 +169,7 @@ extension Array where Element: Equatable {
 
 public struct ShortcutObject: Identifiable, Codable, Equatable {
     public var index: Int?
-    public let indexes: [Int]?
+    public var indexes: [Int]?
     public var page: Int
     public let id: String
     public let title: String

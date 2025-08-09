@@ -25,6 +25,11 @@ extension View {
             self
         }
     }
+    
+    func log(_ message: Any...) -> some View {
+        print(message)
+        return self
+    }
 }
 
 public struct StrokeModifier: ViewModifier {

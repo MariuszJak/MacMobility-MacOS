@@ -49,9 +49,9 @@ extension UserDefaults {
         set(nil, forKey: key) // Optional: also clean legacy UserDefaults
     }
 
-    func clearAll() {
+    func clearAll(except: [Const] = []) {
         for key in Const.allCases {
-            clear(key: key)
+            if !except.contains(key) { clear(key: key) }
         }
     }
 

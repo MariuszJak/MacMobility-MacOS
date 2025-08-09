@@ -15,6 +15,17 @@ struct AssignedAppsToPages: Codable {
     let appPath: String
 }
 
+struct NeighboringIndexes {
+    let page: Int
+    let indexes: [Int]
+    let conflict: Bool
+}
+
+struct PageAndIndex {
+    let page: Int
+    let index: Int
+}
+
 public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
     @Published var connectionManager: ConnectionManager
     @Published var pairingStatus: PairingStatus = .notPaired
@@ -39,6 +50,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var showDependenciesView: Bool = false
     @Published var dependenciesObjects: [DependencyObject] = []
     @Published var idOfObjectToReplaceDependencies: String = ""
+    @Published var draggingData: DraggingData = .init(size: nil)
+    @Published var currentlyTargetedIndex: PageAndIndex?
+    @Published var affectedIndexes: NeighboringIndexes = .init(page: 0, indexes: [], conflict: false)
     @Published var utilities: [ShortcutObject] = [] {
         didSet {
             sections = utilitiesWithSections()
@@ -57,6 +71,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     private var createMultiactions: Bool?
     private var browser: Browsers?
     private var installedAllApps: [ShortcutObject] = []
+    
     
     init(connectionManager: ConnectionManager) {
 //        UserDefaults.standard.clear(key: .quickActionItems)
@@ -86,7 +101,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         
         let test3: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 2, height: 1), path: "", id: "horizontal-scroll3", title: "2 x 1", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
         
-        let test4: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 1), path: "", id: "horizontal-scroll4", title: "3 x 1", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        let test4: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 1), path: "", id: "horizontal-scroll4", title: "Volume Control", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: "osascript -e \"set volume output volume %d\"", utilityType: .commandline, objects: nil, showTitleOnIcon: false, category: "MacOS")
         
         let test5: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 2), path: "", id: "horizontal-scroll5", title: "3 x 2", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
         
@@ -101,6 +116,15 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         self.saveUtility(with: test5)
         self.saveUtility(with: test6)
         self.saveUtility(with: test7)
+        
+        $currentlyTargetedIndex
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] pageAndIndex in
+                guard let self, let pageAndIndex, let indexes = neighboringIndexesWithConflict(for: pageAndIndex.index, page: pageAndIndex.page, size: draggingData.size) else { return }
+                affectedIndexes = indexes
+//                print("View model update: page -> \(pageAndIndex.page), index -> \(pageAndIndex.index), affectedIndexes -> \(affectedIndexes)")
+            }
+            .store(in: &cancellables)
         
         connectionManager
             .$pairingStatus
@@ -366,6 +390,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             return
         }
         
+        let volumeControl: ShortcutObject = .init(type: .control, page: 1, index: 0, indexes: [0, 1, 2], size: .init(width: 3, height: 1), path: "", id: "horizontal-scroll4", title: "Volume Control", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: "osascript -e \"set volume output volume %d\"", utilityType: .commandline, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        addConfiguredShortcut(object: volumeControl)
+        
         options.forEach { option in
             addAutomations(
                 from: setupMode.type == .advanced
@@ -376,7 +403,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 let filtered = setupMode.type == .advanced
                 ? option.scripts
                 : option.scripts.filter { !($0.isAdvanced ?? false) }
-                var i: Int = 0
+                var i: Int = 3
                 
                 filtered.enumerated().forEach { (index, script) in
                     if script.script.contains("URLs"), let browser {
@@ -410,7 +437,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 }
                 if let createMultiactions, createMultiactions {
                     websitesSO.enumerated().forEach { (index, _) in
-//                        websitesSO[index].index = index
+                        websitesSO[index].index = index
+                        websitesSO[index].indexes = [index]
                     }
                     let ma: ShortcutObject = .init(
                         type: .utility, page: 1, index: i, indexes: [i], path: nil, id: UUID().uuidString,
@@ -440,6 +468,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         } else {
             item = tmpAllItems.first { $0.id == id }
         }
+        
         if item?.type == .control {
             guard let allIndexes = neighboringIndexes(for: index, size: item?.size) else {
                 return nil
@@ -598,7 +627,67 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
     }
     
-    func neighboringIndexes(for index: Int?, size: CGSize?, inGridWithColumns columns: Int = 7, rows: Int = 3) -> [Int]? {
+    func checkAvailableSpace(
+        for index: Int?,
+        size: CGSize?,
+        inGridWithColumns columns: Int = 7,
+        rows: Int = 3
+    ) -> ([Int], Bool)? {
+        guard let index, let size else {
+            return nil
+        }
+        let totalSquares = columns * rows
+        let objectWidth = Int(size.width)
+        let objectHeight = Int(size.height)
+
+        let startRow = index / columns
+        let startCol = index % columns
+
+        var result: [Int] = []
+        var outOfBounds: Bool = false
+        for dy in 0..<objectHeight {
+            for dx in 0..<objectWidth {
+                let newRow = startRow + dy
+                let newCol = startCol + dx
+                if newCol >= columns || newRow >= rows {
+                    continue
+                }
+                let newIndex = newRow * columns + newCol
+                result.append(newIndex)
+                
+                outOfBounds = newIndex > totalSquares
+            }
+        }
+        let outOfSpace = startCol + objectWidth > columns || startRow + objectHeight > rows
+
+        return (result, (outOfBounds || outOfSpace))
+    }
+    
+    func neighboringIndexesWithConflict(
+        for index: Int?,
+        page: Int,
+        size: CGSize?,
+        inGridWithColumns columns: Int = 7,
+        rows: Int = 3
+    ) -> NeighboringIndexes? {
+        guard let availableSpace = checkAvailableSpace(for: index, size: size),
+              let draggingIndexes = draggingData.indexes else {
+            return nil
+        }
+        let neighboringIndexes = availableSpace.0
+        let outOfBounds = availableSpace.1
+        let configuredIndexes = configuredShortcuts.filter { $0.page == page }.compactMap { $0.indexes }.flatMap { $0 }
+        let conflict = Set(configuredIndexes).subtracting(draggingIndexes).intersection(neighboringIndexes).isEmpty && !outOfBounds
+        return .init(page: page, indexes: neighboringIndexes, conflict: !conflict)
+    }
+    
+    func neighboringIndexes(
+        for index: Int?,
+        size: CGSize?,
+        inGridWithColumns columns: Int = 7,
+        rows: Int = 3,
+        checkBoundries: Bool = true
+    ) -> [Int]? {
         guard let index, let size else {
             return nil
         }
@@ -610,7 +699,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         let startCol = index % columns
 
         // Check if the object would go out of bounds
-        if startCol + objectWidth > columns || startRow + objectHeight > rows {
+        if checkBoundries, startCol + objectWidth > columns || startRow + objectHeight > rows {
             return nil
         }
 
@@ -623,7 +712,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 let newIndex = newRow * columns + newCol
 
                 // Additional safety check
-                if newIndex < totalSquares {
+                if !checkBoundries || newIndex < totalSquares {
                     result.append(newIndex)
                 } else {
                     return nil
