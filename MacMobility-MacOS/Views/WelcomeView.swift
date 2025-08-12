@@ -1110,7 +1110,9 @@ struct PlusButtonView: View {
         guard affectedIndexes.page == page else {
             return backgroundColor
         }
-        return affectedIndexes.indexes.contains(index) ? affectedIndexes.conflict ? .red : .green : backgroundColor
+        return affectedIndexes.indexes.contains(index)
+        ? affectedIndexes.conflict ? Color(hex: "781616") : Color(hex: "277816")
+        : backgroundColor
     }
 }
 

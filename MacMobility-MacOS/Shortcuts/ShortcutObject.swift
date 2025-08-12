@@ -108,9 +108,7 @@ struct BrightnessVolumeContainerView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.gray)
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
-                .shadow(color: .white.opacity(0.05), radius: 4, x: 0, y: -2)
+                .fill(Color(red: 0.96, green: 0.96, blue: 0.96))
             BrightnessVolumeBarView()
                 .padding()
         }
@@ -122,34 +120,24 @@ struct BrightnessVolumeBarView: View {
 
     var body: some View {
         ZStack(alignment: .trailing) {
-            // Background bar
-            RoundedRectangle(cornerRadius: 20)
-//                .fill(.ultraThinMaterial)
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.init(hex: "FF6906"))
                 .frame(height: 30)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 10)
                         .stroke(Color.white.opacity(0.3), lineWidth: 1)
                 )
-                .shadow(radius: 6)
-
-            // Progress bar
+                .shadow(radius: 2)
             GeometryReader { geometry in
                 HStack(spacing: 0) {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.white.opacity(0.8))
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(red: 0.96, green: 0.96, blue: 0.96))
                         .frame(width: geometry.size.width * progress)
                     Spacer(minLength: 0)
                 }
                 .frame(height: 30)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 .contentShape(Rectangle())
-//                .gesture(
-//                    DragGesture(minimumDistance: 0)
-//                        .onChanged { value in
-//                            let newProgress = min(max(0, value.location.x / geometry.size.width), 1)
-//                            progress = newProgress
-//                        }
-//                )
             }
             .frame(height: 30)
         }

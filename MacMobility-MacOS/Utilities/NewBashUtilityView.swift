@@ -10,6 +10,9 @@ import CodeEditor
 
 class NewBashUtilityViewModel: ObservableObject, JSONLoadable {
     var id: String?
+    @Published var type: ShortcutType = .utility
+    @Published var size: CGSize = .init(width: 1, height: 1)
+    @Published var path: String = ""
     @Published var title: String = ""
     @Published var category: String = "Other"
     @Published var iconData: Data?
@@ -45,6 +48,9 @@ struct NewBashUtilityView: View {
         self.viewModel = NewBashUtilityViewModel(categories: categories)
         if let item {
             currentPage = item.page
+            viewModel.size = item.size ?? .init(width: 1, height: 1)
+            viewModel.path = item.path ?? ""
+            viewModel.type = item.type
             viewModel.title = item.title
             viewModel.id = item.id
             viewModel.scriptCode = item.scriptCode ?? ""
@@ -145,8 +151,10 @@ struct NewBashUtilityView: View {
                 BlueButton(title: "Save", font: .callout, padding: 12.0) {
                     delegate?.saveUtility(with:
                         .init(
-                            type: .utility,
+                            type: viewModel.type,
                             page: currentPage ?? 1,
+                            size: viewModel.size,
+                            path: viewModel.path,
                             id: viewModel.id ?? UUID().uuidString,
                             title: viewModel.title,
                             imageData: viewModel.selectedIcon?.toData,

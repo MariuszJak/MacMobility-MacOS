@@ -380,19 +380,8 @@ struct QuickActionsView: View {
                     if index + ((viewModel.currentPage - 1) * 10) == item.index, item.title != "EMPTY" {
                         mainView(item: item, index: index, angle: angle)
                     } else {
-                        plusView(angle: angle, item: item)
+                        plusView(angle: angle, item: item, index: index)
                     }
-                }
-                .onDrop(of: [.text], isTargeted: nil) { providers in
-                    providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                        if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
-                            DispatchQueue.main.async {
-                                viewModel.add(object, at: index)
-                                update(viewModel.items)
-                            }
-                        }
-                    }
-                    return true
                 }
                 .offset(x: cos(angle.radians) * (radius * (index == hoveredIndex ? 1.05 : 1.0)),
                         y: sin(angle.radians) * (radius * (index == hoveredIndex ? 1.05 : 1.0)))
@@ -436,17 +425,27 @@ struct QuickActionsView: View {
                         if let object = objects[safe: index], object.id != "EMPTY \(index)" {
                             submenuMainView(object: object, subitem: subitem, index: index)
                         } else {
-                            PlusButtonView(size: frame, cornerRadius: 10)
-                                .frame(width: frame.width, height: frame.height)
-                                .onTapGesture {
-                                    isEditing = true
-                                    NotificationCenter.default.post(
-                                        name: .openShortcuts,
-                                        object: nil,
-                                        userInfo: nil
-                                    )
+                            PlusButtonView(size: frame, cornerRadius: 10, dropAction: { droppedItem in
+                                if let droppedString = droppedItem as? String,
+                                   let object = viewModel.object(for: droppedString) {
+                                    DispatchQueue.main.async {
+                                        if let updatedItem = viewModel.addSubitem(to: subitem.id, item: object, at: index) {
+                                            self.subitem = updatedItem
+                                        }
+                                        update(viewModel.items)
+                                    }
                                 }
-                                .opacity(subitem.title == "EMPTY" ? 0.3 : 1.0)
+                            })
+                            .frame(width: frame.width, height: frame.height)
+                            .onTapGesture {
+                                isEditing = true
+                                NotificationCenter.default.post(
+                                    name: .openShortcuts,
+                                    object: nil,
+                                    userInfo: nil
+                                )
+                            }
+                            .opacity(subitem.title == "EMPTY" ? 0.3 : 1.0)
                         }
                     }
                     .onDrop(of: [.text], isTargeted: nil) { providers in
@@ -476,30 +475,37 @@ struct QuickActionsView: View {
         }
     }
     
-    private func plusView(angle: Angle, item: ShortcutObject) -> some View {
-        PlusButtonView(size: frame, cornerRadius: 10)
-            .frame(width: frame.width, height: frame.height)
-            .onTapGesture {
-                isEditing = true
-                showPopup = true
-                submenuDegrees = angle.degrees - 92
-                subitem = item
-                NotificationCenter.default.post(
-                    name: .openShortcuts,
-                    object: nil,
-                    userInfo: nil
-                )
-            }
-            .onHover { _ in
-                if !isEditing {
-                    showPopup = false
-//                    lastHoveredIndex = nil
-                } else {
-                    submenuDegrees = angle.degrees - 92
-                    subitem = item
-                    showPopup = true
+    private func plusView(angle: Angle, item: ShortcutObject, index: Int) -> some View {
+        PlusButtonView(size: frame, cornerRadius: 10, dropAction: { droppedItem in
+            if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
+                DispatchQueue.main.async {
+                    viewModel.add(object, at: index)
+                    update(viewModel.items)
                 }
             }
+        })
+        .frame(width: frame.width, height: frame.height)
+        .onTapGesture {
+            isEditing = true
+            showPopup = true
+            submenuDegrees = angle.degrees - 92
+            subitem = item
+            NotificationCenter.default.post(
+                name: .openShortcuts,
+                object: nil,
+                userInfo: nil
+            )
+        }
+        .onHover { _ in
+            if !isEditing {
+                showPopup = false
+                // lastHoveredIndex = nil
+            } else {
+                submenuDegrees = angle.degrees - 92
+                subitem = item
+                showPopup = true
+            }
+        }
     }
     
     private func submenuMainView(object: ShortcutObject, subitem: ShortcutObject, index: Int) -> some View {

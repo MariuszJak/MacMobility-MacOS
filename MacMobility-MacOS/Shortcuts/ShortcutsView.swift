@@ -527,7 +527,7 @@ struct ShortcutsView: View {
                         type: object.type,
                         page: page,
                         index: index,
-                        indexes: neighboringIndexes(for: index, size: object.size  ?? .init(width: 1, height: 1)),
+                        indexes: neighboringIndexes(for: index, size: object.size ?? .init(width: 1, height: 1)),
                         size: object.size ?? .init(width: 1, height: 1),
                         path: object.path,
                         id: object.id,
@@ -761,8 +761,11 @@ struct ShortcutsView: View {
                     }
                 }
             } else if object.type == .control {
-                if object.title == "Volume Control" {
+                if object.path == "control:horizontal-slider" {
                     BrightnessVolumeContainerView()
+                        .frame(width: size.width, height: size.height)
+                } else if object.path == "control:rotary-knob" {
+                    RotaryKnobIcon()
                         .frame(width: size.width, height: size.height)
                 } else {
                     RoundedRectangle(cornerRadius: cornerRadius)
