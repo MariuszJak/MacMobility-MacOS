@@ -36,7 +36,6 @@ class ConnectionManager: NSObject, ObservableObject {
     @ObservedObject var observer = FocusedAppObserver()
     @Published var screenIndex = 0
     @Published var inProgressWindow: NSWindow?
-    @Published var availablePeer: MCPeerID?
     @Published var availablePeerWithName: (MCPeerID?, String)?
     @Published var connectedPeerName: String?
     @Published var connectedPeerResolution: String?
@@ -114,7 +113,7 @@ class ConnectionManager: NSObject, ObservableObject {
     public var subscriptions = Set<AnyCancellable>()
     public var isUpdating = false
     public var isConnecting: Bool {
-        availablePeer != nil && pairingStatus == .notPaired
+        availablePeerWithName != nil && pairingStatus == .notPaired
     }
     private var deviceName: String {
         Host.current().localizedName ?? ""
@@ -257,21 +256,17 @@ class ConnectionManager: NSObject, ObservableObject {
     
     func stopBrowsing() {
         serviceBrowser.stopBrowsingForPeers()
-        availablePeer = nil
+        availablePeerWithName = nil
     }
     
     func toggleAdvertising() {
         switch pairingStatus {
         case .notPaired:
             startAdvertising()
-            stopKeepAliveActivity()
-            allowSleep()
         case .pairining:
             break
         case .paired:
             stopAdvertising()
-            startKeepAliveActivity()
-            preventSleep()
         }
     }
     
@@ -289,39 +284,6 @@ class ConnectionManager: NSObject, ObservableObject {
         session.disconnect()
         pairingStatus = .notPaired
         toggleAdvertising()
-    }
-    
-    func preventSleep() {
-        let reasonForActivity = "TCP + Multipeer streaming requires continuous processing" as CFString
-        let result = IOPMAssertionCreateWithName(
-            kIOPMAssertionTypeNoIdleSleep as CFString,
-            IOPMAssertionLevel(kIOPMAssertionLevelOn),
-            reasonForActivity,
-            &assertionID
-        )
-        
-        if result == kIOReturnSuccess {
-            print("Sleep prevention assertion created.")
-        }
-    }
-
-    func allowSleep() {
-        IOPMAssertionRelease(assertionID)
-        print("Sleep prevention assertion released.")
-    }
-
-    func startKeepAliveActivity() {
-        keepAliveActivity = ProcessInfo.processInfo.beginActivity(
-            options: [.userInitiated, .latencyCritical, .idleSystemSleepDisabled, .suddenTerminationDisabled, .automaticTerminationDisabled],
-            reason: "Screen streaming and multipeer connection"
-        )
-    }
-
-    func stopKeepAliveActivity() {
-        if let activity = keepAliveActivity {
-            ProcessInfo.processInfo.endActivity(activity)
-            keepAliveActivity = nil
-        }
     }
 }
 
@@ -357,7 +319,7 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
 
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
         DispatchQueue.main.async {
-            if self.availablePeer == nil, !peerID.displayName.contains(".local") {
+            if self.availablePeerWithName == nil, !peerID.displayName.contains(".local") {
                 let name = info?["name"] ?? peerID.displayName
                 self.availablePeerWithName = (peerID, name)
                 self.connectedPeerName = name
@@ -367,8 +329,8 @@ extension ConnectionManager: MCNearbyServiceBrowserDelegate {
     }
 
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        guard availablePeer == peerID else { return }
-        availablePeer = nil
+        guard let availablePeerWithName, availablePeerWithName.0 == peerID else { return }
+        self.availablePeerWithName = nil
     }
 }
 
