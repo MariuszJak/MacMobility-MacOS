@@ -52,6 +52,8 @@ struct ShortcutsView: View {
     @State private var automationItemWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
     @State private var companionAppWindow: NSWindow?
+    @State private var uiControlAppWindow: NSWindow?
+    @State private var uiControlListAppWindow: NSWindow?
     @State private var quickActionSetupWindow: NSWindow?
     @State private var shouldShowCompanionRequestPopup: Bool = false
     @State private var selectedTab = 0
@@ -167,6 +169,18 @@ struct ShortcutsView: View {
                     backgroundColor: .clear
                 ) {
                     openCreateNewUtilityWindow()
+                }
+                .padding(.all, 3.0)
+                
+                BlueButton(
+                    title: "UI Controls",
+                    font: .callout,
+                    padding: 8.0,
+                    cornerRadius: 6.0,
+                    leadingImage: "plus.app",
+                    backgroundColor: .clear
+                ) {
+                    openUIControlAppWindow()
                 }
                 .padding(.all, 3.0)
                 
@@ -1033,6 +1047,69 @@ struct ShortcutsView: View {
         companionAppWindow?.makeKeyAndOrderFront(nil)
     }
     
+    private func openUIControlAppWindow() {
+        uiControlAppWindow?.close()
+        uiControlAppWindow = nil
+        if nil == uiControlAppWindow {
+            uiControlAppWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            uiControlAppWindow?.center()
+            uiControlAppWindow?.setFrameAutosaveName("UIControl")
+            uiControlAppWindow?.isReleasedWhenClosed = false
+            uiControlAppWindow?.titlebarAppearsTransparent = true
+            uiControlAppWindow?.appearance = NSAppearance(named: .darkAqua)
+            uiControlAppWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlAppWindow) else {
+                return
+            }
+            uiControlAppWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: UIControlChoiceView(nil, action: { mode in
+                openUIControlListAppWindow()
+                uiControlAppWindow?.close()
+            }))
+            uiControlAppWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = uiControlAppWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            uiControlAppWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+    }
+    
+    private func openUIControlListAppWindow() {
+        uiControlListAppWindow?.close()
+        uiControlListAppWindow = nil
+        if nil == uiControlListAppWindow {
+            uiControlListAppWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 850, height: 550),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            uiControlListAppWindow?.center()
+            uiControlListAppWindow?.setFrameAutosaveName("UIControlList2")
+            uiControlListAppWindow?.isReleasedWhenClosed = false
+            uiControlListAppWindow?.titlebarAppearsTransparent = true
+            uiControlListAppWindow?.appearance = NSAppearance(named: .darkAqua)
+            uiControlListAppWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlListAppWindow) else {
+                return
+            }
+            uiControlListAppWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: UIControlsListView())
+            uiControlListAppWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = uiControlListAppWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            uiControlListAppWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+    }
+    
     private func openInstallAutomationsWindow() {
         if nil == automationsToInstallWindow {
             automationsToInstallWindow = NSWindow(
@@ -1345,5 +1422,132 @@ struct CompanionAppView: View {
                                   errorCorrection: .high)
         guard let generated = doc.cgImage(CGSize(width: 800, height: 800)) else { return nil }
         return NSImage(cgImage: generated, size: .init(width: 200, height: 200))
+    }
+}
+
+struct UIControlChoiceView: View {
+    @State private var selectedMode: String = "prepared"
+    private let action: (SetupMode) -> Void
+    
+    let options: [SetupMode] = [
+        SetupMode(title: "Premade UI Controls",
+                  description: "Get started quickly with few premade UI Controls",
+                  imageName: "sparkles",
+                  type: .advanced),
+        
+        SetupMode(title: "Create Yourself",
+                  description: "Choose UI Control type and customize to your liking",
+                  imageName: "square.dashed",
+                  type: .basic)
+    ]
+    
+    init(_ setupMode: SetupMode?, action: @escaping (SetupMode) -> Void) {
+        self.action = action
+    }
+    
+    var body: some View {
+        VStack(spacing: 32) {
+            Text("What would you like to do?")
+                .font(.title)
+                .fontWeight(.bold)
+            
+            Text("Choose a UI control type.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            HStack(spacing: 24) {
+                ForEach(options.indices, id: \.self) { index in
+                    let mode = options[index]
+                    let isSelected = (selectedMode == "prepared" && index == 0) || (selectedMode == "blank" && index == 1)
+                    
+                    VStack(spacing: 12) {
+                        Image(systemName: mode.imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 60, height: 60)
+                            .foregroundColor(isSelected ? .blue : .gray)
+
+                        Text(mode.title)
+                            .font(.headline)
+
+                        Text(mode.description)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(isSelected ? Color.blue : Color.gray.opacity(0.3), lineWidth: isSelected ? 3 : 1)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(isSelected ? Color.blue.opacity(0.1) : Color.clear)
+                            )
+                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        selectedMode = (index == 0) ? "prepared" : "blank"
+                    }
+                }
+            }
+            Button("Confirm") {
+                let index = selectedMode == "prepared" ? 0 : 1
+                action(options[index])
+            }
+        }
+        .padding()
+    }
+}
+
+struct UIControlItem: Identifiable {
+    let id: UUID
+    let title: String
+    let description: String
+}
+
+struct UIControlsListView: View {
+    let controls: [UIControlItem] = [
+        .init(id: UUID(), title: "Volume Slider", description: "Control Volume of your MacBook with elegant slider"),
+        .init(id: UUID(), title: "Volume Knob", description: "Control Volume of your MacBook with elegant knob")
+    ]
+    
+    var body: some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 400))], spacing: 6) {
+                ForEach(controls) { control in
+                    HStack(alignment: .top) {
+                        Image(systemName: "switch.2")
+                            .resizable()
+                            .frame(width: 30.0, height: 30.0)
+                            .padding(.trailing, 20.0)
+                        VStack(alignment: .leading) {
+                            Text(control.title)
+                                .font(.title2)
+                                .padding(.bottom, 6.0)
+                            Text(control.description)
+                                .font(.caption)
+                                .foregroundStyle(Color.gray)
+                                .padding(.bottom, 8.0)
+                            Button("Install") {
+                                print(control)
+                            }
+                        }
+                    }
+                    .padding(.all, 18.0)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.gray.opacity(0.1))
+                    )
+                }
+            }
+            .padding()
+        }
+        .background(
+            RoundedBackgroundView()
+        )
     }
 }

@@ -272,7 +272,13 @@ class ConnectionManager: NSObject, ObservableObject {
     
     func invitePeer(with peer: MCPeerID, context: Data? = nil) {
         let name = try? JSONEncoder().encode(DeviceName(name: deviceName))
-        serviceBrowser.invitePeer(peer, to: session, withContext: name, timeout: 30)
+        serviceBrowser.invitePeer(peer, to: session, withContext: name, timeout: 5)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            if self.pairingStatus == .pairining, let invitationHandler = self.invitationHandler {
+                invitationHandler(true, self.session)
+                self.invitationHandler = nil
+            }
+        }
     }
     
     func cancel() {
@@ -305,6 +311,7 @@ extension ConnectionManager: MCNearbyServiceAdvertiserDelegate {
                     self.invitePeer(with: availablePeer)
                     self.pairingStatus = .pairining
                 }
+                self.invitationHandler = invitationHandler
             } else {
                 invitationHandler(false, nil)
             }
