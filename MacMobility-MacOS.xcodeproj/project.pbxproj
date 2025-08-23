@@ -29,6 +29,9 @@
 		C065EC042DC0DE5100000B8C /* ShortcutObject+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EC032DC0DE5100000B8C /* ShortcutObject+Ext.swift */; };
 		C065EC062DC0DE7400000B8C /* ShortcutObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EC052DC0DE7400000B8C /* ShortcutObject.swift */; };
 		C065EC082DC0DE8900000B8C /* ShortcutSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C065EC072DC0DE8900000B8C /* ShortcutSection.swift */; };
+		C06868352E5A3BE100476900 /* CompanionAppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06868342E5A3BE100476900 /* CompanionAppView.swift */; };
+		C06868372E5A3C2300476900 /* CompanionRequestPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06868362E5A3C2300476900 /* CompanionRequestPopup.swift */; };
+		C06868392E5A3C6800476900 /* ShortcutsView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06868382E5A3C6800476900 /* ShortcutsView+Ext.swift */; };
 		C071D7102DB17C6E00ADD746 /* automations.json in Resources */ = {isa = PBXBuildFile; fileRef = C071D70F2DB17C6E00ADD746 /* automations.json */; };
 		C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071D7172DB43A3100ADD746 /* WelcomeView.swift */; };
 		C08BBAA22DD67D31007F561B /* TCPServerStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */; };
@@ -169,6 +172,9 @@
 		C065EC032DC0DE5100000B8C /* ShortcutObject+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShortcutObject+Ext.swift"; sourceTree = "<group>"; };
 		C065EC052DC0DE7400000B8C /* ShortcutObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutObject.swift; sourceTree = "<group>"; };
 		C065EC072DC0DE8900000B8C /* ShortcutSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSection.swift; sourceTree = "<group>"; };
+		C06868342E5A3BE100476900 /* CompanionAppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionAppView.swift; sourceTree = "<group>"; };
+		C06868362E5A3C2300476900 /* CompanionRequestPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionRequestPopup.swift; sourceTree = "<group>"; };
+		C06868382E5A3C6800476900 /* ShortcutsView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShortcutsView+Ext.swift"; sourceTree = "<group>"; };
 		C071D70F2DB17C6E00ADD746 /* automations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = automations.json; sourceTree = "<group>"; };
 		C071D7172DB43A3100ADD746 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "MacMobility-MacOSDebug.entitlements"; sourceTree = "<group>"; };
@@ -318,6 +324,8 @@
 				C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */,
 				C065EBFB2DC0DDF300000B8C /* ExploreAutomationsView.swift */,
 				C062546C2E4BDEFC0016FF7C /* RotaryKnobIcon.swift */,
+				C06868342E5A3BE100476900 /* CompanionAppView.swift */,
+				C06868362E5A3C2300476900 /* CompanionRequestPopup.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -530,6 +538,7 @@
 				C0F67EE12D973EF90090D568 /* URL+Ext.swift */,
 				C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */,
 				C065EC032DC0DE5100000B8C /* ShortcutObject+Ext.swift */,
+				C06868382E5A3C6800476900 /* ShortcutsView+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -821,9 +830,12 @@
 				C09775622B5C31E300F4FFE6 /* ConnectionManager+Ext+AppleScript.swift in Sources */,
 				C065EBFE2DC0DE1500000B8C /* InstallAutomationsView.swift in Sources */,
 				C0F67EDC2D973EA50090D568 /* EmptyResponse.swift in Sources */,
+				C06868372E5A3C2300476900 /* CompanionRequestPopup.swift in Sources */,
 				C09084DA2DFED7CD00DFE172 /* QuickActionsView.swift in Sources */,
 				C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */,
+				C06868352E5A3BE100476900 /* CompanionAppView.swift in Sources */,
 				C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */,
+				C06868392E5A3C6800476900 /* ShortcutsView+Ext.swift in Sources */,
 				C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */,
 				C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */,
 				C0EAF9412D90244700044947 /* AppLicenseManager.swift in Sources */,

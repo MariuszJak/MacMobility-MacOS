@@ -94,25 +94,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchInstalledApps()
         registerListener()
         startMonitoring()
-//        
-//        let test: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 1, height: 2), path: "", id: "horizontal-scroll", title: "1 x 2", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
-//        
-//        let test2: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 1, height: 3), path: "", id: "horizontal-scroll2", title: "1 x 3", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
-//        
-//        let test3: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 2, height: 1), path: "", id: "horizontal-scroll3", title: "2 x 1", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
-        
-        let slider: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 1), path: "control:horizontal-slider", id: "volume-control-ver-1", title: "Volume Control", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: "osascript -e \"set volume output volume %d\"", utilityType: .commandline, objects: nil, showTitleOnIcon: false, category: "MacOS")
-        
-//        let test5: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 2), path: "", id: "horizontal-scroll5", title: "3 x 2", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: nil, utilityType: nil, objects: nil, showTitleOnIcon: false, category: "Experimental")
-        
-        let rotary1: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 2, height: 2), path: "control:rotary-knob", id: "rotary-knob-ver-2", title: "Rotary Zoom", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: "", utilityType: .automation, objects: nil, showTitleOnIcon: false, category: "MacOS")
-        
-        let rotary2: ShortcutObject = .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 2, height: 2), path: "control:rotary-knob", id: "rotary-knob-ver-1", title: "Rotary Knob", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: "", utilityType: .automation, objects: nil, showTitleOnIcon: false, category: "MacOS")
-        
-//        self.saveUtility(with: slider)
-//        self.saveUtility(with: rotary1)
-//        self.saveUtility(with: rotary2)
-//        
+            
         $currentlyTargetedIndex
             .receive(on: DispatchQueue.main)
             .sink { [weak self] pageAndIndex in
