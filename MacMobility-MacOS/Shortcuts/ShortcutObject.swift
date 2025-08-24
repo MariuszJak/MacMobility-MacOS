@@ -233,3 +233,27 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
         self.size = try container.decodeIfPresent(CGSize.self, forKey: .size)
     }
 }
+
+protocol ScriptExecutable {
+    func execute(script: String) -> String?
+}
+
+extension ScriptExecutable {
+    func execute(script: String) -> String? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/bash")
+        process.arguments = ["-c", script]
+
+        let outputPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = outputPipe
+
+        do {
+            try process.run()
+            let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            return String(data: outputData, encoding: .utf8)
+        } catch {
+            return "Error executing script: \(error)"
+        }
+    }
+}

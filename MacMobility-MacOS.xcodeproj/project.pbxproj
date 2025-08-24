@@ -32,6 +32,10 @@
 		C06868352E5A3BE100476900 /* CompanionAppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06868342E5A3BE100476900 /* CompanionAppView.swift */; };
 		C06868372E5A3C2300476900 /* CompanionRequestPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06868362E5A3C2300476900 /* CompanionRequestPopup.swift */; };
 		C06868392E5A3C6800476900 /* ShortcutsView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06868382E5A3C6800476900 /* ShortcutsView+Ext.swift */; };
+		C068683C2E5A466800476900 /* UIControlChoiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C068683B2E5A466800476900 /* UIControlChoiceView.swift */; };
+		C068683E2E5A468100476900 /* UIControlsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C068683D2E5A468100476900 /* UIControlsListView.swift */; };
+		C06868402E5A48E300476900 /* UIControlCreateListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C068683F2E5A48E300476900 /* UIControlCreateListView.swift */; };
+		C06868422E5A4C3F00476900 /* UIControlCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06868412E5A4C3F00476900 /* UIControlCreateView.swift */; };
 		C071D7102DB17C6E00ADD746 /* automations.json in Resources */ = {isa = PBXBuildFile; fileRef = C071D70F2DB17C6E00ADD746 /* automations.json */; };
 		C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071D7172DB43A3100ADD746 /* WelcomeView.swift */; };
 		C08BBAA22DD67D31007F561B /* TCPServerStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */; };
@@ -175,6 +179,10 @@
 		C06868342E5A3BE100476900 /* CompanionAppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionAppView.swift; sourceTree = "<group>"; };
 		C06868362E5A3C2300476900 /* CompanionRequestPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionRequestPopup.swift; sourceTree = "<group>"; };
 		C06868382E5A3C6800476900 /* ShortcutsView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShortcutsView+Ext.swift"; sourceTree = "<group>"; };
+		C068683B2E5A466800476900 /* UIControlChoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlChoiceView.swift; sourceTree = "<group>"; };
+		C068683D2E5A468100476900 /* UIControlsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlsListView.swift; sourceTree = "<group>"; };
+		C068683F2E5A48E300476900 /* UIControlCreateListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlCreateListView.swift; sourceTree = "<group>"; };
+		C06868412E5A4C3F00476900 /* UIControlCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlCreateView.swift; sourceTree = "<group>"; };
 		C071D70F2DB17C6E00ADD746 /* automations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = automations.json; sourceTree = "<group>"; };
 		C071D7172DB43A3100ADD746 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "MacMobility-MacOSDebug.entitlements"; sourceTree = "<group>"; };
@@ -311,6 +319,7 @@
 		C05DA7362DAC102900BD4FBA /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C068683A2E5A466200476900 /* UIControls */,
 				C0B1605B2E185C0A00C70CBD /* QuickActionMenu */,
 				C05DA7372DAC103300BD4FBA /* AboutView.swift */,
 				C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */,
@@ -339,6 +348,17 @@
 				C065EC072DC0DE8900000B8C /* ShortcutSection.swift */,
 			);
 			path = Shortcuts;
+			sourceTree = "<group>";
+		};
+		C068683A2E5A466200476900 /* UIControls */ = {
+			isa = PBXGroup;
+			children = (
+				C068683B2E5A466800476900 /* UIControlChoiceView.swift */,
+				C068683D2E5A468100476900 /* UIControlsListView.swift */,
+				C068683F2E5A48E300476900 /* UIControlCreateListView.swift */,
+				C06868412E5A4C3F00476900 /* UIControlCreateView.swift */,
+			);
+			path = UIControls;
 			sourceTree = "<group>";
 		};
 		C071D6452DB0402F00ADD746 /* Automations */ = {
@@ -810,6 +830,7 @@
 				C097755F2B5C31D700F4FFE6 /* ConnectionManager.swift in Sources */,
 				C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */,
 				C065EC022DC0DE3E00000B8C /* JSONLoadable.swift in Sources */,
+				C06868402E5A48E300476900 /* UIControlCreateListView.swift in Sources */,
 				C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */,
 				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
 				C065EC082DC0DE8900000B8C /* ShortcutSection.swift in Sources */,
@@ -823,6 +844,7 @@
 				C09775302B5C319D00F4FFE6 /* MacMobility_MacOSApp.swift in Sources */,
 				C0EAF9392D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift in Sources */,
 				C0F67EE02D973ECA0090D568 /* String+Ext.swift in Sources */,
+				C068683E2E5A468100476900 /* UIControlsListView.swift in Sources */,
 				C0D21D652D7A25B600FEF931 /* CreateWorkspaceWithMultipleScreensViewModel.swift in Sources */,
 				C0D21D6D2D7A261F00FEF931 /* ScreenTypeView.swift in Sources */,
 				C0B160622E1AF2D700C70CBD /* SliceButton.swift in Sources */,
@@ -842,6 +864,7 @@
 				C0EAF9F92D902AB100044947 /* Resolver.swift in Sources */,
 				C0F67EDA2D973E930090D568 /* Request.swift in Sources */,
 				C0F67EE42D973F070090D568 /* DBSDataProviderRepresentable.swift in Sources */,
+				C068683C2E5A466800476900 /* UIControlChoiceView.swift in Sources */,
 				C0B1605A2E185BF100C70CBD /* QuickActionsViewModel.swift in Sources */,
 				C0CEDBAE2D70992700E1A041 /* WorkspacesWindowViewModel.swift in Sources */,
 				C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */,
@@ -868,6 +891,7 @@
 				C08BBAA42DD67D71007F561B /* ScreenViewManager.swift in Sources */,
 				C0EAFC1A2D903E7400044947 /* TrialManager.swift in Sources */,
 				C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */,
+				C06868422E5A4C3F00476900 /* UIControlCreateView.swift in Sources */,
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
 				C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */,
 				C064BA672D876FA40091E2BE /* Optional+Ext.swift in Sources */,

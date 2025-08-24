@@ -156,7 +156,7 @@ extension ShortcutsView {
         uiControlAppWindow = nil
         if nil == uiControlAppWindow {
             uiControlAppWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 350),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -173,7 +173,12 @@ extension ShortcutsView {
             }
             uiControlAppWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: UIControlChoiceView(nil, action: { mode in
-                openUIControlListAppWindow()
+                switch mode.type {
+                case .advanced:
+                    openCreateUIControlListAppWindow()
+                case .basic:
+                    openUIControlListAppWindow()
+                }
                 uiControlAppWindow?.close()
             }))
             uiControlAppWindow?.contentView?.addSubview(hv.view)
@@ -217,6 +222,39 @@ extension ShortcutsView {
         }
     }
     
+    func openCreateUIControlListAppWindow() {
+        uiControlListAppWindow?.close()
+        uiControlListAppWindow = nil
+        if nil == uiControlListAppWindow {
+            uiControlListAppWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 850, height: 550),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            uiControlListAppWindow?.center()
+            uiControlListAppWindow?.setFrameAutosaveName("UICreateControlList")
+            uiControlListAppWindow?.isReleasedWhenClosed = false
+            uiControlListAppWindow?.titlebarAppearsTransparent = true
+            uiControlListAppWindow?.appearance = NSAppearance(named: .darkAqua)
+            uiControlListAppWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlListAppWindow) else {
+                return
+            }
+            uiControlListAppWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: UIControlCreateListView(createAction: { type in
+                uiControlListAppWindow?.close()
+                openCreateUIControlWindow(type: type)
+            }))
+            uiControlListAppWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = uiControlListAppWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            uiControlListAppWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+    }
+    
     func openInstallAutomationsWindow() {
         if nil == automationsToInstallWindow {
             automationsToInstallWindow = NSWindow(
@@ -246,6 +284,44 @@ extension ShortcutsView {
             return
         }
         automationsToInstallWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    func openCreateUIControlWindow(type: UIControlType) {
+        uiControlCreateWindow?.close()
+        uiControlCreateWindow = nil
+        if nil == uiControlCreateWindow {
+            uiControlCreateWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 850, height: 700),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            uiControlCreateWindow?.center()
+            uiControlCreateWindow?.setFrameAutosaveName("UIControlCreateWindow")
+            uiControlCreateWindow?.isReleasedWhenClosed = false
+            uiControlCreateWindow?.titlebarAppearsTransparent = true
+            uiControlCreateWindow?.appearance = NSAppearance(named: .darkAqua)
+            uiControlCreateWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlCreateWindow) else {
+                return
+            }
+            
+            uiControlCreateWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: UIControlCreateView(
+                type: type,
+                connectionManager: viewModel.connectionManager,
+                categories: viewModel.allCategories(),
+                delegate: viewModel,
+                closeAction: {
+                    uiControlCreateWindow?.close()
+                }
+            ))
+            uiControlCreateWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = uiControlCreateWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        uiControlCreateWindow?.makeKeyAndOrderFront(nil)
     }
     
     func openCreateNewUtilityWindow() {

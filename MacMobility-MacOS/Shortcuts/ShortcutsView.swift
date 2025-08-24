@@ -55,6 +55,7 @@ struct ShortcutsView: View {
     @State var uiControlAppWindow: NSWindow?
     @State var uiControlListAppWindow: NSWindow?
     @State var quickActionSetupWindow: NSWindow?
+    @State var uiControlCreateWindow: NSWindow?
     @State var shouldShowCompanionRequestPopup: Bool = false
     @State var selectedTab = 0
     @State var tab: Tab = .apps

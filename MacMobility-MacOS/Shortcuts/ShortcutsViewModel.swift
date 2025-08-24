@@ -26,7 +26,7 @@ struct PageAndIndex {
     let index: Int
 }
 
-public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable {
+public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, UtilitiesWindowDelegate, JSONLoadable, ScriptExecutable {
     @Published var connectionManager: ConnectionManager
     @Published var pairingStatus: PairingStatus = .notPaired
     @Published var availablePeerWithName: (MCPeerID?, String)?
@@ -40,7 +40,8 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var searchText: String = ""
     @Published var cancellables = Set<AnyCancellable>()
     @Published var pages = 1
-    @Published var scrollToApp: String = ""
+    @Published var scrollToApp: String = " "
+
     @Published var scrollToPage: Int = 0
     @Published var availablePeerName: String = ""
     @Published var sections: [ShortcutSection] = []
@@ -143,6 +144,18 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         
         dependencyUpdate = { updates in
             self.updateDependenciesOfObject(with: self.idOfObjectToReplaceDependencies, replacements: updates)
+        }
+        runInitialScriptsIfNeeded()
+    }
+    
+    func runInitialScriptsIfNeeded() {
+        configuredShortcuts.enumerated().forEach { (index, object) in
+            if object.type == .control, let initialScript = object.color, !initialScript.contains("INITIAL") {
+                if let executedResult = execute(script: initialScript) {
+                    configuredShortcuts[index].color = "INITIAL:\(executedResult)"
+                    connectionManager.shortcuts = configuredShortcuts
+                }
+            }
         }
     }
     
@@ -601,6 +614,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             configuredShortcuts.removeAll(where: { $0.page == page && $0.id == object.id })
             configuredShortcuts.append(object)
         }
+        runInitialScriptsIfNeeded()
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
     }
