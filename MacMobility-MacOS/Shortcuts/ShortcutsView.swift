@@ -56,6 +56,7 @@ struct ShortcutsView: View {
     @State var uiControlListAppWindow: NSWindow?
     @State var quickActionSetupWindow: NSWindow?
     @State var uiControlCreateWindow: NSWindow?
+    @State var uiControlCreateTestWindow: NSWindow?
     @State var shouldShowCompanionRequestPopup: Bool = false
     @State var selectedTab = 0
     @State var tab: Tab = .apps
@@ -856,7 +857,6 @@ struct ShortcutsView: View {
                                 .id(app.title)
                                 Spacer()
                             }
-                            
                             .background(app.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
                             .animation(.easeOut, value: appNameToFlash)
                             .cornerRadius(10)

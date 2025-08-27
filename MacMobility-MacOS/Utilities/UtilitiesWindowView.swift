@@ -18,6 +18,7 @@ struct UtilitiesWindowView: View {
     @State private var editUtilitiesWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
     @StateObject var viewModel: ShortcutsViewModel
+    @State private var appNameToFlash: String = ""
     
     enum Constants {
         static let imageSize = 46.0
@@ -62,53 +63,69 @@ struct UtilitiesWindowView: View {
                     }
                     .padding([.trailing, .top], 16.0)
                 }
-                ScrollView {
-                    Spacer()
-                        .frame(height: 16.0)
-                    if viewModel.searchText.isEmpty {
-                        ForEach(viewModel.sections) { section in
-                            Section {
-                                if section.isExpanded {
-                                    ForEach(section.items) { item in
-                                        if let path = item.path {
-                                            if path.isEmpty || path != "Hidden" {
-                                                itemView(item: item)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        Spacer()
+                            .frame(height: 16.0)
+                        if viewModel.searchText.isEmpty {
+                            ForEach(viewModel.sections) { section in
+                                Section {
+                                    if section.isExpanded {
+                                        ForEach(section.items) { item in
+                                            if let path = item.path {
+                                                if path.isEmpty || path != "Hidden" {
+                                                    itemView(item: item)
+                                                        .id(item.title)
+                                                } else {
+                                                    EmptyView()
+                                                }
                                             } else {
-                                                EmptyView()
+                                                itemView(item: item)
+                                                    .id(item.title)
                                             }
-                                        } else {
-                                            itemView(item: item)
                                         }
+                                    } else {
+                                        EmptyView()
+                                    }
+                                } header: {
+                                    HStack {
+                                        Image(systemName: section.isExpanded ? "arrowtriangle.up.fill" : "arrowtriangle.down.fill")
+                                            .padding(.leading, 16.0)
+                                        Text(section.title)
+                                            .font(.headline)
+                                            .padding(.vertical, 12)
+                                            .padding(.horizontal)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Color.gray.opacity(0.2))
+                                    .onTapGesture {
+                                        viewModel.toggleCollapseForSection(for: section.title)
+                                    }
+                                }
+                            }
+                        } else {
+                            ForEach(viewModel.utilities) { item in
+                                if let path = item.path {
+                                    if path.isEmpty || path != "Hidden" {
+                                        itemView(item: item)
+                                            .id(item.title)
+                                    } else {
+                                        EmptyView()
                                     }
                                 } else {
-                                    EmptyView()
-                                }
-                            } header: {
-                                HStack {
-                                    Image(systemName: section.isExpanded ? "arrowtriangle.up.fill" : "arrowtriangle.down.fill")
-                                        .padding(.leading, 16.0)
-                                    Text(section.title)
-                                        .font(.headline)
-                                        .padding(.vertical, 12)
-                                        .padding(.horizontal)
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.gray.opacity(0.2))
-                                .onTapGesture {
-                                    viewModel.toggleCollapseForSection(for: section.title)
+                                    itemView(item: item)
+                                        .id(item.title)
                                 }
                             }
                         }
-                    } else {
-                        ForEach(viewModel.utilities) { item in
-                            if let path = item.path {
-                                if path.isEmpty || path != "Hidden" {
-                                    itemView(item: item)
-                                } else {
-                                    EmptyView()
-                                }
-                            } else {
-                                itemView(item: item)
+                    }
+                    .onChange(of: viewModel.scrollToApp) { _, title in
+                        withAnimation {
+                            proxy.scrollTo(title, anchor: .center)
+                        } completion: {
+                            appNameToFlash = title
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                                appNameToFlash = ""
                             }
                         }
                     }
@@ -196,6 +213,8 @@ struct UtilitiesWindowView: View {
                         viewModel.removeUtilityItem(id: item.id)
                     }
             }
+            .background(item.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
+            .animation(.easeOut, value: appNameToFlash)
             .padding(.horizontal, 16.0)
             .padding(.vertical, 6.0)
             Divider()

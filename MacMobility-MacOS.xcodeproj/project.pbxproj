@@ -134,6 +134,10 @@
 		C0F67F192D98303B0090D568 /* Get Image Resolution.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F182D98303B0090D568 /* Get Image Resolution.shortcut */; };
 		C0F67F1B2D9831C90090D568 /* Focus ON.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F1A2D9831C90090D568 /* Focus ON.shortcut */; };
 		C0F67F1D2D9833030090D568 /* Live Text Extractor.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = C0F67F1C2D9833030090D568 /* Live Text Extractor.shortcut */; };
+		C0F767C02E5C808300D026EA /* Throttler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F767BF2E5C808300D026EA /* Throttler.swift */; };
+		C0F767C32E5E2FA600D026EA /* VolumeContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F767C22E5E2FA600D026EA /* VolumeContainerView.swift */; };
+		C0F767C52E5E2FC300D026EA /* RotaryKnob.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F767C42E5E2FC300D026EA /* RotaryKnob.swift */; };
+		C0F767C72E5E2FDB00D026EA /* UIControlTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F767C62E5E2FDB00D026EA /* UIControlTestView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -287,6 +291,10 @@
 		C0F67F182D98303B0090D568 /* Get Image Resolution.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Get Image Resolution.shortcut"; sourceTree = "<group>"; };
 		C0F67F1A2D9831C90090D568 /* Focus ON.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Focus ON.shortcut"; sourceTree = "<group>"; };
 		C0F67F1C2D9833030090D568 /* Live Text Extractor.shortcut */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Live Text Extractor.shortcut"; sourceTree = "<group>"; };
+		C0F767BF2E5C808300D026EA /* Throttler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throttler.swift; sourceTree = "<group>"; };
+		C0F767C22E5E2FA600D026EA /* VolumeContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeContainerView.swift; sourceTree = "<group>"; };
+		C0F767C42E5E2FC300D026EA /* RotaryKnob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotaryKnob.swift; sourceTree = "<group>"; };
+		C0F767C62E5E2FDB00D026EA /* UIControlTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlTestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -353,10 +361,12 @@
 		C068683A2E5A466200476900 /* UIControls */ = {
 			isa = PBXGroup;
 			children = (
+				C0F767C12E5E2FA000D026EA /* Components */,
 				C068683B2E5A466800476900 /* UIControlChoiceView.swift */,
 				C068683D2E5A468100476900 /* UIControlsListView.swift */,
 				C068683F2E5A48E300476900 /* UIControlCreateListView.swift */,
 				C06868412E5A4C3F00476900 /* UIControlCreateView.swift */,
+				C0F767C62E5E2FDB00D026EA /* UIControlTestView.swift */,
 			);
 			path = UIControls;
 			sourceTree = "<group>";
@@ -575,6 +585,7 @@
 				C065EC012DC0DE3E00000B8C /* JSONLoadable.swift */,
 				C0C9B78A2DCAACA40068BCAB /* NewAutomationUtilityView.swift */,
 				C0C9B78C2DCAAD1F0068BCAB /* ConverterView.swift */,
+				C0F767BF2E5C808300D026EA /* Throttler.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -637,6 +648,15 @@
 				C0F67EF02D9815270090D568 /* ShortcutInstallView.swift */,
 			);
 			path = PremadeShortcuts;
+			sourceTree = "<group>";
+		};
+		C0F767C12E5E2FA000D026EA /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				C0F767C22E5E2FA600D026EA /* VolumeContainerView.swift */,
+				C0F767C42E5E2FC300D026EA /* RotaryKnob.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -830,6 +850,7 @@
 				C097755F2B5C31D700F4FFE6 /* ConnectionManager.swift in Sources */,
 				C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */,
 				C065EC022DC0DE3E00000B8C /* JSONLoadable.swift in Sources */,
+				C0F767C02E5C808300D026EA /* Throttler.swift in Sources */,
 				C06868402E5A48E300476900 /* UIControlCreateListView.swift in Sources */,
 				C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */,
 				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
@@ -858,8 +879,10 @@
 				C06868352E5A3BE100476900 /* CompanionAppView.swift in Sources */,
 				C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */,
 				C06868392E5A3C6800476900 /* ShortcutsView+Ext.swift in Sources */,
+				C0F767C52E5E2FC300D026EA /* RotaryKnob.swift in Sources */,
 				C0F67EEC2D97417B0090D568 /* PermissionView.swift in Sources */,
 				C0CEDBAC2D7098BD00E1A041 /* WorkspacesWindowView.swift in Sources */,
+				C0F767C32E5E2FA600D026EA /* VolumeContainerView.swift in Sources */,
 				C0EAF9412D90244700044947 /* AppLicenseManager.swift in Sources */,
 				C0EAF9F92D902AB100044947 /* Resolver.swift in Sources */,
 				C0F67EDA2D973E930090D568 /* Request.swift in Sources */,
@@ -882,6 +905,7 @@
 				C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */,
 				C0EAF93B2D8CC67600044947 /* NewMultiSelectionUtilityView.swift in Sources */,
 				C065EC042DC0DE5100000B8C /* ShortcutObject+Ext.swift in Sources */,
+				C0F767C72E5E2FDB00D026EA /* UIControlTestView.swift in Sources */,
 				C0F67EE22D973EF90090D568 /* URL+Ext.swift in Sources */,
 				C035810E2DB65091009E22F5 /* VisualEffect.swift in Sources */,
 				C09084DC2DFEEAAB00DFE172 /* QuickActionsViewSetup.swift in Sources */,

@@ -66,42 +66,64 @@ struct UIControlCreateListView: View {
     let createAction: (UIControlType) -> Void
     
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 400))], spacing: 6) {
-                ForEach(types) { control in
-                    HStack(alignment: .top) {
-                        Image(control.type.iconName)
-                            .resizable()
-                            .frame(width: 80.0, height: 80.0)
-                            .padding(.trailing, 20.0)
-                        VStack(alignment: .leading) {
-                            Text(control.title)
-                                .font(.title2)
-                                .padding(.bottom, 6.0)
-                            Text(control.description)
-                                .font(.caption)
-                                .foregroundStyle(Color.gray)
-                                .padding(.bottom, 8.0)
-                            
-                        }
-                        Spacer()
-                        Button("Create") {
-                            createAction(control.type)
-                        }
-                        .padding()
-                    }
-                    .padding(.all, 18.0)
-                    .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.gray.opacity(0.1))
-                    )
-                }
+        VStack {
+            HStack {
+                Text("Select control type")
+                    .font(.system(size: 17.0, weight: .bold))
+                    .foregroundStyle(Color.white)
+                    .padding([.horizontal, .top], 16)
+                Spacer()
             }
-            .padding()
+            Divider()
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 6) {
+                    ForEach(types) { control in
+                        VStack(alignment: .leading) {
+                            VStack(alignment: .leading) {
+                                HStack(alignment: .top) {
+                                    Image(control.type.iconName)
+                                        .resizable()
+                                        .frame(width: 64, height: 64)
+                                        .padding(.trailing, 2.0)
+                                    VStack(alignment: .leading) {
+                                        Text(control.title)
+                                            .lineLimit(1)
+                                            .font(.system(size: 16, weight: .bold))
+                                            .padding(.bottom, 4)
+                                        Text(control.description)
+                                            .font(.system(size: 12, weight: .regular))
+                                            .foregroundStyle(Color.gray)
+                                            .padding(.bottom, 8)
+                                    }
+                                }
+                                Divider()
+                                HStack {
+                                    Spacer()
+                                    Image(systemName: "plus.circle.fill")
+                                        .resizable()
+                                        .frame(width: 16, height: 16)
+                                        .onTapGesture {
+                                            createAction(control.type)
+                                        }
+                                    
+                                }
+                            }
+                            .padding(.all, 10)
+                        }
+                        .padding(.all, 18)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.gray.opacity(0.1))
+                        )
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .padding(.all, 16.0)
         }
         .background(
             RoundedBackgroundView()
         )
-        .padding(.all, 16.0)
+        .padding()
     }
 }

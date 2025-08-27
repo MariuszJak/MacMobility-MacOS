@@ -274,6 +274,15 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         utilities = UserDefaults.standard.get(key: .utilities) ?? []
     }
     
+    func expandSectionIfNeeded(for title: String) {
+        if let index = sections.firstIndex(where: { $0.title.lowercased() == title.lowercased() }) {
+            if !sections[index].isExpanded {
+                sections[index].isExpanded.toggle()
+            }
+        }
+        utilities = UserDefaults.standard.get(key: .utilities) ?? []
+    }
+    
     func registerListener() {
         $searchText
             .receive(on: RunLoop.main)
