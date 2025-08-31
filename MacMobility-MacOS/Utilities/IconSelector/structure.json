@@ -2,30 +2,19 @@
   "name": ".",
   "subfolders": [
   {
-    "name": "Audacity",
-    "images": [
-      "audacity_norm.png",
-      "audacity_save.png",
-      "audacity_split.png"
-    ]
-  },
-  {
     "name": "Buttons",
     "subfolders": [
     {
-      "name": "Cyberpunk"
-    },
-    {
-      "name": "Retro"
+      "name": "FutureRetro",
+      "images": [
+        "button-gray-main.png",
+        "button-main-orange.png",
+        "button-option-orange.png",
+        "button-round-gray.png",
+        "cyber-button-1.png",
+        "cyber-button-2.png"
+      ]
     }
-    ]
-  },
-  {
-    "name": "ChatGPT",
-    "images": [
-      "chat-gpt-explain.png",
-      "chat-gpt-new.png",
-      "chat-gpt-summarize.png"
     ]
   }
   ]

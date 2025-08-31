@@ -56,27 +56,34 @@ struct FolderScreen: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        List {
+        VStack {
             if !isRoot {
-                Button {
-                    dismiss()
-                } label: {
-                    Label("Back", systemImage: "chevron.left")
+                HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Label("Back", systemImage: "chevron.left")
+                    }
+                    .padding()
+                    Spacer()
                 }
             }
-            if let subs = folder.subfolders, !subs.isEmpty {
-                Section("Folders") {
-                    ForEach(subs) { sub in
-                        NavigationLink(value: sub) {
-                            Label(sub.name, systemImage: "folder")
+            List {
+                
+                if let subs = folder.subfolders, !subs.isEmpty {
+                    Section("Folders") {
+                        ForEach(subs) { sub in
+                            NavigationLink(value: sub) {
+                                Label(sub.name, systemImage: "folder")
+                            }
                         }
                     }
                 }
-            }
-            if let imgs = folder.images, !imgs.isEmpty {
-                Section("Images") {
-                    ImageGrid(images: imgs, action: action)
-                        .padding(.vertical, 6)
+                if let imgs = folder.images, !imgs.isEmpty {
+                    Section("Images") {
+                        ImageGrid(images: imgs, action: action)
+                            .padding(.vertical, 6)
+                    }
                 }
             }
         }
