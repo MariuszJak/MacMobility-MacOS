@@ -12,6 +12,7 @@ struct IconPickerView: View {
     @Binding var title: String
     @Binding private var userSelectedIcon: NSImage?
     @Binding private var favicon: String
+    @State var iconPickerWindow: NSWindow?
     private var imageSize: CGSize
     private let canSelectImage: Bool
     
@@ -80,12 +81,61 @@ struct IconPickerView: View {
                 }
             }
             if canSelectImage {
-                Button("Select Icon") {
-                    viewModel.pickImage() { icon in
-                        userSelectedIcon = icon
+                VStack(alignment: .leading) {
+                    Button("Browse Icons") {
+                        openIconsPickerWindow()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                    Button("Select Icon") {
+                        viewModel.pickImage() { icon in
+                            userSelectedIcon = icon
+                        }
                     }
                 }
             }
         }
+    }
+    
+    func openIconsPickerWindow() {
+        iconPickerWindow?.close()
+        iconPickerWindow = nil
+        if nil == iconPickerWindow {
+            iconPickerWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 700, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            iconPickerWindow?.center()
+            iconPickerWindow?.setFrameAutosaveName("IconPickerWindow")
+            iconPickerWindow?.isReleasedWhenClosed = false
+            iconPickerWindow?.titlebarAppearsTransparent = true
+            iconPickerWindow?.appearance = NSAppearance(named: .darkAqua)
+            iconPickerWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: iconPickerWindow) else {
+                return
+            }
+            iconPickerWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: IconSelectorView(action: { name in
+                iconPickerWindow?.close()
+                userSelectedIcon = loadImage(named: name)
+            }))
+            iconPickerWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = iconPickerWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            iconPickerWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+        iconPickerWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    private func loadImage(named name: String) -> NSImage? {
+        if let fromAssets = NSImage(named: name) { return fromAssets }
+        if let url = Bundle.main.url(forResource: name, withExtension: nil, subdirectory: "Icons") {
+            return NSImage(contentsOf: url)
+        }
+        return nil
     }
 }

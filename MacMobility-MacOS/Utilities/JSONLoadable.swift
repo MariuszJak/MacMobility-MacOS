@@ -29,3 +29,17 @@ extension JSONLoadable {
         return loaded
     }
 }
+
+protocol ImageLoadable {
+    func loadImage(named name: String) -> NSImage?
+}
+
+extension ImageLoadable {
+    func loadImage(named name: String) -> NSImage? {
+        if let fromAssets = NSImage(named: name) { return fromAssets }
+        if let url = Bundle.main.url(forResource: name, withExtension: nil, subdirectory: "Icons") {
+            return NSImage(contentsOf: url)
+        }
+        return nil
+    }
+}

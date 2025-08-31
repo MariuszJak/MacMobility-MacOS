@@ -1,0 +1,32 @@
+{
+  "name": ".",
+  "subfolders": [
+  {
+    "name": "Audacity",
+    "images": [
+      "audacity_norm.png",
+      "audacity_save.png",
+      "audacity_split.png"
+    ]
+  },
+  {
+    "name": "Buttons",
+    "subfolders": [
+    {
+      "name": "Cyberpunk"
+    },
+    {
+      "name": "Retro"
+    }
+    ]
+  },
+  {
+    "name": "ChatGPT",
+    "images": [
+      "chat-gpt-explain.png",
+      "chat-gpt-new.png",
+      "chat-gpt-summarize.png"
+    ]
+  }
+  ]
+}

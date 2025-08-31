@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		C00CB20B2DD91A680082128F /* ResolutionSelectorCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */; };
+		C01CDF342E630D540082665B /* IconSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CDF332E630D540082665B /* IconSelectorView.swift */; };
+		C01CDF392E630E400082665B /* audacity_norm.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF362E630E400082665B /* audacity_norm.png */; };
+		C01CDF3A2E630E400082665B /* audacity_save.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF372E630E400082665B /* audacity_save.png */; };
+		C01CDF3B2E630E400082665B /* audacity_split.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF382E630E400082665B /* audacity_split.png */; };
+		C01CDF3F2E630E4E0082665B /* chat-gpt-new.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF3D2E630E4E0082665B /* chat-gpt-new.png */; };
+		C01CDF402E630E4E0082665B /* chat-gpt-summarize.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF3E2E630E4E0082665B /* chat-gpt-summarize.png */; };
+		C01CDF412E630E4E0082665B /* chat-gpt-explain.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF3C2E630E4E0082665B /* chat-gpt-explain.png */; };
+		C01CDF432E6377030082665B /* structure.json in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF422E6377030082665B /* structure.json */; };
 		C03581082DB6501E009E22F5 /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581072DB6501E009E22F5 /* IconPickerView.swift */; };
 		C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */; };
 		C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */; };
@@ -159,6 +167,14 @@
 
 /* Begin PBXFileReference section */
 		C00CB20A2DD91A680082128F /* ResolutionSelectorCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResolutionSelectorCard.swift; sourceTree = "<group>"; };
+		C01CDF332E630D540082665B /* IconSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconSelectorView.swift; sourceTree = "<group>"; };
+		C01CDF362E630E400082665B /* audacity_norm.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = audacity_norm.png; sourceTree = "<group>"; };
+		C01CDF372E630E400082665B /* audacity_save.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = audacity_save.png; sourceTree = "<group>"; };
+		C01CDF382E630E400082665B /* audacity_split.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = audacity_split.png; sourceTree = "<group>"; };
+		C01CDF3C2E630E4E0082665B /* chat-gpt-explain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chat-gpt-explain.png"; sourceTree = "<group>"; };
+		C01CDF3D2E630E4E0082665B /* chat-gpt-new.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chat-gpt-new.png"; sourceTree = "<group>"; };
+		C01CDF3E2E630E4E0082665B /* chat-gpt-summarize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chat-gpt-summarize.png"; sourceTree = "<group>"; };
+		C01CDF422E6377030082665B /* structure.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = structure.json; sourceTree = "<group>"; };
 		C03581072DB6501E009E22F5 /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
 		C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerViewModel.swift; sourceTree = "<group>"; };
 		C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Ext.swift"; sourceTree = "<group>"; };
@@ -324,6 +340,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C01CDF302E630AC60082665B /* IconSelector */ = {
+			isa = PBXGroup;
+			children = (
+				C01CDF422E6377030082665B /* structure.json */,
+				C01CDF352E630E290082665B /* Icons */,
+				C01CDF332E630D540082665B /* IconSelectorView.swift */,
+			);
+			path = IconSelector;
+			sourceTree = "<group>";
+		};
+		C01CDF352E630E290082665B /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				C01CDF3C2E630E4E0082665B /* chat-gpt-explain.png */,
+				C01CDF3D2E630E4E0082665B /* chat-gpt-new.png */,
+				C01CDF3E2E630E4E0082665B /* chat-gpt-summarize.png */,
+				C01CDF362E630E400082665B /* audacity_norm.png */,
+				C01CDF372E630E400082665B /* audacity_save.png */,
+				C01CDF382E630E400082665B /* audacity_split.png */,
+			);
+			path = Icons;
+			sourceTree = "<group>";
+		};
 		C05DA7362DAC102900BD4FBA /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -576,6 +615,7 @@
 		C0EAF9332D8B491700044947 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				C01CDF302E630AC60082665B /* IconSelector */,
 				C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */,
 				C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */,
 				C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */,
@@ -797,11 +837,18 @@
 				C0F67F112D982E990090D568 /* EXIF Inspector.shortcut in Resources */,
 				C0F67F122D982E990090D568 /* Convert to JPEG and Copy.shortcut in Resources */,
 				C0F67F132D982E990090D568 /* Show Clipboard.shortcut in Resources */,
+				C01CDF432E6377030082665B /* structure.json in Resources */,
+				C01CDF392E630E400082665B /* audacity_norm.png in Resources */,
+				C01CDF3A2E630E400082665B /* audacity_save.png in Resources */,
+				C01CDF3B2E630E400082665B /* audacity_split.png in Resources */,
 				C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */,
 				C0F67F142D982E990090D568 /* Take Screenshot and Share.shortcut in Resources */,
 				C0F67F152D982E990090D568 /* Calendar Locations.shortcut in Resources */,
 				C0F67F162D982E990090D568 /* Copy Last Photo.shortcut in Resources */,
 				C09775342B5C319E00F4FFE6 /* Assets.xcassets in Resources */,
+				C01CDF3F2E630E4E0082665B /* chat-gpt-new.png in Resources */,
+				C01CDF402E630E4E0082665B /* chat-gpt-summarize.png in Resources */,
+				C01CDF412E630E4E0082665B /* chat-gpt-explain.png in Resources */,
 				C0F67EEF2D9814790090D568 /* Focus Off.shortcut in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -915,6 +962,7 @@
 				C08BBAA42DD67D71007F561B /* ScreenViewManager.swift in Sources */,
 				C0EAFC1A2D903E7400044947 /* TrialManager.swift in Sources */,
 				C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */,
+				C01CDF342E630D540082665B /* IconSelectorView.swift in Sources */,
 				C06868422E5A4C3F00476900 /* UIControlCreateView.swift in Sources */,
 				C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */,
 				C0D21D692D7A25E600FEF931 /* ConfigurableScreenView.swift in Sources */,

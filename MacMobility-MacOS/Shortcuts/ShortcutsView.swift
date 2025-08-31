@@ -57,6 +57,7 @@ struct ShortcutsView: View {
     @State var quickActionSetupWindow: NSWindow?
     @State var uiControlCreateWindow: NSWindow?
     @State var uiControlCreateTestWindow: NSWindow?
+    @State var iconPickerWindow: NSWindow?
     @State var shouldShowCompanionRequestPopup: Bool = false
     @State var selectedTab = 0
     @State var tab: Tab = .apps
@@ -297,6 +298,18 @@ struct ShortcutsView: View {
             backgroundColor: .clear
         ) {
             openInstallAutomationsWindow()
+        }
+        .padding(.all, 3.0)
+        
+        BlueButton(
+            title: "Icons Picker",
+            font: .callout,
+            padding: 8.0,
+            cornerRadius: 6.0,
+            leadingImage: "storefront.circle",
+            backgroundColor: .clear
+        ) {
+            openIconsPickerWindow()
         }
         .padding(.all, 3.0)
         

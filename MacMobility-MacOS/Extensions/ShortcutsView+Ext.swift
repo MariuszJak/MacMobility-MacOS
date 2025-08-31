@@ -293,6 +293,40 @@ extension ShortcutsView {
         automationsToInstallWindow?.makeKeyAndOrderFront(nil)
     }
     
+    func openIconsPickerWindow() {
+        iconPickerWindow?.close()
+        iconPickerWindow = nil
+        if nil == iconPickerWindow {
+            iconPickerWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 700, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            iconPickerWindow?.center()
+            iconPickerWindow?.setFrameAutosaveName("IconPickerWindow")
+            iconPickerWindow?.isReleasedWhenClosed = false
+            iconPickerWindow?.titlebarAppearsTransparent = true
+            iconPickerWindow?.appearance = NSAppearance(named: .darkAqua)
+            iconPickerWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: iconPickerWindow) else {
+                return
+            }
+            iconPickerWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: IconSelectorView(action: { name in
+                iconPickerWindow?.close()
+                print(name)
+            }))
+            iconPickerWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = iconPickerWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            iconPickerWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+        iconPickerWindow?.makeKeyAndOrderFront(nil)
+    }
+    
     func openCreateUIControlWindow(type: UIControlType) {
         uiControlCreateWindow?.close()
         uiControlCreateWindow = nil
