@@ -220,7 +220,7 @@ struct SelectUtilityTypeWindowView: View {
                 hv.view.frame = newWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: categories, item: item, delegate: viewModel.delegate) {
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: categories, showsSizePicker: true, item: item, delegate: viewModel.delegate) {
                     newWindow?.close()
                 })
                 

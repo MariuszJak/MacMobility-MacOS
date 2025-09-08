@@ -181,22 +181,15 @@ struct UtilitiesWindowView: View {
                     Text(item.title)
                 }
                 .onDrag {
-                    switch item.type {
-                    case .control:
-                        viewModel.draggingData = .init(size: item.size, indexes: item.indexes)
-                        return NSItemProvider(object: item.id as NSString)
-                    default:
-                        return NSItemProvider(object: item.id as NSString)
-                    }
+                    viewModel.draggingData = .init(size: item.size, indexes: item.indexes)
+                    return NSItemProvider(object: item.id as NSString)
                 } preview: {
-                    if item.type == .control {
-                        RoundedRectangle(cornerRadius: 5.0)
-                            .fill(Color.blue)
-                            .frame(
-                                width: 20 * (item.size?.width ?? 1) + 7.0 * (item.size?.width ?? 1),
-                                height: 20 * (item.size?.height ?? 1) + 7.0 * (item.size?.height ?? 1)
-                            )
-                    }
+                    RoundedRectangle(cornerRadius: 5.0)
+                        .fill(Color.blue)
+                        .frame(
+                            width: 20 * (item.size?.width ?? 1) + 7.0 * (item.size?.width ?? 1),
+                            height: 20 * (item.size?.height ?? 1) + 7.0 * (item.size?.height ?? 1)
+                        )
                 }
                 Spacer()
                 Image(systemName: "gear")
@@ -327,7 +320,7 @@ struct UtilitiesWindowView: View {
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), showsSizePicker: true, item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
                 })
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)

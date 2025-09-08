@@ -69,7 +69,6 @@ struct FolderScreen: View {
                 }
             }
             List {
-                
                 if let subs = folder.subfolders, !subs.isEmpty {
                     Section("Folders") {
                         ForEach(subs) { sub in

@@ -26,6 +26,11 @@ class NewAutomationUtilityViewModel: ObservableObject, JSONLoadable {
     @Published var automationCode: String = ""
     @Published var showTitleOnIcon: Bool = true
     @Published var categories: [String] = []
+    @Published var sizes: [ItemSize] = ItemSize.onlyRectangleSizes
+    
+    var itemSize: ItemSize {
+        size.toItemSize ?? .size1x1
+    }
     
     init(categories: [String]) {
         self.categories = categories
@@ -38,6 +43,7 @@ class NewAutomationUtilityViewModel: ObservableObject, JSONLoadable {
         category = ""
         automationCode = ""
         showTitleOnIcon = true
+        sizes = ItemSize.onlyRectangleSizes
     }
     
     func loadAutomationFromFile() -> Automation? {
@@ -65,10 +71,12 @@ struct NewAutomationUtilityView: View {
     var closeAction: () -> Void
     weak var delegate: UtilitiesWindowDelegate?
     var currentPage: Int?
+    let showsSizePicker: Bool
     let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 0.7)
     
-    init(categories: [String], item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
+    init(categories: [String], showsSizePicker: Bool, item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
         self.viewModel = .init(categories: categories)
+        self.showsSizePicker = showsSizePicker
         self.delegate = delegate
         self.closeAction = closeAction
         if let item {
@@ -139,6 +147,31 @@ struct NewAutomationUtilityView: View {
                 )
                 .padding(.leading, 16.0)
             }
+            HStack {
+                Text("Size")
+                    .font(.system(size: 14, weight: .regular))
+                    .padding(.trailing, 4.0)
+                Picker("", selection: Binding(
+                    get: {
+                        viewModel.itemSize.description
+                    },
+                    set: { newValue in
+                        let newSize: ItemSize = ItemSize(rawValue: "size\(newValue)") ?? .size1x1
+                        viewModel.size = newSize.cgSize
+                    }
+                )) {
+                    ForEach(viewModel.sizes, id: \.self) { size in
+                        Text(size.description)
+                            .tag(size.description)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200.0)
+                Spacer()
+            }
+            .padding(.bottom, 6.0)
+            .padding(.leading, 60.0)
+            .frame(maxWidth: .infinity)
             HStack {
                 Text("Category")
                     .font(.system(size: 14, weight: .regular))

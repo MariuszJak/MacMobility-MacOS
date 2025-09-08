@@ -393,23 +393,16 @@ struct ShortcutsView: View {
     
     @ViewBuilder
     func dragView<Content: View>(_ view: Content, object: ShortcutObject) -> some View {
-        switch object.type {
-        case .control:
-            view.onDrag {
-                viewModel.draggingData = .init(size: object.size, indexes: object.indexes)
-                return NSItemProvider(object: object.id as NSString)
-            } preview: {
-                RoundedRectangle(cornerRadius: 5.0)
-                    .fill(Color.blue)
-                    .frame(
-                        width: 20 * (object.size?.width ?? 1) + testSize * (object.size?.width ?? 1),
-                        height: 20 * (object.size?.height ?? 1) + testSize * (object.size?.height ?? 1)
-                    )
-            }
-        default:
-            view.onDrag {
-                return NSItemProvider(object: object.id as NSString)
-            }
+        view.onDrag {
+            viewModel.draggingData = .init(size: object.size, indexes: object.indexes)
+            return NSItemProvider(object: object.id as NSString)
+        } preview: {
+            RoundedRectangle(cornerRadius: 5.0)
+                .fill(Color.blue)
+                .frame(
+                    width: 20 * (object.size?.width ?? 1) + testSize * (object.size?.width ?? 1),
+                    height: 20 * (object.size?.height ?? 1) + testSize * (object.size?.height ?? 1)
+                )
         }
     }
     
@@ -713,7 +706,7 @@ struct ShortcutsView: View {
                         .resizable()
                         .scaledToFill()
                         .cornerRadius(cornerRadius)
-                        .frame(width: 70, height: 70)
+                        .frame(width: size.width, height: size.height)
                         .onTapGesture {
                             openEditUtilityWindow(item: object)
                         }

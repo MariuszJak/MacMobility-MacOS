@@ -468,16 +468,20 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         } else {
             item = tmpAllItems.first { $0.id == id }
         }
+        guard let item else { return nil }
         
-        if item?.type == .control {
-            guard let allIndexes = neighboringIndexes(for: index, size: item?.size) else {
+        if item.type == .control || item.size?.toItemSize != .size1x1 {
+            guard let allIndexes = neighboringIndexes(for: index, size: item.size) else {
                 return nil
             }
             let configuredIndexes = configuredShortcuts.filter { $0.page == page && $0.id != id }.compactMap { $0.indexes }.flatMap { $0 }
             let intersects = Set(allIndexes).intersection(Set(configuredIndexes))
             return intersects.isEmpty ? item : nil
         } else {
-            let configuredIndexes = configuredShortcuts.filter { $0.page == page && $0.type == .control }.compactMap { $0.indexes }.flatMap { $0 }
+            guard neighboringIndexes(for: index, size: item.size) != nil else {
+                return nil
+            }
+            let configuredIndexes = configuredShortcuts.filter { $0.page == page && ($0.type == .control || $0.size?.toItemSize != .size1x1) }.compactMap { $0.indexes }.flatMap { $0 }
             return configuredIndexes.contains(index) ? nil : item
         }
     }

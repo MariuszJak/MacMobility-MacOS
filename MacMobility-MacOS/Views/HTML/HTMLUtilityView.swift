@@ -1,18 +1,16 @@
 //
-//  NewBashUtilityView.swift
+//  HTMLUtilityView.swift
 //  MacMobility-MacOS
 //
-//  Created by CoderBlocks on 19/03/2025.
+//  Created by Mariusz Jakowienko on 08/09/2025.
 //
 
+import Foundation
 import SwiftUI
 import CodeEditor
 
-class NewBashUtilityViewModel: ObservableObject, JSONLoadable {
+class HTMLUtilityViewModel: ObservableObject, JSONLoadable {
     var id: String?
-    @Published var type: ShortcutType = .utility
-    @Published var size: CGSize = .init(width: 1, height: 1)
-    @Published var path: String = ""
     @Published var title: String = ""
     @Published var category: String = "Other"
     @Published var iconData: Data?
@@ -20,6 +18,7 @@ class NewBashUtilityViewModel: ObservableObject, JSONLoadable {
     @Published var scriptCode: String = ""
     @Published var showTitleOnIcon: Bool = true
     @Published var categories: [String] = []
+    @Published var size: CGSize = .init(width: 1, height: 1)
     @Published var sizes: [ItemSize] = ItemSize.onlyRectangleSizes
     
     var itemSize: ItemSize {
@@ -37,12 +36,11 @@ class NewBashUtilityViewModel: ObservableObject, JSONLoadable {
         category = ""
         scriptCode = ""
         showTitleOnIcon = true
-        sizes = ItemSize.onlyRectangleSizes
     }
 }
 
-struct NewBashUtilityView: View {
-    @ObservedObject var viewModel: NewBashUtilityViewModel
+struct HTMLUtilityView: View {
+    @ObservedObject var viewModel: HTMLUtilityViewModel
     var closeAction: () -> Void
     weak var delegate: UtilitiesWindowDelegate?
     var currentPage: Int?
@@ -51,13 +49,11 @@ struct NewBashUtilityView: View {
     init(categories: [String], item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
         self.delegate = delegate
         self.closeAction = closeAction
-        self.viewModel = NewBashUtilityViewModel(categories: categories)
+        self.viewModel = HTMLUtilityViewModel(categories: categories)
         if let item {
             currentPage = item.page
-            viewModel.size = item.size ?? .init(width: 1, height: 1)
-            viewModel.path = item.path ?? ""
-            viewModel.type = item.type
             viewModel.title = item.title
+            viewModel.size = item.size ?? .init(width: 1, height: 1)
             viewModel.id = item.id
             viewModel.scriptCode = item.scriptCode ?? ""
             viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
@@ -70,7 +66,7 @@ struct NewBashUtilityView: View {
     
     var body: some View {
         VStack(alignment: .center) {
-            Text("Bash Script")
+            Text("HTML")
                 .font(.system(size: 18.0, weight: .bold))
         }
         VStack(alignment: .leading) {
@@ -96,7 +92,7 @@ struct NewBashUtilityView: View {
                 
                 CodeEditor(
                     source: $viewModel.scriptCode,
-                    language: .bash,
+                    language: .javascript,
                     theme: .pojoaque,
                     fontSize: .constant(14.0),
                     flags: .defaultEditorFlags,
@@ -182,15 +178,14 @@ struct NewBashUtilityView: View {
                 BlueButton(title: "Save", font: .callout, padding: 12.0) {
                     delegate?.saveUtility(with:
                         .init(
-                            type: viewModel.type,
+                            type: .html,
                             page: currentPage ?? 1,
                             size: viewModel.size,
-                            path: viewModel.path,
                             id: viewModel.id ?? UUID().uuidString,
                             title: viewModel.title,
                             imageData: viewModel.selectedIcon?.toData,
                             scriptCode: viewModel.scriptCode,
-                            utilityType: .commandline,
+                            utilityType: .html,
                             showTitleOnIcon: viewModel.showTitleOnIcon,
                             category: viewModel.category
                         )

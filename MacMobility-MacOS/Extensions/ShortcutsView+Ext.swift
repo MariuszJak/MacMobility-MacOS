@@ -593,7 +593,7 @@ extension ShortcutsView {
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), showsSizePicker: false, item: item, delegate: viewModel) {
                     editUtilitiesWindow?.close()
                 })
                 editUtilitiesWindow?.contentView?.addSubview(hv.view)

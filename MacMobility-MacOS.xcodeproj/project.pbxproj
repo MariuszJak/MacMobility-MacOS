@@ -21,6 +21,9 @@
 		C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */; };
 		C035810E2DB65091009E22F5 /* VisualEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810D2DB65091009E22F5 /* VisualEffect.swift */; };
 		C035E5722DF7821E00D6F3B3 /* DependenciesInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */; };
+		C05B87202E6F584500A12E33 /* RaycastUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05B871F2E6F584500A12E33 /* RaycastUtilityView.swift */; };
+		C05B87232E6F586800A12E33 /* HTMLUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05B87222E6F586800A12E33 /* HTMLUtilityView.swift */; };
+		C05B87262E6F58C300A12E33 /* ItemSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05B87252E6F58C300A12E33 /* ItemSize.swift */; };
 		C05DA7382DAC103300BD4FBA /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA7372DAC103300BD4FBA /* AboutView.swift */; };
 		C05DA73A2DAC104A00BD4FBA /* UpdateScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */; };
 		C05DA73C2DAC106C00BD4FBA /* UpdatesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */; };
@@ -180,6 +183,9 @@
 		C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Ext.swift"; sourceTree = "<group>"; };
 		C035810D2DB65091009E22F5 /* VisualEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffect.swift; sourceTree = "<group>"; };
 		C035E5712DF7821E00D6F3B3 /* DependenciesInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependenciesInstallView.swift; sourceTree = "<group>"; };
+		C05B871F2E6F584500A12E33 /* RaycastUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaycastUtilityView.swift; sourceTree = "<group>"; };
+		C05B87222E6F586800A12E33 /* HTMLUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLUtilityView.swift; sourceTree = "<group>"; };
+		C05B87252E6F58C300A12E33 /* ItemSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemSize.swift; sourceTree = "<group>"; };
 		C05DA7372DAC103300BD4FBA /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		C05DA7392DAC104A00BD4FBA /* UpdateScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateScreenView.swift; sourceTree = "<group>"; };
 		C05DA73B2DAC106C00BD4FBA /* UpdatesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatesManager.swift; sourceTree = "<group>"; };
@@ -363,9 +369,35 @@
 			path = Icons;
 			sourceTree = "<group>";
 		};
+		C05B871E2E6F583E00A12E33 /* Raycast */ = {
+			isa = PBXGroup;
+			children = (
+				C05B871F2E6F584500A12E33 /* RaycastUtilityView.swift */,
+			);
+			path = Raycast;
+			sourceTree = "<group>";
+		};
+		C05B87212E6F586300A12E33 /* HTML */ = {
+			isa = PBXGroup;
+			children = (
+				C05B87222E6F586800A12E33 /* HTMLUtilityView.swift */,
+			);
+			path = HTML;
+			sourceTree = "<group>";
+		};
+		C05B87242E6F58BF00A12E33 /* Items */ = {
+			isa = PBXGroup;
+			children = (
+				C05B87252E6F58C300A12E33 /* ItemSize.swift */,
+			);
+			path = Items;
+			sourceTree = "<group>";
+		};
 		C05DA7362DAC102900BD4FBA /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C05B87212E6F586300A12E33 /* HTML */,
+				C05B871E2E6F583E00A12E33 /* Raycast */,
 				C068683A2E5A466200476900 /* UIControls */,
 				C0B1605B2E185C0A00C70CBD /* QuickActionMenu */,
 				C05DA7372DAC103300BD4FBA /* AboutView.swift */,
@@ -615,6 +647,7 @@
 		C0EAF9332D8B491700044947 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				C05B87242E6F58BF00A12E33 /* Items */,
 				C01CDF302E630AC60082665B /* IconSelector */,
 				C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */,
 				C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */,
@@ -893,12 +926,14 @@
 				C097755D2B5C31CA00F4FFE6 /* Array+Ext.swift in Sources */,
 				C0D21D632D7A259B00FEF931 /* CreateWorkspaceWithMultipleScreens.swift in Sources */,
 				C0D21D732D7B8F0400FEF931 /* ConnectionManager+Ext.swift in Sources */,
+				C05B87262E6F58C300A12E33 /* ItemSize.swift in Sources */,
 				C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */,
 				C097755F2B5C31D700F4FFE6 /* ConnectionManager.swift in Sources */,
 				C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */,
 				C065EC022DC0DE3E00000B8C /* JSONLoadable.swift in Sources */,
 				C0F767C02E5C808300D026EA /* Throttler.swift in Sources */,
 				C06868402E5A48E300476900 /* UIControlCreateListView.swift in Sources */,
+				C05B87202E6F584500A12E33 /* RaycastUtilityView.swift in Sources */,
 				C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */,
 				C0D21D672D7A25D700FEF931 /* ScreenItem.swift in Sources */,
 				C065EC082DC0DE8900000B8C /* ShortcutSection.swift in Sources */,
@@ -951,6 +986,7 @@
 				C0F67ED82D973E840090D568 /* ClientError.swift in Sources */,
 				C0E037012BA37FAC00BFBD2A /* WebpagesWindowView.swift in Sources */,
 				C0EAF93B2D8CC67600044947 /* NewMultiSelectionUtilityView.swift in Sources */,
+				C05B87232E6F586800A12E33 /* HTMLUtilityView.swift in Sources */,
 				C065EC042DC0DE5100000B8C /* ShortcutObject+Ext.swift in Sources */,
 				C0F767C72E5E2FDB00D026EA /* UIControlTestView.swift in Sources */,
 				C0F67EE22D973EF90090D568 /* URL+Ext.swift in Sources */,
