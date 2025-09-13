@@ -686,6 +686,26 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         return .init(page: page, indexes: neighboringIndexes, conflict: !conflict)
     }
     
+    func scaleObjectWithConflict(
+        for index: Int?,
+        page: Int,
+        size: CGSize?,
+        indexes: [Int],
+        id: String? = nil,
+        inGridWithColumns columns: Int = 7,
+        rows: Int = 3
+    ) -> NeighboringIndexes? {
+        guard let availableSpace = checkAvailableSpace(for: index, size: size) else {
+            return nil
+        }
+        let neighboringIndexes = availableSpace.0
+        let outOfBounds = availableSpace.1
+        
+        let configuredIndexes = configuredShortcuts.filter { $0.page == page }.filter { $0.id != id }.compactMap { $0.indexes }.flatMap { $0 }
+        let conflict = !(Set(indexes).intersection(configuredIndexes).isEmpty && !outOfBounds)
+        return .init(page: page, indexes: neighboringIndexes, conflict: conflict)
+    }
+    
     func neighboringIndexes(
         for index: Int?,
         size: CGSize?,
@@ -872,17 +892,43 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func saveUtility(with utilityItem: ShortcutObject) {
+        var canSave: Bool = true
+        let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == utilityItem.id })
+        configuredIndexes.forEach { configuredIndex in
+            let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: utilityItem.size) ?? []
+            if let neighboringIndexesWithConflict = scaleObjectWithConflict(
+                for: configuredShortcuts[configuredIndex].index,
+                page: configuredShortcuts[configuredIndex].page,
+                size: utilityItem.size,
+                indexes: indexes,
+                id: utilityItem.id
+            ) {
+                if canSave {
+                    canSave = !neighboringIndexesWithConflict.conflict
+                }
+            } else {
+                canSave = false
+            }
+        }
+        
+        guard canSave else {
+            connectionManager.localError = "Cannot save utility. Some other utility overlaps with this utility or it would go out of bounds."
+            connectionManager.showsLocalError = true
+            return
+        }
+        
         removeFromSections(with: utilityItem.id)
         if let index = utilities.firstIndex(where: { $0.id == utilityItem.id }) {
             utilities[index] = utilityItem
             let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == utilityItem.id })
             configuredIndexes.forEach { configuredIndex in
+                let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: utilityItem.size)
                 configuredShortcuts[configuredIndex] = .init(
                     type: utilityItem.type,
                     page: configuredShortcuts[configuredIndex].page,
                     index: configuredShortcuts[configuredIndex].index,
-                    indexes: configuredShortcuts[configuredIndex].indexes,
-                    size: configuredShortcuts[configuredIndex].size ?? .init(width: 1, height: 1),
+                    indexes: indexes,
+                    size: utilityItem.size,
                     path: utilityItem.path,
                     id: utilityItem.id,
                     title: utilityItem.title,

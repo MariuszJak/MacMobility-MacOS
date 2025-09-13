@@ -69,6 +69,14 @@ extension ItemSize {
     static var onlyRectangleSizes: [ItemSize] {
         [.size1x1, .size2x2, .size3x3]
     }
+    
+    static var onlyHorizontalSizes: [ItemSize] {
+        [.size1x1, .size2x1, .size3x1]
+    }
+    
+    static var onlyVerticalSizes: [ItemSize] {
+        [.size1x1, .size1x2, .size1x3]
+    }
 }
 
 extension CGSize {
