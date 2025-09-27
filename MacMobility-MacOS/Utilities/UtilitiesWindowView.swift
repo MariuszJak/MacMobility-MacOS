@@ -17,6 +17,8 @@ struct UtilitiesWindowView: View {
     @State private var newWindow: NSWindow?
     @State private var editUtilitiesWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
+    @State var uiControlCreateWindow: NSWindow?
+    @State var uiControlCreateTestWindow: NSWindow?
     @StateObject var viewModel: ShortcutsViewModel
     @State private var appNameToFlash: String = ""
     
@@ -297,6 +299,11 @@ struct UtilitiesWindowView: View {
                     editUtilitiesWindow?.contentView?.addSubview(hv.view)
                     hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                     hv.view.autoresizingMask = [.width, .height]
+                } else if item.type == .control {
+                    if let type = UIControlType.typeFromPath(item.path) {
+                        openCreateUIControlWindow(type: type, item: item)
+                    }
+                    return
                 } else {
                     let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                         editUtilitiesWindow?.close()
@@ -320,12 +327,19 @@ struct UtilitiesWindowView: View {
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), showsSizePicker: true, item: item, delegate: viewModel) {
-                    editUtilitiesWindow?.close()
-                })
-                editUtilitiesWindow?.contentView?.addSubview(hv.view)
-                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-                hv.view.autoresizingMask = [.width, .height]
+                if item.type == .control {
+                    if let type = UIControlType.typeFromPath(item.path) {
+                        openCreateUIControlWindow(type: type, item: item)
+                    }
+                    return
+                } else {
+                    let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), showsSizePicker: true, item: item, delegate: viewModel) {
+                        editUtilitiesWindow?.close()
+                    })
+                    editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                    hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                    hv.view.autoresizingMask = [.width, .height]
+                }
             case .macro:
                 let hv = NSHostingController(rootView: MacroRecorderView(item: item, delegate: viewModel){
                     editUtilitiesWindow?.close()
@@ -339,5 +353,87 @@ struct UtilitiesWindowView: View {
             editUtilitiesWindow?.makeKeyAndOrderFront(nil)
             return
         }
+    }
+    
+    func openCreateUIControlWindow(type: UIControlType, item: ShortcutObject) {
+        uiControlCreateWindow?.close()
+        uiControlCreateWindow = nil
+        if nil == uiControlCreateWindow {
+            uiControlCreateWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 850, height: 700),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            uiControlCreateWindow?.center()
+            uiControlCreateWindow?.setFrameAutosaveName("UIControlCreateWindow")
+            uiControlCreateWindow?.isReleasedWhenClosed = false
+            uiControlCreateWindow?.titlebarAppearsTransparent = true
+            uiControlCreateWindow?.appearance = NSAppearance(named: .darkAqua)
+            uiControlCreateWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlCreateWindow) else {
+                return
+            }
+            
+            uiControlCreateWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: UIControlCreateView(
+                type: type,
+                connectionManager: viewModel.connectionManager,
+                categories: viewModel.allCategories(),
+                item: item,
+                delegate: viewModel,
+                closeAction: { object in
+                    uiControlCreateWindow?.close()
+                    guard let object else { return }
+                    if let category = object.category {
+                        viewModel.expandSectionIfNeeded(for: category)
+                    }
+                    viewModel.saveUtility(with: object)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        viewModel.scrollToApp = object.title
+                    }
+                }, testAction: { payload in
+                    openCreateUIControlTestWindow(payload: payload)
+                }
+            ))
+            uiControlCreateWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = uiControlCreateWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        uiControlCreateWindow?.makeKeyAndOrderFront(nil)
+    }
+    
+    func openCreateUIControlTestWindow(payload: UIControlPayload) {
+        uiControlCreateTestWindow?.close()
+        uiControlCreateTestWindow = nil
+        if nil == uiControlCreateTestWindow {
+            uiControlCreateTestWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: payload.type.size.width * 120, height: payload.type.size.height * 120),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            uiControlCreateTestWindow?.center()
+            uiControlCreateTestWindow?.setFrameAutosaveName("UIControlCreateTestWindow")
+            uiControlCreateTestWindow?.isReleasedWhenClosed = false
+            uiControlCreateTestWindow?.titlebarAppearsTransparent = true
+            uiControlCreateTestWindow?.appearance = NSAppearance(named: .darkAqua)
+            uiControlCreateTestWindow?.styleMask.insert(.fullSizeContentView)
+            
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlCreateTestWindow) else {
+                return
+            }
+            
+            uiControlCreateTestWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: UIControlTestView(
+                payload: payload,
+                connectionManager: viewModel.connectionManager
+            ))
+            uiControlCreateTestWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = uiControlCreateTestWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+        }
+        uiControlCreateTestWindow?.makeKeyAndOrderFront(nil)
     }
 }

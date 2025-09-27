@@ -327,7 +327,7 @@ extension ShortcutsView {
         iconPickerWindow?.makeKeyAndOrderFront(nil)
     }
     
-    func openCreateUIControlWindow(type: UIControlType) {
+    func openCreateUIControlWindow(type: UIControlType, item: ShortcutObject? = nil) {
         uiControlCreateWindow?.close()
         uiControlCreateWindow = nil
         if nil == uiControlCreateWindow {
@@ -353,6 +353,7 @@ extension ShortcutsView {
                 type: type,
                 connectionManager: viewModel.connectionManager,
                 categories: viewModel.allCategories(),
+                item: item,
                 delegate: viewModel,
                 closeAction: { object in
                     uiControlCreateWindow?.close()
@@ -570,6 +571,11 @@ extension ShortcutsView {
                     editUtilitiesWindow?.contentView?.addSubview(hv.view)
                     hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                     hv.view.autoresizingMask = [.width, .height]
+                } else if item.type == .control {
+                    if let type = UIControlType.typeFromPath(item.path) {
+                        openCreateUIControlWindow(type: type, item: item)
+                    }
+                    return
                 } else {
                     let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
                         editUtilitiesWindow?.close()
@@ -593,12 +599,19 @@ extension ShortcutsView {
                 hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
                 hv.view.autoresizingMask = [.width, .height]
             case .automation:
-                let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), showsSizePicker: false, item: item, delegate: viewModel) {
-                    editUtilitiesWindow?.close()
-                })
-                editUtilitiesWindow?.contentView?.addSubview(hv.view)
-                hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
-                hv.view.autoresizingMask = [.width, .height]
+                if item.type == .control {
+                    if let type = UIControlType.typeFromPath(item.path) {
+                        openCreateUIControlWindow(type: type, item: item)
+                    }
+                    return
+                } else {
+                    let hv = NSHostingController(rootView: NewAutomationUtilityView(categories: viewModel.allCategories(), showsSizePicker: false, item: item, delegate: viewModel) {
+                        editUtilitiesWindow?.close()
+                    })
+                    editUtilitiesWindow?.contentView?.addSubview(hv.view)
+                    hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+                    hv.view.autoresizingMask = [.width, .height]
+                }
             case .macro:
                 let hv = NSHostingController(rootView: MacroRecorderView(item: item, delegate: viewModel){
                     editUtilitiesWindow?.close()

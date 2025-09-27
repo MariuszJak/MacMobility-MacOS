@@ -82,6 +82,9 @@ struct UIControlCreateView: View {
             if let data = item.imageData {
                 viewModel.selectedIcon = NSImage(data: data)
             }
+            if let initialScriptCode = item.color, !initialScriptCode.isEmpty {
+                viewModel.initialScriptCode = initialScriptCode
+            }
         }
     }
     

@@ -47,6 +47,11 @@
 		C068683E2E5A468100476900 /* UIControlsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C068683D2E5A468100476900 /* UIControlsListView.swift */; };
 		C06868402E5A48E300476900 /* UIControlCreateListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C068683F2E5A48E300476900 /* UIControlCreateListView.swift */; };
 		C06868422E5A4C3F00476900 /* UIControlCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06868412E5A4C3F00476900 /* UIControlCreateView.swift */; };
+		C06C04DB2E75FA9900D2DE99 /* button-colors-cyan.png in Resources */ = {isa = PBXBuildFile; fileRef = C06C04D62E75FA9900D2DE99 /* button-colors-cyan.png */; };
+		C06C04DC2E75FA9900D2DE99 /* button-colors-light-green.png in Resources */ = {isa = PBXBuildFile; fileRef = C06C04D82E75FA9900D2DE99 /* button-colors-light-green.png */; };
+		C06C04DD2E75FA9900D2DE99 /* button-colors-purple.png in Resources */ = {isa = PBXBuildFile; fileRef = C06C04DA2E75FA9900D2DE99 /* button-colors-purple.png */; };
+		C06C04DE2E75FA9900D2DE99 /* button-colors-dark-green.png in Resources */ = {isa = PBXBuildFile; fileRef = C06C04D72E75FA9900D2DE99 /* button-colors-dark-green.png */; };
+		C06C04DF2E75FA9900D2DE99 /* button-colors-orange.png in Resources */ = {isa = PBXBuildFile; fileRef = C06C04D92E75FA9900D2DE99 /* button-colors-orange.png */; };
 		C071D7102DB17C6E00ADD746 /* automations.json in Resources */ = {isa = PBXBuildFile; fileRef = C071D70F2DB17C6E00ADD746 /* automations.json */; };
 		C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071D7172DB43A3100ADD746 /* WelcomeView.swift */; };
 		C08BBAA22DD67D31007F561B /* TCPServerStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */; };
@@ -69,6 +74,43 @@
 		C09775672B5C31EE00F4FFE6 /* AppleScriptCommandable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09775652B5C31EE00F4FFE6 /* AppleScriptCommandable.swift */; };
 		C09775692B5C329300F4FFE6 /* scriptnext.scpt in Resources */ = {isa = PBXBuildFile; fileRef = C09775682B5C329300F4FFE6 /* scriptnext.scpt */; };
 		C097756F2B5C336B00F4FFE6 /* ConnectionSenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */; };
+		C09CB3552E8317A200225F5A /* color-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3532E8317A200225F5A /* color-2.png */; };
+		C09CB3562E8317A200225F5A /* color-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3542E8317A200225F5A /* color-3.png */; };
+		C09CB3572E8317A200225F5A /* color-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3522E8317A200225F5A /* color-1.png */; };
+		C09CB36B2E831A0A00225F5A /* color-20.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3682E831A0A00225F5A /* color-20.png */; };
+		C09CB36C2E831A0A00225F5A /* color-22.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB36A2E831A0A00225F5A /* color-22.png */; };
+		C09CB36D2E831A0A00225F5A /* color-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3582E831A0A00225F5A /* color-4.png */; };
+		C09CB36E2E831A0A00225F5A /* color-7.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB35B2E831A0A00225F5A /* color-7.png */; };
+		C09CB36F2E831A0A00225F5A /* color-17.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3652E831A0A00225F5A /* color-17.png */; };
+		C09CB3702E831A0A00225F5A /* color-19.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3672E831A0A00225F5A /* color-19.png */; };
+		C09CB3712E831A0A00225F5A /* color-11.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB35F2E831A0A00225F5A /* color-11.png */; };
+		C09CB3722E831A0A00225F5A /* color-21.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3692E831A0A00225F5A /* color-21.png */; };
+		C09CB3732E831A0A00225F5A /* color-12.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3602E831A0A00225F5A /* color-12.png */; };
+		C09CB3742E831A0A00225F5A /* color-14.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3622E831A0A00225F5A /* color-14.png */; };
+		C09CB3752E831A0A00225F5A /* color-8.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB35C2E831A0A00225F5A /* color-8.png */; };
+		C09CB3762E831A0A00225F5A /* color-5.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3592E831A0A00225F5A /* color-5.png */; };
+		C09CB3772E831A0A00225F5A /* color-6.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB35A2E831A0A00225F5A /* color-6.png */; };
+		C09CB3782E831A0A00225F5A /* color-9.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB35D2E831A0A00225F5A /* color-9.png */; };
+		C09CB3792E831A0A00225F5A /* color-10.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB35E2E831A0A00225F5A /* color-10.png */; };
+		C09CB37A2E831A0A00225F5A /* color-13.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3612E831A0A00225F5A /* color-13.png */; };
+		C09CB37B2E831A0A00225F5A /* color-15.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3632E831A0A00225F5A /* color-15.png */; };
+		C09CB37C2E831A0A00225F5A /* color-16.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3642E831A0A00225F5A /* color-16.png */; };
+		C09CB37D2E831A0A00225F5A /* color-18.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3662E831A0A00225F5A /* color-18.png */; };
+		C09CB37F2E831BA300225F5A /* soft-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB37E2E831BA300225F5A /* soft-1.png */; };
+		C09CB3882E831D7D00225F5A /* soft-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3812E831D7D00225F5A /* soft-3.png */; };
+		C09CB3892E831D7D00225F5A /* soft-5.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3832E831D7D00225F5A /* soft-5.png */; };
+		C09CB38A2E831D7D00225F5A /* soft-6.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3842E831D7D00225F5A /* soft-6.png */; };
+		C09CB38B2E831D7D00225F5A /* soft-10.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3872E831D7D00225F5A /* soft-10.png */; };
+		C09CB38C2E831D7D00225F5A /* soft-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3802E831D7D00225F5A /* soft-2.png */; };
+		C09CB38D2E831D7D00225F5A /* soft-7.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3852E831D7D00225F5A /* soft-7.png */; };
+		C09CB38E2E831D7D00225F5A /* soft-8.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3862E831D7D00225F5A /* soft-8.png */; };
+		C09CB38F2E831D7D00225F5A /* soft-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3822E831D7D00225F5A /* soft-4.png */; };
+		C09CB3912E83208500225F5A /* cyberpunk-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3902E83208500225F5A /* cyberpunk-1.png */; };
+		C09CB3932E8322E000225F5A /* cyberpunk-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3922E8322E000225F5A /* cyberpunk-2.png */; };
+		C09CB3952E8325D500225F5A /* cyberpunk-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3942E8325D500225F5A /* cyberpunk-3.png */; };
+		C09CB3972E83272200225F5A /* cyberpunk-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3962E83272200225F5A /* cyberpunk-4.png */; };
+		C09CB39A2E83295600225F5A /* cyberpunk-6.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3992E83295600225F5A /* cyberpunk-6.png */; };
+		C09CB39B2E83295600225F5A /* cyberpunk-5.png in Resources */ = {isa = PBXBuildFile; fileRef = C09CB3982E83295600225F5A /* cyberpunk-5.png */; };
 		C0B1605A2E185BF100C70CBD /* QuickActionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */; };
 		C0B1605E2E185C1C00C70CBD /* CircleSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */; };
 		C0B160602E185C4D00C70CBD /* CircleSliceShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */; };
@@ -209,6 +251,11 @@
 		C068683D2E5A468100476900 /* UIControlsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlsListView.swift; sourceTree = "<group>"; };
 		C068683F2E5A48E300476900 /* UIControlCreateListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlCreateListView.swift; sourceTree = "<group>"; };
 		C06868412E5A4C3F00476900 /* UIControlCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlCreateView.swift; sourceTree = "<group>"; };
+		C06C04D62E75FA9900D2DE99 /* button-colors-cyan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-cyan.png"; sourceTree = "<group>"; };
+		C06C04D72E75FA9900D2DE99 /* button-colors-dark-green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-dark-green.png"; sourceTree = "<group>"; };
+		C06C04D82E75FA9900D2DE99 /* button-colors-light-green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-light-green.png"; sourceTree = "<group>"; };
+		C06C04D92E75FA9900D2DE99 /* button-colors-orange.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-orange.png"; sourceTree = "<group>"; };
+		C06C04DA2E75FA9900D2DE99 /* button-colors-purple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-purple.png"; sourceTree = "<group>"; };
 		C071D70F2DB17C6E00ADD746 /* automations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = automations.json; sourceTree = "<group>"; };
 		C071D7172DB43A3100ADD746 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "MacMobility-MacOSDebug.entitlements"; sourceTree = "<group>"; };
@@ -238,6 +285,43 @@
 		C09775682B5C329300F4FFE6 /* scriptnext.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scriptnext.scpt; sourceTree = "<group>"; };
 		C097756A2B5C32AA00F4FFE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C097756E2B5C336B00F4FFE6 /* ConnectionSenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionSenable.swift; sourceTree = "<group>"; };
+		C09CB3522E8317A200225F5A /* color-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-1.png"; sourceTree = "<group>"; };
+		C09CB3532E8317A200225F5A /* color-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-2.png"; sourceTree = "<group>"; };
+		C09CB3542E8317A200225F5A /* color-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-3.png"; sourceTree = "<group>"; };
+		C09CB3582E831A0A00225F5A /* color-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-4.png"; sourceTree = "<group>"; };
+		C09CB3592E831A0A00225F5A /* color-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-5.png"; sourceTree = "<group>"; };
+		C09CB35A2E831A0A00225F5A /* color-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-6.png"; sourceTree = "<group>"; };
+		C09CB35B2E831A0A00225F5A /* color-7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-7.png"; sourceTree = "<group>"; };
+		C09CB35C2E831A0A00225F5A /* color-8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-8.png"; sourceTree = "<group>"; };
+		C09CB35D2E831A0A00225F5A /* color-9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-9.png"; sourceTree = "<group>"; };
+		C09CB35E2E831A0A00225F5A /* color-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-10.png"; sourceTree = "<group>"; };
+		C09CB35F2E831A0A00225F5A /* color-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-11.png"; sourceTree = "<group>"; };
+		C09CB3602E831A0A00225F5A /* color-12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-12.png"; sourceTree = "<group>"; };
+		C09CB3612E831A0A00225F5A /* color-13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-13.png"; sourceTree = "<group>"; };
+		C09CB3622E831A0A00225F5A /* color-14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-14.png"; sourceTree = "<group>"; };
+		C09CB3632E831A0A00225F5A /* color-15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-15.png"; sourceTree = "<group>"; };
+		C09CB3642E831A0A00225F5A /* color-16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-16.png"; sourceTree = "<group>"; };
+		C09CB3652E831A0A00225F5A /* color-17.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-17.png"; sourceTree = "<group>"; };
+		C09CB3662E831A0A00225F5A /* color-18.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-18.png"; sourceTree = "<group>"; };
+		C09CB3672E831A0A00225F5A /* color-19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-19.png"; sourceTree = "<group>"; };
+		C09CB3682E831A0A00225F5A /* color-20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-20.png"; sourceTree = "<group>"; };
+		C09CB3692E831A0A00225F5A /* color-21.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-21.png"; sourceTree = "<group>"; };
+		C09CB36A2E831A0A00225F5A /* color-22.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "color-22.png"; sourceTree = "<group>"; };
+		C09CB37E2E831BA300225F5A /* soft-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-1.png"; sourceTree = "<group>"; };
+		C09CB3802E831D7D00225F5A /* soft-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-2.png"; sourceTree = "<group>"; };
+		C09CB3812E831D7D00225F5A /* soft-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-3.png"; sourceTree = "<group>"; };
+		C09CB3822E831D7D00225F5A /* soft-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-4.png"; sourceTree = "<group>"; };
+		C09CB3832E831D7D00225F5A /* soft-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-5.png"; sourceTree = "<group>"; };
+		C09CB3842E831D7D00225F5A /* soft-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-6.png"; sourceTree = "<group>"; };
+		C09CB3852E831D7D00225F5A /* soft-7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-7.png"; sourceTree = "<group>"; };
+		C09CB3862E831D7D00225F5A /* soft-8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-8.png"; sourceTree = "<group>"; };
+		C09CB3872E831D7D00225F5A /* soft-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "soft-10.png"; sourceTree = "<group>"; };
+		C09CB3902E83208500225F5A /* cyberpunk-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyberpunk-1.png"; sourceTree = "<group>"; };
+		C09CB3922E8322E000225F5A /* cyberpunk-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyberpunk-2.png"; sourceTree = "<group>"; };
+		C09CB3942E8325D500225F5A /* cyberpunk-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyberpunk-3.png"; sourceTree = "<group>"; };
+		C09CB3962E83272200225F5A /* cyberpunk-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyberpunk-4.png"; sourceTree = "<group>"; };
+		C09CB3982E83295600225F5A /* cyberpunk-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyberpunk-5.png"; sourceTree = "<group>"; };
+		C09CB3992E83295600225F5A /* cyberpunk-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyberpunk-6.png"; sourceTree = "<group>"; };
 		C0B160592E185BF100C70CBD /* QuickActionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewModel.swift; sourceTree = "<group>"; };
 		C0B1605D2E185C1C00C70CBD /* CircleSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSlice.swift; sourceTree = "<group>"; };
 		C0B1605F2E185C4D00C70CBD /* CircleSliceShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleSliceShape.swift; sourceTree = "<group>"; };
@@ -359,6 +443,48 @@
 		C01CDF352E630E290082665B /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				C09CB3982E83295600225F5A /* cyberpunk-5.png */,
+				C09CB3992E83295600225F5A /* cyberpunk-6.png */,
+				C09CB3962E83272200225F5A /* cyberpunk-4.png */,
+				C09CB3942E8325D500225F5A /* cyberpunk-3.png */,
+				C09CB3922E8322E000225F5A /* cyberpunk-2.png */,
+				C09CB3902E83208500225F5A /* cyberpunk-1.png */,
+				C09CB3802E831D7D00225F5A /* soft-2.png */,
+				C09CB3812E831D7D00225F5A /* soft-3.png */,
+				C09CB3822E831D7D00225F5A /* soft-4.png */,
+				C09CB3832E831D7D00225F5A /* soft-5.png */,
+				C09CB3842E831D7D00225F5A /* soft-6.png */,
+				C09CB3852E831D7D00225F5A /* soft-7.png */,
+				C09CB3862E831D7D00225F5A /* soft-8.png */,
+				C09CB3872E831D7D00225F5A /* soft-10.png */,
+				C09CB37E2E831BA300225F5A /* soft-1.png */,
+				C09CB3582E831A0A00225F5A /* color-4.png */,
+				C09CB3592E831A0A00225F5A /* color-5.png */,
+				C09CB35A2E831A0A00225F5A /* color-6.png */,
+				C09CB35B2E831A0A00225F5A /* color-7.png */,
+				C09CB35C2E831A0A00225F5A /* color-8.png */,
+				C09CB35D2E831A0A00225F5A /* color-9.png */,
+				C09CB35E2E831A0A00225F5A /* color-10.png */,
+				C09CB35F2E831A0A00225F5A /* color-11.png */,
+				C09CB3602E831A0A00225F5A /* color-12.png */,
+				C09CB3612E831A0A00225F5A /* color-13.png */,
+				C09CB3622E831A0A00225F5A /* color-14.png */,
+				C09CB3632E831A0A00225F5A /* color-15.png */,
+				C09CB3642E831A0A00225F5A /* color-16.png */,
+				C09CB3652E831A0A00225F5A /* color-17.png */,
+				C09CB3662E831A0A00225F5A /* color-18.png */,
+				C09CB3672E831A0A00225F5A /* color-19.png */,
+				C09CB3682E831A0A00225F5A /* color-20.png */,
+				C09CB3692E831A0A00225F5A /* color-21.png */,
+				C09CB36A2E831A0A00225F5A /* color-22.png */,
+				C09CB3522E8317A200225F5A /* color-1.png */,
+				C09CB3532E8317A200225F5A /* color-2.png */,
+				C09CB3542E8317A200225F5A /* color-3.png */,
+				C06C04D62E75FA9900D2DE99 /* button-colors-cyan.png */,
+				C06C04D72E75FA9900D2DE99 /* button-colors-dark-green.png */,
+				C06C04D82E75FA9900D2DE99 /* button-colors-light-green.png */,
+				C06C04D92E75FA9900D2DE99 /* button-colors-orange.png */,
+				C06C04DA2E75FA9900D2DE99 /* button-colors-purple.png */,
 				C01CDF4C2E647A560082665B /* cyber-button-1.png */,
 				C01CDF4D2E647A560082665B /* cyber-button-2.png */,
 				C01CDF442E6470B40082665B /* button-gray-main.png */,
@@ -847,14 +973,28 @@
 				C09775692B5C329300F4FFE6 /* scriptnext.scpt in Resources */,
 				C0F67F1D2D9833030090D568 /* Live Text Extractor.shortcut in Resources */,
 				C0F67EF32D981CAD0090D568 /* Upcoming Events.shortcut in Resources */,
+				C09CB3972E83272200225F5A /* cyberpunk-4.png in Resources */,
 				C09775372B5C319E00F4FFE6 /* Preview Assets.xcassets in Resources */,
 				C0F67F062D982E990090D568 /* ANC ON.shortcut in Resources */,
 				C0B160782E22758A00C70CBD /* QAM-1.mp4 in Resources */,
 				C0F67F072D982E990090D568 /* Live Photo to GIF.shortcut in Resources */,
 				C0B160732E22753D00C70CBD /* QAM-3.mp4 in Resources */,
 				C01CDF482E6470B40082665B /* button-option-orange.png in Resources */,
+				C09CB3552E8317A200225F5A /* color-2.png in Resources */,
+				C09CB3562E8317A200225F5A /* color-3.png in Resources */,
+				C09CB3912E83208500225F5A /* cyberpunk-1.png in Resources */,
+				C09CB3572E8317A200225F5A /* color-1.png in Resources */,
 				C01CDF492E6470B40082665B /* button-main-orange.png in Resources */,
+				C09CB3882E831D7D00225F5A /* soft-3.png in Resources */,
+				C09CB3892E831D7D00225F5A /* soft-5.png in Resources */,
+				C09CB38A2E831D7D00225F5A /* soft-6.png in Resources */,
+				C09CB38B2E831D7D00225F5A /* soft-10.png in Resources */,
+				C09CB38C2E831D7D00225F5A /* soft-2.png in Resources */,
+				C09CB38D2E831D7D00225F5A /* soft-7.png in Resources */,
+				C09CB38E2E831D7D00225F5A /* soft-8.png in Resources */,
+				C09CB38F2E831D7D00225F5A /* soft-4.png in Resources */,
 				C01CDF4A2E6470B40082665B /* button-gray-main.png in Resources */,
+				C09CB3932E8322E000225F5A /* cyberpunk-2.png in Resources */,
 				C01CDF4B2E6470B40082665B /* button-round-gray.png in Resources */,
 				C0B160752E22753D00C70CBD /* QAM-2.mp4 in Resources */,
 				C0B160762E22753D00C70CBD /* QAM-4.mp4 in Resources */,
@@ -871,10 +1011,38 @@
 				C0F67F0E2D982E990090D568 /* PDF to Markdown.shortcut in Resources */,
 				C01CDF4E2E647A560082665B /* cyber-button-2.png in Resources */,
 				C01CDF4F2E647A560082665B /* cyber-button-1.png in Resources */,
+				C06C04DB2E75FA9900D2DE99 /* button-colors-cyan.png in Resources */,
+				C06C04DC2E75FA9900D2DE99 /* button-colors-light-green.png in Resources */,
+				C06C04DD2E75FA9900D2DE99 /* button-colors-purple.png in Resources */,
+				C06C04DE2E75FA9900D2DE99 /* button-colors-dark-green.png in Resources */,
+				C09CB36B2E831A0A00225F5A /* color-20.png in Resources */,
+				C09CB36C2E831A0A00225F5A /* color-22.png in Resources */,
+				C09CB36D2E831A0A00225F5A /* color-4.png in Resources */,
+				C09CB3952E8325D500225F5A /* cyberpunk-3.png in Resources */,
+				C09CB36E2E831A0A00225F5A /* color-7.png in Resources */,
+				C09CB36F2E831A0A00225F5A /* color-17.png in Resources */,
+				C09CB3702E831A0A00225F5A /* color-19.png in Resources */,
+				C09CB3712E831A0A00225F5A /* color-11.png in Resources */,
+				C09CB3722E831A0A00225F5A /* color-21.png in Resources */,
+				C09CB3732E831A0A00225F5A /* color-12.png in Resources */,
+				C09CB3742E831A0A00225F5A /* color-14.png in Resources */,
+				C09CB3752E831A0A00225F5A /* color-8.png in Resources */,
+				C09CB3762E831A0A00225F5A /* color-5.png in Resources */,
+				C09CB3772E831A0A00225F5A /* color-6.png in Resources */,
+				C09CB3782E831A0A00225F5A /* color-9.png in Resources */,
+				C09CB3792E831A0A00225F5A /* color-10.png in Resources */,
+				C09CB37A2E831A0A00225F5A /* color-13.png in Resources */,
+				C09CB37B2E831A0A00225F5A /* color-15.png in Resources */,
+				C09CB39A2E83295600225F5A /* cyberpunk-6.png in Resources */,
+				C09CB39B2E83295600225F5A /* cyberpunk-5.png in Resources */,
+				C09CB37C2E831A0A00225F5A /* color-16.png in Resources */,
+				C09CB37D2E831A0A00225F5A /* color-18.png in Resources */,
+				C06C04DF2E75FA9900D2DE99 /* button-colors-orange.png in Resources */,
 				C0F67F0F2D982E990090D568 /* Save App Store Screenshots.shortcut in Resources */,
 				C0F67F102D982E990090D568 /* Days Until....shortcut in Resources */,
 				C0F67F112D982E990090D568 /* EXIF Inspector.shortcut in Resources */,
 				C0F67F122D982E990090D568 /* Convert to JPEG and Copy.shortcut in Resources */,
+				C09CB37F2E831BA300225F5A /* soft-1.png in Resources */,
 				C0F67F132D982E990090D568 /* Show Clipboard.shortcut in Resources */,
 				C01CDF432E6377030082665B /* structure.json in Resources */,
 				C0C9B7912DCD31E90068BCAB /* mac-connect.mp4 in Resources */,

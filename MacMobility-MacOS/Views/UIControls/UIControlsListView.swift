@@ -21,12 +21,12 @@ struct UIControlsListView: View {
             id: UUID(),
             title: "Volume Slider",
             description: "Control Volume of your MacBook with elegant slider",
-            shortcut: .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 1), path: "control:horizontal-slider", id: "volume-control-ver-1", title: "Volume Slider", color: nil, faviconLink: "slider-icon", browser: nil, imageData: NSImage(named: "slider-icon")?.toData, scriptCode: "osascript -e \"set volume output volume %d\"", utilityType: .commandline, objects: nil, showTitleOnIcon: false, category: "MacOS")),
+            shortcut: .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 3, height: 1), path: UIControlType.slider.path, id: "volume-control-ver-1", title: "Volume Slider", color: "osascript -e \"output volume of (get volume settings)\"", faviconLink: "slider-icon", browser: nil, imageData: NSImage(named: "slider-icon")?.toData, scriptCode: "osascript -e \"set volume output volume %d\"", utilityType: .commandline, objects: nil, showTitleOnIcon: false, category: "MacOS")),
         .init(
             id: UUID(),
             title: "Volume Knob",
             description: "Control Volume of your MacBook with elegant knob",
-            shortcut: .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 2, height: 2), path: "control:rotary-knob", id: "rotary-knob-ver-2", title: "Volume Knob", color: nil, faviconLink: "knob-icon", browser: nil, imageData: NSImage(named: "knob-icon")?.toData, scriptCode: "", utilityType: .automation, objects: nil, showTitleOnIcon: false, category: "MacOS")
+            shortcut: .init(type: .control, page: 1, index: nil, indexes: [], size: .init(width: 2, height: 2), path: UIControlType.knob.path, id: "rotary-knob-ver-2", title: "Volume Knob", color: "osascript -e \"output volume of (get volume settings)\"", faviconLink: "knob-icon", browser: nil, imageData: NSImage(named: "knob-icon")?.toData, scriptCode: "osascript -e \"set volume output volume %d\"", utilityType: .commandline, objects: nil, showTitleOnIcon: false, category: "MacOS")
         )
     ]
     

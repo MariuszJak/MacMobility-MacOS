@@ -725,10 +725,10 @@ struct ShortcutsView: View {
                     }
                 }
             } else if object.type == .control {
-                if object.path == "control:horizontal-slider" {
+                if object.path == UIControlType.slider.path {
                     BrightnessVolumeContainerView()
                         .frame(width: size.width, height: size.height)
-                } else if object.path == "control:rotary-knob" {
+                } else if object.path == UIControlType.knob.path {
                     RotaryKnobIcon()
                         .frame(width: size.width, height: size.height)
                 } else {

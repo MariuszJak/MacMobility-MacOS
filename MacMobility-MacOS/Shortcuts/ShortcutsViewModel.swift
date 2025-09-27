@@ -10,6 +10,12 @@ import Combine
 import UniformTypeIdentifiers
 import MultipeerConnectivity
 
+import Foundation
+import Network
+import ScreenCaptureKit
+import CoreImage
+import CoreGraphics
+
 struct AssignedAppsToPages: Codable {
     var page: Int
     let appPath: String
@@ -95,6 +101,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         fetchInstalledApps()
         registerListener()
         startMonitoring()
+        migrateConfiguredShortcuts()
             
         $currentlyTargetedIndex
             .receive(on: DispatchQueue.main)
@@ -146,6 +153,14 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             self.updateDependenciesOfObject(with: self.idOfObjectToReplaceDependencies, replacements: updates)
         }
         runInitialScriptsIfNeeded()
+    }
+    
+    func migrateConfiguredShortcuts() {
+        configuredShortcuts.enumerated().forEach { (index, object) in
+            if object.size == nil {
+                configuredShortcuts[index].size = .init(width: 1, height: 1)
+            }
+        }
     }
     
     func runInitialScriptsIfNeeded() {

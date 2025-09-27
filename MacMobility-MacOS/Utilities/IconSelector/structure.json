@@ -2,19 +2,74 @@
   "name": ".",
   "subfolders": [
   {
-    "name": "Buttons",
-    "subfolders": [
-    {
-      "name": "FutureRetro",
-      "images": [
-        "button-gray-main.png",
-        "button-main-orange.png",
-        "button-option-orange.png",
-        "button-round-gray.png",
-        "cyber-button-1.png",
-        "cyber-button-2.png"
-      ]
-    }
+    "name": "Colors",
+    "images": [
+      "button-colors-cyan.png",
+      "button-colors-dark-green.png",
+      "button-colors-light-green.png",
+      "button-colors-orange.png",
+      "button-colors-purple.png"
+    ]
+  },
+  {
+    "name": "Cyberpunk",
+    "images": [
+      "cyberpunk-1.png",
+      "cyberpunk-2.png",
+      "cyberpunk-3.png",
+      "cyberpunk-4.png",
+      "cyberpunk-5.png",
+      "cyberpunk-6.png"
+    ]
+  },
+  {
+    "name": "FutureRetro",
+    "images": [
+      "button-gray-main.png",
+      "button-main-orange.png",
+      "button-option-orange.png",
+      "button-round-gray.png"
+    ]
+  },
+  {
+    "name": "Pill-Color",
+    "images": [
+      "color-1.png",
+      "color-10.png",
+      "color-11.png",
+      "color-12.png",
+      "color-13.png",
+      "color-14.png",
+      "color-15.png",
+      "color-16.png",
+      "color-17.png",
+      "color-18.png",
+      "color-19.png",
+      "color-2.png",
+      "color-20.png",
+      "color-21.png",
+      "color-22.png",
+      "color-3.png",
+      "color-4.png",
+      "color-5.png",
+      "color-6.png",
+      "color-7.png",
+      "color-8.png",
+      "color-9.png"
+    ]
+  },
+  {
+    "name": "Soft",
+    "images": [
+      "soft-1.png",
+      "soft-10.png",
+      "soft-2.png",
+      "soft-3.png",
+      "soft-4.png",
+      "soft-5.png",
+      "soft-6.png",
+      "soft-7.png",
+      "soft-8.png"
     ]
   }
   ]

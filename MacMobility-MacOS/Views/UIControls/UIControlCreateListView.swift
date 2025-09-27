@@ -45,6 +45,17 @@ enum UIControlType {
             return "control:rotary-knob"
         }
     }
+    
+    static func typeFromPath(_ path: String?) -> UIControlType? {
+        guard let path else { return nil }
+        if path == UIControlType.knob.path {
+            return .knob
+        } else if path == UIControlType.slider.path {
+            return .slider
+        } else {
+            return nil
+        }
+    }
 }
 
 struct UIControlCreateListView: View {

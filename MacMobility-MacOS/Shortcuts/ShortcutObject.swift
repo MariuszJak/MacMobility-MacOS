@@ -172,7 +172,7 @@ public struct ShortcutObject: Identifiable, Codable, Equatable {
     public var objects: [ShortcutObject]?
     public var showTitleOnIcon: Bool?
     public var category: String?
-    public let size: CGSize?
+    public var size: CGSize?
     
     public init(
         type: ShortcutType,
