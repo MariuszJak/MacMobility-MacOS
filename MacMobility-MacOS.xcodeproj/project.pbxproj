@@ -28,6 +28,30 @@
 		C02F16232E8943000012A888 /* button-colors-9.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16202E8943000012A888 /* button-colors-9.png */; };
 		C02F16242E8943000012A888 /* button-colors-11.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16222E8943000012A888 /* button-colors-11.png */; };
 		C02F16252E8943000012A888 /* button-colors-10.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16212E8943000012A888 /* button-colors-10.png */; };
+		C02F162E2E89C8220012A888 /* fantasy-8.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F162D2E89C8220012A888 /* fantasy-8.png */; };
+		C02F162F2E89C8220012A888 /* fantasy-6.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F162B2E89C8220012A888 /* fantasy-6.png */; };
+		C02F16302E89C8220012A888 /* fantasy-7.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F162C2E89C8220012A888 /* fantasy-7.png */; };
+		C02F16312E89C8220012A888 /* fantasy-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16292E89C8220012A888 /* fantasy-4.png */; };
+		C02F16322E89C8220012A888 /* fantasy-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16272E89C8220012A888 /* fantasy-2.png */; };
+		C02F16332E89C8220012A888 /* fantasy-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16282E89C8220012A888 /* fantasy-3.png */; };
+		C02F16342E89C8220012A888 /* fantasy-5.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F162A2E89C8220012A888 /* fantasy-5.png */; };
+		C02F16352E89C8220012A888 /* fantasy-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16262E89C8220012A888 /* fantasy-1.png */; };
+		C02F163A2E89CCC30012A888 /* keyboard-key-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16362E89CCC30012A888 /* keyboard-key-1.png */; };
+		C02F163B2E89CCC30012A888 /* keyboard-key-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16382E89CCC30012A888 /* keyboard-key-3.png */; };
+		C02F163C2E89CCC30012A888 /* keyboard-key-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16392E89CCC30012A888 /* keyboard-key-4.png */; };
+		C02F163D2E89CCC30012A888 /* keyboard-key-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16372E89CCC30012A888 /* keyboard-key-2.png */; };
+		C02F16622E89CDEF0012A888 /* emoji-6.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165B2E89CDEF0012A888 /* emoji-6.png */; };
+		C02F16632E89CDEF0012A888 /* emoji-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16582E89CDEF0012A888 /* emoji-3.png */; };
+		C02F16642E89CDEF0012A888 /* emoji-10.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165F2E89CDEF0012A888 /* emoji-10.png */; };
+		C02F16652E89CDEF0012A888 /* emoji-7.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165C2E89CDEF0012A888 /* emoji-7.png */; };
+		C02F16662E89CDEF0012A888 /* emoji-11.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16602E89CDEF0012A888 /* emoji-11.png */; };
+		C02F16672E89CDEF0012A888 /* emoji-9.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165E2E89CDEF0012A888 /* emoji-9.png */; };
+		C02F16682E89CDEF0012A888 /* emoji-12.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16612E89CDEF0012A888 /* emoji-12.png */; };
+		C02F16692E89CDEF0012A888 /* emoji-8.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165D2E89CDEF0012A888 /* emoji-8.png */; };
+		C02F166A2E89CDEF0012A888 /* emoji-5.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165A2E89CDEF0012A888 /* emoji-5.png */; };
+		C02F166B2E89CDEF0012A888 /* emoji-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16562E89CDEF0012A888 /* emoji-1.png */; };
+		C02F166C2E89CDEF0012A888 /* emoji-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16572E89CDEF0012A888 /* emoji-2.png */; };
+		C02F166D2E89CDEF0012A888 /* emoji-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16592E89CDEF0012A888 /* emoji-4.png */; };
 		C03581082DB6501E009E22F5 /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581072DB6501E009E22F5 /* IconPickerView.swift */; };
 		C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */; };
 		C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */; };
@@ -295,6 +319,30 @@
 		C02F16202E8943000012A888 /* button-colors-9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-9.png"; sourceTree = "<group>"; };
 		C02F16212E8943000012A888 /* button-colors-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-10.png"; sourceTree = "<group>"; };
 		C02F16222E8943000012A888 /* button-colors-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-11.png"; sourceTree = "<group>"; };
+		C02F16262E89C8220012A888 /* fantasy-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fantasy-1.png"; sourceTree = "<group>"; };
+		C02F16272E89C8220012A888 /* fantasy-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fantasy-2.png"; sourceTree = "<group>"; };
+		C02F16282E89C8220012A888 /* fantasy-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fantasy-3.png"; sourceTree = "<group>"; };
+		C02F16292E89C8220012A888 /* fantasy-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fantasy-4.png"; sourceTree = "<group>"; };
+		C02F162A2E89C8220012A888 /* fantasy-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fantasy-5.png"; sourceTree = "<group>"; };
+		C02F162B2E89C8220012A888 /* fantasy-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fantasy-6.png"; sourceTree = "<group>"; };
+		C02F162C2E89C8220012A888 /* fantasy-7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fantasy-7.png"; sourceTree = "<group>"; };
+		C02F162D2E89C8220012A888 /* fantasy-8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fantasy-8.png"; sourceTree = "<group>"; };
+		C02F16362E89CCC30012A888 /* keyboard-key-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyboard-key-1.png"; sourceTree = "<group>"; };
+		C02F16372E89CCC30012A888 /* keyboard-key-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyboard-key-2.png"; sourceTree = "<group>"; };
+		C02F16382E89CCC30012A888 /* keyboard-key-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyboard-key-3.png"; sourceTree = "<group>"; };
+		C02F16392E89CCC30012A888 /* keyboard-key-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyboard-key-4.png"; sourceTree = "<group>"; };
+		C02F16562E89CDEF0012A888 /* emoji-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-1.png"; sourceTree = "<group>"; };
+		C02F16572E89CDEF0012A888 /* emoji-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-2.png"; sourceTree = "<group>"; };
+		C02F16582E89CDEF0012A888 /* emoji-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-3.png"; sourceTree = "<group>"; };
+		C02F16592E89CDEF0012A888 /* emoji-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-4.png"; sourceTree = "<group>"; };
+		C02F165A2E89CDEF0012A888 /* emoji-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-5.png"; sourceTree = "<group>"; };
+		C02F165B2E89CDEF0012A888 /* emoji-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-6.png"; sourceTree = "<group>"; };
+		C02F165C2E89CDEF0012A888 /* emoji-7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-7.png"; sourceTree = "<group>"; };
+		C02F165D2E89CDEF0012A888 /* emoji-8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-8.png"; sourceTree = "<group>"; };
+		C02F165E2E89CDEF0012A888 /* emoji-9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-9.png"; sourceTree = "<group>"; };
+		C02F165F2E89CDEF0012A888 /* emoji-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-10.png"; sourceTree = "<group>"; };
+		C02F16602E89CDEF0012A888 /* emoji-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-11.png"; sourceTree = "<group>"; };
+		C02F16612E89CDEF0012A888 /* emoji-12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-12.png"; sourceTree = "<group>"; };
 		C03581072DB6501E009E22F5 /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
 		C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerViewModel.swift; sourceTree = "<group>"; };
 		C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Ext.swift"; sourceTree = "<group>"; };
@@ -569,6 +617,30 @@
 		C01CDF352E630E290082665B /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				C02F16562E89CDEF0012A888 /* emoji-1.png */,
+				C02F16572E89CDEF0012A888 /* emoji-2.png */,
+				C02F16582E89CDEF0012A888 /* emoji-3.png */,
+				C02F16592E89CDEF0012A888 /* emoji-4.png */,
+				C02F165A2E89CDEF0012A888 /* emoji-5.png */,
+				C02F165B2E89CDEF0012A888 /* emoji-6.png */,
+				C02F165C2E89CDEF0012A888 /* emoji-7.png */,
+				C02F165D2E89CDEF0012A888 /* emoji-8.png */,
+				C02F165E2E89CDEF0012A888 /* emoji-9.png */,
+				C02F165F2E89CDEF0012A888 /* emoji-10.png */,
+				C02F16602E89CDEF0012A888 /* emoji-11.png */,
+				C02F16612E89CDEF0012A888 /* emoji-12.png */,
+				C02F16362E89CCC30012A888 /* keyboard-key-1.png */,
+				C02F16372E89CCC30012A888 /* keyboard-key-2.png */,
+				C02F16382E89CCC30012A888 /* keyboard-key-3.png */,
+				C02F16392E89CCC30012A888 /* keyboard-key-4.png */,
+				C02F16262E89C8220012A888 /* fantasy-1.png */,
+				C02F16272E89C8220012A888 /* fantasy-2.png */,
+				C02F16282E89C8220012A888 /* fantasy-3.png */,
+				C02F16292E89C8220012A888 /* fantasy-4.png */,
+				C02F162A2E89C8220012A888 /* fantasy-5.png */,
+				C02F162B2E89C8220012A888 /* fantasy-6.png */,
+				C02F162C2E89C8220012A888 /* fantasy-7.png */,
+				C02F162D2E89C8220012A888 /* fantasy-8.png */,
 				C02F16202E8943000012A888 /* button-colors-9.png */,
 				C02F16212E8943000012A888 /* button-colors-10.png */,
 				C02F16222E8943000012A888 /* button-colors-11.png */,
@@ -1198,6 +1270,18 @@
 				C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */,
 				C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */,
 				C0C9B7942DCD35AD0068BCAB /* ipad-connect.mp4 in Resources */,
+				C02F16622E89CDEF0012A888 /* emoji-6.png in Resources */,
+				C02F16632E89CDEF0012A888 /* emoji-3.png in Resources */,
+				C02F16642E89CDEF0012A888 /* emoji-10.png in Resources */,
+				C02F16652E89CDEF0012A888 /* emoji-7.png in Resources */,
+				C02F16662E89CDEF0012A888 /* emoji-11.png in Resources */,
+				C02F16672E89CDEF0012A888 /* emoji-9.png in Resources */,
+				C02F16682E89CDEF0012A888 /* emoji-12.png in Resources */,
+				C02F16692E89CDEF0012A888 /* emoji-8.png in Resources */,
+				C02F166A2E89CDEF0012A888 /* emoji-5.png in Resources */,
+				C02F166B2E89CDEF0012A888 /* emoji-1.png in Resources */,
+				C02F166C2E89CDEF0012A888 /* emoji-2.png in Resources */,
+				C02F166D2E89CDEF0012A888 /* emoji-4.png in Resources */,
 				C0F67F0A2D982E990090D568 /* Weather for Upcoming Events.shortcut in Resources */,
 				C0F67F1B2D9831C90090D568 /* Focus ON.shortcut in Resources */,
 				C0F67F0B2D982E990090D568 /* ANC OFF.shortcut in Resources */,
@@ -1218,6 +1302,14 @@
 				C01CDF4F2E647A560082665B /* cyber-button-1.png in Resources */,
 				C06C04DB2E75FA9900D2DE99 /* button-colors-cyan.png in Resources */,
 				C06C04DC2E75FA9900D2DE99 /* button-colors-light-green.png in Resources */,
+				C02F162E2E89C8220012A888 /* fantasy-8.png in Resources */,
+				C02F162F2E89C8220012A888 /* fantasy-6.png in Resources */,
+				C02F16302E89C8220012A888 /* fantasy-7.png in Resources */,
+				C02F16312E89C8220012A888 /* fantasy-4.png in Resources */,
+				C02F16322E89C8220012A888 /* fantasy-2.png in Resources */,
+				C02F16332E89C8220012A888 /* fantasy-3.png in Resources */,
+				C02F16342E89C8220012A888 /* fantasy-5.png in Resources */,
+				C02F16352E89C8220012A888 /* fantasy-1.png in Resources */,
 				C09CB3B42E88046600225F5A /* cyberpunk-7.png in Resources */,
 				C06C04DD2E75FA9900D2DE99 /* button-colors-purple.png in Resources */,
 				C06C04DE2E75FA9900D2DE99 /* button-colors-dark-green.png in Resources */,
@@ -1287,6 +1379,10 @@
 				C09CB4182E88691F00225F5A /* flat-control-3.png in Resources */,
 				C09CB3F62E88674A00225F5A /* arrow-1.png in Resources */,
 				C09CB3F72E88674A00225F5A /* arrow-5.png in Resources */,
+				C02F163A2E89CCC30012A888 /* keyboard-key-1.png in Resources */,
+				C02F163B2E89CCC30012A888 /* keyboard-key-3.png in Resources */,
+				C02F163C2E89CCC30012A888 /* keyboard-key-4.png in Resources */,
+				C02F163D2E89CCC30012A888 /* keyboard-key-2.png in Resources */,
 				C09CB3F82E88674A00225F5A /* arrow-2.png in Resources */,
 				C09CB37D2E831A0A00225F5A /* color-18.png in Resources */,
 				C06C04DF2E75FA9900D2DE99 /* button-colors-orange.png in Resources */,

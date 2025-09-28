@@ -29,6 +29,36 @@
     ]
   },
   {
+    "name": "Emoji",
+    "images": [
+      "emoji-1.png",
+      "emoji-10.png",
+      "emoji-11.png",
+      "emoji-12.png",
+      "emoji-2.png",
+      "emoji-3.png",
+      "emoji-4.png",
+      "emoji-5.png",
+      "emoji-6.png",
+      "emoji-7.png",
+      "emoji-8.png",
+      "emoji-9.png"
+    ]
+  },
+  {
+    "name": "Fantasy",
+    "images": [
+      "fantasy-1.png",
+      "fantasy-2.png",
+      "fantasy-3.png",
+      "fantasy-4.png",
+      "fantasy-5.png",
+      "fantasy-6.png",
+      "fantasy-7.png",
+      "fantasy-8.png"
+    ]
+  },
+  {
     "name": "Flat Basic Icons",
     "subfolders": [
     {
@@ -126,7 +156,11 @@
       "button-gray-main.png",
       "button-main-orange.png",
       "button-option-orange.png",
-      "button-round-gray.png"
+      "button-round-gray.png",
+      "keyboard-key-1.png",
+      "keyboard-key-2.png",
+      "keyboard-key-3.png",
+      "keyboard-key-4.png"
     ]
   },
   {
