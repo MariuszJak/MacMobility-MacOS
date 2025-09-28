@@ -164,7 +164,12 @@ class ExploreAutomationsViewModel: ObservableObject, JSONLoadable {
     
     func filterByType(tab: StoreTab) -> [AutomationItem] {
         var automations = originalData
-        automations = automations.filter { $0.scripts.contains(where: { $0.type == tab.type }) }
+        if tab == .automations {
+            automations = automations.filter { $0.scripts.contains(where: { $0.type == .automator || $0.type == .bash  }) }
+            automations = automations.filter { !$0.title.contains("Raycast") }
+        } else {
+            automations = automations.filter { $0.scripts.contains(where: { $0.type == tab.type }) }
+        }
         if tab == .raycast {
             automations = automations.filter { $0.title.contains("Raycast") }
         }

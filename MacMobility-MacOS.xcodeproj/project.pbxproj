@@ -16,6 +16,18 @@
 		C01CDF4B2E6470B40082665B /* button-round-gray.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF472E6470B40082665B /* button-round-gray.png */; };
 		C01CDF4E2E647A560082665B /* cyber-button-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF4D2E647A560082665B /* cyber-button-2.png */; };
 		C01CDF4F2E647A560082665B /* cyber-button-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C01CDF4C2E647A560082665B /* cyber-button-1.png */; };
+		C02F160F2E893FB00012A888 /* cyberpunk-8.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F160E2E893FB00012A888 /* cyberpunk-8.png */; };
+		C02F16182E8942580012A888 /* button-colors-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16132E8942580012A888 /* button-colors-4.png */; };
+		C02F16192E8942580012A888 /* button-colors-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16112E8942580012A888 /* button-colors-2.png */; };
+		C02F161A2E8942580012A888 /* button-colors-7.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16162E8942580012A888 /* button-colors-7.png */; };
+		C02F161B2E8942580012A888 /* button-colors-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16102E8942580012A888 /* button-colors-1.png */; };
+		C02F161C2E8942580012A888 /* button-colors-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16122E8942580012A888 /* button-colors-3.png */; };
+		C02F161D2E8942580012A888 /* button-colors-5.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16142E8942580012A888 /* button-colors-5.png */; };
+		C02F161E2E8942580012A888 /* button-colors-6.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16152E8942580012A888 /* button-colors-6.png */; };
+		C02F161F2E8942580012A888 /* button-colors-8.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16172E8942580012A888 /* button-colors-8.png */; };
+		C02F16232E8943000012A888 /* button-colors-9.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16202E8943000012A888 /* button-colors-9.png */; };
+		C02F16242E8943000012A888 /* button-colors-11.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16222E8943000012A888 /* button-colors-11.png */; };
+		C02F16252E8943000012A888 /* button-colors-10.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16212E8943000012A888 /* button-colors-10.png */; };
 		C03581082DB6501E009E22F5 /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581072DB6501E009E22F5 /* IconPickerView.swift */; };
 		C035810A2DB6503E009E22F5 /* IconPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */; };
 		C035810C2DB6507B009E22F5 /* NSImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */; };
@@ -271,6 +283,18 @@
 		C01CDF472E6470B40082665B /* button-round-gray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-round-gray.png"; sourceTree = "<group>"; };
 		C01CDF4C2E647A560082665B /* cyber-button-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyber-button-1.png"; sourceTree = "<group>"; };
 		C01CDF4D2E647A560082665B /* cyber-button-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyber-button-2.png"; sourceTree = "<group>"; };
+		C02F160E2E893FB00012A888 /* cyberpunk-8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cyberpunk-8.png"; sourceTree = "<group>"; };
+		C02F16102E8942580012A888 /* button-colors-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-1.png"; sourceTree = "<group>"; };
+		C02F16112E8942580012A888 /* button-colors-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-2.png"; sourceTree = "<group>"; };
+		C02F16122E8942580012A888 /* button-colors-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-3.png"; sourceTree = "<group>"; };
+		C02F16132E8942580012A888 /* button-colors-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-4.png"; sourceTree = "<group>"; };
+		C02F16142E8942580012A888 /* button-colors-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-5.png"; sourceTree = "<group>"; };
+		C02F16152E8942580012A888 /* button-colors-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-6.png"; sourceTree = "<group>"; };
+		C02F16162E8942580012A888 /* button-colors-7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-7.png"; sourceTree = "<group>"; };
+		C02F16172E8942580012A888 /* button-colors-8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-8.png"; sourceTree = "<group>"; };
+		C02F16202E8943000012A888 /* button-colors-9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-9.png"; sourceTree = "<group>"; };
+		C02F16212E8943000012A888 /* button-colors-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-10.png"; sourceTree = "<group>"; };
+		C02F16222E8943000012A888 /* button-colors-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-11.png"; sourceTree = "<group>"; };
 		C03581072DB6501E009E22F5 /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
 		C03581092DB6503E009E22F5 /* IconPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerViewModel.swift; sourceTree = "<group>"; };
 		C035810B2DB6507B009E22F5 /* NSImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Ext.swift"; sourceTree = "<group>"; };
@@ -545,6 +569,18 @@
 		C01CDF352E630E290082665B /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				C02F16202E8943000012A888 /* button-colors-9.png */,
+				C02F16212E8943000012A888 /* button-colors-10.png */,
+				C02F16222E8943000012A888 /* button-colors-11.png */,
+				C02F16102E8942580012A888 /* button-colors-1.png */,
+				C02F16112E8942580012A888 /* button-colors-2.png */,
+				C02F16122E8942580012A888 /* button-colors-3.png */,
+				C02F16132E8942580012A888 /* button-colors-4.png */,
+				C02F16142E8942580012A888 /* button-colors-5.png */,
+				C02F16152E8942580012A888 /* button-colors-6.png */,
+				C02F16162E8942580012A888 /* button-colors-7.png */,
+				C02F16172E8942580012A888 /* button-colors-8.png */,
+				C02F160E2E893FB00012A888 /* cyberpunk-8.png */,
 				C09CB4092E88691F00225F5A /* flat-control-1.png */,
 				C09CB40A2E88691F00225F5A /* flat-control-2.png */,
 				C09CB40B2E88691F00225F5A /* flat-control-3.png */,
@@ -1205,6 +1241,18 @@
 				C09CB3712E831A0A00225F5A /* color-11.png in Resources */,
 				C09CB3722E831A0A00225F5A /* color-21.png in Resources */,
 				C09CB3732E831A0A00225F5A /* color-12.png in Resources */,
+				C02F16182E8942580012A888 /* button-colors-4.png in Resources */,
+				C02F16192E8942580012A888 /* button-colors-2.png in Resources */,
+				C02F16232E8943000012A888 /* button-colors-9.png in Resources */,
+				C02F16242E8943000012A888 /* button-colors-11.png in Resources */,
+				C02F16252E8943000012A888 /* button-colors-10.png in Resources */,
+				C02F161A2E8942580012A888 /* button-colors-7.png in Resources */,
+				C02F161B2E8942580012A888 /* button-colors-1.png in Resources */,
+				C02F161C2E8942580012A888 /* button-colors-3.png in Resources */,
+				C02F161D2E8942580012A888 /* button-colors-5.png in Resources */,
+				C02F161E2E8942580012A888 /* button-colors-6.png in Resources */,
+				C02F161F2E8942580012A888 /* button-colors-8.png in Resources */,
+				C02F160F2E893FB00012A888 /* cyberpunk-8.png in Resources */,
 				C09CB3742E831A0A00225F5A /* color-14.png in Resources */,
 				C09CB3752E831A0A00225F5A /* color-8.png in Resources */,
 				C09CB3762E831A0A00225F5A /* color-5.png in Resources */,

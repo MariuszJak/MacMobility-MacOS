@@ -24,7 +24,8 @@
       "cyberpunk-4.png",
       "cyberpunk-5.png",
       "cyberpunk-6.png",
-      "cyberpunk-7.png"
+      "cyberpunk-7.png",
+      "cyberpunk-8.png"
     ]
   },
   {
@@ -131,6 +132,17 @@
   {
     "name": "Solid Colors",
     "images": [
+      "button-colors-1.png",
+      "button-colors-10.png",
+      "button-colors-11.png",
+      "button-colors-2.png",
+      "button-colors-3.png",
+      "button-colors-4.png",
+      "button-colors-5.png",
+      "button-colors-6.png",
+      "button-colors-7.png",
+      "button-colors-8.png",
+      "button-colors-9.png",
       "button-colors-cyan.png",
       "button-colors-dark-green.png",
       "button-colors-light-green.png",
