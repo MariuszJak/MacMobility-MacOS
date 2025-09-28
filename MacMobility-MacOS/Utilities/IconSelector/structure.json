@@ -2,13 +2,17 @@
   "name": ".",
   "subfolders": [
   {
-    "name": "Colors",
+    "name": "Cloud Style",
     "images": [
-      "button-colors-cyan.png",
-      "button-colors-dark-green.png",
-      "button-colors-light-green.png",
-      "button-colors-orange.png",
-      "button-colors-purple.png"
+      "soft-1.png",
+      "soft-10.png",
+      "soft-2.png",
+      "soft-3.png",
+      "soft-4.png",
+      "soft-5.png",
+      "soft-6.png",
+      "soft-7.png",
+      "soft-8.png"
     ]
   },
   {
@@ -19,20 +23,77 @@
       "cyberpunk-3.png",
       "cyberpunk-4.png",
       "cyberpunk-5.png",
-      "cyberpunk-6.png"
+      "cyberpunk-6.png",
+      "cyberpunk-7.png"
     ]
   },
   {
-    "name": "FutureRetro",
-    "images": [
-      "button-gray-main.png",
-      "button-main-orange.png",
-      "button-option-orange.png",
-      "button-round-gray.png"
+    "name": "Flat Basic Icons",
+    "subfolders": [
+    {
+      "name": "Dark",
+      "images": [
+        "arrow-13.png",
+        "arrow-14.png",
+        "arrow-15.png",
+        "arrow-16.png",
+        "arrow-5.png",
+        "arrow-6.png",
+        "arrow-7.png",
+        "arrow-8.png",
+        "flat-control-5.png",
+        "flat-control-6.png",
+        "flat-control-7.png",
+        "flat-control-8.png",
+        "flat-icon-5.png",
+        "flat-icon-6.png",
+        "flat-icon-7.png",
+        "flat-icon-8.png",
+        "office-14.png",
+        "office-15.png",
+        "office-16.png",
+        "office-17.png",
+        "office-18.png",
+        "office-5.png",
+        "office-6.png",
+        "office-7.png",
+        "office-8.png"
+      ]
+    },
+    {
+      "name": "Light",
+      "images": [
+        "arrow-1.png",
+        "arrow-10.png",
+        "arrow-11.png",
+        "arrow-12.png",
+        "arrow-2.png",
+        "arrow-3.png",
+        "arrow-4.png",
+        "arrow-9.png",
+        "flat-control-1.png",
+        "flat-control-2.png",
+        "flat-control-3.png",
+        "flat-control-4.png",
+        "flat-icon-1.png",
+        "flat-icon-2.png",
+        "flat-icon-3.png",
+        "flat-icon-4.png",
+        "office-1.png",
+        "office-10.png",
+        "office-11.png",
+        "office-12.png",
+        "office-13.png",
+        "office-2.png",
+        "office-3.png",
+        "office-4.png",
+        "office-9.png"
+      ]
+    }
     ]
   },
   {
-    "name": "Pill-Color",
+    "name": "Gradient Colors",
     "images": [
       "color-1.png",
       "color-10.png",
@@ -59,17 +120,22 @@
     ]
   },
   {
-    "name": "Soft",
+    "name": "Keyboard",
     "images": [
-      "soft-1.png",
-      "soft-10.png",
-      "soft-2.png",
-      "soft-3.png",
-      "soft-4.png",
-      "soft-5.png",
-      "soft-6.png",
-      "soft-7.png",
-      "soft-8.png"
+      "button-gray-main.png",
+      "button-main-orange.png",
+      "button-option-orange.png",
+      "button-round-gray.png"
+    ]
+  },
+  {
+    "name": "Solid Colors",
+    "images": [
+      "button-colors-cyan.png",
+      "button-colors-dark-green.png",
+      "button-colors-light-green.png",
+      "button-colors-orange.png",
+      "button-colors-purple.png"
     ]
   }
   ]
