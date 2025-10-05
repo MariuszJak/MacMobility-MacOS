@@ -289,9 +289,9 @@ struct OnboardingVideoComparisonView: View {
                 .padding(.horizontal)
 
             HStack(spacing: 24) {
-                VideoPreviewView(player: leftPlayer, title: "From mobile device", description: "If app on Macbook is already open, you can connect your device to Macbook using the Connect button from the mobile device.")
+                VideoPreviewView(player: leftPlayer, title: "From mobile device", description: "If app on Macbook is already open, you can connect your device to Macbook using the Connect button from the mobile device.", height: 200.0)
 
-                VideoPreviewView(player: rightPlayer, title: "From Macbook", description: "Open the app on Macbook and select the device you want to connect with.")
+                VideoPreviewView(player: rightPlayer, title: "From Macbook", description: "Open the app on Macbook and select the device you want to connect with.", height: 200.0)
             }
             .frame(height: 240)
         }
@@ -475,7 +475,7 @@ struct AVPlayerViewNoControls: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspect
+        playerLayer.videoGravity = .resizeAspectFill
         playerLayer.isHidden = false
         playerLayer.needsDisplayOnBoundsChange = true
         view.layer = playerLayer
@@ -492,6 +492,14 @@ struct VideoPreviewView: View {
     let player: AVPlayer
     let title: String
     let description: String
+    let height: CGFloat?
+    
+    init(player: AVPlayer, title: String, description: String, height: CGFloat? = nil) {
+        self.player = player
+        self.title = title
+        self.description = description
+        self.height = height
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -499,7 +507,9 @@ struct VideoPreviewView: View {
                 .disabled(true)
                 .cornerRadius(12)
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-//                .frame(height: 200)
+                .ifLet(height) {
+                    $0.frame(height: $1)
+                }
 
             Text(title)
                 .font(.headline)
