@@ -161,6 +161,35 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 configuredShortcuts[index].size = .init(width: 1, height: 1)
             }
         }
+        shortcuts.enumerated().forEach { (index, object) in
+            if object.size == nil {
+                shortcuts[index].size = .init(width: 1, height: 1)
+            }
+        }
+        webpages.enumerated().forEach { (index, object) in
+            if object.size == nil {
+                webpages[index].size = .init(width: 1, height: 1)
+            }
+        }
+        utilities.enumerated().forEach { (index, object) in
+            if object.size == nil {
+                utilities[index].size = .init(width: 1, height: 1)
+            }
+        }
+        appsAddedByUser.enumerated().forEach { (index, object) in
+            if object.size == nil {
+                appsAddedByUser[index].size = .init(width: 1, height: 1)
+            }
+        }
+        installedApps.enumerated().forEach { (index, object) in
+            if object.size == nil {
+                installedApps[index].size = .init(width: 1, height: 1)
+            }
+        }
+        UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+        UserDefaults.standard.store(webpages, for: .webItems)
+        UserDefaults.standard.store(utilities, for: .utilities)
+        UserDefaults.standard.store(appsAddedByUser, for: .userApps)
     }
     
     func runInitialScriptsIfNeeded() {
