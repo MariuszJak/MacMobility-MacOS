@@ -1078,8 +1078,6 @@ struct PlusButtonView: View {
     }
     
     var body: some View {
-        
-
         return ZStack {
             RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(fillColor())
