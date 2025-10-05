@@ -76,15 +76,7 @@ struct NewMultiSelectionUtilityView: View {
                     }
                     .frame(width: 70, height: 70)
                     .background(
-                        PlusButtonView()
-                    )
-                    .ifLet(viewModel.objectAt(index: index)?.id) { view, id in
-                        view.onDrag {
-                            NSItemProvider(object: id as NSString)
-                        }
-                    }
-                    .onDrop(of: [.text], isTargeted: nil) { providers in
-                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                        PlusButtonView(dropAction: { droppedItem in
                             if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
                                 DispatchQueue.main.async {
                                     viewModel.addConfiguredShortcut(object:
@@ -110,8 +102,12 @@ struct NewMultiSelectionUtilityView: View {
                                     )
                                 }
                             }
+                        })
+                    )
+                    .ifLet(viewModel.objectAt(index: index)?.id) { view, id in
+                        view.onDrag {
+                            NSItemProvider(object: id as NSString)
                         }
-                        return true
                     }
                 }
             }

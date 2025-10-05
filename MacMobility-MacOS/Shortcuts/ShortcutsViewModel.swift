@@ -434,9 +434,9 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             return
         }
         
-        let volumeControl: ShortcutObject = .init(type: .control, page: 1, index: 0, indexes: [0, 1, 2], size: .init(width: 3, height: 1), path: "", id: "horizontal-scroll4", title: "Volume Control", color: nil, faviconLink: nil, browser: nil, imageData: nil, scriptCode: "osascript -e \"set volume output volume %d\"", utilityType: .commandline, objects: nil, showTitleOnIcon: false, category: "Experimental")
+        let volumeControl: ShortcutObject = .init(type: .control, page: 1, index: 0, indexes: [0, 1, 2], size: .init(width: 3, height: 1), path: UIControlType.slider.path, id: "volume-control-ver-1", title: "Volume Slider", color: "osascript -e \"output volume of (get volume settings)\"", faviconLink: "slider-icon", browser: nil, imageData: NSImage(named: "slider-icon")?.toData, scriptCode: "osascript -e \"set volume output volume %d\"", utilityType: .commandline, objects: nil, showTitleOnIcon: false, category: "MacOS")
         addConfiguredShortcut(object: volumeControl)
-        
+        saveUtility(with: volumeControl)
         options.forEach { option in
             addAutomations(
                 from: setupMode.type == .advanced
@@ -479,7 +479,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                         i += 1
                     }
                 }
-                if let createMultiactions, createMultiactions {
+                if let createMultiactions, createMultiactions, !websitesSO.isEmpty {
                     websitesSO.enumerated().forEach { (index, _) in
                         websitesSO[index].index = index
                         websitesSO[index].indexes = [index]
