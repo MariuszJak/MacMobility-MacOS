@@ -27,7 +27,7 @@ class UIControlCreateViewViewModel: ObservableObject, JSONLoadable {
     @Published var selectedIcon: NSImage? = NSImage(named: "terminal")
     @Published var scriptCode: String = ""
     @Published var initialScriptCode: String = ""
-    @Published var showTitleOnIcon: Bool = true
+    @Published var showTitleOnIcon: Bool = false
     @Published var categories: [String] = []
     
     init(categories: [String]) {
@@ -40,7 +40,7 @@ class UIControlCreateViewViewModel: ObservableObject, JSONLoadable {
         title = ""
         category = ""
         scriptCode = ""
-        showTitleOnIcon = true
+        showTitleOnIcon = false
     }
 }
 
@@ -77,7 +77,7 @@ struct UIControlCreateView: View {
             viewModel.title = item.title
             viewModel.id = item.id
             viewModel.scriptCode = item.scriptCode ?? ""
-            viewModel.showTitleOnIcon = item.showTitleOnIcon ?? true
+            viewModel.showTitleOnIcon = false
             viewModel.category = item.category ?? ""
             if let data = item.imageData {
                 viewModel.selectedIcon = NSImage(data: data)
@@ -99,13 +99,6 @@ struct UIControlCreateView: View {
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 4.0)
                 RoundedTextField(placeholder: "", text: $viewModel.title)
-                HStack(alignment: .center) {
-                    Toggle("", isOn: $viewModel.showTitleOnIcon)
-                        .padding(.trailing, 6.0)
-                        .toggleStyle(.switch)
-                    Text("Show title on icon")
-                        .font(.system(size: 14.0))
-                }
             }
             .padding(.bottom, 6.0)
             .padding(.leading, 80.0)
@@ -134,6 +127,10 @@ struct UIControlCreateView: View {
                 .padding(.leading, 16.0)
             }
             .frame(height: 100.0)
+            Text("This code will be triggered when the control item is shown on the screen - it can be used to initialize the control with a specific value. Result of this function will be used as the control's initial value.")
+                .font(.system(size: 11, weight: .light))
+                .foregroundStyle(Color.gray)
+                .padding(.leading, 140.0)
             HStack(alignment: .top) {
                 Text("Component Code")
                     .font(.system(size: 14, weight: .regular))
@@ -157,6 +154,10 @@ struct UIControlCreateView: View {
                 )
                 .padding(.leading, 16.0)
             }
+            Text("This code will be ran after every update of the UI component (after user performed an action, like moving a slider). Value returned by this function will be set as a new value for the control - field %d will be replaced with the returned value of the control.")
+                .font(.system(size: 11, weight: .light))
+                .foregroundStyle(Color.gray)
+                .padding(.leading, 140.0)
             HStack {
                 Spacer()
                 BlueButton(
@@ -204,9 +205,13 @@ struct UIControlCreateView: View {
             .padding(.leading, 60.0)
             .frame(maxWidth: .infinity)
             HStack {
-                IconPickerView(viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
-                    viewModel.selectedIcon = image
-                }, userSelectedIcon: $viewModel.selectedIcon, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""))
+                IconPickerView(
+                    viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
+                        viewModel.selectedIcon = image
+                    },
+                    userSelectedIcon: $viewModel.selectedIcon, title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""),
+                    canSelectImage: false
+                )
                 .padding(.leading, 60.0)
                 
                 Spacer()

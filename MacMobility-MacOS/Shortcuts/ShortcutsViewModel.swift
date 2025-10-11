@@ -81,10 +81,6 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     
     
     init(connectionManager: ConnectionManager) {
-//        UserDefaults.standard.clear(key: .quickActionItems)
-//        UserDefaults.standard.clear(key: .subitemPages)
-//        UserDefaults.standard.clear(key: .utilities)
-//        UserDefaults.standard.clearAll()
         self.connectionManager = connectionManager
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
@@ -108,7 +104,6 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             .sink { [weak self] pageAndIndex in
                 guard let self, let pageAndIndex, let indexes = neighboringIndexesWithConflict(for: pageAndIndex.index, page: pageAndIndex.page, size: draggingData.size) else { return }
                 affectedIndexes = indexes
-//                print("View model update: page -> \(pageAndIndex.page), index -> \(pageAndIndex.index), affectedIndexes -> \(affectedIndexes)")
             }
             .store(in: &cancellables)
         

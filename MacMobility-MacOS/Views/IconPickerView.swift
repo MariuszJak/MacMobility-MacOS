@@ -82,11 +82,9 @@ struct IconPickerView: View {
             }
             if canSelectImage {
                 VStack(alignment: .leading) {
-                    Button("Browse Icons") {
+                    ProminentButtonView("Browse Icons") {
                         openIconsPickerWindow()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.blue)
                     Button("Select Icon") {
                         viewModel.pickImage() { icon in
                             userSelectedIcon = icon
@@ -103,7 +101,7 @@ struct IconPickerView: View {
         if nil == iconPickerWindow {
             iconPickerWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 700, height: 500),
-                styleMask: [.titled, .closable, .miniaturizable],
+                styleMask: [.titled, .closable, .resizable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )

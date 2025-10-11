@@ -65,7 +65,7 @@ struct NewWebpageView: View {
     
     var body: some View {
         VStack(alignment: .center) {
-            Text("Add Link")
+            Text("Add URL")
                 .font(.system(size: 18.0, weight: .bold))
         }
         VStack(alignment: .leading) {

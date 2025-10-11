@@ -152,18 +152,14 @@ struct WelcomeView: View {
                         }
                     }
                     if viewModel.currentPage < viewModel.pageLimit {
-                        Button("Next") {
+                        ProminentButtonView("Next") {
                             self.viewModel.nextPage()
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.blue)
                     }
                     Spacer()
-                    Button("Skip") {
+                    ProminentButtonView("Skip", tint: .red) {
                         self.showSkipAlert = true
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.red)
                 }
                 .padding()
             }
@@ -426,15 +422,13 @@ struct NewQAMVideoTutorialView: View {
                 }
             }
             if currentResourceIndex < resources.count - 1 {
-                Button("Next") {
+                ProminentButtonView("Next") {
                     currentResourceIndex += 1
                     setupLoopingVideo(player: player, resource: resources[currentResourceIndex])
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.blue)
             } else {
                 if isFirstOpen {
-                    Button("Open QAM") {
+                    ProminentButtonView("Open QAM") {
                         NotificationCenter.default.post(
                             name: .openQAM,
                             object: nil,
@@ -442,14 +436,10 @@ struct NewQAMVideoTutorialView: View {
                         )
                         closeHandler()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.blue)
                 } else {
-                    Button("Close") {
+                    ProminentButtonView("Close") {
                         closeHandler()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.blue)
                 }
             }
         }
@@ -1053,6 +1043,26 @@ struct AnimatedSearchBar: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: isExpanded)
+    }
+}
+
+struct ProminentButtonView: View {
+    var title: String
+    var tint: Color
+    var action: () -> Void
+    
+    init(_ title: String, tint: Color = .blue, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
+        self.tint = tint
+    }
+    
+    var body: some View {
+        Button(title) {
+            action()
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(tint)
     }
 }
 

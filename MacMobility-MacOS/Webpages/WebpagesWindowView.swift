@@ -117,7 +117,8 @@ struct WebpagesWindowView: View {
                     Text(item.title.isEmpty ? item.path ?? "Untitled" : item.title)
                 }
                 .onDrag {
-                    NSItemProvider(object: item.id as NSString)
+                    viewModel.draggingData = .init(size: item.size, indexes: item.indexes)
+                    return NSItemProvider(object: item.id as NSString)
                 }
                 Spacer()
                 Image(systemName: "gear")

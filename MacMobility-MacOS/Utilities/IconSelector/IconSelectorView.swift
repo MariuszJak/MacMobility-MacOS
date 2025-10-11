@@ -44,7 +44,6 @@ struct IconSelectorView: View, JSONLoadable {
                 }
             }
         }
-        .frame(minWidth: 700, minHeight: 480)
     }
 }
 
@@ -105,7 +104,6 @@ struct ImageGrid: View, ImageLoadable {
                             .scaledToFit()
                             .frame(height: 140)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(.quaternary))
                     } else {
                         ZStack {
                             RoundedRectangle(cornerRadius: 10).fill(.quaternary)
@@ -115,11 +113,6 @@ struct ImageGrid: View, ImageLoadable {
                         }
                         .frame(height: 140)
                     }
-                    Text(name)
-                        .font(.caption)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                        .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .onTapGesture {
                     action(name)

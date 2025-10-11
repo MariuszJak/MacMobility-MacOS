@@ -68,7 +68,7 @@ struct UIControlsListView: View {
                                 Divider()
                                 HStack {
                                     Spacer()
-                                    Button("Install") {
+                                    ProminentButtonView("Install") {
                                         installAction(control.shortcut)
                                     }
                                 }
@@ -81,6 +81,8 @@ struct UIControlsListView: View {
                                 .fill(Color.gray.opacity(0.1))
                         )
                     }
+                    ComingMoreView()
+                        .frame(height: 170.0)
                 }
                 .padding(.horizontal)
             }

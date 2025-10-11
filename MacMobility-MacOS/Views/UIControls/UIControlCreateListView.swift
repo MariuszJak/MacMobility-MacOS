@@ -62,13 +62,13 @@ struct UIControlCreateListView: View {
     let types: [UIControlCreateItem] = [
         .init(
             id: UUID(),
-            title: "Volume Slider",
+            title: "Slider",
             description: "Create Slider UI Control",
             type: .slider
         ),
         .init(
             id: UUID(),
-            title: "Volume Knob",
+            title: "Knob",
             description: "Create Knob UI Control",
             type: .knob
         )
@@ -127,6 +127,7 @@ struct UIControlCreateListView: View {
                                 .fill(Color.gray.opacity(0.1))
                         )
                     }
+                    ComingMoreView()
                 }
                 .padding(.horizontal)
             }
@@ -136,5 +137,27 @@ struct UIControlCreateListView: View {
             RoundedBackgroundView()
         )
         .padding()
+    }
+}
+
+struct ComingMoreView: View {
+    var cornerRadius: CGFloat = 20.0
+    let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+    let accentColor = Color(.sRGB, red: 0.3, green: 0.3, blue: 0.3, opacity: 1)
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(backgroundColor)
+
+            Text("Coming More Soon!")
+                .font(.system(size: 16.0, weight: .bold))
+                .foregroundStyle(Color.white)
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(accentColor, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
     }
 }

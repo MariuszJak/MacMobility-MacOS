@@ -31,11 +31,10 @@ struct CompanionRequestPopup: View {
                 .keyboardShortcut(.cancelAction)
                 .buttonStyle(.bordered)
 
-                Button("Accept") {
+                ProminentButtonView("Accept") {
                     onAccept()
                 }
                 .keyboardShortcut(.defaultAction)
-                .buttonStyle(.borderedProminent)
             }
         }
         .padding()

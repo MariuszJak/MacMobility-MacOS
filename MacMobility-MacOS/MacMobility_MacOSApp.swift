@@ -12,7 +12,7 @@ import Combine
 struct MacMobility_MacOSApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene {
-        Settings {
+        WindowGroup {
             EmptyView()
         }
     }
@@ -41,6 +41,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         register()
+        closeInitialSystemWindows()
         menuView = MacOSMainPopoverView(connectionManager: connectionManager) {
             self.openShortcutsWindow()
         }
@@ -58,8 +59,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         .store(in: &cancellables)
 //        UserDefaults.standard.clearAll(except: [.license, .licenseKey])
-//        UserDefaults.standard.clear(key: .lifecycle)
-//        UserDefaults.standard.clear(key: .quickActionTutorialSeen)
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
         if lifecycle.openCount == 0 {
             openWelcomeWindow()
@@ -116,6 +115,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
         setupKeyboardListener()
+    }
+    
+    func closeInitialSystemWindows() {
+        NSApp.windows[safe: 0]?.close()
     }
     
     @objc func openNewQAMTutorial() {
