@@ -66,7 +66,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
     }
     var dependencyUpdate: ([String]) -> Void = { _ in }
-    var close: () -> Void = {}
+    var close: (ShortcutObject?) -> Void = { _ in }
     private var timer: Timer?
     public var testColor = "#6DDADE"
     private var allWebpages: [ShortcutObject] = []

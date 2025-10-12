@@ -7,6 +7,8 @@
 
 import SwiftUI
 import Combine
+import FirebaseCore
+import FirebaseAnalytics
 
 @main
 struct MacMobility_MacOSApp: App {
@@ -40,7 +42,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     lazy var shortcutsViewModel: ShortcutsViewModel = .init(connectionManager: connectionManager)
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        FirebaseApp.configure()
         register()
+        registerForAnalytics()
         closeInitialSystemWindows()
         menuView = MacOSMainPopoverView(connectionManager: connectionManager) {
             self.openShortcutsWindow()
@@ -59,6 +63,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         .store(in: &cancellables)
 //        UserDefaults.standard.clearAll(except: [.license, .licenseKey])
+//        UserDefaults.standard.clear(key: .analyticsConsent)
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
         if lifecycle.openCount == 0 {
             openWelcomeWindow()
@@ -332,6 +337,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             shortcutsWindow?.appearance = NSAppearance(named: .darkAqua)
             shortcutsWindow?.styleMask.insert(.fullSizeContentView)
             shortcutsWindow?.title = "Editor"
+            shortcutsWindow?.titleVisibility = .hidden
             shortcutsWindow?.appearance = NSAppearance(named: .darkAqua)
             let hv = NSHostingController(rootView: ShortcutsView(viewModel: shortcutsViewModel))
             shortcutsWindow?.contentView?.addSubview(hv.view)
@@ -357,6 +363,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             qamTutorialWindow?.titlebarAppearsTransparent = true
             qamTutorialWindow?.appearance = NSAppearance(named: .darkAqua)
             qamTutorialWindow?.styleMask.insert(.fullSizeContentView)
+            qamTutorialWindow?.title = "QamTutorialWindow"
+            qamTutorialWindow?.titleVisibility = .hidden
             let hv = NSHostingController(rootView: QuickActionVideoTutorialView())
             qamTutorialWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = qamTutorialWindow?.contentView?.bounds ?? .zero
@@ -381,6 +389,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             newQamTutorialWindow?.titlebarAppearsTransparent = true
             newQamTutorialWindow?.appearance = NSAppearance(named: .darkAqua)
             newQamTutorialWindow?.styleMask.insert(.fullSizeContentView)
+            newQamTutorialWindow?.title = "NewQamTutorialWindow"
+            newQamTutorialWindow?.titleVisibility = .hidden
             let hv = NSHostingController(rootView: NewQAMVideoTutorialView(isFirstOpen: isFirstOpen){
                 self.newQamTutorialWindow?.close()
                 self.newQamTutorialWindow = nil
@@ -406,7 +416,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             welcomeWindow?.titlebarAppearsTransparent = true
             welcomeWindow?.appearance = NSAppearance(named: .darkAqua)
             welcomeWindow?.styleMask.insert(.fullSizeContentView)
-            
+            welcomeWindow?.title = "WelcomeWindow"
+            welcomeWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: welcomeWindow) else {
                 return
             }
@@ -442,7 +453,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             permissionsWindow?.titlebarAppearsTransparent = true
             permissionsWindow?.appearance = NSAppearance(named: .darkAqua)
             permissionsWindow?.styleMask.insert(.fullSizeContentView)
-            
+            permissionsWindow?.title = "Permissions"
+            permissionsWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: permissionsWindow) else {
                 return
             }
@@ -478,5 +490,23 @@ extension AppDelegate {
         Resolver.register(AppUpdateUseCase() as AppUpdateUseCaseProtocol)
         Resolver.register(AppLicenseManager(), .locked)
         Resolver.register(UpdatesManager(), .locked)
+        Resolver.register(CoreObserver() as CoreObserverProtocol)
+    }
+    
+    func registerForAnalytics() {
+        let observer: CoreObserverProtocol = Resolver.resolve()
+        observer.subscribe(self) { event in
+            #if DEBUG
+            if let analyticsConsent: Bool = UserDefaults.standard.get(key: .analyticsConsent), analyticsConsent {
+                print(event)
+            } else {
+                print("User denied analytics")
+            }
+            #else
+            if let analyticsConsent: Bool = UserDefaults.standard.get(key: .analyticsConsent), analyticsConsent {
+                Analytics.logEvent(event.event.rawValue, parameters: event.additions)
+            }
+            #endif
+        }
     }
 }

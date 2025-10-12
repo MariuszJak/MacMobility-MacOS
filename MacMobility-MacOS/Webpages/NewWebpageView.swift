@@ -144,25 +144,24 @@ struct NewWebpageView: View {
                 Spacer()
                 BlueButton(title: "Cancel", font: .callout, padding: 12.0, backgroundColor: .gray) {
                     viewModel.clear()
-                    delegate?.close()
+                    delegate?.close(nil)
                 }
                 .padding(.trailing, 6.0)
                 BlueButton(title: "Save", font: .callout, padding: 12.0) {
-                    delegate?.saveWebpage(with:
-                        .init(
-                            type: .webpage,
-                            page: currentPage ?? 1,
-                            path: viewModel.fullLink(),
-                            id: viewModel.id ?? UUID().uuidString,
-                            title: viewModel.title,
-                            faviconLink: viewModel.faviconLink,
-                            browser: viewModel.browser,
-                            imageData: viewModel.userSelectedIcon?.toData ?? viewModel.savedIcon?.toData,
-                            showTitleOnIcon: viewModel.showTitleOnIcon
-                        )
+                    let item: ShortcutObject = .init(
+                        type: .webpage,
+                        page: currentPage ?? 1,
+                        path: viewModel.fullLink(),
+                        id: viewModel.id ?? UUID().uuidString,
+                        title: viewModel.title,
+                        faviconLink: viewModel.faviconLink,
+                        browser: viewModel.browser,
+                        imageData: viewModel.userSelectedIcon?.toData ?? viewModel.savedIcon?.toData,
+                        showTitleOnIcon: viewModel.showTitleOnIcon
                     )
+                    delegate?.saveWebpage(with: item)
                     viewModel.clear()
-                    delegate?.close()
+                    delegate?.close(item)
                 }
             }
             .padding(.trailing, 28.0)

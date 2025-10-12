@@ -115,6 +115,7 @@ extension UserDefaults {
         case quickActionItems
         case quickActionTutorialSeen
         case newQuickActionTutorialSeen
+        case analyticsConsent
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {

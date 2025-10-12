@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import Foundation
 
 enum StreamConnectionState {
     case notConnected
@@ -65,6 +66,7 @@ struct ShortcutsView: View {
     @State var resolutions: [DisplayMode] = []
     @State var selectedMode: DisplayMode?
     @State var cancellables = Set<AnyCancellable>()
+    @State private var showConsentPrompt = false
     
     let testSize = 7.0
 
@@ -227,8 +229,25 @@ struct ShortcutsView: View {
         .sheet(isPresented: $viewModel.showDependenciesView) {
             DependenciesInstallView(dependencies: viewModel.dependenciesObjects, dependencyUpdate: viewModel.dependencyUpdate)
         }
+        .sheet(isPresented: $showConsentPrompt) {
+            AnalyticsConsentPrompt(
+                onAgree: {
+                    UserDefaults.standard.store(true, for: .analyticsConsent)
+                },
+                onDisagree: {
+                    UserDefaults.standard.store(false, for: .analyticsConsent)
+                },
+                isPresented: $showConsentPrompt
+            )
+        }
         .frame(minWidth: 1300.0)
         .padding(.top, 21.0)
+        .onAppear {
+            let analyticsConsent: Bool? = UserDefaults.standard.get(key: .analyticsConsent)
+            if analyticsConsent == nil {
+                showConsentPrompt = true
+            }
+        }
     }
     
     @ViewBuilder
@@ -813,6 +832,12 @@ struct ShortcutsView: View {
     
     private var installedAppsView: some View {
         VStack(alignment: .leading) {
+            ProminentButtonView("Search in Finder") {
+                if let path = selectApp() {
+                    viewModel.addInstalledApp(for: path)
+                }
+            }
+            .padding()
             if viewModel.installedApps.isEmpty {
                 VStack {
                     Spacer()
@@ -883,6 +908,7 @@ struct ShortcutsView: View {
                         }
                     }
                     .onChange(of: viewModel.scrollToApp) { _, title in
+                        guard title != "--> none" else { return }
                         DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
                             withAnimation {
                                 proxy.scrollTo(title, anchor: .center)
@@ -890,6 +916,7 @@ struct ShortcutsView: View {
                                 appNameToFlash = title
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                     appNameToFlash = ""
+                                    viewModel.scrollToApp = "--> none"
                                 }
                             }
                             
@@ -929,6 +956,8 @@ struct ShortcutsView: View {
     }
     
     private var utilitiesView: some View {
-        UtilitiesWindowView(viewModel: viewModel)
+        UtilitiesWindowView(viewModel: viewModel) { tab in
+            self.tab = tab
+        }
     }
 }

@@ -445,9 +445,9 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
             inProgressWindow?.titlebarAppearsTransparent = true
             inProgressWindow?.appearance = NSAppearance(named: .darkAqua)
             inProgressWindow?.styleMask.insert(.fullSizeContentView)
-            
+            inProgressWindow?.title = "In Progress"
             inProgressWindow?.collectionBehavior = [.canJoinAllSpaces, .stationary]
-            
+            inProgressWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: inProgressWindow) else {
                 return
             }
@@ -480,7 +480,8 @@ struct WorkspacesWindowView: View, AppleScriptCommandable {
             newWindow?.titlebarAppearsTransparent = true
             newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
-            
+            newWindow?.title = "New Workspace"
+            newWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
                 return
             }

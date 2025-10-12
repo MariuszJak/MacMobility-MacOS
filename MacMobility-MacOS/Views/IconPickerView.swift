@@ -111,7 +111,8 @@ struct IconPickerView: View {
             iconPickerWindow?.titlebarAppearsTransparent = true
             iconPickerWindow?.appearance = NSAppearance(named: .darkAqua)
             iconPickerWindow?.styleMask.insert(.fullSizeContentView)
-            
+            iconPickerWindow?.title = "IconPickerWindow"
+            iconPickerWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: iconPickerWindow) else {
                 return
             }

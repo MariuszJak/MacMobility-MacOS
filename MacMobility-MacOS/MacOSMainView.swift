@@ -130,7 +130,8 @@ struct MacOSMainPopoverView: View {
             updatesWindow?.titlebarAppearsTransparent = true
             updatesWindow?.appearance = NSAppearance(named: .darkAqua)
             updatesWindow?.styleMask.insert(.fullSizeContentView)
-            
+            updatesWindow?.title = "Updates"
+            updatesWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: updatesWindow) else {
                 return
             }
@@ -158,7 +159,8 @@ struct MacOSMainPopoverView: View {
             permissionsWindow?.titlebarAppearsTransparent = true
             permissionsWindow?.appearance = NSAppearance(named: .darkAqua)
             permissionsWindow?.styleMask.insert(.fullSizeContentView)
-            
+            permissionsWindow?.title = "Permissions"
+            permissionsWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: permissionsWindow) else {
                 return
             }
@@ -186,7 +188,8 @@ struct MacOSMainPopoverView: View {
             licenseWindow?.titlebarAppearsTransparent = true
             licenseWindow?.appearance = NSAppearance(named: .darkAqua)
             licenseWindow?.styleMask.insert(.fullSizeContentView)
-            
+            licenseWindow?.title = "License"
+            licenseWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: licenseWindow) else {
                 return
             }
@@ -214,7 +217,8 @@ struct MacOSMainPopoverView: View {
             aboutWindow?.titlebarAppearsTransparent = true
             aboutWindow?.appearance = NSAppearance(named: .darkAqua)
             aboutWindow?.styleMask.insert(.fullSizeContentView)
-            
+            aboutWindow?.title = "About"
+            aboutWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: aboutWindow) else {
                 return
             }

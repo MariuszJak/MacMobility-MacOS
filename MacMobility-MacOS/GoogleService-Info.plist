@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDZIK863AO2n52hbcqLXu-QyN_vDRcJcOs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>822774778619</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.macmobility.MacMobility-MacOS</string>
+	<key>PROJECT_ID</key>
+	<string>macmobility-49baa</string>
+	<key>STORAGE_BUCKET</key>
+	<string>macmobility-49baa.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:822774778619:ios:fafca2267d83305c9c7e5e</string>
+</dict>
+</plist>

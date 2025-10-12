@@ -53,11 +53,19 @@ struct SelectUtilityTypeWindowView: View {
     let connectionManager: ConnectionManager
     let categories: [String]
     let closeAction: () -> Void
+    let switchTo: (Tab) -> Void
     
-    init(connectionManager: ConnectionManager, categories: [String], delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
+    init(
+        connectionManager: ConnectionManager,
+        categories: [String],
+        delegate: UtilitiesWindowDelegate?,
+        switchTo: @escaping (Tab) -> Void,
+        closeAction: @escaping () -> Void
+    ) {
         self.connectionManager = connectionManager
         self.closeAction = closeAction
         self.categories = categories
+        self.switchTo = switchTo
         self._viewModel = .init(wrappedValue: .init(connectionManager: connectionManager, delegate: delegate))
     }
     
@@ -160,6 +168,8 @@ struct SelectUtilityTypeWindowView: View {
                 newWindow?.titlebarAppearsTransparent = true
                 newWindow?.appearance = NSAppearance(named: .darkAqua)
                 newWindow?.styleMask.insert(.fullSizeContentView)
+                newWindow?.title = "CreateNewUtility; \(type.rawValue); \(title)"
+                newWindow?.titleVisibility = .hidden
             } else {
                 newWindow = NSWindow(
                     contentRect: NSRect(x: 0, y: 0, width: 520, height: type == .commandline ? 800 : 470),
@@ -173,6 +183,8 @@ struct SelectUtilityTypeWindowView: View {
                 newWindow?.titlebarAppearsTransparent = true
                 newWindow?.appearance = NSAppearance(named: .darkAqua)
                 newWindow?.styleMask.insert(.fullSizeContentView)
+                newWindow?.title = "CreateNewUtility; \(type.rawValue); \(title)"
+                newWindow?.titleVisibility = .hidden
             }
             
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
@@ -198,7 +210,16 @@ struct SelectUtilityTypeWindowView: View {
                     hv.view.frame = newWindow?.contentView?.bounds ?? .zero
                     hv.view.autoresizingMask = [.width, .height]
                 } else {
-                    let hv = NSHostingController(rootView: NewBashUtilityView(categories: categories, item: item, delegate: viewModel.delegate) {
+                    let hv = NSHostingController(rootView: NewBashUtilityView(categories: categories, item: item, delegate: viewModel.delegate) { item in
+                        switchTo(.utilities)
+                        if let category = item?.category {
+                            viewModel.delegate?.expandSectionIfNeeded(for: category)
+                        }
+                        if let name = item?.title {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                viewModel.delegate?.scrollToApp = name
+                            }
+                        }
                         newWindow?.close()
                     })
                     newWindow?.contentView?.addSubview(hv.view)

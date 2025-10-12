@@ -43,12 +43,12 @@ class NewBashUtilityViewModel: ObservableObject, JSONLoadable {
 
 struct NewBashUtilityView: View {
     @ObservedObject var viewModel: NewBashUtilityViewModel
-    var closeAction: () -> Void
+    var closeAction: (ShortcutObject?) -> Void
     weak var delegate: UtilitiesWindowDelegate?
     var currentPage: Int?
     let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 0.7)
     
-    init(categories: [String], item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping () -> Void) {
+    init(categories: [String], item: ShortcutObject? = nil, delegate: UtilitiesWindowDelegate?, closeAction: @escaping (ShortcutObject?) -> Void) {
         self.delegate = delegate
         self.closeAction = closeAction
         self.viewModel = NewBashUtilityViewModel(categories: categories)
@@ -176,27 +176,26 @@ struct NewBashUtilityView: View {
                 Spacer()
                 BlueButton(title: "Cancel", font: .callout, padding: 12.0, backgroundColor: .gray) {
                     viewModel.clear()
-                    closeAction()
+                    closeAction(nil)
                 }
                 .padding(.trailing, 6.0)
                 BlueButton(title: "Save", font: .callout, padding: 12.0) {
-                    delegate?.saveUtility(with:
-                        .init(
-                            type: viewModel.type,
-                            page: currentPage ?? 1,
-                            size: viewModel.size,
-                            path: viewModel.path,
-                            id: viewModel.id ?? UUID().uuidString,
-                            title: viewModel.title,
-                            imageData: viewModel.selectedIcon?.toData,
-                            scriptCode: viewModel.scriptCode,
-                            utilityType: .commandline,
-                            showTitleOnIcon: viewModel.showTitleOnIcon,
-                            category: viewModel.category
-                        )
+                    let item: ShortcutObject = .init(
+                        type: viewModel.type,
+                        page: currentPage ?? 1,
+                        size: viewModel.size,
+                        path: viewModel.path,
+                        id: viewModel.id ?? UUID().uuidString,
+                        title: viewModel.title,
+                        imageData: viewModel.selectedIcon?.toData,
+                        scriptCode: viewModel.scriptCode,
+                        utilityType: .commandline,
+                        showTitleOnIcon: viewModel.showTitleOnIcon,
+                        category: viewModel.category
                     )
+                    delegate?.saveUtility(with: item)
                     viewModel.clear()
-                    closeAction()
+                    closeAction(item)
                 }
             }
             .padding(.trailing, 6.0)

@@ -77,6 +77,8 @@ extension ShortcutsView {
     }
     
     func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {
+        newWindow?.close()
+        newWindow = nil
         if nil == newWindow {
             newWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
@@ -90,14 +92,28 @@ extension ShortcutsView {
             newWindow?.titlebarAppearsTransparent = true
             newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
-            
+            if let item {
+                newWindow?.title = "Edit URL Link"
+            } else {
+                newWindow?.title = "Create URL Link"
+            }
+            newWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
                 return
             }
             newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
-            viewModel.close = {
+            viewModel.close = { item in
                 tab = .webpages
+                if let category = item?.category {
+                    viewModel.expandSectionIfNeeded(for: category)
+                }
+                if let title = item?.title {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        viewModel.scrollToApp = title
+                    }
+                }
+                
                 newWindow?.close()
             }
             newWindow?.contentView?.addSubview(hv.view)
@@ -106,15 +122,6 @@ extension ShortcutsView {
             newWindow?.makeKeyAndOrderFront(nil)
             return
         }
-        newWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
-        let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
-        viewModel.close = {
-            newWindow?.close()
-        }
-        newWindow?.contentView?.addSubview(hv.view)
-        hv.view.frame = newWindow?.contentView?.bounds ?? .zero
-        hv.view.autoresizingMask = [.width, .height]
-        newWindow?.makeKeyAndOrderFront(nil)
     }
     
     func openCompanionAppWindow() {
@@ -126,12 +133,13 @@ extension ShortcutsView {
                 defer: false
             )
             companionAppWindow?.center()
-            companionAppWindow?.setFrameAutosaveName("Webpages")
+            companionAppWindow?.setFrameAutosaveName("CompanionAppWindow")
             companionAppWindow?.isReleasedWhenClosed = false
             companionAppWindow?.titlebarAppearsTransparent = true
             companionAppWindow?.appearance = NSAppearance(named: .darkAqua)
             companionAppWindow?.styleMask.insert(.fullSizeContentView)
-            
+            companionAppWindow?.title = "CompanionAppWindow"
+            companionAppWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: companionAppWindow) else {
                 return
             }
@@ -167,7 +175,8 @@ extension ShortcutsView {
             uiControlAppWindow?.titlebarAppearsTransparent = true
             uiControlAppWindow?.appearance = NSAppearance(named: .darkAqua)
             uiControlAppWindow?.styleMask.insert(.fullSizeContentView)
-            
+            uiControlAppWindow?.title = "UIControl"
+            uiControlAppWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlAppWindow) else {
                 return
             }
@@ -205,7 +214,8 @@ extension ShortcutsView {
             uiControlListAppWindow?.titlebarAppearsTransparent = true
             uiControlListAppWindow?.appearance = NSAppearance(named: .darkAqua)
             uiControlListAppWindow?.styleMask.insert(.fullSizeContentView)
-            
+            uiControlListAppWindow?.title = "UIControlList"
+            uiControlListAppWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlListAppWindow) else {
                 return
             }
@@ -245,7 +255,8 @@ extension ShortcutsView {
             uiControlListAppWindow?.titlebarAppearsTransparent = true
             uiControlListAppWindow?.appearance = NSAppearance(named: .darkAqua)
             uiControlListAppWindow?.styleMask.insert(.fullSizeContentView)
-            
+            uiControlListAppWindow?.title = "UICreateControlList"
+            uiControlListAppWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlListAppWindow) else {
                 return
             }
@@ -276,7 +287,9 @@ extension ShortcutsView {
             automationsToInstallWindow?.titlebarAppearsTransparent = true
             automationsToInstallWindow?.appearance = NSAppearance(named: .darkAqua)
             automationsToInstallWindow?.styleMask.insert(.fullSizeContentView)
-            
+            automationsToInstallWindow?.title = "Store"
+            automationsToInstallWindow?.titleVisibility = .hidden
+
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: automationsToInstallWindow) else {
                 return
             }
@@ -309,7 +322,8 @@ extension ShortcutsView {
             iconPickerWindow?.titlebarAppearsTransparent = true
             iconPickerWindow?.appearance = NSAppearance(named: .darkAqua)
             iconPickerWindow?.styleMask.insert(.fullSizeContentView)
-            
+            iconPickerWindow?.title = "IconPickerWindow"
+            iconPickerWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: iconPickerWindow) else {
                 return
             }
@@ -343,7 +357,8 @@ extension ShortcutsView {
             uiControlCreateWindow?.titlebarAppearsTransparent = true
             uiControlCreateWindow?.appearance = NSAppearance(named: .darkAqua)
             uiControlCreateWindow?.styleMask.insert(.fullSizeContentView)
-            
+            uiControlCreateWindow?.title = "UIControlCreateWindow"
+            uiControlCreateWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlCreateWindow) else {
                 return
             }
@@ -393,7 +408,8 @@ extension ShortcutsView {
             uiControlCreateTestWindow?.titlebarAppearsTransparent = true
             uiControlCreateTestWindow?.appearance = NSAppearance(named: .darkAqua)
             uiControlCreateTestWindow?.styleMask.insert(.fullSizeContentView)
-            
+            uiControlCreateTestWindow?.title = "UIControlCreateTestWindow"
+            uiControlCreateTestWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlCreateTestWindow) else {
                 return
             }
@@ -426,7 +442,8 @@ extension ShortcutsView {
             newUtilityWindow?.titlebarAppearsTransparent = true
             newUtilityWindow?.appearance = NSAppearance(named: .darkAqua)
             newUtilityWindow?.styleMask.insert(.fullSizeContentView)
-            
+            newUtilityWindow?.title = "NewUtility"
+            newUtilityWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newUtilityWindow) else {
                 return
             }
@@ -436,6 +453,7 @@ extension ShortcutsView {
                 connectionManager: viewModel.connectionManager,
                 categories: viewModel.allCategories(),
                 delegate: viewModel,
+                switchTo: { tab in self.tab = tab },
                 closeAction: {
                     newUtilityWindow?.close()
                 }))
@@ -462,6 +480,8 @@ extension ShortcutsView {
             quickActionSetupWindow?.titlebarAppearsTransparent = true
             quickActionSetupWindow?.appearance = NSAppearance(named: .darkAqua)
             quickActionSetupWindow?.styleMask.insert(.fullSizeContentView)
+            quickActionSetupWindow?.title = "QuickActionSetupWindow"
+            quickActionSetupWindow?.titleVisibility = .hidden
             quickActionSetupWindow?.level = .floating
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: quickActionSetupWindow) else {
                 return
@@ -504,7 +524,8 @@ extension ShortcutsView {
             automationItemWindow?.titlebarAppearsTransparent = true
             automationItemWindow?.appearance = NSAppearance(named: .darkAqua)
             automationItemWindow?.styleMask.insert(.fullSizeContentView)
-            
+            automationItemWindow?.title = "Install Automations; \(item.title)"
+            automationItemWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: automationItemWindow) else {
                 return
             }
@@ -513,6 +534,14 @@ extension ShortcutsView {
                 viewModel.addAutomations(from: scripts)
                 automationItemWindow?.close()
                 tab = .utilities
+                if let category = scripts.first?.category {
+                    viewModel.expandSectionIfNeeded(for: category)
+                }
+                if let name = scripts.first?.name {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        viewModel.scrollToApp = name
+                    }
+                }
             }, close: {
                 automationItemWindow?.close()
             }))
@@ -549,7 +578,8 @@ extension ShortcutsView {
             editUtilitiesWindow?.titlebarAppearsTransparent = true
             editUtilitiesWindow?.appearance = NSAppearance(named: .darkAqua)
             editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
-            
+            editUtilitiesWindow?.title = "Edit Utilities; \(item.utilityType?.rawValue ?? "")"
+            editUtilitiesWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
                 return
             }
@@ -577,7 +607,7 @@ extension ShortcutsView {
                     }
                     return
                 } else {
-                    let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                    let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) { item in
                         editUtilitiesWindow?.close()
                     })
                     editUtilitiesWindow?.contentView?.addSubview(hv.view)

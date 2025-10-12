@@ -49,7 +49,7 @@ struct StandaloneTabView: View {
     }
     
     private var utilitiesView: some View {
-        UtilitiesWindowView(viewModel: viewModel)
+        UtilitiesWindowView(viewModel: viewModel, switchTo: { _ in })
     }
         
     private var installedAppsView: some View {

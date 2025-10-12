@@ -9,13 +9,14 @@ import SwiftUI
 
 protocol WebpagesWindowDelegate: AnyObject {
     func saveWebpage(with webpageItem: ShortcutObject)
-    var close: () -> Void { get }
+    var close: (ShortcutObject?) -> Void { get }
 }
 
 struct WebpagesWindowView: View {
     @State private var newWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
     @StateObject var viewModel: ShortcutsViewModel
+    @State private var appNameToFlash: String = ""
     
     enum Constants {
         static let imageSize = 46.0
@@ -50,16 +51,32 @@ struct WebpagesWindowView: View {
                     Spacer()
                 }
             } else {
-                ScrollView {
-                    ForEach(viewModel.webpages) { item in
-                        if let scriptCode = item.scriptCode {
-                            if scriptCode.isEmpty {
-                                itemView(item: item)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        ForEach(viewModel.webpages) { item in
+                            if let scriptCode = item.scriptCode {
+                                if scriptCode.isEmpty {
+                                    itemView(item: item)
+                                        .id(item.title)
+                                } else {
+                                    EmptyView()
+                                }
                             } else {
-                                EmptyView()
+                                itemView(item: item)
+                                    .id(item.title)
                             }
-                        } else {
-                            itemView(item: item)
+                        }
+                    }
+                    .onChange(of: viewModel.scrollToApp) { _, title in
+                        guard title != "--> none" else { return }
+                        withAnimation {
+                            proxy.scrollTo(title, anchor: .center)
+                        } completion: {
+                            appNameToFlash = title
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                                appNameToFlash = ""
+                                viewModel.scrollToApp = "--> none"
+                            }
                         }
                     }
                 }
@@ -135,6 +152,8 @@ struct WebpagesWindowView: View {
                         viewModel.removeWebItem(id: item.id)
                     }
             }
+            .background(item.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
+            .animation(.easeOut, value: appNameToFlash)
             .padding(.horizontal, 16.0)
             .padding(.vertical, 6.0)
             Divider()
@@ -142,6 +161,8 @@ struct WebpagesWindowView: View {
     }
     
     private func openCreateNewWebpageWindow(item: ShortcutObject? = nil) {
+        newWindow?.close()
+        newWindow = nil
         if nil == newWindow {
             newWindow = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
@@ -155,13 +176,18 @@ struct WebpagesWindowView: View {
             newWindow?.titlebarAppearsTransparent = true
             newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
-            
+            if let item {
+                newWindow?.title = "Edit URL Link"
+            } else {
+                newWindow?.title = "Create URL Link"
+            }
+            newWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
                 return
             }
             newWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
-            viewModel.close = {
+            viewModel.close = { _ in
                 newWindow?.close()
             }
             newWindow?.contentView?.addSubview(hv.view)
@@ -170,14 +196,5 @@ struct WebpagesWindowView: View {
             newWindow?.makeKeyAndOrderFront(nil)
             return
         }
-        let hv = NSHostingController(rootView: NewWebpageView(item: item, delegate: viewModel))
-        viewModel.close = {
-            newWindow?.close()
-        }
-        newWindow?.contentView?.subviews.forEach { $0.removeFromSuperview() }
-        newWindow?.contentView?.addSubview(hv.view)
-        hv.view.frame = newWindow?.contentView?.bounds ?? .zero
-        hv.view.autoresizingMask = [.width, .height]
-        newWindow?.makeKeyAndOrderFront(nil)
     }
 }

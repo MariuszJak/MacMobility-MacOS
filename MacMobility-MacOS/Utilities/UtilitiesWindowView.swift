@@ -10,7 +10,9 @@ import SwiftUI
 protocol UtilitiesWindowDelegate: AnyObject {
     func saveUtility(with utilityItem: ShortcutObject)
     func allObjects() -> [ShortcutObject]
-    var close: () -> Void { get }
+    func expandSectionIfNeeded(for title: String)
+    var close: (ShortcutObject?) -> Void { get }
+    var scrollToApp: String { get set }
 }
 
 struct UtilitiesWindowView: View {
@@ -21,14 +23,16 @@ struct UtilitiesWindowView: View {
     @State var uiControlCreateTestWindow: NSWindow?
     @StateObject var viewModel: ShortcutsViewModel
     @State private var appNameToFlash: String = ""
+    private let switchTo: (Tab) -> Void
     
     enum Constants {
         static let imageSize = 46.0
         static let cornerRadius = 6.0
     }
     
-    init(viewModel: ShortcutsViewModel) {
+    init(viewModel: ShortcutsViewModel, switchTo: @escaping (Tab) -> Void) {
         self._viewModel = .init(wrappedValue: viewModel)
+        self.switchTo = switchTo
     }
     
     var body: some View {
@@ -122,6 +126,7 @@ struct UtilitiesWindowView: View {
                         }
                     }
                     .onChange(of: viewModel.scrollToApp) { _, title in
+                        guard title != "--> none" else { return }
                         withAnimation {
                             proxy.scrollTo(title, anchor: .center)
                         } completion: {
@@ -129,6 +134,7 @@ struct UtilitiesWindowView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                                 appNameToFlash = ""
                             }
+                            viewModel.scrollToApp = "--> none"
                         }
                     }
                 }
@@ -232,7 +238,8 @@ struct UtilitiesWindowView: View {
             newWindow?.titlebarAppearsTransparent = true
             newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
-            
+            newWindow?.title = "NewUtility"
+            newWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: newWindow) else {
                 return
             }
@@ -242,6 +249,7 @@ struct UtilitiesWindowView: View {
                 connectionManager: viewModel.connectionManager,
                 categories: viewModel.allCategories(),
                 delegate: viewModel,
+                switchTo: switchTo,
                 closeAction: {
                     newWindow?.close()
                 }))
@@ -277,7 +285,8 @@ struct UtilitiesWindowView: View {
             editUtilitiesWindow?.titlebarAppearsTransparent = true
             editUtilitiesWindow?.appearance = NSAppearance(named: .darkAqua)
             editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
-            
+            editUtilitiesWindow?.title = "Edit Utilities; \(item.utilityType?.rawValue ?? "")"
+            editUtilitiesWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
                 return
             }
@@ -305,7 +314,16 @@ struct UtilitiesWindowView: View {
                     }
                     return
                 } else {
-                    let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) {
+                    let hv = NSHostingController(rootView: NewBashUtilityView(categories: viewModel.allCategories(), item: item, delegate: viewModel) { item in
+                        switchTo(.utilities)
+                        if let category = item?.category {
+                            viewModel.expandSectionIfNeeded(for: category)
+                        }
+                        if let name = item?.title {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                viewModel.scrollToApp = name
+                            }
+                        }
                         editUtilitiesWindow?.close()
                     })
                     editUtilitiesWindow?.contentView?.addSubview(hv.view)
@@ -371,7 +389,8 @@ struct UtilitiesWindowView: View {
             uiControlCreateWindow?.titlebarAppearsTransparent = true
             uiControlCreateWindow?.appearance = NSAppearance(named: .darkAqua)
             uiControlCreateWindow?.styleMask.insert(.fullSizeContentView)
-            
+            uiControlCreateWindow?.title = "UIControlCreateWindow"
+            uiControlCreateWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlCreateWindow) else {
                 return
             }
@@ -420,7 +439,8 @@ struct UtilitiesWindowView: View {
             uiControlCreateTestWindow?.titlebarAppearsTransparent = true
             uiControlCreateTestWindow?.appearance = NSAppearance(named: .darkAqua)
             uiControlCreateTestWindow?.styleMask.insert(.fullSizeContentView)
-            
+            uiControlCreateTestWindow?.title = "UIControlCreateTestWindow"
+            uiControlCreateTestWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: uiControlCreateTestWindow) else {
                 return
             }
