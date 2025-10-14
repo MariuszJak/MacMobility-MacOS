@@ -120,8 +120,8 @@ struct GeneralSettingsView: View {
                     Text("Orion").tag(Browsers.orion)
                 }
                 .pickerStyle(.menu)
-                Text("Select default browser for creating and opening links.")
-                    .font(.system(size: 11, weight: .light))
+                Text("Select default browser for creating and opening links. IMPORTANT: This setting will not affect existing links. You have to manually update them if needed.")
+                    .font(.system(size: 13, weight: .light))
                     .foregroundStyle(Color.gray)
             }
             .padding()
@@ -151,16 +151,21 @@ class PrivacySettingsViewModel: ObservableObject {
 
 struct PrivacySettingsView: View {
     @ObservedObject var viewModel = PrivacySettingsViewModel()
+    private let alignment: HorizontalAlignment
+    
+    init(alignment: HorizontalAlignment = .leading) {
+        self.alignment = alignment
+    }
     
     var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: alignment, spacing: 12) {
                 Text("Privacy Settings")
                     .font(.title2)
                     .bold()
                 Toggle("Allow analytics tracking", isOn: $viewModel.isSendingUsageData)
                 Text("We’d like to collect anonymous analytics data to improve app performance and user experience. No personal data is ever shared.")
-                    .font(.system(size: 11, weight: .light))
+                    .font(.system(size: 13, weight: .light))
                     .foregroundStyle(Color.gray)
             }
             .padding()

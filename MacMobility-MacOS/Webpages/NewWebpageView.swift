@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+extension Color {
+    static var dragPreviewColor: Color {
+        .gray
+    }
+}
+
 class NewWebpageViewModel: ObservableObject {
     var id: String?
     @Published var title: String = ""

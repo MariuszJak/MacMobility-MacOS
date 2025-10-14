@@ -16,7 +16,7 @@ struct WebpagesWindowView: View {
     @State private var newWindow: NSWindow?
     @State private var allBrowserwWindow: NSWindow?
     @StateObject var viewModel: ShortcutsViewModel
-    @State private var appNameToFlash: String = ""
+    @State private var appNameToFlash: String = " "
     
     enum Constants {
         static let imageSize = 46.0
@@ -57,13 +57,13 @@ struct WebpagesWindowView: View {
                             if let scriptCode = item.scriptCode {
                                 if scriptCode.isEmpty {
                                     itemView(item: item)
-                                        .id(item.title)
+                                        .id(item.path)
                                 } else {
                                     EmptyView()
                                 }
                             } else {
                                 itemView(item: item)
-                                    .id(item.title)
+                                    .id(item.path)
                             }
                         }
                     }
@@ -74,7 +74,7 @@ struct WebpagesWindowView: View {
                         } completion: {
                             appNameToFlash = title
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                                appNameToFlash = ""
+                                appNameToFlash = " "
                                 viewModel.scrollToApp = "--> none"
                             }
                         }
@@ -152,7 +152,7 @@ struct WebpagesWindowView: View {
                         viewModel.removeWebItem(id: item.id)
                     }
             }
-            .background(item.title == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
+            .background(item.path == appNameToFlash ? Color.yellow.opacity(0.5) : Color.clear)
             .animation(.easeOut, value: appNameToFlash)
             .padding(.horizontal, 16.0)
             .padding(.vertical, 6.0)

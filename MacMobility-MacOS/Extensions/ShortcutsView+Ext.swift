@@ -108,9 +108,9 @@ extension ShortcutsView {
                 if let category = item?.category {
                     viewModel.expandSectionIfNeeded(for: category)
                 }
-                if let title = item?.title {
+                if let path = item?.path {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        viewModel.scrollToApp = title
+                        viewModel.scrollToApp = path
                     }
                 }
                 

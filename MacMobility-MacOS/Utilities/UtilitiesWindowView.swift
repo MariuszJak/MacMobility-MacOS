@@ -193,7 +193,7 @@ struct UtilitiesWindowView: View {
                     return NSItemProvider(object: item.id as NSString)
                 } preview: {
                     RoundedRectangle(cornerRadius: 5.0)
-                        .fill(Color.blue)
+                        .fill(Color.dragPreviewColor)
                         .frame(
                             width: 20 * (item.size?.width ?? 1) + 7.0 * (item.size?.width ?? 1),
                             height: 20 * (item.size?.height ?? 1) + 7.0 * (item.size?.height ?? 1)

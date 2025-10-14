@@ -40,14 +40,16 @@ class PermissionViewModel: ObservableObject {
 
 struct PermissionView: View {
     @ObservedObject private var viewModel: PermissionViewModel
+    private let alignment: HorizontalAlignment
     
-    init(viewModel: PermissionViewModel) {
+    init(viewModel: PermissionViewModel, alignment: HorizontalAlignment = .leading) {
         self.viewModel = viewModel
+        self.alignment = alignment
     }
     
     public var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 12.0) {
+            VStack(alignment: alignment, spacing: 12.0) {
                 Text("Accessibility Permission")
                     .font(.title2)
                     .bold()
@@ -56,7 +58,7 @@ struct PermissionView: View {
                 }
                 .disabled(AXIsProcessTrusted())
                 Text("We need access to your system to allow accessibility features to work correctly. Please allow this permission in your system preferences.")
-                    .font(.system(size: 11, weight: .light))
+                    .font(.system(size: 13, weight: .light))
                     .foregroundStyle(Color.gray)
             }
             .padding()

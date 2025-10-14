@@ -67,7 +67,6 @@ extension ConnectionManager {
         case .control:
             if shortcutItem.utilityType == .commandline {
                 if let script = shortcutItem.scriptCode {
-                    print("script: \(script)")
                     if let message = runInlineBashScript(script: script), message.lowercased().contains("error") {
                         DispatchQueue.main.async {
                             print(message)
@@ -77,7 +76,6 @@ extension ConnectionManager {
             } else if shortcutItem.utilityType == .automation {
                 self.dynamicUrls.1.removeAll()
                 if let script = shortcutItem.scriptCode {
-                    print("script: \(script)")
                     execute(script) { [weak self] error in
                         guard let self else { return }
                         DispatchQueue.main.async {

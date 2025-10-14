@@ -15,6 +15,7 @@ struct IconPickerView: View {
     @State var iconPickerWindow: NSWindow?
     private var imageSize: CGSize
     private let canSelectImage: Bool
+    private let canBrowseIcons: Bool
     
     init(
         viewModel: IconPickerViewModel,
@@ -22,7 +23,8 @@ struct IconPickerView: View {
         title: Binding<String> = .constant(""),
         favicon: Binding<String> = .constant(""),
         imageSize: CGSize = .init(width: 100.0, height: 100.0),
-        canSelectImage: Bool = true
+        canSelectImage: Bool = true,
+        canBrowseIcons: Bool = true
     ) {
         self._viewModel = .init(wrappedValue: viewModel)
         self._title = title
@@ -30,6 +32,7 @@ struct IconPickerView: View {
         self._userSelectedIcon = userSelectedIcon
         self.imageSize = imageSize
         self.canSelectImage = canSelectImage
+        self.canBrowseIcons = canBrowseIcons
     }
     
     var body: some View {
@@ -82,8 +85,10 @@ struct IconPickerView: View {
             }
             if canSelectImage {
                 VStack(alignment: .leading) {
-                    ProminentButtonView("Browse Icons") {
-                        openIconsPickerWindow()
+                    if canBrowseIcons {
+                        ProminentButtonView("Browse Icons") {
+                            openIconsPickerWindow()
+                        }
                     }
                     Button("Select Icon") {
                         viewModel.pickImage() { icon in

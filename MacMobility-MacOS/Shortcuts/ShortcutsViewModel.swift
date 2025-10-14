@@ -443,19 +443,21 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 ? option.scripts
                 : option.scripts.filter { !($0.isAdvanced ?? false) }
                 var i: Int = 3
-                
-                filtered.enumerated().forEach { (index, script) in
-                    if script.script.contains("URLs"), let browser {
-                        if script.script.contains(browser.name.uppercased()) {
-                            let so: ShortcutObject = .from(script: script, at: i)
-                            addConfiguredShortcut(object: so)
-                            i += 1
-                        }
-                    } else {
-                        if !script.script.contains("URLs") {
-                            let so: ShortcutObject = .from(script: script, at: i)
-                            addConfiguredShortcut(object: so)
-                            i += 1
+                let sorted = filtered.sorted { $0.name.lowercased() < $1.name.lowercased() }
+                sorted.enumerated().forEach { (index, script) in
+                    if script.category != "Window Management" {
+                        if script.script.contains("URLs"), let browser {
+                            if script.script.contains(browser.name.uppercased()) {
+                                let so: ShortcutObject = .from(script: script, at: i)
+                                addConfiguredShortcut(object: so)
+                                i += 1
+                            }
+                        } else {
+                            if !script.script.contains("URLs") {
+                                let so: ShortcutObject = .from(script: script, at: i)
+                                addConfiguredShortcut(object: so)
+                                i += 1
+                            }
                         }
                     }
                 }
@@ -481,7 +483,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     }
                     let ma: ShortcutObject = .init(
                         type: .utility, page: 1, index: i, indexes: [i], path: nil, id: UUID().uuidString,
-                        title: "", color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData,
+                        title: "Initial Websites", color: nil, faviconLink: nil, browser: nil, imageData: NSImage(named: "multiapp")?.toData,
                         scriptCode: nil, utilityType: .multiselection, objects: websitesSO, showTitleOnIcon: false,
                         category: "Multiselection"
                     )

@@ -101,7 +101,31 @@ struct WelcomeView: View {
                 case 2:
                     OnboardingVideoComparisonView()
                 case 3:
-                    PermissionView(viewModel: .init(connectionManager: connectionManager))
+                    VStack(alignment: .center, spacing: 12.0) {
+                        Text("Permissions Setup")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        Text("Please check our permissions to continue.")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                            .padding(.bottom, 30.0)
+                        VStack {
+                            PermissionView(viewModel: .init(connectionManager: connectionManager))
+                            PrivacySettingsView()
+                        }
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(Color.clear)
+                                )
+                        )
+                        .contentShape(Rectangle())
+                    }
                 case 4:
                     AppSetupChoiceView(viewModel.setupMode) { setupMode in
                         viewModel.updateSetupMode(setupMode)
@@ -176,6 +200,7 @@ struct WelcomeView: View {
             Text("Are you sure you want to skip onboarding? You might miss important setup information.")
         }
         .onAppear {
+            UserDefaults.standard.store(true, for: .analyticsConsent)
             withAnimation(.easeInOut(duration: 5)) {
                 showWelcomeText = true
             }
@@ -1299,14 +1324,18 @@ struct PredefinedWebsitesCreationView: View {
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 20.0)
                 RoundedTextField(placeholder: "", text: $viewModel.firstLink)
-                IconPickerView(viewModel: .init(
-                    selectedImage: viewModel.selectedIcon ?? viewModel.savedIcon,
-                    shouldAutofetchImage: viewModel.selectedIcon == nil,
-                    searchText: viewModel.firstLink,
-                    completion: { image in
-                        viewModel.savedIcon = image
-                        action(.init(id: viewModel.idOne, nsImage: viewModel.selectedIcon ?? image, url: viewModel.firstLink))
-                    }), userSelectedIcon: $viewModel.selectedIcon, imageSize: .init(width: 50.0, height: 50.0)
+                IconPickerView(
+                    viewModel: .init(
+                        selectedImage: viewModel.selectedIcon ?? viewModel.savedIcon,
+                        shouldAutofetchImage: viewModel.selectedIcon == nil,
+                        searchText: viewModel.firstLink,
+                        completion: { image in
+                            viewModel.savedIcon = image
+                            action(.init(id: viewModel.idOne, nsImage: viewModel.selectedIcon ?? image, url: viewModel.firstLink))
+                        }),
+                    userSelectedIcon: $viewModel.selectedIcon,
+                    imageSize: .init(width: 50.0, height: 50.0),
+                    canBrowseIcons: false
                 )
             }
             .frame(maxWidth: .infinity)
@@ -1321,14 +1350,18 @@ struct PredefinedWebsitesCreationView: View {
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 20.0)
                 RoundedTextField(placeholder: "", text: $viewModel.secondLink)
-                IconPickerView(viewModel: .init(
-                    selectedImage: viewModel.selectedIconTwo ?? viewModel.savedIconTwo,
-                    shouldAutofetchImage: viewModel.selectedIconTwo == nil,
-                    searchText: viewModel.secondLink,
-                    completion: { image in
-                        viewModel.savedIconTwo = image
-                        action(.init(id: viewModel.idTwo, nsImage: image, url: viewModel.secondLink))
-                    }), userSelectedIcon: $viewModel.selectedIconTwo, imageSize: .init(width: 50.0, height: 50.0)
+                IconPickerView(
+                    viewModel: .init(
+                        selectedImage: viewModel.selectedIconTwo ?? viewModel.savedIconTwo,
+                        shouldAutofetchImage: viewModel.selectedIconTwo == nil,
+                        searchText: viewModel.secondLink,
+                        completion: { image in
+                            viewModel.savedIconTwo = image
+                            action(.init(id: viewModel.idTwo, nsImage: image, url: viewModel.secondLink))
+                        }),
+                    userSelectedIcon: $viewModel.selectedIconTwo,
+                    imageSize: .init(width: 50.0, height: 50.0),
+                    canBrowseIcons: false
                 )
             }
             .frame(maxWidth: .infinity)
@@ -1343,14 +1376,18 @@ struct PredefinedWebsitesCreationView: View {
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 20.0)
                 RoundedTextField(placeholder: "", text: $viewModel.thirdLink)
-                IconPickerView(viewModel: .init(
-                    selectedImage: viewModel.selectedIconThree ?? viewModel.savedIconThree,
-                    shouldAutofetchImage: viewModel.selectedIconThree == nil,
-                    searchText: viewModel.thirdLink,
-                    completion: { image in
-                        viewModel.savedIconThree = image
-                        action(.init(id: viewModel.idThree, nsImage: image, url: viewModel.thirdLink))
-                    }), userSelectedIcon: $viewModel.selectedIconThree, imageSize: .init(width: 50.0, height: 50.0)
+                IconPickerView(
+                    viewModel: .init(
+                        selectedImage: viewModel.selectedIconThree ?? viewModel.savedIconThree,
+                        shouldAutofetchImage: viewModel.selectedIconThree == nil,
+                        searchText: viewModel.thirdLink,
+                        completion: { image in
+                            viewModel.savedIconThree = image
+                            action(.init(id: viewModel.idThree, nsImage: image, url: viewModel.thirdLink))
+                        }),
+                    userSelectedIcon: $viewModel.selectedIconThree,
+                    imageSize: .init(width: 50.0, height: 50.0),
+                    canBrowseIcons: false
                 )
             }
             .frame(maxWidth: .infinity)

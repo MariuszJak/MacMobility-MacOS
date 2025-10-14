@@ -196,6 +196,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             circularWindow?.hasShadow = false
             circularWindow?.isMovableByWindowBackground = true
             circularWindow?.level = .floating
+            circularWindow?.title = "Quick Action Menu"
+            circularWindow?.titleVisibility = .hidden
             let hostingController = NSHostingController(
                 rootView: QuickActionsView(
                     viewModel: .init(

@@ -405,7 +405,7 @@ struct ShortcutsView: View {
             return NSItemProvider(object: object.id as NSString)
         } preview: {
             RoundedRectangle(cornerRadius: 5.0)
-                .fill(Color.blue)
+                .fill(Color.dragPreviewColor)
                 .frame(
                     width: 20 * (object.size?.width ?? 1) + testSize * (object.size?.width ?? 1),
                     height: 20 * (object.size?.height ?? 1) + testSize * (object.size?.height ?? 1)
@@ -653,14 +653,14 @@ struct ShortcutsView: View {
                     Image(nsImage: image)
                         .resizable()
                         .interpolation(.high)
+                        .aspectRatio(contentMode: .fill)
+                        .cornerRadius(cornerRadius)
                         .if(object.size == ItemSize.size1x1.cgSize) {
                             $0.frame(width: 70.0, height: 70.0)
                         }
                         .if(object.size != ItemSize.size1x1.cgSize) {
                             $0.frame(width: size.width, height: size.height)
                         }
-                        .aspectRatio(contentMode: .fill)
-                        .cornerRadius(cornerRadius)
                         .clipShape(
                             RoundedRectangle(cornerRadius: cornerRadius)
                         )
