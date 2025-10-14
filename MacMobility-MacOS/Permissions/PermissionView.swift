@@ -46,34 +46,21 @@ struct PermissionView: View {
     }
     
     public var body: some View {
-        VStack {
-            VStack {
-                Spacer()
-                Image(.logo)
-                    .resizable()
-                    .frame(width: 128, height: 128)
-                    .cornerRadius(20)
-                Spacer()
-            }
-            .padding()
-            VStack {
-                Spacer()
+        HStack {
+            VStack(alignment: .leading, spacing: 12.0) {
                 Text("Accessibility Permission")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(Color.white)
-                    .padding(.bottom, 6.0)
-                Text("We need access to your system to allow accessibility features to work correctly. Please allow this permission in your system preferences.")
-                    .foregroundStyle(Color.gray)
-                    .padding(.bottom, 6.0)
+                    .font(.title2)
+                    .bold()
                 Button("Ask for permission") {
                     viewModel.askForPermission()
                 }
                 .disabled(AXIsProcessTrusted())
-                .padding(.bottom, 42)
-                Spacer()
+                Text("We need access to your system to allow accessibility features to work correctly. Please allow this permission in your system preferences.")
+                    .font(.system(size: 11, weight: .light))
+                    .foregroundStyle(Color.gray)
             }
             .padding()
+            Spacer()
         }
-        .padding(.horizontal, 21.0)
     }
 }

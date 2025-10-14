@@ -77,15 +77,15 @@ struct MacOSMainPopoverView: View {
             checkForUpdateButtonView
         }
         if viewModel.isPaidLicense {
-            permissionView
             Divider()
             shortcutsWindowButtonView
             pairiningView
             Divider()
+            settingsView
+            Divider()
             quitView
         } else {
             licenseWindowButtonView
-            permissionView
             Divider()
             if viewModel.isTrialExpired {
                 Button {
@@ -108,6 +108,8 @@ struct MacOSMainPopoverView: View {
                 }
                 pairiningView
             }
+            Divider()
+            settingsView
             Divider()
             quitView
         }
@@ -148,7 +150,7 @@ struct MacOSMainPopoverView: View {
     func openPermissionsWindow() {
         if nil == permissionsWindow {
             permissionsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 450),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -166,7 +168,7 @@ struct MacOSMainPopoverView: View {
             }
             
             permissionsWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
-            let hv = NSHostingController(rootView: PermissionView(viewModel: .init(connectionManager: connectionManager)))
+            let hv = NSHostingController(rootView: SettingsView(connectionManager: connectionManager))
             permissionsWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = permissionsWindow?.contentView?.bounds ?? .zero
             hv.view.autoresizingMask = [.width, .height]
@@ -249,13 +251,13 @@ struct MacOSMainPopoverView: View {
         }
     }
     
-    private var permissionView: some View {
+    private var settingsView: some View {
         Button {
             openPermissionsWindow()
         } label: {
             HStack {
-                Image(systemName: "lock.app.dashed")
-                Text("Check permissions")
+                Image(systemName: "gearshape")
+                Text("Settings")
             }
         }
     }

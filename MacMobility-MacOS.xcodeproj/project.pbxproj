@@ -40,18 +40,6 @@
 		C02F163B2E89CCC30012A888 /* keyboard-key-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16382E89CCC30012A888 /* keyboard-key-3.png */; };
 		C02F163C2E89CCC30012A888 /* keyboard-key-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16392E89CCC30012A888 /* keyboard-key-4.png */; };
 		C02F163D2E89CCC30012A888 /* keyboard-key-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16372E89CCC30012A888 /* keyboard-key-2.png */; };
-		C02F16622E89CDEF0012A888 /* emoji-6.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165B2E89CDEF0012A888 /* emoji-6.png */; };
-		C02F16632E89CDEF0012A888 /* emoji-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16582E89CDEF0012A888 /* emoji-3.png */; };
-		C02F16642E89CDEF0012A888 /* emoji-10.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165F2E89CDEF0012A888 /* emoji-10.png */; };
-		C02F16652E89CDEF0012A888 /* emoji-7.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165C2E89CDEF0012A888 /* emoji-7.png */; };
-		C02F16662E89CDEF0012A888 /* emoji-11.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16602E89CDEF0012A888 /* emoji-11.png */; };
-		C02F16672E89CDEF0012A888 /* emoji-9.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165E2E89CDEF0012A888 /* emoji-9.png */; };
-		C02F16682E89CDEF0012A888 /* emoji-12.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16612E89CDEF0012A888 /* emoji-12.png */; };
-		C02F16692E89CDEF0012A888 /* emoji-8.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165D2E89CDEF0012A888 /* emoji-8.png */; };
-		C02F166A2E89CDEF0012A888 /* emoji-5.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F165A2E89CDEF0012A888 /* emoji-5.png */; };
-		C02F166B2E89CDEF0012A888 /* emoji-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16562E89CDEF0012A888 /* emoji-1.png */; };
-		C02F166C2E89CDEF0012A888 /* emoji-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16572E89CDEF0012A888 /* emoji-2.png */; };
-		C02F166D2E89CDEF0012A888 /* emoji-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16592E89CDEF0012A888 /* emoji-4.png */; };
 		C02F16E72E92F2F70012A888 /* pages.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16C52E92F2F70012A888 /* pages.png */; };
 		C02F16E82E92F2F70012A888 /* apple-notes.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16A62E92F2F70012A888 /* apple-notes.png */; };
 		C02F16E92E92F2F70012A888 /* apple-music-play-pause.png in Resources */ = {isa = PBXBuildFile; fileRef = C02F16A32E92F2F70012A888 /* apple-music-play-pause.png */; };
@@ -159,17 +147,6 @@
 		C06C04DD2E75FA9900D2DE99 /* button-colors-purple.png in Resources */ = {isa = PBXBuildFile; fileRef = C06C04DA2E75FA9900D2DE99 /* button-colors-purple.png */; };
 		C06C04DE2E75FA9900D2DE99 /* button-colors-dark-green.png in Resources */ = {isa = PBXBuildFile; fileRef = C06C04D72E75FA9900D2DE99 /* button-colors-dark-green.png */; };
 		C06C04DF2E75FA9900D2DE99 /* button-colors-orange.png in Resources */ = {isa = PBXBuildFile; fileRef = C06C04D92E75FA9900D2DE99 /* button-colors-orange.png */; };
-		C06F44D62E99979C00C33E5A /* emoji-16.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44CE2E99979C00C33E5A /* emoji-16.png */; };
-		C06F44D72E99979C00C33E5A /* emoji-21.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44D32E99979C00C33E5A /* emoji-21.png */; };
-		C06F44D82E99979C00C33E5A /* emoji-23.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44D52E99979C00C33E5A /* emoji-23.png */; };
-		C06F44D92E99979C00C33E5A /* emoji-17.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44CF2E99979C00C33E5A /* emoji-17.png */; };
-		C06F44DA2E99979C00C33E5A /* emoji-18.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44D02E99979C00C33E5A /* emoji-18.png */; };
-		C06F44DB2E99979C00C33E5A /* emoji-19.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44D12E99979C00C33E5A /* emoji-19.png */; };
-		C06F44DC2E99979C00C33E5A /* emoji-20.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44D22E99979C00C33E5A /* emoji-20.png */; };
-		C06F44DD2E99979C00C33E5A /* emoji-22.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44D42E99979C00C33E5A /* emoji-22.png */; };
-		C06F44DE2E99979C00C33E5A /* emoji-14.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44CC2E99979C00C33E5A /* emoji-14.png */; };
-		C06F44DF2E99979C00C33E5A /* emoji-13.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44CB2E99979C00C33E5A /* emoji-13.png */; };
-		C06F44E02E99979C00C33E5A /* emoji-15.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44CD2E99979C00C33E5A /* emoji-15.png */; };
 		C06F45012E9A6C4F00C33E5A /* Glass-icon-29.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44FF2E9A6C4F00C33E5A /* Glass-icon-29.png */; };
 		C06F45022E9A6C4F00C33E5A /* Glass-icon-15.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44F12E9A6C4F00C33E5A /* Glass-icon-15.png */; };
 		C06F45032E9A6C4F00C33E5A /* Glass-icon-16.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F44F22E9A6C4F00C33E5A /* Glass-icon-16.png */; };
@@ -204,6 +181,30 @@
 		C06F452C2E9BCCA400C33E5A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C06F452B2E9BCCA400C33E5A /* GoogleService-Info.plist */; };
 		C06F452F2E9BCD2300C33E5A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C06F452E2E9BCD2300C33E5A /* FirebaseAnalytics */; };
 		C06F45312E9BD62000C33E5A /* AnalyticsConsentPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06F45302E9BD62000C33E5A /* AnalyticsConsentPrompt.swift */; };
+		C06F45342E9C2C2E00C33E5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06F45332E9C2C2E00C33E5A /* SettingsView.swift */; };
+		C06F457A2E9D7B8E00C33E5A /* emoji-21.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45772E9D7B8E00C33E5A /* emoji-21.png */; };
+		C06F457B2E9D7B8E00C33E5A /* emoji-17.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45732E9D7B8E00C33E5A /* emoji-17.png */; };
+		C06F457C2E9D7B8E00C33E5A /* emoji-23.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45792E9D7B8E00C33E5A /* emoji-23.png */; };
+		C06F457D2E9D7B8E00C33E5A /* emoji-12.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F456E2E9D7B8E00C33E5A /* emoji-12.png */; };
+		C06F457E2E9D7B8E00C33E5A /* emoji-5.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45672E9D7B8E00C33E5A /* emoji-5.png */; };
+		C06F457F2E9D7B8E00C33E5A /* emoji-15.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45712E9D7B8E00C33E5A /* emoji-15.png */; };
+		C06F45802E9D7B8E00C33E5A /* emoji-2.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45642E9D7B8E00C33E5A /* emoji-2.png */; };
+		C06F45812E9D7B8E00C33E5A /* emoji-18.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45742E9D7B8E00C33E5A /* emoji-18.png */; };
+		C06F45822E9D7B8E00C33E5A /* emoji-11.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F456D2E9D7B8E00C33E5A /* emoji-11.png */; };
+		C06F45832E9D7B8E00C33E5A /* emoji-6.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45682E9D7B8E00C33E5A /* emoji-6.png */; };
+		C06F45842E9D7B8E00C33E5A /* emoji-10.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F456C2E9D7B8E00C33E5A /* emoji-10.png */; };
+		C06F45852E9D7B8E00C33E5A /* emoji-13.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F456F2E9D7B8E00C33E5A /* emoji-13.png */; };
+		C06F45862E9D7B8E00C33E5A /* emoji-3.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45652E9D7B8E00C33E5A /* emoji-3.png */; };
+		C06F45872E9D7B8E00C33E5A /* emoji-16.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45722E9D7B8E00C33E5A /* emoji-16.png */; };
+		C06F45882E9D7B8E00C33E5A /* emoji-20.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45762E9D7B8E00C33E5A /* emoji-20.png */; };
+		C06F45892E9D7B8E00C33E5A /* emoji-22.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45782E9D7B8E00C33E5A /* emoji-22.png */; };
+		C06F458A2E9D7B8E00C33E5A /* emoji-9.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F456B2E9D7B8E00C33E5A /* emoji-9.png */; };
+		C06F458B2E9D7B8E00C33E5A /* emoji-14.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45702E9D7B8E00C33E5A /* emoji-14.png */; };
+		C06F458C2E9D7B8E00C33E5A /* emoji-4.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45662E9D7B8E00C33E5A /* emoji-4.png */; };
+		C06F458D2E9D7B8E00C33E5A /* emoji-8.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F456A2E9D7B8E00C33E5A /* emoji-8.png */; };
+		C06F458E2E9D7B8E00C33E5A /* emoji-1.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45632E9D7B8E00C33E5A /* emoji-1.png */; };
+		C06F458F2E9D7B8E00C33E5A /* emoji-7.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45692E9D7B8E00C33E5A /* emoji-7.png */; };
+		C06F45902E9D7B8E00C33E5A /* emoji-19.png in Resources */ = {isa = PBXBuildFile; fileRef = C06F45752E9D7B8E00C33E5A /* emoji-19.png */; };
 		C071D7102DB17C6E00ADD746 /* automations.json in Resources */ = {isa = PBXBuildFile; fileRef = C071D70F2DB17C6E00ADD746 /* automations.json */; };
 		C071D7182DB43A3100ADD746 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071D7172DB43A3100ADD746 /* WelcomeView.swift */; };
 		C08BBAA22DD67D31007F561B /* TCPServerStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08BBAA12DD67D31007F561B /* TCPServerStreamer.swift */; };
@@ -447,18 +448,6 @@
 		C02F16372E89CCC30012A888 /* keyboard-key-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyboard-key-2.png"; sourceTree = "<group>"; };
 		C02F16382E89CCC30012A888 /* keyboard-key-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyboard-key-3.png"; sourceTree = "<group>"; };
 		C02F16392E89CCC30012A888 /* keyboard-key-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyboard-key-4.png"; sourceTree = "<group>"; };
-		C02F16562E89CDEF0012A888 /* emoji-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-1.png"; sourceTree = "<group>"; };
-		C02F16572E89CDEF0012A888 /* emoji-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-2.png"; sourceTree = "<group>"; };
-		C02F16582E89CDEF0012A888 /* emoji-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-3.png"; sourceTree = "<group>"; };
-		C02F16592E89CDEF0012A888 /* emoji-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-4.png"; sourceTree = "<group>"; };
-		C02F165A2E89CDEF0012A888 /* emoji-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-5.png"; sourceTree = "<group>"; };
-		C02F165B2E89CDEF0012A888 /* emoji-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-6.png"; sourceTree = "<group>"; };
-		C02F165C2E89CDEF0012A888 /* emoji-7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-7.png"; sourceTree = "<group>"; };
-		C02F165D2E89CDEF0012A888 /* emoji-8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-8.png"; sourceTree = "<group>"; };
-		C02F165E2E89CDEF0012A888 /* emoji-9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-9.png"; sourceTree = "<group>"; };
-		C02F165F2E89CDEF0012A888 /* emoji-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-10.png"; sourceTree = "<group>"; };
-		C02F16602E89CDEF0012A888 /* emoji-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-11.png"; sourceTree = "<group>"; };
-		C02F16612E89CDEF0012A888 /* emoji-12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-12.png"; sourceTree = "<group>"; };
 		C02F16A02E92F2F70012A888 /* Adobe_Photoshop_CC_icon-1.svg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Adobe_Photoshop_CC_icon-1.svg.png"; sourceTree = "<group>"; };
 		C02F16A12E92F2F70012A888 /* Adobe_Photoshop_CC_icon.svg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Adobe_Photoshop_CC_icon.svg.png; sourceTree = "<group>"; };
 		C02F16A22E92F2F70012A888 /* apple-music-next-track.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "apple-music-next-track.png"; sourceTree = "<group>"; };
@@ -566,17 +555,6 @@
 		C06C04D82E75FA9900D2DE99 /* button-colors-light-green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-light-green.png"; sourceTree = "<group>"; };
 		C06C04D92E75FA9900D2DE99 /* button-colors-orange.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-orange.png"; sourceTree = "<group>"; };
 		C06C04DA2E75FA9900D2DE99 /* button-colors-purple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-colors-purple.png"; sourceTree = "<group>"; };
-		C06F44CB2E99979C00C33E5A /* emoji-13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-13.png"; sourceTree = "<group>"; };
-		C06F44CC2E99979C00C33E5A /* emoji-14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-14.png"; sourceTree = "<group>"; };
-		C06F44CD2E99979C00C33E5A /* emoji-15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-15.png"; sourceTree = "<group>"; };
-		C06F44CE2E99979C00C33E5A /* emoji-16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-16.png"; sourceTree = "<group>"; };
-		C06F44CF2E99979C00C33E5A /* emoji-17.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-17.png"; sourceTree = "<group>"; };
-		C06F44D02E99979C00C33E5A /* emoji-18.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-18.png"; sourceTree = "<group>"; };
-		C06F44D12E99979C00C33E5A /* emoji-19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-19.png"; sourceTree = "<group>"; };
-		C06F44D22E99979C00C33E5A /* emoji-20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-20.png"; sourceTree = "<group>"; };
-		C06F44D32E99979C00C33E5A /* emoji-21.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-21.png"; sourceTree = "<group>"; };
-		C06F44D42E99979C00C33E5A /* emoji-22.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-22.png"; sourceTree = "<group>"; };
-		C06F44D52E99979C00C33E5A /* emoji-23.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-23.png"; sourceTree = "<group>"; };
 		C06F44E32E9A6C4F00C33E5A /* Glass-icon-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Glass-icon-1.png"; sourceTree = "<group>"; };
 		C06F44E42E9A6C4F00C33E5A /* Glass-icon-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Glass-icon-2.png"; sourceTree = "<group>"; };
 		C06F44E52E9A6C4F00C33E5A /* Glass-icon-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Glass-icon-3.png"; sourceTree = "<group>"; };
@@ -610,6 +588,30 @@
 		C06F45292E9BBC9700C33E5A /* CoreObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreObserver.swift; sourceTree = "<group>"; };
 		C06F452B2E9BCCA400C33E5A /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C06F45302E9BD62000C33E5A /* AnalyticsConsentPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsConsentPrompt.swift; sourceTree = "<group>"; };
+		C06F45332E9C2C2E00C33E5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C06F45632E9D7B8E00C33E5A /* emoji-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-1.png"; sourceTree = "<group>"; };
+		C06F45642E9D7B8E00C33E5A /* emoji-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-2.png"; sourceTree = "<group>"; };
+		C06F45652E9D7B8E00C33E5A /* emoji-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-3.png"; sourceTree = "<group>"; };
+		C06F45662E9D7B8E00C33E5A /* emoji-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-4.png"; sourceTree = "<group>"; };
+		C06F45672E9D7B8E00C33E5A /* emoji-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-5.png"; sourceTree = "<group>"; };
+		C06F45682E9D7B8E00C33E5A /* emoji-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-6.png"; sourceTree = "<group>"; };
+		C06F45692E9D7B8E00C33E5A /* emoji-7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-7.png"; sourceTree = "<group>"; };
+		C06F456A2E9D7B8E00C33E5A /* emoji-8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-8.png"; sourceTree = "<group>"; };
+		C06F456B2E9D7B8E00C33E5A /* emoji-9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-9.png"; sourceTree = "<group>"; };
+		C06F456C2E9D7B8E00C33E5A /* emoji-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-10.png"; sourceTree = "<group>"; };
+		C06F456D2E9D7B8E00C33E5A /* emoji-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-11.png"; sourceTree = "<group>"; };
+		C06F456E2E9D7B8E00C33E5A /* emoji-12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-12.png"; sourceTree = "<group>"; };
+		C06F456F2E9D7B8E00C33E5A /* emoji-13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-13.png"; sourceTree = "<group>"; };
+		C06F45702E9D7B8E00C33E5A /* emoji-14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-14.png"; sourceTree = "<group>"; };
+		C06F45712E9D7B8E00C33E5A /* emoji-15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-15.png"; sourceTree = "<group>"; };
+		C06F45722E9D7B8E00C33E5A /* emoji-16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-16.png"; sourceTree = "<group>"; };
+		C06F45732E9D7B8E00C33E5A /* emoji-17.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-17.png"; sourceTree = "<group>"; };
+		C06F45742E9D7B8E00C33E5A /* emoji-18.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-18.png"; sourceTree = "<group>"; };
+		C06F45752E9D7B8E00C33E5A /* emoji-19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-19.png"; sourceTree = "<group>"; };
+		C06F45762E9D7B8E00C33E5A /* emoji-20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-20.png"; sourceTree = "<group>"; };
+		C06F45772E9D7B8E00C33E5A /* emoji-21.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-21.png"; sourceTree = "<group>"; };
+		C06F45782E9D7B8E00C33E5A /* emoji-22.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-22.png"; sourceTree = "<group>"; };
+		C06F45792E9D7B8E00C33E5A /* emoji-23.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "emoji-23.png"; sourceTree = "<group>"; };
 		C071D70F2DB17C6E00ADD746 /* automations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = automations.json; sourceTree = "<group>"; };
 		C071D7172DB43A3100ADD746 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "MacMobility-MacOSDebug.entitlements"; sourceTree = "<group>"; };
@@ -849,6 +851,29 @@
 		C01CDF352E630E290082665B /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				C06F45632E9D7B8E00C33E5A /* emoji-1.png */,
+				C06F45642E9D7B8E00C33E5A /* emoji-2.png */,
+				C06F45652E9D7B8E00C33E5A /* emoji-3.png */,
+				C06F45662E9D7B8E00C33E5A /* emoji-4.png */,
+				C06F45672E9D7B8E00C33E5A /* emoji-5.png */,
+				C06F45682E9D7B8E00C33E5A /* emoji-6.png */,
+				C06F45692E9D7B8E00C33E5A /* emoji-7.png */,
+				C06F456A2E9D7B8E00C33E5A /* emoji-8.png */,
+				C06F456B2E9D7B8E00C33E5A /* emoji-9.png */,
+				C06F456C2E9D7B8E00C33E5A /* emoji-10.png */,
+				C06F456D2E9D7B8E00C33E5A /* emoji-11.png */,
+				C06F456E2E9D7B8E00C33E5A /* emoji-12.png */,
+				C06F456F2E9D7B8E00C33E5A /* emoji-13.png */,
+				C06F45702E9D7B8E00C33E5A /* emoji-14.png */,
+				C06F45712E9D7B8E00C33E5A /* emoji-15.png */,
+				C06F45722E9D7B8E00C33E5A /* emoji-16.png */,
+				C06F45732E9D7B8E00C33E5A /* emoji-17.png */,
+				C06F45742E9D7B8E00C33E5A /* emoji-18.png */,
+				C06F45752E9D7B8E00C33E5A /* emoji-19.png */,
+				C06F45762E9D7B8E00C33E5A /* emoji-20.png */,
+				C06F45772E9D7B8E00C33E5A /* emoji-21.png */,
+				C06F45782E9D7B8E00C33E5A /* emoji-22.png */,
+				C06F45792E9D7B8E00C33E5A /* emoji-23.png */,
 				C06F44E32E9A6C4F00C33E5A /* Glass-icon-1.png */,
 				C06F44E42E9A6C4F00C33E5A /* Glass-icon-2.png */,
 				C06F44E52E9A6C4F00C33E5A /* Glass-icon-3.png */,
@@ -879,17 +904,6 @@
 				C06F44FE2E9A6C4F00C33E5A /* Glass-icon-28.png */,
 				C06F44FF2E9A6C4F00C33E5A /* Glass-icon-29.png */,
 				C06F45002E9A6C4F00C33E5A /* Glass-icon-30.png */,
-				C06F44CB2E99979C00C33E5A /* emoji-13.png */,
-				C06F44CC2E99979C00C33E5A /* emoji-14.png */,
-				C06F44CD2E99979C00C33E5A /* emoji-15.png */,
-				C06F44CE2E99979C00C33E5A /* emoji-16.png */,
-				C06F44CF2E99979C00C33E5A /* emoji-17.png */,
-				C06F44D02E99979C00C33E5A /* emoji-18.png */,
-				C06F44D12E99979C00C33E5A /* emoji-19.png */,
-				C06F44D22E99979C00C33E5A /* emoji-20.png */,
-				C06F44D32E99979C00C33E5A /* emoji-21.png */,
-				C06F44D42E99979C00C33E5A /* emoji-22.png */,
-				C06F44D52E99979C00C33E5A /* emoji-23.png */,
 				C02F16A02E92F2F70012A888 /* Adobe_Photoshop_CC_icon-1.svg.png */,
 				C02F16A12E92F2F70012A888 /* Adobe_Photoshop_CC_icon.svg.png */,
 				C02F16A22E92F2F70012A888 /* apple-music-next-track.png */,
@@ -961,18 +975,6 @@
 				C02F16E42E92F2F70012A888 /* vs-app-icon.png */,
 				C02F16E52E92F2F70012A888 /* xcode-icon.png */,
 				C02F16E62E92F2F70012A888 /* xcode-icon-bg.png */,
-				C02F16562E89CDEF0012A888 /* emoji-1.png */,
-				C02F16572E89CDEF0012A888 /* emoji-2.png */,
-				C02F16582E89CDEF0012A888 /* emoji-3.png */,
-				C02F16592E89CDEF0012A888 /* emoji-4.png */,
-				C02F165A2E89CDEF0012A888 /* emoji-5.png */,
-				C02F165B2E89CDEF0012A888 /* emoji-6.png */,
-				C02F165C2E89CDEF0012A888 /* emoji-7.png */,
-				C02F165D2E89CDEF0012A888 /* emoji-8.png */,
-				C02F165E2E89CDEF0012A888 /* emoji-9.png */,
-				C02F165F2E89CDEF0012A888 /* emoji-10.png */,
-				C02F16602E89CDEF0012A888 /* emoji-11.png */,
-				C02F16612E89CDEF0012A888 /* emoji-12.png */,
 				C02F16362E89CCC30012A888 /* keyboard-key-1.png */,
 				C02F16372E89CCC30012A888 /* keyboard-key-2.png */,
 				C02F16382E89CCC30012A888 /* keyboard-key-3.png */,
@@ -1182,6 +1184,14 @@
 			path = Analytics;
 			sourceTree = "<group>";
 		};
+		C06F45322E9C2C1C00C33E5A /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				C06F45332E9C2C2E00C33E5A /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		C071D6452DB0402F00ADD746 /* Automations */ = {
 			isa = PBXGroup;
 			children = (
@@ -1251,13 +1261,14 @@
 			isa = PBXGroup;
 			children = (
 				C06F452B2E9BCCA400C33E5A /* GoogleService-Info.plist */,
-				C06F45282E9BBC8800C33E5A /* Analytics */,
 				C08BBAA62DD67DC0007F561B /* MacMobility-Bridging-Header.h */,
 				C08BBAA52DD67D8E007F561B /* CGVirtualDisplayPrivate.h */,
-				C08BBAA02DD67D1F007F561B /* VirtualDisplay */,
 				C08BBA8C2DD3E9A3007F561B /* MacMobility-MacOSDebug.entitlements */,
 				C09775382B5C319E00F4FFE6 /* MacMobility_MacOS.entitlements */,
+				C06F45322E9C2C1C00C33E5A /* Settings */,
 				C0C9B78E2DCD31D80068BCAB /* Video */,
+				C06F45282E9BBC8800C33E5A /* Analytics */,
+				C08BBAA02DD67D1F007F561B /* VirtualDisplay */,
 				C071D6452DB0402F00ADD746 /* Automations */,
 				C05DA7362DAC102900BD4FBA /* Views */,
 				C0F67EED2D9814670090D568 /* PremadeShortcuts */,
@@ -1628,18 +1639,6 @@
 				C0F67F082D982E990090D568 /* Pick Windows and Create Pairs.shortcut in Resources */,
 				C0F67F092D982E990090D568 /* Word & Character Count.shortcut in Resources */,
 				C0C9B7942DCD35AD0068BCAB /* ipad-connect.mp4 in Resources */,
-				C02F16622E89CDEF0012A888 /* emoji-6.png in Resources */,
-				C02F16632E89CDEF0012A888 /* emoji-3.png in Resources */,
-				C02F16642E89CDEF0012A888 /* emoji-10.png in Resources */,
-				C02F16652E89CDEF0012A888 /* emoji-7.png in Resources */,
-				C02F16662E89CDEF0012A888 /* emoji-11.png in Resources */,
-				C02F16672E89CDEF0012A888 /* emoji-9.png in Resources */,
-				C02F16682E89CDEF0012A888 /* emoji-12.png in Resources */,
-				C02F16692E89CDEF0012A888 /* emoji-8.png in Resources */,
-				C02F166A2E89CDEF0012A888 /* emoji-5.png in Resources */,
-				C02F166B2E89CDEF0012A888 /* emoji-1.png in Resources */,
-				C02F166C2E89CDEF0012A888 /* emoji-2.png in Resources */,
-				C02F166D2E89CDEF0012A888 /* emoji-4.png in Resources */,
 				C0F67F0A2D982E990090D568 /* Weather for Upcoming Events.shortcut in Resources */,
 				C0F67F1B2D9831C90090D568 /* Focus ON.shortcut in Resources */,
 				C0F67F0B2D982E990090D568 /* ANC OFF.shortcut in Resources */,
@@ -1765,6 +1764,29 @@
 				C09CB4162E88691F00225F5A /* flat-control-2.png in Resources */,
 				C09CB4172E88691F00225F5A /* flat-control-8.png in Resources */,
 				C09CB4182E88691F00225F5A /* flat-control-3.png in Resources */,
+				C06F457A2E9D7B8E00C33E5A /* emoji-21.png in Resources */,
+				C06F457B2E9D7B8E00C33E5A /* emoji-17.png in Resources */,
+				C06F457C2E9D7B8E00C33E5A /* emoji-23.png in Resources */,
+				C06F457D2E9D7B8E00C33E5A /* emoji-12.png in Resources */,
+				C06F457E2E9D7B8E00C33E5A /* emoji-5.png in Resources */,
+				C06F457F2E9D7B8E00C33E5A /* emoji-15.png in Resources */,
+				C06F45802E9D7B8E00C33E5A /* emoji-2.png in Resources */,
+				C06F45812E9D7B8E00C33E5A /* emoji-18.png in Resources */,
+				C06F45822E9D7B8E00C33E5A /* emoji-11.png in Resources */,
+				C06F45832E9D7B8E00C33E5A /* emoji-6.png in Resources */,
+				C06F45842E9D7B8E00C33E5A /* emoji-10.png in Resources */,
+				C06F45852E9D7B8E00C33E5A /* emoji-13.png in Resources */,
+				C06F45862E9D7B8E00C33E5A /* emoji-3.png in Resources */,
+				C06F45872E9D7B8E00C33E5A /* emoji-16.png in Resources */,
+				C06F45882E9D7B8E00C33E5A /* emoji-20.png in Resources */,
+				C06F45892E9D7B8E00C33E5A /* emoji-22.png in Resources */,
+				C06F458A2E9D7B8E00C33E5A /* emoji-9.png in Resources */,
+				C06F458B2E9D7B8E00C33E5A /* emoji-14.png in Resources */,
+				C06F458C2E9D7B8E00C33E5A /* emoji-4.png in Resources */,
+				C06F458D2E9D7B8E00C33E5A /* emoji-8.png in Resources */,
+				C06F458E2E9D7B8E00C33E5A /* emoji-1.png in Resources */,
+				C06F458F2E9D7B8E00C33E5A /* emoji-7.png in Resources */,
+				C06F45902E9D7B8E00C33E5A /* emoji-19.png in Resources */,
 				C09CB3F62E88674A00225F5A /* arrow-1.png in Resources */,
 				C09CB3F72E88674A00225F5A /* arrow-5.png in Resources */,
 				C02F163A2E89CCC30012A888 /* keyboard-key-1.png in Resources */,
@@ -1826,17 +1848,6 @@
 				C02F17142E92F2F70012A888 /* cmm-clutter.png in Resources */,
 				C02F17152E92F2F70012A888 /* cmm-cleanup.png in Resources */,
 				C02F17162E92F2F70012A888 /* greenlight-icon.png in Resources */,
-				C06F44D62E99979C00C33E5A /* emoji-16.png in Resources */,
-				C06F44D72E99979C00C33E5A /* emoji-21.png in Resources */,
-				C06F44D82E99979C00C33E5A /* emoji-23.png in Resources */,
-				C06F44D92E99979C00C33E5A /* emoji-17.png in Resources */,
-				C06F44DA2E99979C00C33E5A /* emoji-18.png in Resources */,
-				C06F44DB2E99979C00C33E5A /* emoji-19.png in Resources */,
-				C06F44DC2E99979C00C33E5A /* emoji-20.png in Resources */,
-				C06F44DD2E99979C00C33E5A /* emoji-22.png in Resources */,
-				C06F44DE2E99979C00C33E5A /* emoji-14.png in Resources */,
-				C06F44DF2E99979C00C33E5A /* emoji-13.png in Resources */,
-				C06F44E02E99979C00C33E5A /* emoji-15.png in Resources */,
 				C02F17172E92F2F70012A888 /* vlc-icon.png in Resources */,
 				C02F17182E92F2F70012A888 /* vs-app-icon.png in Resources */,
 				C02F17192E92F2F70012A888 /* safari-icon.png in Resources */,
@@ -1928,6 +1939,7 @@
 				C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */,
 				C00CB20B2DD91A680082128F /* ResolutionSelectorCard.swift in Sources */,
 				C06F45312E9BD62000C33E5A /* AnalyticsConsentPrompt.swift in Sources */,
+				C06F45342E9C2C2E00C33E5A /* SettingsView.swift in Sources */,
 				C0D21D6B2D7A25F700FEF931 /* ConfigurableScreenViewModel.swift in Sources */,
 				C03581082DB6501E009E22F5 /* IconPickerView.swift in Sources */,
 				C0EAF93F2D90213100044947 /* MacOSMainPopoverViewModel.swift in Sources */,
@@ -2174,7 +2186,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.0.39;
+				MARKETING_VERSION = 1.0.40;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -2211,7 +2223,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.0.39;
+				MARKETING_VERSION = 1.0.40;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.macmobility.MacMobility-MacOS";
 				PRODUCT_NAME = MacMobility;
 				PROVISIONING_PROFILE_SPECIFIER = "";

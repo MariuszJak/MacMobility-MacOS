@@ -116,6 +116,7 @@ extension UserDefaults {
         case quickActionTutorialSeen
         case newQuickActionTutorialSeen
         case analyticsConsent
+        case shouldOpenEditorWindowOnAppLaunch
     }
 
     func set(_ value: Any?, forKey defaultName: Const) {
