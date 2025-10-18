@@ -130,11 +130,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openNewQAMTutorialWindow(isFirstOpen: false)
         circularWindow?.close()
         circularWindow = nil
+        HotKeyManager.shared.unregisterArrowAndEnterHotKeys()
     }
     
     func setupKeyboardListener() {
         guard !connectionManager.listenerAdded else { return }
-        HotKeyManager.shared.registerHotKey()
+        HotKeyManager.shared.registerGeneralHotKey()
         
         responder
             .$showWindow
@@ -144,6 +145,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     let newQuickActionTutorialSeen = UserDefaults.standard.get(key: .newQuickActionTutorialSeen) ?? false
                     if newQuickActionTutorialSeen {
                         self?.openCircularWindow()
+                        HotKeyManager.shared.registerArrowAndEnterHotKeys()
                     } else {
                         self?.openNewQAMTutorialWindow(isFirstOpen: true)
                         UserDefaults.standard.store(true, for: .newQuickActionTutorialSeen)
@@ -163,6 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if !windowFrame.contains(mouseLocation) {
                 circularWindow?.close()
                 circularWindow = nil
+                HotKeyManager.shared.unregisterArrowAndEnterHotKeys()
                 NotificationCenter.default.post(
                     name: .closeShortcuts,
                     object: nil,
@@ -202,20 +205,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 rootView: QuickActionsView(
                     viewModel: .init(
                         items: shortcutsViewModel.quickActionItems,
-                        allItems: shortcutsViewModel.allObjects()
-                    ),
-                    action: { [weak self] item in
-                        guard let self else { return }
-                        connectionManager.runShortuct(for: item)
-                        circularWindow?.close()
-                        circularWindow = nil
-                    }, update: { [weak self] items in
+                        allItems: shortcutsViewModel.allObjects(),
+                        action: { [weak self] item in
+                            guard let self else { return }
+                            connectionManager.runShortuct(for: item)
+                            circularWindow?.close()
+                            circularWindow = nil
+                            HotKeyManager.shared.unregisterArrowAndEnterHotKeys()
+                        }
+                    ), update: { [weak self] items in
                         guard let self else { return }
                         shortcutsViewModel.saveQuickActionItems(items)
                     }, close: { [weak self] in
                         self?.closeShortcuts()
                         self?.circularWindow?.close()
                         self?.circularWindow = nil
+                        HotKeyManager.shared.unregisterArrowAndEnterHotKeys()
                     }
                 )
             )
@@ -502,7 +507,7 @@ extension AppDelegate {
             if let analyticsConsent: Bool = UserDefaults.standard.get(key: .analyticsConsent), analyticsConsent {
                 print(event)
             } else {
-                print("User denied analytics")
+//                print("User denied analytics")
             }
             #else
             if let analyticsConsent: Bool = UserDefaults.standard.get(key: .analyticsConsent), analyticsConsent {

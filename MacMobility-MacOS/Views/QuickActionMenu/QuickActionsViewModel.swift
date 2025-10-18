@@ -7,22 +7,28 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 class QuickActionsViewModel: ObservableObject {
     private var cachedIcons: [String: Data] = [:]
     @ObservedObject var observer = FocusedAppObserver()
+    @Published var hoveredIndex: Int? = nil
     @Published var assignedAppsToPages: [AssignedAppsToPages] = []
     @Published var items: [ShortcutObject] = []
     @Published var sections: [Int: [ShortcutObject]] = [:]
     @Published var pages: Int = 1
     @Published var currentPage: Int = 1
+    public let action: (ShortcutObject) -> Void = { _ in }
     private let allItems: [ShortcutObject]
     private var lastDirectionChange: Date = .distantPast
     private let throttleInterval: TimeInterval = 0.4
+//    private var responder = HotKeyResponder.shared
+    private var cancellables = Set<AnyCancellable>()
     
-    init(items: [ShortcutObject], allItems: [ShortcutObject]) {
+    init(items: [ShortcutObject], allItems: [ShortcutObject], action: @escaping (ShortcutObject) -> Void) {
         self.items = items
         self.allItems = allItems
+//        self.action = action
         self.assignedAppsToPages = UserDefaults.standard.get(key: .assignedAppsToSubpages) ?? []
         self.currentPage = UserDefaults.standard.get(key: .subitemCurrentPage) ?? 1
         self.pages = UserDefaults.standard.get(key: .subitemPages) ?? 1
@@ -37,6 +43,57 @@ class QuickActionsViewModel: ObservableObject {
                 self.items[index].page = 1
             }
         }
+        
+//        responder
+//            .$isEnterPressed
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] value in
+//                guard let self else { return }
+//                if let index = self.hoveredIndex, value {
+////                    let item = self.items[index * pages]
+////                    self.action(item)
+//                    let item = self.items.first(where: { ($0.index ?? -1) == (index * self.currentPage) })
+//                    if let item {
+////                        self.action(item)
+//                        print(item.title)
+//                    }
+//                }
+//            }
+//            .store(in: &cancellables)
+//        
+//        responder
+//            .$lastArrow
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] value in
+//                guard let self else { return }
+//                switch value {
+//                case .left:
+//                    self.prevPage()
+//                case .right:
+//                    self.nextPage()
+//                case .up:
+//                    if hoveredIndex == nil {
+//                        hoveredIndex = 3
+//                    } else {
+//                        hoveredIndex! += 1
+//                        if hoveredIndex! > 9 {
+//                            hoveredIndex = 0
+//                        }
+//                    }
+//                case .down:
+//                    if hoveredIndex == nil {
+//                        hoveredIndex = 0
+//                    } else {
+//                        hoveredIndex! -= 1
+//                        if hoveredIndex! < 0 {
+//                            hoveredIndex = 10
+//                        }
+//                    }
+//                case .none:
+//                    break
+//                }
+//            }
+//            .store(in: &cancellables)
     }
     
     func handleDirection(_ direction: EventDirection) {

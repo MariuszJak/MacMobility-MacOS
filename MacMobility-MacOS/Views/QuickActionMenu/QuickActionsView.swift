@@ -10,7 +10,6 @@ import SwiftUI
 
 struct QuickActionsView: View {
     @ObservedObject private var viewModel: QuickActionsViewModel
-    @State private var hoveredIndex: Int? = nil
     @State private var hoveredSubIndex: Int? = nil
     @State private var isVisible: Bool = false
     @State private var subMenuIsVisible: Bool = false
@@ -21,7 +20,6 @@ struct QuickActionsView: View {
     private let buttonCount = 10
     private let cornerRadius = 20.0
     private let radius: CGFloat = 120
-    private let action: (ShortcutObject) -> Void
     private let update: ([ShortcutObject]) -> Void
     private let close: () -> Void
     private let frame = CGSize(width: 40, height: 40)
@@ -91,12 +89,10 @@ struct QuickActionsView: View {
     
     init(
         viewModel: QuickActionsViewModel,
-        action: @escaping (ShortcutObject) -> Void,
         update: @escaping ([ShortcutObject]) -> Void,
         close: @escaping () -> Void
     ) {
         self.viewModel = viewModel
-        self.action = action
         self.update = update
         self.close = close
     }
@@ -155,7 +151,7 @@ struct QuickActionsView: View {
                                 .shadow(color: .black.opacity(0.6), radius: 4.0)
                                 .if(!isEditing) {
                                     $0.onTapGesture {
-                                        action(app)
+                                        viewModel.action(app)
                                     }
                                     .contextMenu {
                                         Button("Edit") {
@@ -374,8 +370,8 @@ struct QuickActionsView: View {
                 let angle = Angle.degrees(Double(index) / Double(buttonCount) * 360)
                 CircleSliceBackground(index: index, sliceAngle: sliceAngle, thickness: 60)
                 CircleSlice(index: index, sliceAngle: sliceAngle, thickness: 60)
-                    .scaleEffect(index == hoveredIndex ? 1.05 : 1.0)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
+                    .scaleEffect(index == viewModel.hoveredIndex ? 1.05 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredIndex)
                 ZStack {
                     if index + ((viewModel.currentPage - 1) * 10) == item.index, item.title != "EMPTY" {
                         mainView(item: item, index: index, angle: angle)
@@ -383,8 +379,8 @@ struct QuickActionsView: View {
                         plusView(angle: angle, item: item, index: index)
                     }
                 }
-                .offset(x: cos(angle.radians) * (radius * (index == hoveredIndex ? 1.05 : 1.0)),
-                        y: sin(angle.radians) * (radius * (index == hoveredIndex ? 1.05 : 1.0)))
+                .offset(x: cos(angle.radians) * (radius * (index == viewModel.hoveredIndex ? 1.05 : 1.0)),
+                        y: sin(angle.radians) * (radius * (index == viewModel.hoveredIndex ? 1.05 : 1.0)))
                 .zIndex(1000)
             }
         }
@@ -515,7 +511,7 @@ struct QuickActionsView: View {
                     $0.scaleEffect(index == hoveredSubIndex ? 1.3 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredSubIndex)
                         .onTapGesture {
-                            action(object)
+                            viewModel.action(object)
                         }
                         .contextMenu {
                             Button("Edit") {
@@ -556,10 +552,10 @@ struct QuickActionsView: View {
         ZStack {
             itemView(object: item)
                 .if(!isEditing) {
-                    $0.scaleEffect(index == hoveredIndex ? 1.3 : 1.0)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredIndex)
+                    $0.scaleEffect(index == viewModel.hoveredIndex ? 1.3 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredIndex)
                         .onTapGesture {
-                            action(item)
+                            viewModel.action(item)
                         }
                         .contextMenu {
                             Button("Edit") {
@@ -572,7 +568,7 @@ struct QuickActionsView: View {
                             }
                         }
                         .onHover { hovering in
-                            hoveredIndex = hovering ? index : (hoveredIndex == index ? nil : hoveredIndex)
+                            viewModel.hoveredIndex = hovering ? index : (viewModel.hoveredIndex == index ? nil : viewModel.hoveredIndex)
 //                            showPopup = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 submenuDegrees = angle.degrees - 92
