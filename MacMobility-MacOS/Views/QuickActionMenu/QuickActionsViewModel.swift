@@ -55,7 +55,6 @@ class QuickActionsViewModel: ObservableObject {
     private func binding() {
         responder
             .$isEnterPressed
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 guard let self, !isEditing else { return }
                 if !isTabPressed {
@@ -80,7 +79,6 @@ class QuickActionsViewModel: ObservableObject {
         
         responder
             .$isTabPressed
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 guard let self, !isEditing else { return }
                 guard let index = self.hoveredIndex else {
@@ -109,7 +107,6 @@ class QuickActionsViewModel: ObservableObject {
         
         responder
             .$lastArrow
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 guard let value, let self,!isEditing else { return }
                 if !isTabPressed {
