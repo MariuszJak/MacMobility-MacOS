@@ -13,8 +13,8 @@ import SwiftUI
 class HotKeyManager {
     static let shared = HotKeyManager()
 
-    private var generalHotKeyRef: EventHotKeyRef?        // for Ctrl + Option + Space
-    private var arrowHotKeyRefs: [EventHotKeyRef?] = []  // for arrows + Enter
+    private var generalHotKeyRef: EventHotKeyRef?        // Ctrl + Option + Space
+    private var arrowHotKeyRefs: [EventHotKeyRef?] = []  // Arrows + Enter + Tab
     private var eventHandler: EventHandlerRef?
 
     // MARK: - Register general hotkey (Ctrl + Option + Space)
@@ -53,7 +53,8 @@ class HotKeyManager {
             (UInt32(kVK_DownArrow), "DNAR"),
             (UInt32(kVK_LeftArrow), "LFAR"),
             (UInt32(kVK_RightArrow), "RTAR"),
-            (UInt32(kVK_Return), "ENTR")
+            (UInt32(kVK_Return), "ENTR"),
+            (UInt32(kVK_Tab), "TABK")
         ]
 
         for (keyCode, signature) in hotKeys {
@@ -135,6 +136,8 @@ private let hotKeyCallback: EventHandlerUPP = { _, eventRef, _ in
             HotKeyResponder.shared.arrowPressed(.right)
         case OSType("ENTR".fourCharCodeValue):
             HotKeyResponder.shared.enterPressed()
+        case OSType("TABK".fourCharCodeValue):
+            HotKeyResponder.shared.tabPressed()
         default:
             break
         }
@@ -148,6 +151,7 @@ class HotKeyResponder: ObservableObject {
 
     @Published var showWindow = false
     @Published var isEnterPressed = false
+    @Published var isTabPressed = false
     @Published var lastArrow: ArrowKey?
 
     enum ArrowKey {
@@ -164,5 +168,9 @@ class HotKeyResponder: ObservableObject {
 
     func enterPressed() {
         isEnterPressed = true
+    }
+    
+    func tabPressed() {
+        isTabPressed = true
     }
 }

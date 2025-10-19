@@ -10,13 +10,10 @@ import SwiftUI
 
 struct QuickActionsView: View {
     @ObservedObject private var viewModel: QuickActionsViewModel
-    @State private var hoveredSubIndex: Int? = nil
+    
     @State private var isVisible: Bool = false
     @State private var subMenuIsVisible: Bool = false
-    @State private var isEditing: Bool = false
-    @State private var showPopup = false
-    @State private var submenuDegrees = 0.0
-    @State private var subitem: ShortcutObject?
+    
     private let buttonCount = 10
     private let cornerRadius = 20.0
     private let radius: CGFloat = 120
@@ -34,7 +31,7 @@ struct QuickActionsView: View {
             Color(red: 44/255, green: 44/255, blue: 46/255),
             Color(red: 44/255, green: 44/255, blue: 46/255),
             Color(red: 44/255, green: 44/255, blue: 46/255),
-            isEditing ? Color(red: 58/255, green: 58/255, blue: 60/255) : Color(red: 44/255, green: 44/255, blue: 46/255),
+            viewModel.isEditing ? Color(red: 58/255, green: 58/255, blue: 60/255) : Color(red: 44/255, green: 44/255, blue: 46/255),
             Color(red: 58/255, green: 58/255, blue: 60/255)
         ]
     }
@@ -43,7 +40,7 @@ struct QuickActionsView: View {
         [
             {
                 viewModel.nextPage()
-                showPopup = false
+                viewModel.showPopup = false
             },
             {
                 viewModel.addPage()
@@ -55,10 +52,10 @@ struct QuickActionsView: View {
             },
             {
                 viewModel.prevPage()
-                showPopup = false
+                viewModel.showPopup = false
             },
             {
-                if !isEditing {
+                if !viewModel.isEditing {
                     NotificationCenter.default.post(
                         name: .openNewQAMTutorial,
                         object: nil,
@@ -77,7 +74,7 @@ struct QuickActionsView: View {
             { AnyView(Text("-").allowsHitTesting(false)) },
             { AnyView(Text("<").allowsHitTesting(false)) },
             {
-                if isEditing {
+                if viewModel.isEditing {
                     AnyView(EmptyView())
                 } else {
                     AnyView(Image(systemName: "info.circle").frame(width: 10, height: 10).allowsHitTesting(false))
@@ -105,7 +102,7 @@ struct QuickActionsView: View {
                     close()
                 }
             circleMainView()
-            if showPopup {
+            if viewModel.showPopup {
                 submenuPopup()
             }
             innerCircleMenu()
@@ -139,9 +136,9 @@ struct QuickActionsView: View {
                         VStack {
                             ZStack {
                                 ZStack {
-                                    EventView { direction in
-                                        viewModel.handleDirection(direction)
-                                    }
+//                                    EventView { direction in
+//                                        viewModel.handleDirection(direction)
+//                                    }
                                     Image(nsImage: image)
                                         .resizable()
                                         .scaledToFill()
@@ -149,13 +146,13 @@ struct QuickActionsView: View {
                                 }
                                 .frame(width: 60, height: 60)
                                 .shadow(color: .black.opacity(0.6), radius: 4.0)
-                                .if(!isEditing) {
+                                .if(!viewModel.isEditing) {
                                     $0.onTapGesture {
                                         viewModel.action(app)
                                     }
                                     .contextMenu {
                                         Button("Edit") {
-                                            isEditing = true
+                                            viewModel.isEditing = true
                                             NotificationCenter.default.post(
                                                 name: .openShortcuts,
                                                 object: nil,
@@ -164,7 +161,7 @@ struct QuickActionsView: View {
                                         }
                                     }
                                 }
-                                if isEditing {
+                                if viewModel.isEditing {
                                     VStack {
                                         HStack {
                                             Spacer()
@@ -191,7 +188,7 @@ struct QuickActionsView: View {
                             }
                             return true
                         }
-                        if !isEditing {
+                        if !viewModel.isEditing {
                             CircularPageDotsView(
                                 pageCount: viewModel.pages,
                                 currentPage: viewModel.currentPage - 1
@@ -203,19 +200,19 @@ struct QuickActionsView: View {
                     }
                 }
             } else {
-                if !isEditing {
+                if !viewModel.isEditing {
                     ZStack {
                         ZStack {
-                            EventView { direction in
-                                viewModel.handleDirection(direction)
-                            }
+//                            EventView { direction in
+//                                viewModel.handleDirection(direction)
+//                            }
                             Image(systemName: "slider.horizontal.3")
                                 .resizable()
                                 .frame(width: 20, height: 20)
                         }
                         .frame(width: 30, height: 30)
                         .onTapGesture {
-                            isEditing = true
+                            viewModel.isEditing = true
                             NotificationCenter.default.post(
                                 name: .openShortcuts,
                                 object: nil,
@@ -323,15 +320,15 @@ struct QuickActionsView: View {
                     .fill(elegantGray)
                     .onHover { _ in
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            self.showPopup = false
-                            subitem = nil
+                            self.viewModel.showPopup = false
+                            self.viewModel.subitem = nil
                         }
                     }
                     .contentShape(Circle())
                     .frame(width: 120, height: 120)
                     
                 VStack {
-                    if isEditing {
+                    if viewModel.isEditing {
                         VStack(spacing: 2.0) {
                             pageNumberView(page: viewModel.currentPage)
                             BlueButton(
@@ -341,8 +338,8 @@ struct QuickActionsView: View {
                                 cornerRadius: 3.0,
                                 backgroundColor: .accentColor
                             ) {
-                                isEditing = false
-                                showPopup = false
+                                viewModel.isEditing = false
+                                viewModel.showPopup = false
                                 NotificationCenter.default.post(
                                     name: .closeShortcuts,
                                     object: nil,
@@ -389,17 +386,19 @@ struct QuickActionsView: View {
     
     private func submenuPopup() -> some View {
         ZStack {
-            if let subitem, let objects = subitem.objects, objects.contains(where: { $0.title != "EMPTY" || isEditing }) {
+            if let subitem = viewModel.subitem,
+               let objects = subitem.objects,
+               objects.contains(where: { $0.title != "EMPTY" || viewModel.isEditing }) {
                 ForEach(Array(objects.enumerated()), id: \.offset) { (index, item) in
                     CircleSliceShape(
-                        startAngle: .degrees(submenuDegrees),
+                        startAngle: .degrees(viewModel.submenuDegrees),
                         sliceAngle: .degrees(sliceAngle),
                         thickness: 60
                     )
                     .fill(.cyan)
                     .rotationEffect(.degrees(Double(index) * sliceAngle))
                     CircleSliceShape(
-                        startAngle: .degrees(submenuDegrees),
+                        startAngle: .degrees(viewModel.submenuDegrees),
                         sliceAngle: .degrees(sliceAngle),
                         thickness: 60
                     )
@@ -415,8 +414,8 @@ struct QuickActionsView: View {
                         )
                     )
                     .rotationEffect(.degrees(Double(index) * sliceAngle))
-                    .scaleEffect(index == hoveredSubIndex ? 1.05 : 1.0)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredSubIndex)
+                    .scaleEffect(index == viewModel.hoveredSubIndex ? 1.05 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredSubIndex)
                     ZStack {
                         if let object = objects[safe: index], object.id != "EMPTY \(index)" {
                             submenuMainView(object: object, subitem: subitem, index: index)
@@ -426,7 +425,7 @@ struct QuickActionsView: View {
                                    let object = viewModel.object(for: droppedString) {
                                     DispatchQueue.main.async {
                                         if let updatedItem = viewModel.addSubitem(to: subitem.id, item: object, at: index) {
-                                            self.subitem = updatedItem
+                                            self.viewModel.subitem = updatedItem
                                         }
                                         update(viewModel.items)
                                     }
@@ -434,7 +433,7 @@ struct QuickActionsView: View {
                             })
                             .frame(width: frame.width, height: frame.height)
                             .onTapGesture {
-                                isEditing = true
+                                viewModel.isEditing = true
                                 NotificationCenter.default.post(
                                     name: .openShortcuts,
                                     object: nil,
@@ -450,7 +449,7 @@ struct QuickActionsView: View {
                                let object = viewModel.object(for: droppedString) {
                                 DispatchQueue.main.async {
                                     if let updatedItem = viewModel.addSubitem(to: subitem.id, item: object, at: index) {
-                                        self.subitem = updatedItem
+                                        self.viewModel.subitem = updatedItem
                                     }
                                     update(viewModel.items)
                                 }
@@ -458,8 +457,8 @@ struct QuickActionsView: View {
                         }
                         return true
                     }
-                    .offset(x: cos(Angle.degrees((submenuDegrees + 20) + (35.0 * Double(index))).radians) * 185,
-                            y: sin(Angle.degrees((submenuDegrees + 20) + (35.0 * Double(index))).radians) * 185)
+                    .offset(x: cos(Angle.degrees((viewModel.submenuDegrees + 20) + (35.0 * Double(index))).radians) * 185,
+                            y: sin(Angle.degrees((viewModel.submenuDegrees + 20) + (35.0 * Double(index))).radians) * 185)
                 }
             }
         }
@@ -482,10 +481,10 @@ struct QuickActionsView: View {
         })
         .frame(width: frame.width, height: frame.height)
         .onTapGesture {
-            isEditing = true
-            showPopup = true
-            submenuDegrees = angle.degrees - 92
-            subitem = item
+            viewModel.isEditing = true
+            viewModel.showPopup = true
+            viewModel.submenuDegrees = angle.degrees - 92
+            viewModel.subitem = item
             NotificationCenter.default.post(
                 name: .openShortcuts,
                 object: nil,
@@ -493,13 +492,13 @@ struct QuickActionsView: View {
             )
         }
         .onHover { _ in
-            if !isEditing {
-                showPopup = false
+            if !viewModel.isEditing {
+                viewModel.showPopup = false
                 // lastHoveredIndex = nil
             } else {
-                submenuDegrees = angle.degrees - 92
-                subitem = item
-                showPopup = true
+                viewModel.submenuDegrees = angle.degrees - 92
+                viewModel.subitem = item
+                viewModel.showPopup = true
             }
         }
     }
@@ -507,15 +506,15 @@ struct QuickActionsView: View {
     private func submenuMainView(object: ShortcutObject, subitem: ShortcutObject, index: Int) -> some View {
         ZStack {
             itemView(object: object)
-                .if(!isEditing) {
-                    $0.scaleEffect(index == hoveredSubIndex ? 1.3 : 1.0)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == hoveredSubIndex)
+                .if(!viewModel.isEditing) {
+                    $0.scaleEffect(index == viewModel.hoveredSubIndex ? 1.3 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredSubIndex)
                         .onTapGesture {
                             viewModel.action(object)
                         }
                         .contextMenu {
                             Button("Edit") {
-                               isEditing = true
+                                viewModel.isEditing = true
                                 NotificationCenter.default.post(
                                     name: .openShortcuts,
                                     object: nil,
@@ -524,17 +523,21 @@ struct QuickActionsView: View {
                             }
                         }
                         .onHover { hovering in
-                            hoveredSubIndex = hovering ? index : (hoveredSubIndex == index ? nil : hoveredSubIndex)
+                            viewModel.hoveredSubIndex = hovering
+                            ? index
+                            : (viewModel.hoveredSubIndex == index
+                               ? nil
+                               : viewModel.hoveredSubIndex)
                         }
                 }
                 .shadow(color: .black.opacity(0.6), radius: 4.0)
-            if isEditing {
+            if viewModel.isEditing {
                 VStack {
                     HStack {
                         Spacer()
                         RedXButton {
                             if let updatedItem = viewModel.removeSubitem(from: subitem.id, at: index) {
-                                self.subitem = updatedItem
+                                self.viewModel.subitem = updatedItem
                             }
                             update(viewModel.items)
                         }
@@ -546,12 +549,10 @@ struct QuickActionsView: View {
         .frame(width: 60.0, height: 60.0)
     }
     
-//    @State private var lastHoveredIndex: Int?
-    
     private func mainView(item: ShortcutObject, index: Int, angle: Angle) -> some View {
         ZStack {
             itemView(object: item)
-                .if(!isEditing) {
+                .if(!viewModel.isEditing) {
                     $0.scaleEffect(index == viewModel.hoveredIndex ? 1.3 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredIndex)
                         .onTapGesture {
@@ -559,7 +560,7 @@ struct QuickActionsView: View {
                         }
                         .contextMenu {
                             Button("Edit") {
-                                isEditing = true
+                                viewModel.isEditing = true
                                 NotificationCenter.default.post(
                                     name: .openShortcuts,
                                     object: nil,
@@ -571,26 +572,26 @@ struct QuickActionsView: View {
                             viewModel.hoveredIndex = hovering ? index : (viewModel.hoveredIndex == index ? nil : viewModel.hoveredIndex)
 //                            showPopup = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                submenuDegrees = angle.degrees - 92
-                                showPopup = true
-                                subitem = item
+                                viewModel.submenuDegrees = angle.degrees - 92
+                                viewModel.showPopup = true
+                                viewModel.subitem = item
                             }
                         }
                 }
-                .if(isEditing) {
+                .if(viewModel.isEditing) {
                     $0.onHover { hovering in
-                        showPopup = true
-                        submenuDegrees = angle.degrees - 92
-                        subitem = item
+                        viewModel.showPopup = true
+                        viewModel.submenuDegrees = angle.degrees - 92
+                        viewModel.subitem = item
                     }
                 }
                 .shadow(color: .black.opacity(0.6), radius: 4.0)
-            if isEditing {
+            if viewModel.isEditing {
                 VStack {
                     HStack {
                         Spacer()
                         RedXButton {
-                            subitem = viewModel.remove(at: index)
+                            viewModel.subitem = viewModel.remove(at: index)
                             update(viewModel.items)
                         }
                     }

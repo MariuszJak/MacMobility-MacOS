@@ -13,22 +13,28 @@ class QuickActionsViewModel: ObservableObject {
     private var cachedIcons: [String: Data] = [:]
     @ObservedObject var observer = FocusedAppObserver()
     @Published var hoveredIndex: Int? = nil
+    @Published var hoveredSubIndex: Int? = nil
     @Published var assignedAppsToPages: [AssignedAppsToPages] = []
     @Published var items: [ShortcutObject] = []
     @Published var sections: [Int: [ShortcutObject]] = [:]
     @Published var pages: Int = 1
     @Published var currentPage: Int = 1
-    public let action: (ShortcutObject) -> Void = { _ in }
+    @Published var showPopup = false
+    @Published var submenuDegrees = 0.0
+    @Published var subitem: ShortcutObject?
+    @Published var isEditing: Bool = false
+    public let action: (ShortcutObject) -> Void
     private let allItems: [ShortcutObject]
     private var lastDirectionChange: Date = .distantPast
     private let throttleInterval: TimeInterval = 0.4
-//    private var responder = HotKeyResponder.shared
+    private var responder = HotKeyResponder.shared
     private var cancellables = Set<AnyCancellable>()
+    private var isTabPressed = false
     
     init(items: [ShortcutObject], allItems: [ShortcutObject], action: @escaping (ShortcutObject) -> Void) {
         self.items = items
         self.allItems = allItems
-//        self.action = action
+        self.action = action
         self.assignedAppsToPages = UserDefaults.standard.get(key: .assignedAppsToSubpages) ?? []
         self.currentPage = UserDefaults.standard.get(key: .subitemCurrentPage) ?? 1
         self.pages = UserDefaults.standard.get(key: .subitemPages) ?? 1
@@ -43,57 +49,128 @@ class QuickActionsViewModel: ObservableObject {
                 self.items[index].page = 1
             }
         }
+        self.binding()
+    }
+    
+    private func binding() {
+        responder
+            .$isEnterPressed
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                guard let self, !isEditing else { return }
+                if !isTabPressed {
+                    if let index = hoveredIndex, value {
+                        let tmpIndex = index + ((currentPage - 1) * 10)
+                        let item = self.items[tmpIndex]
+                        if item.title != "EMPTY" {
+                            action(item)
+                        }
+                    }
+                } else {
+                    guard let hoveredSubIndex,
+                          let subitem,
+                          let item = subitem.objects?[hoveredSubIndex],
+                          value else {
+                        return
+                    }
+                    action(item)
+                }
+            }
+            .store(in: &cancellables)
         
-//        responder
-//            .$isEnterPressed
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] value in
-//                guard let self else { return }
-//                if let index = self.hoveredIndex, value {
-////                    let item = self.items[index * pages]
-////                    self.action(item)
-//                    let item = self.items.first(where: { ($0.index ?? -1) == (index * self.currentPage) })
-//                    if let item {
-////                        self.action(item)
-//                        print(item.title)
-//                    }
-//                }
-//            }
-//            .store(in: &cancellables)
-//        
-//        responder
-//            .$lastArrow
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] value in
-//                guard let self else { return }
-//                switch value {
-//                case .left:
-//                    self.prevPage()
-//                case .right:
-//                    self.nextPage()
-//                case .up:
-//                    if hoveredIndex == nil {
-//                        hoveredIndex = 3
-//                    } else {
-//                        hoveredIndex! += 1
-//                        if hoveredIndex! > 9 {
-//                            hoveredIndex = 0
-//                        }
-//                    }
-//                case .down:
-//                    if hoveredIndex == nil {
-//                        hoveredIndex = 0
-//                    } else {
-//                        hoveredIndex! -= 1
-//                        if hoveredIndex! < 0 {
-//                            hoveredIndex = 10
-//                        }
-//                    }
-//                case .none:
-//                    break
-//                }
-//            }
-//            .store(in: &cancellables)
+        responder
+            .$isTabPressed
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                guard let self, !isEditing else { return }
+                guard let index = self.hoveredIndex else {
+                    isTabPressed = false
+                    showPopup = false
+                    return
+                }
+                let tmpIndex = index + ((currentPage - 1) * 10)
+                let item = self.items[tmpIndex]
+                let subitems = (item.objects ?? []).filter { $0.title != "EMPTY" }
+                guard item.title != "EMPTY" && subitems.count > 0 else {
+                    isTabPressed = false
+                    showPopup = false
+                    return
+                }
+                let angle = Angle.degrees(Double(index) / Double(10) * 360)
+                submenuDegrees = angle.degrees - 92
+                subitem = item
+                isTabPressed.toggle()
+                showPopup.toggle()
+                if isTabPressed {
+                    hoveredSubIndex = 2
+                }
+            }
+            .store(in: &cancellables)
+        
+        responder
+            .$lastArrow
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                guard let value, let self,!isEditing else { return }
+                if !isTabPressed {
+                    handleArrowsForMainMenu(value)
+                } else {
+                    handleArrowsForSubMenu(value)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func handleArrowsForMainMenu(_ direction: HotKeyResponder.ArrowKey) {
+        switch direction {
+        case .left:
+            self.prevPage()
+        case .right:
+            self.nextPage()
+        case .up:
+            if hoveredIndex == nil {
+                hoveredIndex = 3
+            } else {
+                hoveredIndex! += 1
+                if hoveredIndex! > 9 {
+                    hoveredIndex = 0
+                }
+            }
+        case .down:
+            if hoveredIndex == nil {
+                hoveredIndex = 0
+            } else {
+                hoveredIndex! -= 1
+                if hoveredIndex! < 0 {
+                    hoveredIndex = 9
+                }
+            }
+        }
+    }
+    
+    private func handleArrowsForSubMenu(_ direction: HotKeyResponder.ArrowKey) {
+        switch direction {
+        case .left, .right:
+            break
+        case .up:
+            if hoveredSubIndex == nil {
+                hoveredSubIndex = 2
+            } else {
+                hoveredSubIndex! += 1
+                if hoveredSubIndex! > 4 {
+                    hoveredSubIndex = 0
+                }
+            }
+        case .down:
+            if hoveredSubIndex == nil {
+                hoveredSubIndex = 2
+            } else {
+                hoveredSubIndex! -= 1
+                if hoveredSubIndex! < 0 {
+                    hoveredSubIndex = 4
+                }
+            }
+        }
     }
     
     func handleDirection(_ direction: EventDirection) {

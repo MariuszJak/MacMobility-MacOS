@@ -106,6 +106,10 @@ enum EventDirection {
 
 struct EventView: NSViewRepresentable {
     var action: (EventDirection) -> Void
+    
+    init(action: @escaping (EventDirection) -> Void) {
+        self.action = action
+    }
 
     class Coordinator: NSObject {
         var parent: EventView
