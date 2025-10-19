@@ -24,12 +24,12 @@ class QuickActionsViewModel: ObservableObject {
     @Published var subitem: ShortcutObject?
     @Published var isEditing: Bool = false
     public let action: (ShortcutObject) -> Void
+    public var isTabPressed = false
     private let allItems: [ShortcutObject]
     private var lastDirectionChange: Date = .distantPast
     private let throttleInterval: TimeInterval = 0.4
     private var responder = HotKeyResponder.shared
     private var cancellables = Set<AnyCancellable>()
-    private var isTabPressed = false
     
     init(items: [ShortcutObject], allItems: [ShortcutObject], action: @escaping (ShortcutObject) -> Void) {
         self.items = items

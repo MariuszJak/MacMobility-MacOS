@@ -382,25 +382,28 @@ struct NewQAMVideoTutorialView: View {
     private let isFirstOpen: Bool
     private let closeHandler: () -> Void
     private let player = AVQueuePlayer()
-    let resources = [
+    let resources: [String?] = [
         "QAM-1",
         "QAM-2",
         "QAM-3",
-        "QAM-4"
+        "QAM-4",
+        "QAM-1",
     ]
     
     let names = [
         "Assigning items to Quick Action Menu",
         "Navigation in Quick Action Menu",
         "Edit items in Quick Action Menu",
-        "Assign apps to pages in Quick Action Menu"
+        "Assign apps to pages in Quick Action Menu",
+        "Use keyboard for navigation"
     ]
     
     let descriptions = [
         "Assign apps with Edit option.\nYou can assign app to a page, and assign up to 10 apps to a circle.\nEach option in circle has additional 5 more spaces",
-        "Create new circle page with `+` button.\nNavigate with `<` and `>` buttons or by swiping on trackpad.\nRemove page with `-` button.",
+        "Create new circle page with `+` button.\nNavigate with `<` and `>` buttons.\nRemove page with `-` button.",
         "Right-click on any item to Edit it.",
-        "Once an app is assigned to a page, it will be automatically shown in the circle if this app is in focus."
+        "Once an app is assigned to a page, it will be automatically shown in the circle if this app is in focus.",
+        "Keyboard controls:\nUse left and right arrow to navigate through pages.\nUse up (clockwise) and down (counter-clockwise) arrow to naviagte through options in current page.\nTab to enter submenu."
     ]
 
     init(isFirstOpen: Bool, closeHandler: @escaping () -> Void) {
@@ -410,7 +413,7 @@ struct NewQAMVideoTutorialView: View {
     }
 
     var body: some View {
-        VStack(spacing: 32) {
+        VStack {
             VStack {
                 Text(names[currentResourceIndex])
                     .font(.title)
@@ -423,11 +426,13 @@ struct NewQAMVideoTutorialView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
             }
-            .frame(height: 100.0)
             .padding(.top, 40.0)
+            .padding(.bottom, 20.0)
 
-            VideoPreviewView(player: player, title: "", description: "")
-                .frame(width: 700.0, height: 445.0)
+            if resources[currentResourceIndex] != nil {
+                VideoPreviewView(player: player, title: "", description: "")
+                    .frame(width: 650.0, height: 405.0)
+            }
             
             controls()
                 .padding(.bottom, 50.0)
@@ -470,8 +475,8 @@ struct NewQAMVideoTutorialView: View {
         }
     }
 
-    private func setupLoopingVideo(player: AVQueuePlayer, resource: String) {
-        guard let url = Bundle.main.url(forResource: resource, withExtension: "mp4") else { return }
+    private func setupLoopingVideo(player: AVQueuePlayer, resource: String?) {
+        guard let resource, let url = Bundle.main.url(forResource: resource, withExtension: "mp4") else { return }
         let item = AVPlayerItem(url: url)
         player.removeAllItems()
         player.insert(item, after: nil)

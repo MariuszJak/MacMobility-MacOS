@@ -41,6 +41,7 @@ struct QuickActionsView: View {
             {
                 viewModel.nextPage()
                 viewModel.showPopup = false
+                viewModel.isTabPressed = false
             },
             {
                 viewModel.addPage()
@@ -53,6 +54,7 @@ struct QuickActionsView: View {
             {
                 viewModel.prevPage()
                 viewModel.showPopup = false
+                viewModel.isTabPressed = false
             },
             {
                 if !viewModel.isEditing {
@@ -322,6 +324,7 @@ struct QuickActionsView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                             self.viewModel.showPopup = false
                             self.viewModel.subitem = nil
+                            self.viewModel.isTabPressed = false
                         }
                     }
                     .contentShape(Circle())
@@ -340,6 +343,7 @@ struct QuickActionsView: View {
                             ) {
                                 viewModel.isEditing = false
                                 viewModel.showPopup = false
+                                viewModel.isTabPressed = false
                                 NotificationCenter.default.post(
                                     name: .closeShortcuts,
                                     object: nil,
@@ -494,6 +498,7 @@ struct QuickActionsView: View {
         .onHover { _ in
             if !viewModel.isEditing {
                 viewModel.showPopup = false
+                viewModel.isTabPressed = false
                 // lastHoveredIndex = nil
             } else {
                 viewModel.submenuDegrees = angle.degrees - 92

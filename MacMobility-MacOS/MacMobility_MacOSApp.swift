@@ -385,7 +385,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         newQamTutorialWindow = nil
         if nil == newQamTutorialWindow {
             newQamTutorialWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 800, height: 700),
+                contentRect: NSRect(x: 0, y: 0, width: 800, height: 800),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -401,6 +401,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let hv = NSHostingController(rootView: NewQAMVideoTutorialView(isFirstOpen: isFirstOpen){
                 self.newQamTutorialWindow?.close()
                 self.newQamTutorialWindow = nil
+                HotKeyManager.shared.registerArrowAndEnterHotKeys()
             })
             newQamTutorialWindow?.contentView?.addSubview(hv.view)
             hv.view.frame = newQamTutorialWindow?.contentView?.bounds ?? .zero
