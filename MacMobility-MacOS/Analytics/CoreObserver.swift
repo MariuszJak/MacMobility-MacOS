@@ -74,6 +74,12 @@ public extension NSWindow {
     @objc private func swizzled_makeKeyAndOrderFront(_ sender: Any?) {
         // Call original implementation
         self.swizzled_makeKeyAndOrderFront(sender)
-        Resolver.resolve(CoreObserverProtocol.self).submit(event: .screen, additions: ["WindowAppear": self.title])
+        Resolver.obsever.submit(event: .screen, additions: ["WindowAppear": self.title])
+    }
+}
+
+extension Resolver {
+    static var obsever: CoreObserverProtocol {
+        return Resolver.resolve()
     }
 }

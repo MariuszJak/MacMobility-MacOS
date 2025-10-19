@@ -175,6 +175,7 @@ class ConnectionManager: NSObject, ObservableObject {
     }
     
     func extendScreen() async {
+        Resolver.obsever.submit(event: .action, additions: ["Extend screen": "Extend screen"])
         streamConnectionState = .connecting
         await startTCPServer { success, displayId in
             if let displayId {

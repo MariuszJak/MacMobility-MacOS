@@ -42,6 +42,10 @@ extension ConnectionManager {
         }
         if let shortcutItem = try? JSONDecoder().decode(ShortcutObject.self, from: data) {
             DispatchQueue.main.async {
+                Resolver.obsever.submit(event: .action, additions: [
+                    "Shortcut Action": shortcutItem.title,
+                    "Shortcut type": shortcutItem.type.rawValue
+                ])
                 self.runShortuct(for: shortcutItem)
             }
             return
