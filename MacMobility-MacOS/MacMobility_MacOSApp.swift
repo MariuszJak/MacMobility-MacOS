@@ -63,7 +63,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         .store(in: &cancellables)
 //        UserDefaults.standard.clearAll(except: [.license, .licenseKey])
-//        UserDefaults.standard.clear(key: .analyticsConsent)
         let lifecycle: Lifecycle = UserDefaults.standard.get(key: .lifecycle) ?? .init(openCount: 0)
         if lifecycle.openCount == 0 {
             openWelcomeWindow()
@@ -137,23 +136,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard !connectionManager.listenerAdded else { return }
         HotKeyManager.shared.registerGeneralHotKey()
         
-        responder
-            .$showWindow
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] value in
-                if value {
-                    let newQuickActionTutorialSeen = UserDefaults.standard.get(key: .newQuickActionTutorialSeen) ?? false
-                    if newQuickActionTutorialSeen {
-                        self?.openCircularWindow()
-                        HotKeyManager.shared.registerArrowAndEnterHotKeys()
-                    } else {
-                        self?.openNewQAMTutorialWindow(isFirstOpen: true)
-                        UserDefaults.standard.store(true, for: .newQuickActionTutorialSeen)
-                    }
-//                    self?.openNewQAMTutorialWindow(isFirstOpen: true)
+        responder.showWindow = { [weak self] value in
+            if value {
+                let newQuickActionTutorialSeen = UserDefaults.standard.get(key: .newQuickActionTutorialSeen) ?? false
+                if newQuickActionTutorialSeen {
+                    self?.openCircularWindow()
+                    HotKeyManager.shared.registerArrowAndEnterHotKeys()
+                } else {
+                    self?.openNewQAMTutorialWindow(isFirstOpen: true)
+                    UserDefaults.standard.store(true, for: .newQuickActionTutorialSeen)
                 }
             }
-            .store(in: &cancellables)
+        }
         
         NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
             guard let self else { return }
@@ -201,19 +195,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             circularWindow?.level = .floating
             circularWindow?.title = "Quick Action Menu"
             circularWindow?.titleVisibility = .hidden
+            let viewModel: QuickActionsViewModel = .init(
+                items: shortcutsViewModel.quickActionItems,
+                allItems: shortcutsViewModel.allObjects(),
+                action: { [weak self] item in
+                    guard let self else { return }
+                    connectionManager.runShortuct(for: item)
+                    circularWindow?.close()
+                    circularWindow = nil
+                    HotKeyManager.shared.unregisterArrowAndEnterHotKeys()
+                }
+            )
             let hostingController = NSHostingController(
                 rootView: QuickActionsView(
-                    viewModel: .init(
-                        items: shortcutsViewModel.quickActionItems,
-                        allItems: shortcutsViewModel.allObjects(),
-                        action: { [weak self] item in
-                            guard let self else { return }
-                            connectionManager.runShortuct(for: item)
-                            circularWindow?.close()
-                            circularWindow = nil
-                            HotKeyManager.shared.unregisterArrowAndEnterHotKeys()
-                        }
-                    ), update: { [weak self] items in
+                    viewModel: viewModel,
+                    update: { [weak self] items in
                         guard let self else { return }
                         shortcutsViewModel.saveQuickActionItems(items)
                     }, close: { [weak self] in
@@ -519,3 +515,9 @@ extension AppDelegate {
     }
 }
 
+public extension Array {
+    /// Returns a copy of the array.
+    func copy() -> [Element] {
+        return Array(self)
+    }
+}

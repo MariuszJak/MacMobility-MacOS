@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import Combine
 
 class QuickActionsViewModel: ObservableObject {
     private var cachedIcons: [String: Data] = [:]
@@ -23,13 +22,12 @@ class QuickActionsViewModel: ObservableObject {
     @Published var submenuDegrees = 0.0
     @Published var subitem: ShortcutObject?
     @Published var isEditing: Bool = false
-    public let action: (ShortcutObject) -> Void
+    public var action: ((ShortcutObject) -> Void)?
     public var isTabPressed = false
     private let allItems: [ShortcutObject]
     private var lastDirectionChange: Date = .distantPast
     private let throttleInterval: TimeInterval = 0.4
     private var responder = HotKeyResponder.shared
-    private var cancellables = Set<AnyCancellable>()
     
     init(items: [ShortcutObject], allItems: [ShortcutObject], action: @escaping (ShortcutObject) -> Void) {
         self.items = items
@@ -53,72 +51,60 @@ class QuickActionsViewModel: ObservableObject {
     }
     
     private func binding() {
-        responder
-            .$isEnterPressed
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] value in
-                guard let self, !isEditing else { return }
-                if !isTabPressed {
-                    if let index = hoveredIndex, value {
-                        let tmpIndex = index + ((currentPage - 1) * 10)
-                        let item = self.items[tmpIndex]
-                        if item.title != "EMPTY" {
-                            action(item)
-                        }
+        responder.isEnterPressed = { [weak self] value in
+            guard let self, !isEditing else { return }
+            if !isTabPressed {
+                if let index = hoveredIndex, value {
+                    let tmpIndex = index + ((currentPage - 1) * 10)
+                    let item = self.items[tmpIndex]
+                    if item.title != "EMPTY" {
+                        action?(item)
                     }
-                } else {
-                    guard let hoveredSubIndex,
-                          let subitem,
-                          let item = subitem.objects?[hoveredSubIndex],
-                          value else {
-                        return
-                    }
-                    action(item)
                 }
-            }
-            .store(in: &cancellables)
-        
-        responder
-            .$isTabPressed
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] value in
-                guard let self, !isEditing else { return }
-                guard let index = self.hoveredIndex else {
-                    isTabPressed = false
-                    showPopup = false
+            } else {
+                guard let hoveredSubIndex,
+                      let subitem,
+                      let item = subitem.objects?[hoveredSubIndex],
+                      value else {
                     return
                 }
-                let tmpIndex = index + ((currentPage - 1) * 10)
-                let item = self.items[tmpIndex]
-                let subitems = (item.objects ?? []).filter { $0.title != "EMPTY" }
-                guard item.title != "EMPTY" && subitems.count > 0 else {
-                    isTabPressed = false
-                    showPopup = false
-                    return
-                }
-                let angle = Angle.degrees(Double(index) / Double(10) * 360)
-                submenuDegrees = angle.degrees - 92
-                subitem = item
-                isTabPressed.toggle()
-                showPopup.toggle()
-                if isTabPressed {
-                    hoveredSubIndex = 2
-                }
+                action?(item)
             }
-            .store(in: &cancellables)
+        }
         
-        responder
-            .$lastArrow
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] value in
-                guard let value, let self,!isEditing else { return }
-                if !isTabPressed {
-                    handleArrowsForMainMenu(value)
-                } else {
-                    handleArrowsForSubMenu(value)
-                }
+        responder.isTabPressed = { [weak self] value in
+            guard let self, !isEditing else { return }
+            guard let index = self.hoveredIndex else {
+                isTabPressed = false
+                showPopup = false
+                return
             }
-            .store(in: &cancellables)
+            let tmpIndex = index + ((currentPage - 1) * 10)
+            let item = self.items[tmpIndex]
+            let subitems = (item.objects ?? []).filter { $0.title != "EMPTY" }
+            guard item.title != "EMPTY" && subitems.count > 0 else {
+                isTabPressed = false
+                showPopup = false
+                return
+            }
+            let angle = Angle.degrees(Double(index) / Double(10) * 360)
+            submenuDegrees = angle.degrees - 92
+            subitem = item
+            isTabPressed.toggle()
+            showPopup.toggle()
+            if isTabPressed {
+                hoveredSubIndex = 2
+            }
+        }
+        
+        responder.lastArrow = { [weak self] value in
+            guard let value, let self,!isEditing else { return }
+            if !isTabPressed {
+                handleArrowsForMainMenu(value)
+            } else {
+                handleArrowsForSubMenu(value)
+            }
+        }
     }
     
     private func handleArrowsForMainMenu(_ direction: HotKeyResponder.ArrowKey) {

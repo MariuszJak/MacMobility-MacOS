@@ -16,6 +16,42 @@ class HotKeyManager {
     private var generalHotKeyRef: EventHotKeyRef?        // Ctrl + Option + Space
     private var arrowHotKeyRefs: [EventHotKeyRef?] = []  // Arrows + Enter + Tab
     private var eventHandler: EventHandlerRef?
+    
+    private let hotKeyCallback: EventHandlerUPP = { _, eventRef, _ in
+        var hotKeyID = EventHotKeyID()
+        GetEventParameter(
+            eventRef,
+            EventParamName(kEventParamDirectObject),
+            EventParamType(typeEventHotKeyID),
+            nil,
+            MemoryLayout<EventHotKeyID>.size,
+            nil,
+            &hotKeyID
+        )
+
+        DispatchQueue.main.async {
+            switch hotKeyID.signature {
+            case OSType("HTK1".fourCharCodeValue):
+                HotKeyResponder.shared.triggered()
+            case OSType("UPAR".fourCharCodeValue):
+                HotKeyResponder.shared.arrowPressed(.up)
+            case OSType("DNAR".fourCharCodeValue):
+                HotKeyResponder.shared.arrowPressed(.down)
+            case OSType("LFAR".fourCharCodeValue):
+                HotKeyResponder.shared.arrowPressed(.left)
+            case OSType("RTAR".fourCharCodeValue):
+                HotKeyResponder.shared.arrowPressed(.right)
+            case OSType("ENTR".fourCharCodeValue):
+                HotKeyResponder.shared.enterPressed()
+            case OSType("TABK".fourCharCodeValue):
+                HotKeyResponder.shared.tabPressed()
+            default:
+                break
+            }
+        }
+
+        return noErr
+    }
 
     // MARK: - Register general hotkey (Ctrl + Option + Space)
     func registerGeneralHotKey() {
@@ -108,69 +144,31 @@ extension String {
     }
 }
 
-private var eventHandler: EventHandlerRef?
-
-private let hotKeyCallback: EventHandlerUPP = { _, eventRef, _ in
-    var hotKeyID = EventHotKeyID()
-    GetEventParameter(
-        eventRef,
-        EventParamName(kEventParamDirectObject),
-        EventParamType(typeEventHotKeyID),
-        nil,
-        MemoryLayout<EventHotKeyID>.size,
-        nil,
-        &hotKeyID
-    )
-
-    DispatchQueue.main.async {
-        switch hotKeyID.signature {
-        case OSType("HTK1".fourCharCodeValue):
-            HotKeyResponder.shared.triggered()
-        case OSType("UPAR".fourCharCodeValue):
-            HotKeyResponder.shared.arrowPressed(.up)
-        case OSType("DNAR".fourCharCodeValue):
-            HotKeyResponder.shared.arrowPressed(.down)
-        case OSType("LFAR".fourCharCodeValue):
-            HotKeyResponder.shared.arrowPressed(.left)
-        case OSType("RTAR".fourCharCodeValue):
-            HotKeyResponder.shared.arrowPressed(.right)
-        case OSType("ENTR".fourCharCodeValue):
-            HotKeyResponder.shared.enterPressed()
-        case OSType("TABK".fourCharCodeValue):
-            HotKeyResponder.shared.tabPressed()
-        default:
-            break
-        }
-    }
-
-    return noErr
-}
-
 class HotKeyResponder: ObservableObject {
     static let shared = HotKeyResponder()
 
-    @Published var showWindow = false
-    @Published var isEnterPressed = false
-    @Published var isTabPressed = false
-    @Published var lastArrow: ArrowKey?
+    var showWindow: (Bool) -> Void = { _ in }
+    var isEnterPressed: (Bool) -> Void = { _ in }
+    var isTabPressed: (Bool) -> Void = { _ in }
+    var lastArrow: (ArrowKey?) -> Void = { _ in }
 
     enum ArrowKey {
         case up, down, left, right
     }
 
     func triggered() {
-        showWindow = true
+        showWindow(true)
     }
 
     func arrowPressed(_ arrow: ArrowKey) {
-        lastArrow = arrow
+        lastArrow(arrow)
     }
 
     func enterPressed() {
-        isEnterPressed = true
+        isEnterPressed(true)
     }
     
     func tabPressed() {
-        isTabPressed = true
+        isTabPressed(true)
     }
 }

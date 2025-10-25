@@ -150,7 +150,7 @@ struct QuickActionsView: View {
                                 .shadow(color: .black.opacity(0.6), radius: 4.0)
                                 .if(!viewModel.isEditing) {
                                     $0.onTapGesture {
-                                        viewModel.action(app)
+                                        viewModel.action?(app)
                                     }
                                     .contextMenu {
                                         Button("Edit") {
@@ -515,7 +515,7 @@ struct QuickActionsView: View {
                     $0.scaleEffect(index == viewModel.hoveredSubIndex ? 1.3 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredSubIndex)
                         .onTapGesture {
-                            viewModel.action(object)
+                            viewModel.action?(object)
                         }
                         .contextMenu {
                             Button("Edit") {
@@ -561,7 +561,7 @@ struct QuickActionsView: View {
                     $0.scaleEffect(index == viewModel.hoveredIndex ? 1.3 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredIndex)
                         .onTapGesture {
-                            viewModel.action(item)
+                            viewModel.action?(item)
                         }
                         .contextMenu {
                             Button("Edit") {
