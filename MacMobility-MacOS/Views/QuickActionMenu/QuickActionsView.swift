@@ -575,7 +575,6 @@ struct QuickActionsView: View {
                         }
                         .onHover { hovering in
                             viewModel.hoveredIndex = hovering ? index : (viewModel.hoveredIndex == index ? nil : viewModel.hoveredIndex)
-//                            showPopup = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 viewModel.submenuDegrees = angle.degrees - 92
                                 viewModel.showPopup = true
@@ -601,6 +600,17 @@ struct QuickActionsView: View {
                         }
                     }
                     Spacer()
+                }
+            } else {
+                if let objects = item.objects?.filter({ $0.title != "EMPTY" }),
+                   objects.count > 0 {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            InfoView(count: "\(objects.count)")
+                        }
+                        Spacer()
+                    }
                 }
             }
         }

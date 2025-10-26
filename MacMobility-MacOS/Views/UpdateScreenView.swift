@@ -43,8 +43,10 @@ struct UpdateScreenView: View {
                 .font(.system(size: 18.0))
                 .padding(.bottom, 12.0)
                 .padding(.top, 12.0)
-            Text(viewModel.updateData.release_notes)
-                .font(.system(size: 14.0))
+            ScrollView {
+                Text(viewModel.updateData.release_notes)
+                    .font(.system(size: 14.0))
+            }
             Spacer()
             if viewModel.isUpdating {
                 ProgressView()

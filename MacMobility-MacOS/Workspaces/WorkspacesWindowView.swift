@@ -546,3 +546,18 @@ struct RedXButton: View {
             }
     }
 }
+
+
+struct InfoView: View {
+    var count: String
+    
+    var body: some View {
+        Text(count)
+            .font(.system(size: 15, weight: .bold))
+            .frame(width: 25, height: 25)
+            .foregroundStyle(Color.black)
+            .background(Color.gray)
+            .clipShape(Circle())
+            .shadow(color: .black, radius: 2.0)
+    }
+}

@@ -44,7 +44,7 @@ public class UpdatesManager: ObservableObject {
         case .success(let data):
             updateData = data
             completion(Version(data.latest_version) > Version(appVersion))
-        case .failure(let error):
+        case .failure:
             completion(false)
         }
     }
