@@ -7,7 +7,13 @@
 
 import SwiftUI
 
+class AutomationInstallViewModel: ObservableObject {
+    @Published var localUnnamedScript: AutomationScript?
+    @Published var showDependenciesView: Bool = false
+}
+
 struct AutomationInstallView: View {
+    @ObservedObject var viewModel = AutomationInstallViewModel()
     var automationItem: AutomationItem
     var selectedScriptsAction: ([AutomationScript]) -> Void
     var close: () -> Void
@@ -94,7 +100,14 @@ struct AutomationInstallView: View {
                 Spacer()
                 Button("Install") {
                     let selectedScripts = automationItem.scripts.filter { selectedScriptIDs.contains($0.id) }
-                    selectedScriptsAction(selectedScripts)
+                    // There can be only one script with undefined name!
+                    if selectedScripts.count == 1,
+                        let unnamedScript = selectedScripts.first(where: { $0.name == "[UNDEFINED]" }) {
+                        viewModel.localUnnamedScript = unnamedScript
+                        viewModel.showDependenciesView = true
+                    } else {
+                        selectedScriptsAction(selectedScripts)
+                    }
                 }
                 .keyboardShortcut(.defaultAction)
                 Button("Close") {
@@ -103,6 +116,14 @@ struct AutomationInstallView: View {
                 Spacer()
             }
             .padding(.bottom)
+            .sheet(isPresented: $viewModel.showDependenciesView) {
+                if let localUnnamedScript = viewModel.localUnnamedScript {
+                    UnnamedScriptInstallView(script: localUnnamedScript) { updatedScript in
+                        viewModel.showDependenciesView = false
+                        selectedScriptsAction([updatedScript])
+                    }
+                }
+            }
         }
         .padding()
         .frame(minWidth: 400, minHeight: 400)

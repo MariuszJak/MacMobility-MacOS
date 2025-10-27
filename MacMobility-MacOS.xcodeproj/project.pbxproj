@@ -347,6 +347,7 @@
 		C0E037062BA37FEF00BFBD2A /* NewWebpageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */; };
 		C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */; };
 		C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */; };
+		C0E7295A2EAF5D1300452F80 /* UnnamedScriptInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E729592EAF5D1300452F80 /* UnnamedScriptInstallView.swift */; };
 		C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */; };
 		C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */; };
 		C0EAF9392D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */; };
@@ -760,6 +761,7 @@
 		C0E037052BA37FEF00BFBD2A /* NewWebpageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWebpageView.swift; sourceTree = "<group>"; };
 		C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Ext.swift"; sourceTree = "<group>"; };
 		C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Ext.swift"; sourceTree = "<group>"; };
+		C0E729592EAF5D1300452F80 /* UnnamedScriptInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnnamedScriptInstallView.swift; sourceTree = "<group>"; };
 		C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilitiesWindowView.swift; sourceTree = "<group>"; };
 		C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBashUtilityView.swift; sourceTree = "<group>"; };
 		C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectUtilityTypeWindowView.swift; sourceTree = "<group>"; };
@@ -1147,6 +1149,7 @@
 				C062546C2E4BDEFC0016FF7C /* RotaryKnobIcon.swift */,
 				C06868342E5A3BE100476900 /* CompanionAppView.swift */,
 				C06868362E5A3C2300476900 /* CompanionRequestPopup.swift */,
+				C0E729592EAF5D1300452F80 /* UnnamedScriptInstallView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1988,6 +1991,7 @@
 				C0EAF93B2D8CC67600044947 /* NewMultiSelectionUtilityView.swift in Sources */,
 				C05B87232E6F586800A12E33 /* HTMLUtilityView.swift in Sources */,
 				C065EC042DC0DE5100000B8C /* ShortcutObject+Ext.swift in Sources */,
+				C0E7295A2EAF5D1300452F80 /* UnnamedScriptInstallView.swift in Sources */,
 				C0F767C72E5E2FDB00D026EA /* UIControlTestView.swift in Sources */,
 				C0F67EE22D973EF90090D568 /* URL+Ext.swift in Sources */,
 				C035810E2DB65091009E22F5 /* VisualEffect.swift in Sources */,
