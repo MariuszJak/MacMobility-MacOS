@@ -67,11 +67,13 @@ struct SettingsView: View {
 
 class GeneralSettingsViewModel: ObservableObject {
     @Published var browser: Browsers
+    @Published var qamType: ControlType
     @Published var editorWindowOnStart: Bool
     private var cancellables = Set<AnyCancellable>()
     
     init() {
         browser = UserDefaults.standard.get(key: .browser) ?? .chrome
+        qamType = UserDefaults.standard.get(key: .qamType) ?? .mouse
         editorWindowOnStart = UserDefaults.standard.get(key: .shouldOpenEditorWindowOnAppLaunch) ?? true
         binding()
     }
@@ -81,6 +83,13 @@ class GeneralSettingsViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { browser in
                 UserDefaults.standard.store(browser, for: .browser)
+            }
+            .store(in: &cancellables)
+        
+        $qamType
+            .receive(on: DispatchQueue.main)
+            .sink { qamType in
+                UserDefaults.standard.store(qamType, for: .qamType)
             }
             .store(in: &cancellables)
         
@@ -121,6 +130,15 @@ struct GeneralSettingsView: View {
                 }
                 .pickerStyle(.menu)
                 Text("Select default browser for creating and opening links. IMPORTANT: This setting will not affect existing links. You have to manually update them if needed.")
+                    .font(.system(size: 13, weight: .light))
+                    .foregroundStyle(Color.gray)
+                Divider()
+                Picker("Quick Action Menu Type", selection: $viewModel.qamType) {
+                    Text("Mouse").tag(ControlType.mouse)
+                    Text("Keyboard").tag(ControlType.keyboard)
+                }
+                .pickerStyle(.menu)
+                Text("Select how you want to control your Quick Action Button menu.")
                     .font(.system(size: 13, weight: .light))
                     .foregroundStyle(Color.gray)
             }

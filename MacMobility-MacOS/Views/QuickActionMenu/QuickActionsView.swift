@@ -8,12 +8,35 @@
 import Foundation
 import SwiftUI
 
+enum ControlType: Codable {
+    case mouse
+    case keyboard
+    
+    var mainWindowSize: CGSize {
+        switch self {
+        case .keyboard:
+            return .init(width: 560, height: 700)
+        case .mouse:
+            return .init(width: 460, height: 460)
+        }
+    }
+    
+    var itemSize: CGSize {
+        switch self {
+        case .keyboard:
+            return .init(width: 45, height: 45)
+        case .mouse:
+            return .init(width: 60, height: 60)
+        }
+    }
+}
+
 struct QuickActionsView: View {
     @ObservedObject private var viewModel: QuickActionsViewModel
     
     @State private var isVisible: Bool = false
     @State private var subMenuIsVisible: Bool = false
-    
+    private let controlType: ControlType
     private let buttonCount = 10
     private let cornerRadius = 20.0
     private let radius: CGFloat = 120
@@ -91,6 +114,7 @@ struct QuickActionsView: View {
         update: @escaping ([ShortcutObject]) -> Void,
         close: @escaping () -> Void
     ) {
+        self.controlType = UserDefaults.standard.get(key: .qamType) ?? .mouse
         self.viewModel = viewModel
         self.update = update
         self.close = close
@@ -103,15 +127,24 @@ struct QuickActionsView: View {
                 .onTapGesture {
                     close()
                 }
-            circleMainView()
-            if viewModel.showPopup {
-                submenuPopup()
+            switch controlType {
+            case .mouse:
+                circleMainView()
+                if viewModel.showPopup {
+                    submenuPopup()
+                }
+                innerCircleMenu()
+            case .keyboard:
+                listMainView()
+                if viewModel.showPopup {
+                    keyboardSubmenuMainView()
+                        .padding(.leading, 300)
+                }
             }
-            innerCircleMenu()
         }
         .scaleEffect(isVisible ? 1.0 : 0.6)
         .opacity(isVisible ? 1.0 : 0.0)
-        .frame(width: 460, height: 460)
+        .frame(width: controlType.mainWindowSize.width, height: controlType.mainWindowSize.height)
         .onAppear {
             withAnimation(.easeInOut) {
                 isVisible = true
@@ -128,6 +161,29 @@ struct QuickActionsView: View {
     }
     
     @ViewBuilder
+    private func keyboardOnlyPageNumberView(page: Int) -> some View {
+        VStack {
+            if let assignedApp = viewModel.getAssigned(to: page),
+               let app = viewModel.object(path: assignedApp.appPath) {
+                if let data = viewModel.getIcon(fromAppPath: assignedApp.appPath),
+                   let image = NSImage(data: data) {
+                    ZStack {
+                        assignedAppView(image: image, app: app, assignedApp: assignedApp, page: page)
+                    }
+                }
+            } else {
+                if !viewModel.isEditing {
+                    ZStack {
+                        dropAssignedAppView()
+                    }
+                } else {
+                    dropAssignedPageView(page: page)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
     private func pageNumberView(page: Int) -> some View {
         VStack {
             if let assignedApp = viewModel.getAssigned(to: page),
@@ -135,61 +191,7 @@ struct QuickActionsView: View {
                 if let data = viewModel.getIcon(fromAppPath: assignedApp.appPath),
                    let image = NSImage(data: data) {
                     ZStack {
-                        VStack {
-                            ZStack {
-                                ZStack {
-//                                    EventView { direction in
-//                                        viewModel.handleDirection(direction)
-//                                    }
-                                    Image(nsImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .cornerRadius(cornerRadius)
-                                }
-                                .frame(width: 60, height: 60)
-                                .shadow(color: .black.opacity(0.6), radius: 4.0)
-                                .if(!viewModel.isEditing) {
-                                    $0.onTapGesture {
-                                        viewModel.action?(app)
-                                    }
-                                    .contextMenu {
-                                        Button("Edit") {
-                                            viewModel.isEditing = true
-                                            NotificationCenter.default.post(
-                                                name: .openShortcuts,
-                                                object: nil,
-                                                userInfo: nil
-                                            )
-                                        }
-                                    }
-                                }
-                                if viewModel.isEditing {
-                                    VStack {
-                                        HStack {
-                                            Spacer()
-                                            RedXButton {
-                                                viewModel.unassign(app: assignedApp.appPath, from: page)
-                                            }
-                                        }
-                                        Spacer()
-                                    }
-                                }
-                            }
-                        }
-                        .frame(width: 60, height: 60)
-                        .onDrop(of: [.text], isTargeted: nil) { providers in
-                            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                                if let droppedString = droppedItem as? String,
-                                   let object = viewModel.object(for: droppedString),
-                                   object.type == .app,
-                                   let path = object.path {
-                                    DispatchQueue.main.async {
-                                        viewModel.replace(app: path, to: page)
-                                    }
-                                }
-                            }
-                            return true
-                        }
+                        assignedAppView(image: image, app: app, assignedApp: assignedApp, page: page)
                         if !viewModel.isEditing {
                             CircularPageDotsView(
                                 pageCount: viewModel.pages,
@@ -204,27 +206,7 @@ struct QuickActionsView: View {
             } else {
                 if !viewModel.isEditing {
                     ZStack {
-                        ZStack {
-//                            EventView { direction in
-//                                viewModel.handleDirection(direction)
-//                            }
-                            Image(systemName: "slider.horizontal.3")
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                        }
-                        .frame(width: 30, height: 30)
-                        .onTapGesture {
-                            viewModel.isEditing = true
-                            NotificationCenter.default.post(
-                                name: .openShortcuts,
-                                object: nil,
-                                userInfo: nil
-                            )
-                        }
-                        .padding(.all, 10.0)
-                        .background(
-                            RoundedBackgroundView(cornerRadius: 10.0)
-                        )
+                        dropAssignedAppView()
                         CircularPageDotsView(
                             pageCount: viewModel.pages,
                             currentPage: viewModel.currentPage - 1
@@ -234,28 +216,108 @@ struct QuickActionsView: View {
                         .rotationEffect(circularDotsRotation)
                     }
                 } else {
-                    RoundedTextButtonView(
-                        higlightedText: "Page \(page)",
-                        text: "Drop App Here",
-                        size: .init(width: 60.0, height: 60.0),
-                        cornerRadius: 10
-                    )
-                    .onDrop(of: [.text], isTargeted: nil) { providers in
-                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
-                            if let droppedString = droppedItem as? String,
-                               let object = viewModel.object(for: droppedString),
-                               object.type == .app,
-                                   let path = object.path {
-                                    DispatchQueue.main.async {
-                                        viewModel.assign(app: path, to: page)
-                                    }
-                                }
-                            }
-                            return true
-                        }
+                    dropAssignedPageView(page: page)
                 }
             }
         }
+    }
+    
+    func assignedAppView(image: NSImage, app: ShortcutObject, assignedApp: AssignedAppsToPages, page: Int) -> some View {
+        VStack {
+            ZStack {
+                ZStack {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .cornerRadius(cornerRadius)
+                }
+                .frame(width: controlType.itemSize.width, height: controlType.itemSize.height)
+                .shadow(color: .black.opacity(0.6), radius: 4.0)
+                .if(!viewModel.isEditing) {
+                    $0.onTapGesture {
+                        viewModel.action?(app)
+                    }
+                    .contextMenu {
+                        Button("Edit") {
+                            viewModel.isEditing = true
+                            NotificationCenter.default.post(
+                                name: .openShortcuts,
+                                object: nil,
+                                userInfo: nil
+                            )
+                        }
+                    }
+                }
+                if viewModel.isEditing {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            RedXButton {
+                                viewModel.unassign(app: assignedApp.appPath, from: page)
+                            }
+                        }
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .frame(width: controlType.itemSize.width, height: controlType.itemSize.height)
+        .onDrop(of: [.text], isTargeted: nil) { providers in
+            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                if let droppedString = droppedItem as? String,
+                   let object = viewModel.object(for: droppedString),
+                   object.type == .app,
+                   let path = object.path {
+                    DispatchQueue.main.async {
+                        viewModel.replace(app: path, to: page)
+                    }
+                }
+            }
+            return true
+        }
+    }
+    
+    func dropAssignedAppView() -> some View {
+        ZStack {
+            Image(systemName: "slider.horizontal.3")
+                .resizable()
+                .frame(width: 20, height: 20)
+        }
+        .frame(width: controlType.itemSize.width / 2, height: controlType.itemSize.height / 2)
+        .onTapGesture {
+            viewModel.isEditing = true
+            NotificationCenter.default.post(
+                name: .openShortcuts,
+                object: nil,
+                userInfo: nil
+            )
+        }
+        .padding(.all, controlType == .mouse ? 10.0 : 3.0)
+        .background(
+            RoundedBackgroundView(cornerRadius: 10.0)
+        )
+    }
+    
+    func dropAssignedPageView(page: Int) -> some View {
+        RoundedTextButtonView(
+            higlightedText: "Page \(page)",
+            text: "Drop App Here",
+            size: .init(width: controlType.itemSize.width, height: controlType.itemSize.height),
+            cornerRadius: 10
+        )
+        .onDrop(of: [.text], isTargeted: nil) { providers in
+            providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                if let droppedString = droppedItem as? String,
+                   let object = viewModel.object(for: droppedString),
+                   object.type == .app,
+                       let path = object.path {
+                        DispatchQueue.main.async {
+                            viewModel.assign(app: path, to: page)
+                        }
+                    }
+                }
+                return true
+            }
     }
     
     func selectApp() -> String? {
@@ -388,6 +450,78 @@ struct QuickActionsView: View {
         .frame(width: 300, height: 300)
     }
     
+    private func listMainView() -> some View {
+        VStack(alignment: .center) {
+            VStack(alignment: .leading) {
+                Spacer().frame(height: 12.0)
+                ForEach(Array(viewModel.items.filter { $0.page == viewModel.currentPage }.enumerated()), id: \.offset) { (index, item) in
+                    if index + ((viewModel.currentPage - 1) * 10) == item.index, item.title != "EMPTY" {
+                        HStack {
+                            mainView(item: item, index: index, angle: nil)
+                                .padding(.leading, 12.0)
+                            Text(item.title)
+                                .multilineTextAlignment(.leading)
+                                .scaleEffect(index == viewModel.hoveredIndex ? 1.1 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredIndex)
+                            Spacer()
+                        }
+                    } else {
+                        HStack {
+                            plusView(angle: nil, item: item, index: index)
+                                .padding(.leading, 12.0)
+                            Text("Empty slot")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color.gray)
+                        }
+                        .scaleEffect(index == viewModel.hoveredIndex ? 1.1 : 0.8)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredIndex)
+                    }
+                    Divider()
+                }
+                Spacer().frame(height: 12.0)
+            }
+            .background(
+                RoundedBackgroundView()
+            )
+            .padding(.bottom, 2.0)
+            VStack {
+                HStack {
+                    keyboardOnlyPageNumberView(page: viewModel.currentPage - 1)
+                    PageDotsView(pageCount: viewModel.pages, currentPage: viewModel.currentPage - 1)
+                    Button("+") {
+                        viewModel.addPage()
+                    }
+                    Button("-") {
+                        viewModel.removePage(with: viewModel.currentPage)
+                    }
+                    if viewModel.isEditing {
+                        BlueButton(
+                            title: "Close",
+                            font: .callout,
+                            padding: 3.0,
+                            cornerRadius: 3.0,
+                            backgroundColor: .accentColor
+                        ) {
+                            viewModel.isEditing = false
+                            viewModel.showPopup = false
+                            viewModel.isTabPressed = false
+                            NotificationCenter.default.post(
+                                name: .closeShortcuts,
+                                object: nil,
+                                userInfo: nil
+                            )
+                        }
+                    }
+                }
+                .padding()
+            }
+            .background(
+                RoundedBackgroundView()
+            )
+        }
+        .frame(width: 260.0)
+    }
+    
     private func submenuPopup() -> some View {
         ZStack {
             if let subitem = viewModel.subitem,
@@ -424,17 +558,7 @@ struct QuickActionsView: View {
                         if let object = objects[safe: index], object.id != "EMPTY \(index)" {
                             submenuMainView(object: object, subitem: subitem, index: index)
                         } else {
-                            PlusButtonView(size: frame, cornerRadius: 10, dropAction: { droppedItem in
-                                if let droppedString = droppedItem as? String,
-                                   let object = viewModel.object(for: droppedString) {
-                                    DispatchQueue.main.async {
-                                        if let updatedItem = viewModel.addSubitem(to: subitem.id, item: object, at: index) {
-                                            self.viewModel.subitem = updatedItem
-                                        }
-                                        update(viewModel.items)
-                                    }
-                                }
-                            })
+                            submenuPlusView(subitem: subitem, index: index)
                             .frame(width: frame.width, height: frame.height)
                             .onTapGesture {
                                 viewModel.isEditing = true
@@ -474,7 +598,96 @@ struct QuickActionsView: View {
         }
     }
     
-    private func plusView(angle: Angle, item: ShortcutObject, index: Int) -> some View {
+    private func keyboardSubmenuMainView() -> some View {
+        VStack {
+            keyboardSubmenuPopup()
+        }
+        .background(
+            RoundedBackgroundView()
+        )
+    }
+    
+    private func keyboardSubmenuPopup() -> some View {
+        VStack(alignment: .leading) {
+            if let subitem = viewModel.subitem,
+               let objects = subitem.objects {
+                Spacer().frame(height: 12.0)
+                ForEach(Array(objects.enumerated()), id: \.offset) { (index, item) in
+                    VStack {
+                        if let object = objects[safe: index], object.id != "EMPTY \(index)" {
+                            HStack {
+                                submenuMainView(object: object, subitem: subitem, index: index)
+                                    .padding(.leading, 12.0)
+                                Text(item.title)
+                                    .multilineTextAlignment(.leading)
+                                    .scaleEffect(index == viewModel.hoveredSubIndex ? 1.1 : 1.0)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredSubIndex)
+                                Spacer()
+                            }
+                        } else {
+                            HStack {
+                                submenuPlusView(subitem: subitem, index: index)
+                                Text("Empty slot")
+                                    .multilineTextAlignment(.leading)
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(Color.gray)
+                            }
+                            .scaleEffect(index == viewModel.hoveredSubIndex ? 1.0 : 0.7)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: index == viewModel.hoveredSubIndex)
+                        }
+                    }
+                    .onDrop(of: [.text], isTargeted: nil) { providers in
+                        providers.first?.loadObject(ofClass: NSString.self) { (droppedItem, _) in
+                            if let droppedString = droppedItem as? String,
+                               let object = viewModel.object(for: droppedString) {
+                                DispatchQueue.main.async {
+                                    if let updatedItem = viewModel.addSubitem(to: subitem.id, item: object, at: index) {
+                                        self.viewModel.subitem = updatedItem
+                                    }
+                                    update(viewModel.items)
+                                }
+                            }
+                        }
+                        return true
+                    }
+                }
+                Spacer().frame(height: 12.0)
+            }
+        }
+        .frame(width: 220)
+        .scaleEffect(subMenuIsVisible ? 1.0 : 0.6)
+        .opacity(subMenuIsVisible ? 1.0 : 0.0)
+        .onAppear {
+            subMenuIsVisible = true
+        }
+    }
+    
+    private func submenuPlusView(subitem: ShortcutObject, index: Int) -> some View {
+        PlusButtonView(size: frame, cornerRadius: 10, dropAction: { droppedItem in
+            if let droppedString = droppedItem as? String,
+               let object = viewModel.object(for: droppedString) {
+                DispatchQueue.main.async {
+                    print(subitem.id, object.title, index)
+                    if let updatedItem = viewModel.addSubitem(to: subitem.id, item: object, at: index) {
+                        self.viewModel.subitem = updatedItem
+                    }
+                    update(viewModel.items)
+                }
+            }
+        })
+        .frame(width: frame.width, height: frame.height)
+        .onTapGesture {
+            viewModel.isEditing = true
+            NotificationCenter.default.post(
+                name: .openShortcuts,
+                object: nil,
+                userInfo: nil
+            )
+        }
+        .opacity(subitem.title == "EMPTY" ? 0.3 : 1.0)
+    }
+    
+    private func plusView(angle: Angle?, item: ShortcutObject, index: Int) -> some View {
         PlusButtonView(size: frame, cornerRadius: 10, dropAction: { droppedItem in
             if let droppedString = droppedItem as? String, let object = viewModel.object(for: droppedString) {
                 DispatchQueue.main.async {
@@ -487,7 +700,9 @@ struct QuickActionsView: View {
         .onTapGesture {
             viewModel.isEditing = true
             viewModel.showPopup = true
-            viewModel.submenuDegrees = angle.degrees - 92
+            if let angle {
+                viewModel.submenuDegrees = angle.degrees - 92
+            }
             viewModel.subitem = item
             NotificationCenter.default.post(
                 name: .openShortcuts,
@@ -496,12 +711,15 @@ struct QuickActionsView: View {
             )
         }
         .onHover { _ in
+            guard controlType == .mouse else { return }
             if !viewModel.isEditing {
                 viewModel.showPopup = false
                 viewModel.isTabPressed = false
                 // lastHoveredIndex = nil
             } else {
-                viewModel.submenuDegrees = angle.degrees - 92
+                if let angle {
+                    viewModel.submenuDegrees = angle.degrees - 92
+                }
                 viewModel.subitem = item
                 viewModel.showPopup = true
             }
@@ -528,6 +746,7 @@ struct QuickActionsView: View {
                             }
                         }
                         .onHover { hovering in
+                            guard controlType == .mouse else { return }
                             viewModel.hoveredSubIndex = hovering
                             ? index
                             : (viewModel.hoveredSubIndex == index
@@ -551,10 +770,10 @@ struct QuickActionsView: View {
                 }
             }
         }
-        .frame(width: 60.0, height: 60.0)
+        .frame(width: controlType.itemSize.width, height: controlType.itemSize.height)
     }
     
-    private func mainView(item: ShortcutObject, index: Int, angle: Angle) -> some View {
+    private func mainView(item: ShortcutObject, index: Int, angle: Angle?) -> some View {
         ZStack {
             itemView(object: item)
                 .if(!viewModel.isEditing) {
@@ -574,9 +793,12 @@ struct QuickActionsView: View {
                             }
                         }
                         .onHover { hovering in
+                            guard controlType == .mouse else { return }
                             viewModel.hoveredIndex = hovering ? index : (viewModel.hoveredIndex == index ? nil : viewModel.hoveredIndex)
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                viewModel.submenuDegrees = angle.degrees - 92
+                                if let angle {
+                                    viewModel.submenuDegrees = angle.degrees - 92
+                                }
                                 viewModel.showPopup = true
                                 viewModel.subitem = item
                             }
@@ -584,8 +806,11 @@ struct QuickActionsView: View {
                 }
                 .if(viewModel.isEditing) {
                     $0.onHover { hovering in
+                        guard controlType == .mouse else { return }
                         viewModel.showPopup = true
-                        viewModel.submenuDegrees = angle.degrees - 92
+                        if let angle {
+                            viewModel.submenuDegrees = angle.degrees - 92
+                        }
                         viewModel.subitem = item
                     }
                 }
@@ -614,7 +839,7 @@ struct QuickActionsView: View {
                 }
             }
         }
-        .frame(width: 60.0, height: 60.0)
+        .frame(width: controlType.itemSize.width, height: controlType.itemSize.height)
     }
     
     @ViewBuilder
@@ -735,5 +960,23 @@ struct CircularPageDotsView: View {
             }
         }
         .frame(width: radius * 2, height: radius * 2)
+    }
+}
+
+struct PageDotsView: View {
+    var pageCount: Int
+    var currentPage: Int
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<pageCount, id: \.self) { index in
+                Circle()
+                    .fill(index == currentPage ? Color.white : Color.gray.opacity(0.6))
+                    .frame(width: index == currentPage ? 12 : 6,
+                           height: index == currentPage ? 12 : 6)
+                    .animation(.interpolatingSpring(stiffness: 300, damping: 20), value: currentPage)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }

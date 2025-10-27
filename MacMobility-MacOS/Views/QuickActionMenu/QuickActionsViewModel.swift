@@ -117,18 +117,18 @@ class QuickActionsViewModel: ObservableObject {
             if hoveredIndex == nil {
                 hoveredIndex = 3
             } else {
-                hoveredIndex! += 1
-                if hoveredIndex! > 9 {
-                    hoveredIndex = 0
+                hoveredIndex! -= 1
+                if hoveredIndex! < 0 {
+                    hoveredIndex = 9
                 }
             }
         case .down:
             if hoveredIndex == nil {
                 hoveredIndex = 0
             } else {
-                hoveredIndex! -= 1
-                if hoveredIndex! < 0 {
-                    hoveredIndex = 9
+                hoveredIndex! += 1
+                if hoveredIndex! > 9 {
+                    hoveredIndex = 0
                 }
             }
         }
@@ -140,20 +140,20 @@ class QuickActionsViewModel: ObservableObject {
             break
         case .up:
             if hoveredSubIndex == nil {
-                hoveredSubIndex = 2
-            } else {
-                hoveredSubIndex! += 1
-                if hoveredSubIndex! > 4 {
-                    hoveredSubIndex = 0
-                }
-            }
-        case .down:
-            if hoveredSubIndex == nil {
-                hoveredSubIndex = 2
+                hoveredSubIndex = 0
             } else {
                 hoveredSubIndex! -= 1
                 if hoveredSubIndex! < 0 {
                     hoveredSubIndex = 4
+                }
+            }
+        case .down:
+            if hoveredSubIndex == nil {
+                hoveredSubIndex = 0
+            } else {
+                hoveredSubIndex! += 1
+                if hoveredSubIndex! > 4 {
+                    hoveredSubIndex = 0
                 }
             }
         }
