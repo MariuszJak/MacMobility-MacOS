@@ -348,6 +348,9 @@
 		C0E037092BA3802800BFBD2A /* UserDefaults+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */; };
 		C0E0370B2BA3806D00BFBD2A /* View+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */; };
 		C0E7295A2EAF5D1300452F80 /* UnnamedScriptInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E729592EAF5D1300452F80 /* UnnamedScriptInstallView.swift */; };
+		C0E7295E2EB1601D00452F80 /* Photopea_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = C0E7295B2EB1601D00452F80 /* Photopea_logo.png */; };
+		C0E7295F2EB1601D00452F80 /* Photopea_open-and-resize-to-hide-ads.png in Resources */ = {isa = PBXBuildFile; fileRef = C0E7295C2EB1601D00452F80 /* Photopea_open-and-resize-to-hide-ads.png */; };
+		C0E729602EB1601D00452F80 /* Photopea-open-and-resize.png in Resources */ = {isa = PBXBuildFile; fileRef = C0E7295D2EB1601D00452F80 /* Photopea-open-and-resize.png */; };
 		C0EAF9352D8B492B00044947 /* UtilitiesWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */; };
 		C0EAF9372D8B6B7F00044947 /* NewBashUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */; };
 		C0EAF9392D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */; };
@@ -762,6 +765,9 @@
 		C0E037082BA3802800BFBD2A /* UserDefaults+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Ext.swift"; sourceTree = "<group>"; };
 		C0E0370A2BA3806D00BFBD2A /* View+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Ext.swift"; sourceTree = "<group>"; };
 		C0E729592EAF5D1300452F80 /* UnnamedScriptInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnnamedScriptInstallView.swift; sourceTree = "<group>"; };
+		C0E7295B2EB1601D00452F80 /* Photopea_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Photopea_logo.png; sourceTree = "<group>"; };
+		C0E7295C2EB1601D00452F80 /* Photopea_open-and-resize-to-hide-ads.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Photopea_open-and-resize-to-hide-ads.png"; sourceTree = "<group>"; };
+		C0E7295D2EB1601D00452F80 /* Photopea-open-and-resize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Photopea-open-and-resize.png"; sourceTree = "<group>"; };
 		C0EAF9342D8B492B00044947 /* UtilitiesWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilitiesWindowView.swift; sourceTree = "<group>"; };
 		C0EAF9362D8B6B7F00044947 /* NewBashUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBashUtilityView.swift; sourceTree = "<group>"; };
 		C0EAF9382D8B6B9A00044947 /* SelectUtilityTypeWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectUtilityTypeWindowView.swift; sourceTree = "<group>"; };
@@ -853,6 +859,9 @@
 		C01CDF352E630E290082665B /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				C0E7295B2EB1601D00452F80 /* Photopea_logo.png */,
+				C0E7295C2EB1601D00452F80 /* Photopea_open-and-resize-to-hide-ads.png */,
+				C0E7295D2EB1601D00452F80 /* Photopea-open-and-resize.png */,
 				C06F45632E9D7B8E00C33E5A /* emoji-1.png */,
 				C06F45642E9D7B8E00C33E5A /* emoji-2.png */,
 				C06F45652E9D7B8E00C33E5A /* emoji-3.png */,
@@ -1634,6 +1643,9 @@
 				C09CB38D2E831D7D00225F5A /* soft-7.png in Resources */,
 				C09CB38E2E831D7D00225F5A /* soft-8.png in Resources */,
 				C09CB38F2E831D7D00225F5A /* soft-4.png in Resources */,
+				C0E7295E2EB1601D00452F80 /* Photopea_logo.png in Resources */,
+				C0E7295F2EB1601D00452F80 /* Photopea_open-and-resize-to-hide-ads.png in Resources */,
+				C0E729602EB1601D00452F80 /* Photopea-open-and-resize.png in Resources */,
 				C01CDF4A2E6470B40082665B /* button-gray-main.png in Resources */,
 				C09CB3932E8322E000225F5A /* cyberpunk-2.png in Resources */,
 				C01CDF4B2E6470B40082665B /* button-round-gray.png in Resources */,
