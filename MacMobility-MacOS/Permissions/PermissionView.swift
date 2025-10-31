@@ -10,6 +10,7 @@ import Network
 import AppKit
 
 class PermissionViewModel: ObservableObject {
+    @Published var showAlert: Bool = false
     private let connectionManager: ConnectionManager
     private var browser: NWBrowser?
     
@@ -20,16 +21,31 @@ class PermissionViewModel: ObservableObject {
     
     func askForPermission() {
         guard !AXIsProcessTrusted() else { return }
+        showAlert = true
+    }
+    
+    func openAccessibilitySettings() {
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let major = osVersion.majorVersion
+        let minor = osVersion.minorVersion
         
-        let alert = NSAlert()
-        alert.messageText = "Accessibility Access Required"
-        alert.informativeText = "Your app needs accessibility access to perform certain actions. Please enable accessibility access in System Preferences."
-        alert.addButton(withTitle: "Open System Preferences")
-        alert.addButton(withTitle: "Cancel")
+        // ✅ macOS 15 (Tahoe) and later – new URL scheme
+        if major >= 15 {
+            if let url = URL(string: "x-apple.systempreferences:com.apple.Settings.PrivacySecurity.extension?Privacy_Accessibility") {
+                NSWorkspace.shared.open(url)
+                return
+            }
+        }
         
-        let response = alert.runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+        // ✅ macOS 13–14 (Ventura, Sonoma)
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+            NSWorkspace.shared.open(url)
+            return
+        }
+        
+        // Fallback — open the Security & Privacy pane generally
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security") {
+            NSWorkspace.shared.open(url)
         }
     }
     
@@ -63,6 +79,21 @@ struct PermissionView: View {
             }
             .padding()
             Spacer()
+        }
+        .alert("Accessibility Access Required", isPresented: $viewModel.showAlert) {
+            Button("Open Settings", role: .none) {
+                viewModel.showAlert = false
+                viewModel.openAccessibilitySettings()
+            }
+            Button("Cancel", role: .cancel) {
+                viewModel.showAlert = false
+                
+            }
+        } message: {
+            Text("""
+        Your app needs accessibility access to perform certain actions.
+        Please enable it in System Settings → Privacy & Security → Accessibility.
+        """)
         }
     }
 }
