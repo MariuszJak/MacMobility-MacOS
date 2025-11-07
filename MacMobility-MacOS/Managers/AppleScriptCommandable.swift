@@ -15,14 +15,16 @@ protocol AppleScriptCommandable {
 
 extension AppleScriptCommandable {
     func execute(_ scriptString: String, completion: ((NSDictionary) -> Void)? = nil) {
-        DispatchQueue.main.async {
+        DispatchQueue.global(qos: .userInitiated).async {
             guard let script = NSAppleScript(source: scriptString) else {
                 return
             }
             var errorInfo: NSDictionary?
             script.executeAndReturnError(&errorInfo)
             if let error = errorInfo {
-                completion?(error)
+                DispatchQueue.main.async {
+                    completion?(error)
+                }
             }
         }
     }

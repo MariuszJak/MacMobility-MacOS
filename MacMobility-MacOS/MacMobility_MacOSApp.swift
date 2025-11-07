@@ -42,7 +42,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     lazy var shortcutsViewModel: ShortcutsViewModel = .init(connectionManager: connectionManager)
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        #if DEBUG
+        print("Skip Firebase configure")
+        #else
         FirebaseApp.configure()
+        #endif
         register()
         registerForAnalytics()
         closeInitialSystemWindows()
@@ -512,12 +516,5 @@ extension AppDelegate {
             }
             #endif
         }
-    }
-}
-
-public extension Array {
-    /// Returns a copy of the array.
-    func copy() -> [Element] {
-        return Array(self)
     }
 }
