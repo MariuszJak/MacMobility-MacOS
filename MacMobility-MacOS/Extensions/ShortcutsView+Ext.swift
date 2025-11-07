@@ -553,6 +553,40 @@ extension ShortcutsView {
         }
     }
     
+    func openEditAppsWindow(item: ShortcutObject) {
+        editUtilitiesWindow?.close()
+        editUtilitiesWindow = nil
+        if nil == editUtilitiesWindow {
+            editUtilitiesWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 450, height: 220),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            editUtilitiesWindow?.center()
+            editUtilitiesWindow?.setFrameAutosaveName("Apps")
+            editUtilitiesWindow?.isReleasedWhenClosed = false
+            editUtilitiesWindow?.titlebarAppearsTransparent = true
+            editUtilitiesWindow?.appearance = NSAppearance(named: .darkAqua)
+            editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
+            editUtilitiesWindow?.title = "Edit App; \(item.utilityType?.rawValue ?? "")"
+            editUtilitiesWindow?.titleVisibility = .hidden
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
+                return
+            }
+            
+            editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: AppSettingView(item: item, delegate: viewModel) { item in
+                editUtilitiesWindow?.close()
+            })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            editUtilitiesWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+    }
+    
     func openEditUtilityWindow(item: ShortcutObject) {
         editUtilitiesWindow?.close()
         editUtilitiesWindow = nil

@@ -16,6 +16,7 @@ struct IconPickerView: View {
     private var imageSize: CGSize
     private let canSelectImage: Bool
     private let canBrowseIcons: Bool
+    private let setDefaultAppIconAction: (() -> Void)?
     
     init(
         viewModel: IconPickerViewModel,
@@ -24,7 +25,8 @@ struct IconPickerView: View {
         favicon: Binding<String> = .constant(""),
         imageSize: CGSize = .init(width: 100.0, height: 100.0),
         canSelectImage: Bool = true,
-        canBrowseIcons: Bool = true
+        canBrowseIcons: Bool = true,
+        setDefaultAppIconAction: (() -> Void)? = nil
     ) {
         self._viewModel = .init(wrappedValue: viewModel)
         self._title = title
@@ -33,6 +35,7 @@ struct IconPickerView: View {
         self.imageSize = imageSize
         self.canSelectImage = canSelectImage
         self.canBrowseIcons = canBrowseIcons
+        self.setDefaultAppIconAction = setDefaultAppIconAction
     }
     
     var body: some View {
@@ -88,6 +91,11 @@ struct IconPickerView: View {
                     if canBrowseIcons {
                         ProminentButtonView("Browse Icons") {
                             openIconsPickerWindow()
+                        }
+                    }
+                    if setDefaultAppIconAction != nil {
+                        Button("Set Default App Icon") {
+                            setDefaultAppIconAction?()
                         }
                     }
                     Button("Select Icon") {

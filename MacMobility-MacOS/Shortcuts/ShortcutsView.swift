@@ -618,12 +618,34 @@ struct ShortcutsView: View {
     @ViewBuilder
     func itemViews(for index: Int, page: Int, size: CGSize) -> some View {
         if let object = viewModel.objectAt(index: index, page: page) {
-            if let path = object.path, object.type == .app {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: path))
-                    .resizable()
-                    .interpolation(.high)
-                    .frame(width: size.width, height: size.height)
-                    .aspectRatio(contentMode: .fill)
+            if object.type == .app {
+                if let data = object.imageData, let image = NSImage(data: data) {
+                    Image(nsImage: image)
+                        .resizable()
+                        .interpolation(.high)
+                        .if(object.size == ItemSize.size1x1.cgSize) {
+                            $0.frame(width: 70.0, height: 70.0)
+                        }
+                        .if(object.size != ItemSize.size1x1.cgSize) {
+                            $0.frame(width: size.width, height: size.height)
+                        }
+                        .scaledToFit()
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                        )
+                        .onTapGesture {
+                            openEditAppsWindow(item: object)
+                        }
+                } else if let path = object.path {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: path))
+                        .resizable()
+                        .interpolation(.high)
+                        .frame(width: size.width, height: size.height)
+                        .aspectRatio(contentMode: .fill)
+                        .onTapGesture {
+                            openEditAppsWindow(item: object)
+                        }
+                }
             } else if object.type == .shortcut {
                 if let data = object.imageData, let image = NSImage(data: data) {
                     Image(nsImage: image)

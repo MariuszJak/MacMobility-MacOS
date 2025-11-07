@@ -505,7 +505,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     func object(for id: String, index: Int, page: Int) -> ShortcutObject? {
         var item: ShortcutObject?
         if searchText.isEmpty {
-            item = shortcuts.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id } ?? utilities.first { $0.id == id }
+            item = shortcuts.first { $0.id == id } ?? appsAddedByUser.first { $0.id == id } ?? installedApps.first { $0.id == id } ?? webpages.first { $0.id == id } ?? utilities.first { $0.id == id } 
         } else {
             item = tmpAllItems.first { $0.id == id }
         }
@@ -1011,6 +1011,117 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
         connectionManager.shortcuts = configuredShortcuts
         UserDefaults.standard.store(utilities, for: .utilities)
+    }
+    
+    func saveApp(with app: ShortcutObject) {
+        var canSave: Bool = true
+        let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == app.id })
+        configuredIndexes.forEach { configuredIndex in
+            let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: app.size) ?? []
+            if let neighboringIndexesWithConflict = scaleObjectWithConflict(
+                for: configuredShortcuts[configuredIndex].index,
+                page: configuredShortcuts[configuredIndex].page,
+                size: app.size,
+                indexes: indexes,
+                id: app.id
+            ) {
+                if canSave {
+                    canSave = !neighboringIndexesWithConflict.conflict
+                }
+            } else {
+                canSave = false
+            }
+        }
+        
+        guard canSave else {
+            connectionManager.localError = "Cannot save utility. Some other utility overlaps with this utility or it would go out of bounds."
+            connectionManager.showsLocalError = true
+            return
+        }
+        
+        if let index = appsAddedByUser.firstIndex(where: { $0.id == app.id }) {
+            appsAddedByUser[index] = app
+            let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == app.id })
+            configuredIndexes.forEach { configuredIndex in
+                let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: app.size)
+                configuredShortcuts[configuredIndex] = .init(
+                    type: app.type,
+                    page: configuredShortcuts[configuredIndex].page,
+                    index: configuredShortcuts[configuredIndex].index,
+                    indexes: indexes,
+                    size: app.size,
+                    path: app.path,
+                    id: app.id,
+                    title: app.title,
+                    color: app.color,
+                    faviconLink: app.faviconLink,
+                    browser: app.browser,
+                    imageData: app.imageData,
+                    scriptCode: app.scriptCode,
+                    utilityType: app.utilityType,
+                    objects: app.objects,
+                    showTitleOnIcon: app.showTitleOnIcon ?? true,
+                    category: app.category
+                )
+            }
+            UserDefaults.standard.store(appsAddedByUser, for: .userApps)
+            UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+        } else {
+            print("1. App not added by user.")
+        }
+        
+        if let index = installedApps.firstIndex(where: { $0.id == app.id }) {
+            installedApps[index] = app
+            let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == app.id })
+            configuredIndexes.forEach { configuredIndex in
+                let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: app.size)
+                configuredShortcuts[configuredIndex] = .init(
+                    type: app.type,
+                    page: configuredShortcuts[configuredIndex].page,
+                    index: configuredShortcuts[configuredIndex].index,
+                    indexes: indexes,
+                    size: app.size,
+                    path: app.path,
+                    id: app.id,
+                    title: app.title,
+                    color: app.color,
+                    faviconLink: app.faviconLink,
+                    browser: app.browser,
+                    imageData: app.imageData,
+                    scriptCode: app.scriptCode,
+                    utilityType: app.utilityType,
+                    objects: app.objects,
+                    showTitleOnIcon: app.showTitleOnIcon ?? true,
+                    category: app.category
+                )
+            }
+            UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+        } else {
+            print("1. App not fetched from system")
+        }
+        
+        let qamIndexes = quickActionItems.allIndexes(where: { $0.id == app.id })
+        qamIndexes.forEach { index in
+            quickActionItems[index] = .init(
+                type: app.type,
+                page: quickActionItems[index].page,
+                index: quickActionItems[index].index,
+                path: app.path,
+                id: app.id,
+                title: app.title,
+                color: app.color,
+                faviconLink: app.faviconLink,
+                browser: app.browser,
+                imageData: app.imageData,
+                scriptCode: app.scriptCode,
+                utilityType: app.utilityType,
+                objects: app.objects,
+                showTitleOnIcon: app.showTitleOnIcon ?? true,
+                category: app.category
+            )
+        }
+        UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
+        connectionManager.shortcuts = configuredShortcuts
     }
     
     func openShortcut(name: String) {
