@@ -10,6 +10,7 @@ import SwiftUI
 protocol UtilitiesWindowDelegate: AnyObject {
     func saveUtility(with utilityItem: ShortcutObject)
     func saveApp(with utilityItem: ShortcutObject)
+    func saveShortcut(with utilityItem: ShortcutObject)
     func allObjects() -> [ShortcutObject]
     func expandSectionIfNeeded(for title: String)
     var close: (ShortcutObject?) -> Void { get }

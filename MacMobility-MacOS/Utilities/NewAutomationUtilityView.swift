@@ -166,7 +166,6 @@ struct NewAutomationUtilityView: View {
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
-                .frame(width: 200.0)
                 Spacer()
             }
             .padding(.bottom, 6.0)

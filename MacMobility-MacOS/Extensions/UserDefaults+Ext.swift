@@ -104,6 +104,7 @@ extension UserDefaults {
         case subitemPages
         case subitemCurrentPage
         case utilities
+        case editedItems
         case license
         case licenseKey
         case firstActivationDate

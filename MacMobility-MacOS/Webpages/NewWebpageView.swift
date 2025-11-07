@@ -17,6 +17,7 @@ class NewWebpageViewModel: ObservableObject {
     var id: String?
     @Published var title: String = ""
     @Published var link: String = ""
+    @Published var size: CGSize = .init(width: 1, height: 1)
     @Published var faviconLink: String = ""
     @Published var iconData: Data?
     @Published var selectedIcon: NSImage?
@@ -24,6 +25,11 @@ class NewWebpageViewModel: ObservableObject {
     @Published var browser: Browsers
     @Published var showTitleOnIcon: Bool = true
     @Published var userSelectedIcon: NSImage?
+    @Published var sizes: [ItemSize] = ItemSize.onlyRectangleSizes
+    
+    var itemSize: ItemSize {
+        size.toItemSize ?? .size1x1
+    }
     
     init() {
         self.browser = UserDefaults.standard.get(key: .browser) ?? .chrome
@@ -56,6 +62,7 @@ struct NewWebpageView: View {
         self.delegate = delegate
         if let item {
             viewModel.browser = item.browser ?? .chrome
+            viewModel.size = item.size ?? ItemSize.size1x1.cgSize
             viewModel.title = item.title
             viewModel.link = item.path ?? ""
             viewModel.id = item.id
@@ -80,6 +87,13 @@ struct NewWebpageView: View {
                     .font(.system(size: 14, weight: .regular))
                     .padding(.trailing, 20.0)
                 RoundedTextField(placeholder: "", text: $viewModel.title)
+                HStack(alignment: .center) {
+                    Toggle("", isOn: $viewModel.showTitleOnIcon)
+                        .padding(.trailing, 6.0)
+                        .toggleStyle(.switch)
+                    Text("Show title on icon")
+                        .font(.system(size: 14.0))
+                }
             }
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
@@ -116,35 +130,52 @@ struct NewWebpageView: View {
             }
             .padding(.bottom, 6.0)
             .frame(maxWidth: .infinity)
+            HStack {
+                Text("Size")
+                    .font(.system(size: 13, weight: .regular))
+                Picker("", selection: Binding(
+                    get: {
+                        viewModel.itemSize.description
+                    },
+                    set: { newValue in
+                        let newSize: ItemSize = ItemSize(rawValue: "size\(newValue)") ?? .size1x1
+                        viewModel.size = newSize.cgSize
+                    }
+                )) {
+                    ForEach(viewModel.sizes, id: \.self) { size in
+                        Text(size.description)
+                            .tag(size.description)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                Spacer()
+            }
+            .padding(.bottom, 6.0)
+            .padding(.leading, 70.0)
+            .frame(maxWidth: .infinity)
             Picker("Browser", selection: $viewModel.browser) {
                 Text("Chrome").tag(Browsers.chrome)
                 Text("Safari").tag(Browsers.safari)
                 Text("Orion").tag(Browsers.orion)
             }
             .pickerStyle(.menu)
-            .frame(width: 200.0)
             .padding(.bottom, 12.0)
             .padding(.leading, 70.0)
             
-            IconPickerView(viewModel: .init(
-                selectedImage: viewModel.selectedIcon ?? viewModel.savedIcon,
-                shouldAutofetchImage: viewModel.userSelectedIcon == nil,
-                searchText: viewModel.link,
-                completion: { image in
-                    viewModel.savedIcon = image
-                }), userSelectedIcon: $viewModel.userSelectedIcon,
-                           favicon: $viewModel.faviconLink
+            IconPickerView(
+                viewModel: .init(
+                    selectedImage: viewModel.selectedIcon ?? viewModel.savedIcon,
+                    shouldAutofetchImage: viewModel.userSelectedIcon == nil,
+                    searchText: viewModel.link,
+                    completion: { image in
+                        viewModel.savedIcon = image
+                    }),
+                userSelectedIcon: $viewModel.userSelectedIcon,
+                title: viewModel.showTitleOnIcon ? $viewModel.title : .constant(""),
+                favicon: $viewModel.faviconLink
             )
             .padding(.bottom, 12.0)
             .padding(.leading, 70.0)
-            HStack(alignment: .center) {
-                Toggle("", isOn: $viewModel.showTitleOnIcon)
-                    .padding(.trailing, 6.0)
-                    .toggleStyle(.switch)
-                Text("Show title on icon")
-                    .font(.system(size: 14.0))
-            }
-            .padding(.leading, 65.0)
             
             HStack {
                 Spacer()
@@ -157,6 +188,7 @@ struct NewWebpageView: View {
                     let item: ShortcutObject = .init(
                         type: .webpage,
                         page: currentPage ?? 1,
+                        size: viewModel.size,
                         path: viewModel.fullLink(),
                         id: viewModel.id ?? UUID().uuidString,
                         title: viewModel.title,

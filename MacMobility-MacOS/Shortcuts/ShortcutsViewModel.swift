@@ -39,6 +39,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     @Published var connectedPeerName: String?
     @Published var configuredShortcuts: [ShortcutObject] = []
     @Published var shortcuts: [ShortcutObject] = []
+    @Published var editedItems: [ShortcutObject] = []
     @Published var installedApps: [ShortcutObject] = []
     @Published var appsAddedByUser: [ShortcutObject] = []
     @Published var webpages: [ShortcutObject] = []
@@ -85,6 +86,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         self.configuredShortcuts = UserDefaults.standard.get(key: .shortcuts) ?? []
         self.webpages = UserDefaults.standard.get(key: .webItems) ?? []
         self.utilities = UserDefaults.standard.get(key: .utilities) ?? []
+        self.editedItems = UserDefaults.standard.get(key: .editedItems) ?? []
         self.pages = UserDefaults.standard.get(key: .pages) ?? 1
         self.appsAddedByUser = UserDefaults.standard.get(key: .userApps) ?? []
         self.quickActionItems = UserDefaults.standard.get(key: .quickActionItems) ?? (0..<10).map { .empty(for: $0, page: 1) }
@@ -882,15 +884,41 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
     }
     
     func saveWebpage(with webpageItem: ShortcutObject) {
+        var canSave: Bool = true
+        let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == webpageItem.id })
+        configuredIndexes.forEach { configuredIndex in
+            let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: webpageItem.size) ?? []
+            if let neighboringIndexesWithConflict = scaleObjectWithConflict(
+                for: configuredShortcuts[configuredIndex].index,
+                page: configuredShortcuts[configuredIndex].page,
+                size: webpageItem.size,
+                indexes: indexes,
+                id: webpageItem.id
+            ) {
+                if canSave {
+                    canSave = !neighboringIndexesWithConflict.conflict
+                }
+            } else {
+                canSave = false
+            }
+        }
+        
+        guard canSave else {
+            connectionManager.localError = "Cannot save webpage. Some other item overlaps with this one or it would go out of bounds."
+            connectionManager.showsLocalError = true
+            return
+        }
+        
         if let index = webpages.firstIndex(where: { $0.id == webpageItem.id }) {
             webpages[index] = webpageItem
             if let configuredIndex = configuredShortcuts.firstIndex(where: { $0.id == webpageItem.id }) {
+                let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: webpageItem.size)
                 configuredShortcuts[configuredIndex] = .init(
                     type: webpageItem.type,
                     page: configuredShortcuts[configuredIndex].page,
                     index: configuredShortcuts[configuredIndex].index,
-                    indexes: configuredShortcuts[configuredIndex].indexes,
-                    size: configuredShortcuts[configuredIndex].size ?? .init(width: 1, height: 1),
+                    indexes: indexes,
+                    size: webpageItem.size,
                     path: webpageItem.path,
                     id: webpageItem.id,
                     title: webpageItem.title,
@@ -1034,7 +1062,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
         }
         
         guard canSave else {
-            connectionManager.localError = "Cannot save utility. Some other utility overlaps with this utility or it would go out of bounds."
+            connectionManager.localError = "Cannot save application. Some other item overlaps with this one or it would go out of bounds."
             connectionManager.showsLocalError = true
             return
         }
@@ -1075,7 +1103,7 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == app.id })
             configuredIndexes.forEach { configuredIndex in
                 let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: app.size)
-                configuredShortcuts[configuredIndex] = .init(
+                let newItem: ShortcutObject = .init(
                     type: app.type,
                     page: configuredShortcuts[configuredIndex].page,
                     index: configuredShortcuts[configuredIndex].index,
@@ -1094,8 +1122,15 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                     showTitleOnIcon: app.showTitleOnIcon ?? true,
                     category: app.category
                 )
+                configuredShortcuts[configuredIndex] = newItem
+                if let index = editedItems.firstIndex(where: { $0.id == newItem.id }) {
+                    editedItems[index] = newItem
+                } else {
+                    editedItems.append(newItem)
+                }
             }
             UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+            UserDefaults.standard.store(editedItems, for: .editedItems)
         } else {
             print("1. App not fetched from system")
         }
@@ -1118,6 +1153,93 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 objects: app.objects,
                 showTitleOnIcon: app.showTitleOnIcon ?? true,
                 category: app.category
+            )
+        }
+        UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
+        connectionManager.shortcuts = configuredShortcuts
+    }
+    
+    func saveShortcut(with shortcut: ShortcutObject) {
+        var canSave: Bool = true
+        let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == shortcut.id })
+        configuredIndexes.forEach { configuredIndex in
+            let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: shortcut.size) ?? []
+            if let neighboringIndexesWithConflict = scaleObjectWithConflict(
+                for: configuredShortcuts[configuredIndex].index,
+                page: configuredShortcuts[configuredIndex].page,
+                size: shortcut.size,
+                indexes: indexes,
+                id: shortcut.id
+            ) {
+                if canSave {
+                    canSave = !neighboringIndexesWithConflict.conflict
+                }
+            } else {
+                canSave = false
+            }
+        }
+        
+        guard canSave else {
+            connectionManager.localError = "Cannot save application. Some other item overlaps with this one or it would go out of bounds."
+            connectionManager.showsLocalError = true
+            return
+        }
+        
+        if let index = shortcuts.firstIndex(where: { $0.id == shortcut.id }) {
+            shortcuts[index] = shortcut
+            let configuredIndexes = configuredShortcuts.allIndexes(where: { $0.id == shortcut.id })
+            configuredIndexes.forEach { configuredIndex in
+                let indexes = neighboringIndexes(for: configuredShortcuts[configuredIndex].index, size: shortcut.size)
+                let newItem: ShortcutObject = .init(
+                    type: shortcut.type,
+                    page: configuredShortcuts[configuredIndex].page,
+                    index: configuredShortcuts[configuredIndex].index,
+                    indexes: indexes,
+                    size: shortcut.size,
+                    path: shortcut.path,
+                    id: shortcut.id,
+                    title: shortcut.title,
+                    color: shortcut.color,
+                    faviconLink: shortcut.faviconLink,
+                    browser: shortcut.browser,
+                    imageData: shortcut.imageData,
+                    scriptCode: shortcut.scriptCode,
+                    utilityType: shortcut.utilityType,
+                    objects: shortcut.objects,
+                    showTitleOnIcon: shortcut.showTitleOnIcon ?? true,
+                    category: shortcut.category
+                )
+                configuredShortcuts[configuredIndex] = newItem
+                if let index = editedItems.firstIndex(where: { $0.id == newItem.id }) {
+                    editedItems[index] = newItem
+                } else {
+                    editedItems.append(newItem)
+                }
+            }
+            UserDefaults.standard.store(configuredShortcuts, for: .shortcuts)
+            UserDefaults.standard.store(editedItems, for: .editedItems)
+        } else {
+            print("1. App not added by user.")
+        }
+        
+        let qamIndexes = quickActionItems.allIndexes(where: { $0.id == shortcut.id })
+        qamIndexes.forEach { index in
+            quickActionItems[index] = .init(
+                type: shortcut.type,
+                page: quickActionItems[index].page,
+                index: quickActionItems[index].index,
+                path: shortcut.path,
+                id: shortcut.id,
+                title: shortcut.title,
+                color: shortcut.color,
+                faviconLink: shortcut.faviconLink,
+                browser: shortcut.browser,
+                imageData: shortcut.imageData,
+                scriptCode: shortcut.scriptCode,
+                utilityType: shortcut.utilityType,
+                objects: shortcut.objects,
+                showTitleOnIcon: shortcut.showTitleOnIcon ?? true,
+                category: shortcut.category
             )
         }
         UserDefaults.standard.store(quickActionItems, for: .quickActionItems)
@@ -1147,29 +1269,49 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
             
             if self.searchText.isEmpty {
                 return list?.map {
-                    item in .init(
+                    item in
+                    let imageData = shortcuts.first(where: { shortcut in item == shortcut.title })?.imageData
+                    ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.imageData
+                    ?? editedItems.first(where: { shortcut in item == shortcut.title })?.imageData
+                    ?? NSImage(named: "shortcuts")?.tiffRepresentation
+                    return .init(
                         type: .shortcut,
                         page: 1,
+                        size: shortcuts.first(where: { shortcut in item == shortcut.title })?.size
+                        ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.size
+                        ?? editedItems.first(where: { shortcut in item == shortcut.title })?.size
+                        ?? ItemSize.size1x1.cgSize,
                         id: shortcuts.first(where: { shortcut in item == shortcut.title })?.id
                         ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id
+                        ?? editedItems.first(where: { shortcut in item == shortcut.title })?.id
                         ?? UUID().uuidString,
                         title: item,
                         color: testColor,
-                        imageData: NSImage(named: "shortcuts")?.tiffRepresentation
+                        imageData: imageData
                     )
                 } ?? []
             } else {
                 return list?.filter { $0.lowercased().contains(self.searchText.lowercased()) }
                     .map {
-                        item in .init(
+                        item in
+                        let imageData = shortcuts.first(where: { shortcut in item == shortcut.title })?.imageData
+                        ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.imageData
+                        ?? editedItems.first(where: { shortcut in item == shortcut.title })?.imageData
+                        ?? NSImage(named: "shortcuts")?.tiffRepresentation
+                        return .init(
                             type: .shortcut,
                             page: 1,
+                            size: shortcuts.first(where: { shortcut in item == shortcut.title })?.size
+                            ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.size
+                            ?? editedItems.first(where: { shortcut in item == shortcut.title })?.size
+                            ?? ItemSize.size1x1.cgSize,
                             id: shortcuts.first(where: { shortcut in item == shortcut.title })?.id
                             ?? configuredShortcuts.first(where: { shortcut in item == shortcut.title })?.id
+                            ?? editedItems.first(where: { shortcut in item == shortcut.title })?.id
                             ?? UUID().uuidString,
                             title: item,
                             color: testColor,
-                            imageData: NSImage(named: "shortcuts")?.tiffRepresentation
+                            imageData: imageData
                         )
                     } ?? []
             }
@@ -1250,16 +1392,22 @@ public class ShortcutsViewModel: ObservableObject, WebpagesWindowDelegate, Utili
                 let appName = appURL.deletingPathExtension().lastPathComponent
                 let id: String = installedApps.first(where: { shortcut in appURL.path == shortcut.path })?.id
                 ?? installedAllApps.first(where: { shortcut in appURL.path == shortcut.path })?.id
+                ?? editedItems.first(where: { shortcut in appURL.path == shortcut.path })?.id
                 ?? configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.id
                 ?? UUID().uuidString
+                let imageData: Data? = editedItems.first(where: { shortcut in appURL.path == shortcut.path })?.imageData
+                ?? cachedIcons[appURL.path]
+                ?? getIcon(fromAppPath: appURL.path)
+                let size = editedItems.first(where: { shortcut in appURL.path == shortcut.path })?.size
                 apps.append(
                     ShortcutObject(
                         type: .app,
                         page: configuredShortcuts.first(where: { shortcut in appURL.path == shortcut.path })?.page ?? 1,
+                        size: size ?? ItemSize.size1x1.cgSize,
                         path: appURL.path,
                         id: id,
                         title: appName,
-                        imageData: cachedIcons[appURL.path] ?? getIcon(fromAppPath: appURL.path)
+                        imageData: imageData
                     )
                 )
             }

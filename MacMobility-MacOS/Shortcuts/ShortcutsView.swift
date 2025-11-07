@@ -660,7 +660,7 @@ struct ShortcutsView: View {
                         .scaledToFill()
                         .cornerRadius(cornerRadius)
                         .onTapGesture {
-                            openEditUtilityWindow(item: object)
+                            openEditShortcutWindow(item: object)
                         }
                 }
                 if object.showTitleOnIcon ?? true {
@@ -669,6 +669,9 @@ struct ShortcutsView: View {
                         .multilineTextAlignment(.center)
                         .padding(.all, 3)
                         .outlinedText()
+                        .onTapGesture {
+                            openEditShortcutWindow(item: object)
+                        }
                 }
             } else if object.type == .webpage {
                 if let data = object.imageData, let image = NSImage(data: data) {

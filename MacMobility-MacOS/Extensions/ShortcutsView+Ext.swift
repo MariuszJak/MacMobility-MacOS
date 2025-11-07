@@ -81,7 +81,7 @@ extension ShortcutsView {
         newWindow = nil
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 570),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -92,7 +92,7 @@ extension ShortcutsView {
             newWindow?.titlebarAppearsTransparent = true
             newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
-            if let item {
+            if item != nil {
                 newWindow?.title = "Edit URL Link"
             } else {
                 newWindow?.title = "Create URL Link"
@@ -569,7 +569,7 @@ extension ShortcutsView {
             editUtilitiesWindow?.titlebarAppearsTransparent = true
             editUtilitiesWindow?.appearance = NSAppearance(named: .darkAqua)
             editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
-            editUtilitiesWindow?.title = "Edit App; \(item.utilityType?.rawValue ?? "")"
+            editUtilitiesWindow?.title = "Edit App; \(item.title)"
             editUtilitiesWindow?.titleVisibility = .hidden
             guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
                 return
@@ -577,6 +577,40 @@ extension ShortcutsView {
             
             editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
             let hv = NSHostingController(rootView: AppSettingView(item: item, delegate: viewModel) { item in
+                editUtilitiesWindow?.close()
+            })
+            editUtilitiesWindow?.contentView?.addSubview(hv.view)
+            hv.view.frame = editUtilitiesWindow?.contentView?.bounds ?? .zero
+            hv.view.autoresizingMask = [.width, .height]
+            editUtilitiesWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+    }
+    
+    func openEditShortcutWindow(item: ShortcutObject) {
+        editUtilitiesWindow?.close()
+        editUtilitiesWindow = nil
+        if nil == editUtilitiesWindow {
+            editUtilitiesWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 450, height: 220),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            editUtilitiesWindow?.center()
+            editUtilitiesWindow?.setFrameAutosaveName("Shortcuts")
+            editUtilitiesWindow?.isReleasedWhenClosed = false
+            editUtilitiesWindow?.titlebarAppearsTransparent = true
+            editUtilitiesWindow?.appearance = NSAppearance(named: .darkAqua)
+            editUtilitiesWindow?.styleMask.insert(.fullSizeContentView)
+            editUtilitiesWindow?.title = "Edit Shortcut; \(item.title)"
+            editUtilitiesWindow?.titleVisibility = .hidden
+            guard let visualEffect = NSVisualEffectView.createVisualAppearance(for: editUtilitiesWindow) else {
+                return
+            }
+            
+            editUtilitiesWindow?.contentView?.addSubview(visualEffect, positioned: .below, relativeTo: nil)
+            let hv = NSHostingController(rootView: ShortcutSettingView(item: item, delegate: viewModel) { item in
                 editUtilitiesWindow?.close()
             })
             editUtilitiesWindow?.contentView?.addSubview(hv.view)

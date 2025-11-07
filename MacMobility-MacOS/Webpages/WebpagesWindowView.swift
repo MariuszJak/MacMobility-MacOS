@@ -165,7 +165,7 @@ struct WebpagesWindowView: View {
         newWindow = nil
         if nil == newWindow {
             newWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 550),
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 570),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -176,7 +176,7 @@ struct WebpagesWindowView: View {
             newWindow?.titlebarAppearsTransparent = true
             newWindow?.appearance = NSAppearance(named: .darkAqua)
             newWindow?.styleMask.insert(.fullSizeContentView)
-            if let item {
+            if item != nil {
                 newWindow?.title = "Edit URL Link"
             } else {
                 newWindow?.title = "Create URL Link"

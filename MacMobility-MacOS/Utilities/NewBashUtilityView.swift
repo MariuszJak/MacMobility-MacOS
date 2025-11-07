@@ -54,7 +54,7 @@ struct NewBashUtilityView: View {
         self.viewModel = NewBashUtilityViewModel(categories: categories)
         if let item {
             currentPage = item.page
-            viewModel.size = item.size ?? .init(width: 1, height: 1)
+            viewModel.size = item.size ?? ItemSize.size1x1.cgSize
             viewModel.path = item.path ?? ""
             viewModel.type = item.type
             viewModel.title = item.title
@@ -132,7 +132,6 @@ struct NewBashUtilityView: View {
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
-                .frame(width: 200.0)
                 Spacer()
             }
             .padding(.bottom, 6.0)
@@ -360,6 +359,129 @@ struct AppSettingView: View {
                         category: viewModel.item.category
                     )
                     delegate?.saveApp(with: item)
+                    viewModel.clear()
+                    closeAction(item)
+                }
+                Spacer()
+            }
+            .padding(.trailing, 6.0)
+        }
+    }
+}
+
+// ---
+
+class ShortcutSettingViewModel: ObservableObject, JSONLoadable {
+    var id: String?
+    @Published var item: ShortcutObject
+    @Published var size: CGSize = .init(width: 1, height: 1)
+    @Published var iconData: Data?
+    @Published var selectedIcon: NSImage? = NSImage(named: "terminal")
+    @Published var sizes: [ItemSize] = ItemSize.onlyRectangleSizes
+    
+    var itemSize: ItemSize {
+        size.toItemSize ?? .size1x1
+    }
+    
+    init(item: ShortcutObject) {
+        self.item = item
+    }
+    
+    func clear() {
+        id = nil
+        iconData = nil
+        sizes = ItemSize.onlyRectangleSizes
+    }
+    
+    func setDefaultAppIcon() {
+        self.iconData = NSImage(named: "shortcuts")?.tiffRepresentation
+        self.selectedIcon = NSImage(named: "shortcuts")
+    }
+}
+
+struct ShortcutSettingView: View {
+    @ObservedObject var viewModel: ShortcutSettingViewModel
+    var closeAction: (ShortcutObject?) -> Void
+    weak var delegate: UtilitiesWindowDelegate?
+    var currentPage: Int?
+    let backgroundColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1, opacity: 0.7)
+    
+    init(item: ShortcutObject, delegate: UtilitiesWindowDelegate?, closeAction: @escaping (ShortcutObject?) -> Void) {
+        self.delegate = delegate
+        self.closeAction = closeAction
+        self.viewModel = ShortcutSettingViewModel(item: item)
+        currentPage = item.page
+        viewModel.size = item.size ?? .init(width: 1, height: 1)
+        viewModel.id = item.id
+        if let data = item.imageData {
+            viewModel.selectedIcon = NSImage(data: data)
+        }
+    }
+    
+    var body: some View {
+        VStack(alignment: .center) {
+            Text(viewModel.item.title)
+                .font(.system(size: 18.0, weight: .bold))
+        }
+        VStack(alignment: .leading) {
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading) {
+                    IconPickerView(
+                        viewModel: .init(selectedImage: viewModel.selectedIcon) { image in
+                            viewModel.selectedIcon = image
+                        }, userSelectedIcon: $viewModel.selectedIcon,
+                        title: .constant(""),
+                        setDefaultAppIconAction: {
+                            viewModel.setDefaultAppIcon()
+                        })
+                    .padding(.leading, 20.0)
+                    HStack {
+                        Text("Size: ")
+                            .font(.system(size: 14, weight: .regular))
+                            .padding(.trailing, 4.0)
+                        Picker("", selection: Binding(
+                            get: {
+                                viewModel.itemSize.description
+                            },
+                            set: { newValue in
+                                let newSize: ItemSize = ItemSize(rawValue: "size\(newValue)") ?? .size1x1
+                                viewModel.size = newSize.cgSize
+                            }
+                        )) {
+                            ForEach(viewModel.sizes, id: \.self) { size in
+                                Text(size.description)
+                                    .tag(size.description)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(width: 70.0)
+                        Spacer()
+                    }
+                    .padding(.bottom, 6.0)
+                    .padding(.leading, 130.0)
+                    .frame(maxWidth: .infinity)
+                }
+                
+                BlueButton(title: "Cancel", font: .callout, padding: 12.0, backgroundColor: .gray) {
+                    viewModel.clear()
+                    closeAction(nil)
+                }
+                .padding(.trailing, 6.0)
+                BlueButton(title: "Save", font: .callout, padding: 12.0) {
+                    let item: ShortcutObject = .init(
+                        type: viewModel.item.type,
+                        page: currentPage ?? 1,
+                        size: viewModel.size,
+                        path: viewModel.item.path,
+                        id: viewModel.id ?? UUID().uuidString,
+                        title: viewModel.item.title,
+                        imageData: viewModel.selectedIcon?.toData,
+                        scriptCode: viewModel.item.scriptCode,
+                        utilityType: viewModel.item.utilityType,
+                        showTitleOnIcon: viewModel.item.showTitleOnIcon ?? false,
+                        category: viewModel.item.category
+                    )
+                    delegate?.saveShortcut(with: item)
                     viewModel.clear()
                     closeAction(item)
                 }
