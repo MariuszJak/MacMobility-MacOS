@@ -825,10 +825,22 @@ struct ShortcutsView: View {
                                     .scaledToFill()
                                     .cornerRadius(cornerRadius)
                                     .frame(width: 38, height: 38)
+                                    .onTapGesture {
+                                        openEditShortcutWindow(item: shortcut)
+                                    }
                             }
                             Text(shortcut.title)
                                 .padding(.vertical, 6.0)
+                                .onTapGesture {
+                                    openEditShortcutWindow(item: shortcut)
+                                }
                             Spacer()
+                            Image(systemName: "gear")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                                .onTapGesture {
+                                    openEditShortcutWindow(item: shortcut)
+                                }
                         }
                         .onDrag {
                             viewModel.draggingData = .init(size: shortcut.size, indexes: shortcut.indexes)
@@ -902,14 +914,26 @@ struct ShortcutsView: View {
                                             .frame(width: 46, height: 46)
                                             .cornerRadius(cornerRadius)
                                             .padding(.trailing, 8)
+                                            .onTapGesture {
+                                                openEditAppsWindow(item: app)
+                                            }
                                         Text(app.title)
                                             .padding(.vertical, 6.0)
+                                            .onTapGesture {
+                                                openEditAppsWindow(item: app)
+                                            }
                                     }
                                     .onDrag {
                                         viewModel.draggingData = .init(size: app.size, indexes: app.indexes)
                                         return NSItemProvider(object: app.id as NSString)
                                     }
                                     Spacer()
+                                    Image(systemName: "gear")
+                                        .resizable()
+                                        .frame(width: 16, height: 16)
+                                        .onTapGesture {
+                                            openEditAppsWindow(item: app)
+                                        }
                                     if let automation = viewModel.appHasAutomation(path: app.path ?? "") {
                                         ProminentButtonView("Automation") {
                                             openAutomationItemWindow(automation)

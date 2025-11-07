@@ -106,6 +106,9 @@ struct WebpagesWindowView: View {
                             .clipShape(
                                 RoundedRectangle(cornerRadius: Constants.cornerRadius)
                             )
+                            .onTapGesture {
+                                openCreateNewWebpageWindow(item: item)
+                            }
                     } else if let link = item.faviconLink, let url = URL(string: link) {
                         AsyncImage(url: url,
                                    content: { image in
@@ -114,11 +117,17 @@ struct WebpagesWindowView: View {
                                 .scaledToFit()
                                 .cornerRadius(Constants.cornerRadius)
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                .onTapGesture {
+                                    openCreateNewWebpageWindow(item: item)
+                                }
                         }, placeholder: {
                             Image("Empty")
                                 .resizable()
                                 .cornerRadius(Constants.cornerRadius)
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                .onTapGesture {
+                                    openCreateNewWebpageWindow(item: item)
+                                }
                         })
                         .cornerRadius(Constants.cornerRadius)
                         .frame(width: Constants.imageSize, height: Constants.imageSize)
@@ -129,9 +138,15 @@ struct WebpagesWindowView: View {
                                 .scaledToFit()
                                 .cornerRadius(Constants.cornerRadius)
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                .onTapGesture {
+                                    openCreateNewWebpageWindow(item: item)
+                                }
                         }
                     }
                     Text(item.title.isEmpty ? item.path ?? "Untitled" : item.title)
+                        .onTapGesture {
+                            openCreateNewWebpageWindow(item: item)
+                        }
                 }
                 .onDrag {
                     viewModel.draggingData = .init(size: item.size, indexes: item.indexes)

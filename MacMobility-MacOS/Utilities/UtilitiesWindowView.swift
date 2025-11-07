@@ -163,6 +163,9 @@ struct UtilitiesWindowView: View {
                             .scaledToFit()
                             .cornerRadius(Constants.cornerRadius)
                             .frame(width: Constants.imageSize, height: Constants.imageSize)
+                            .onTapGesture {
+                                openEditUtilityWindow(item: item)
+                            }
                     } else if let link = item.faviconLink, let url = URL(string: link) {
                         AsyncImage(url: url,
                                    content: { image in
@@ -171,11 +174,17 @@ struct UtilitiesWindowView: View {
                                 .scaledToFit()
                                 .cornerRadius(Constants.cornerRadius)
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                .onTapGesture {
+                                    openEditUtilityWindow(item: item)
+                                }
                         }, placeholder: {
                             Image("Empty")
                                 .resizable()
                                 .cornerRadius(Constants.cornerRadius)
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                .onTapGesture {
+                                    openEditUtilityWindow(item: item)
+                                }
                         })
                         .cornerRadius(Constants.cornerRadius)
                         .frame(width: Constants.imageSize, height: Constants.imageSize)
@@ -186,9 +195,15 @@ struct UtilitiesWindowView: View {
                                 .scaledToFit()
                                 .cornerRadius(Constants.cornerRadius)
                                 .frame(width: Constants.imageSize, height: Constants.imageSize)
+                                .onTapGesture {
+                                    openEditUtilityWindow(item: item)
+                                }
                         }
                     }
                     Text(item.title)
+                        .onTapGesture {
+                            openEditUtilityWindow(item: item)
+                        }
                 }
                 .onDrag {
                     viewModel.draggingData = .init(size: item.size, indexes: item.indexes)
