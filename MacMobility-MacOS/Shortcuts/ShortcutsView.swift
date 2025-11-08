@@ -626,8 +626,11 @@ struct ShortcutsView: View {
                         .if(object.size == ItemSize.size1x1.cgSize) {
                             $0.frame(width: 70.0, height: 70.0)
                         }
-                        .if(object.size != ItemSize.size1x1.cgSize) {
-                            $0.frame(width: size.width, height: size.height)
+                        .if(object.size == ItemSize.size2x2.cgSize) {
+                            $0.frame(width: size.width + 20, height: size.height + 20)
+                        }
+                        .if(object.size == ItemSize.size3x3.cgSize) {
+                            $0.frame(width: size.width + 42.0, height: size.height + 42.0)
                         }
                         .scaledToFit()
                         .clipShape(
